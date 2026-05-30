@@ -1,65 +1,46 @@
-import Image from "next/image";
+import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
 
-export default function Home() {
+export default async function Dashboard() {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+
+  const name = user?.user_metadata?.full_name?.split(' ')[0] || 'Spieler'
+
+  const nav = [
+    { href: '/profil', label: 'Profil', sub: 'ELO, Level, Statistiken', icon: '👤', color: '#FF00C8', live: true },
+    { href: '/liga', label: 'Liga', sub: 'Stadtweise Saisons', icon: '🏆', color: '#4ADE80', live: false },
+    { href: '/turniere', label: 'Turniere', sub: 'Anmelden & mitspielen', icon: '⚔️', color: '#FACC15', live: false },
+    { href: '/match', label: 'Find a Match', sub: 'Spontan mitspielen', icon: '🎯', color: '#60A5FA', live: false },
+  ]
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main style={{ minHeight: '100vh', background: '#0A0A0C', padding: '0 0 40px' }}>
+      <header style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '700px', margin: '0 auto' }}>
+        <p style={{ fontSize: '11px', fontWeight: 700, color: '#FF00C8', letterSpacing: '0.14em', textTransform: 'uppercase' }}>Ping Pong Lounge</p>
+        <Link href="/profil" style={{ fontSize: '13px', color: '#6B6E7A', textDecoration: 'none' }}>{name} →</Link>
+      </header>
+      <section style={{ maxWidth: '700px', margin: '0 auto', padding: '48px 20px 0', textAlign: 'center' }}>
+        <h1 style={{ fontSize: 'clamp(36px,8vw,60px)', fontWeight: 900, textTransform: 'uppercase', lineHeight: 0.95, marginBottom: '8px', color: '#FFF9F3' }}>Hey {name}</h1>
+        <p style={{ fontSize: '15px', color: '#6B6E7A', marginBottom: '48px' }}>Bereit zu spielen?</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          {nav.map(item => (
+            <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
+              <div style={{ background: '#0D0E12', border: '1px solid #26282E', borderRadius: '14px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', opacity: item.live ? 1 : 0.55 }}>
+                <span style={{ fontSize: '28px' }}>{item.icon}</span>
+                <div style={{ flex: 1, textAlign: 'left' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <p style={{ fontSize: '17px', fontWeight: 700, color: '#FFF9F3', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{item.label}</p>
+                    {item.live ? <span style={{ fontSize: '9px', fontWeight: 700, color: item.color, background: `${item.color}20`, borderRadius: '999px', padding: '2px 7px' }}>LIVE</span> : <span style={{ fontSize: '9px', fontWeight: 700, color: '#6B6E7A', background: '#1A1B1F', borderRadius: '999px', padding: '2px 7px' }}>Q3 2026</span>}
+                  </div>
+                  <p style={{ fontSize: '13px', color: '#6B6E7A', marginTop: '2px' }}>{item.sub}</p>
+                </div>
+                <span style={{ color: item.color, fontSize: '18px' }}>→</span>
+              </div>
+            </Link>
+          ))}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
-  );
+      </section>
+    </main>
+  )
 }
