@@ -87,7 +87,7 @@ const S = {
   sub: { fontSize: "14px", color: "#6B6E7A", marginBottom: "28px", lineHeight: 1.6 },
   input: { width: "100%", background: "#0D0E12", border: "1px solid #26282E", borderRadius: "10px", padding: "14px 16px", fontSize: "15px", color: "#FFF9F3", outline: "none", marginBottom: "10px", boxSizing: "border-box" as const },
   btn: (disabled = false) => ({ width: "100%", background: disabled ? "#26282E" : "#FF00C8", color: disabled ? "#6B6E7A" : "#0A0A0C", border: "none", borderRadius: "10px", padding: "15px", fontSize: "14px", fontWeight: 700, cursor: disabled ? "not-allowed" : "pointer", textTransform: "uppercase" as const, letterSpacing: "0.06em", marginTop: "8px" } as React.CSSProperties),
-  opt: (selected: boolean) => ({ width: "100%", background: selected ? "rgba(255,0,200,0.1)" : "#0D0E12", border: selected ? "1px solid #FF00C8" : "1px solid #26282E", borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: selected ? "#FF00C8" : "#FFF9F3", cursor: "pointer", textAlign: "left" as const, marginBottom: "8px", fontWeight: selected ? 700 : 400, display: "block", width: "100%" } as React.CSSProperties),
+  opt: (selected: boolean) => ({ width: "100%", background: selected ? "rgba(255,0,200,0.1)" : "#0D0E12", border: selected ? "1px solid #FF00C8" : "1px solid #26282E", borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: selected ? "#FF00C8" : "#FFF9F3", cursor: "pointer", textAlign: "left" as const, marginBottom: "8px", fontWeight: selected ? 700 : 400 } as React.CSSProperties),
 }
 
 export default function OnboardingPage() {
