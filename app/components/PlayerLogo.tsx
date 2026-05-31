@@ -1,60 +1,65 @@
 "use client"
 
 interface PlayerLogoProps {
-  width?: string
+  size?: "sm" | "md" | "lg"
   showTagline?: boolean
 }
 
-export default function PlayerLogo({ width = "220px", showTagline = false }: PlayerLogoProps) {
+export default function PlayerLogo({ size = "md", showTagline = false }: PlayerLogoProps) {
+  const iconSize = size === "sm" ? 48 : size === "lg" ? 80 : 64
+  const textSize = size === "sm" ? "28px" : size === "lg" ? "48px" : "38px"
+  const tagSize  = size === "sm" ? "9px"  : size === "lg" ? "13px" : "11px"
+  const G = "#39FF14"
+
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
-      <div style={{ display: "flex", alignItems: "flex-end", gap: "10px" }}>
-        {/* P-Paddle + Ball — SVG */}
-        <svg
-          viewBox="0 0 70 78"
+
+      {/* P-Mark Icon — outline P + solid dot */}
+      <svg
+        width={iconSize}
+        height={iconSize}
+        viewBox="0 0 56 72"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {/* P shape — single path, stroke only */}
+        <path
+          d="M13 66 L13 8 L30 8 C45 8 50 16 50 26 C50 36 45 44 30 44 L13 44"
+          stroke={G}
+          strokeWidth="5.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          style={{ height: "52px", width: "auto", flexShrink: 0 }}
-        >
-          {/* P-Paddle solid */}
-          <path
-            d="M6 72L6 8L32 8C47 8 56 18 56 36C56 54 47 64 32 64L20 64L20 72Z"
-            fill="#39FF14"
-          />
-          {/* Ball */}
-          <circle cx="64" cy="68" r="7" fill="#39FF14" />
-        </svg>
+        />
+        {/* Dot */}
+        <circle cx="50" cy="64" r="7" fill={G} />
+      </svg>
 
-        {/* PLAYER — Outline Text via CSS */}
-        <span
-          style={{
-            fontSize: "52px",
-            fontWeight: 900,
-            lineHeight: 1,
-            fontFamily: "'League Spartan', system-ui, sans-serif",
-            letterSpacing: "1px",
-            color: "transparent",
-            WebkitTextStroke: "2px #39FF14",
-            textTransform: "uppercase",
-            userSelect: "none",
-            paddingBottom: "4px",
-          }}
-        >
-          PLAYER
-        </span>
-      </div>
+      {/* PLAYER — solid bold */}
+      <span style={{
+        fontSize: textSize,
+        fontWeight: 900,
+        color: G,
+        letterSpacing: "3px",
+        textTransform: "uppercase",
+        lineHeight: 1,
+        fontFamily: "'League Spartan', system-ui, sans-serif",
+        userSelect: "none",
+      }}>
+        PLAYER
+      </span>
 
+      {/* Tagline */}
       {showTagline && (
-        <p style={{
-          fontSize: "10px",
+        <span style={{
+          fontSize: tagSize,
           fontWeight: 700,
           color: "#7B7E8A",
-          letterSpacing: "0.18em",
+          letterSpacing: "0.2em",
           textTransform: "uppercase",
-          margin: 0,
         }}>
           by Ping Pong Lounge
-        </p>
+        </span>
       )}
     </div>
   )
