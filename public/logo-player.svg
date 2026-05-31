@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80" fill="none">
+  <!-- P-Paddle solid -->
+  <path d="M 6 68 L 6 12 L 30 12 C 44 12 52 20 52 34 C 52 48 44 56 30 56 L 22 56 L 22 68 Z" fill="#39FF14"/>
+  <!-- Ball -->
+  <circle cx="62" cy="64" r="7" fill="#39FF14"/>
+  <!-- PLAYER outline wordmark -->
+  <text x="76" y="66" font-family="'League Spartan', system-ui, sans-serif" font-size="58" font-weight="900" letter-spacing="2" fill="none" stroke="#39FF14" stroke-width="2.2" paint-order="stroke">PLAYER</text>
+</svg>
