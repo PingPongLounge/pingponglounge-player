@@ -66,7 +66,7 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
           letterSpacing: "0.2em",
           textTransform: "uppercase" as const,
         }}>
-          by Ping Pong Lounge
+          The Next Level of Table Tennis
         </span>
       )}
     </div>
