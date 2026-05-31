@@ -8,10 +8,10 @@ export default async function Dashboard() {
   const name = user?.user_metadata?.full_name?.split(' ')[0] || 'Spieler'
 
   const nav = [
-    { href: '/profil', label: 'Profil', sub: 'ELO, Level, Statistiken', icon: '👤', color: '#FF00C8', live: true },
-    { href: '/liga', label: 'Liga', sub: 'Stadtweise Saisons', icon: '🏆', color: '#4ADE80', live: false },
-    { href: '/turniere', label: 'Turniere', sub: 'Anmelden & mitspielen', icon: '⚔️', color: '#FACC15', live: false },
-    { href: '/match', label: 'Find a Match', sub: 'Spontan mitspielen', icon: '🎯', color: '#60A5FA', live: false },
+    { href: '/profil', label: 'Profil', sub: 'ELO, Level, Statistiken', svg: '<circle cx=12 cy=8 r=4/><path d=M6 20v-2a6 6 0 0 1 12 0v2/>', color: '#FF00C8', live: true },
+    { href: '/liga', label: 'Liga', sub: 'Stadtweise Saisons', svg: '<path d=M7 4h10v5a5 5 0 0 1-10 0Z/><path d=M7 6H4v1a3 3 0 0 0 3 3/><path d=M17 6h3v1a3 3 0 0 1-3 3/><path d=M9.5 20h5/><path d=M12 14v4/>', color: '#FFF9F3', live: false },
+    { href: '/turniere', label: 'Turniere', sub: 'Anmelden & mitspielen', svg: '<rect x=3 y=3 width=18 height=4 rx=1/><rect x=3 y=10 width=18 height=4 rx=1/><rect x=3 y=17 width=18 height=4 rx=1/>', color: '#FFF9F3', live: false },
+    { href: '/match', label: 'Find a Match', sub: 'Spontan mitspielen', svg: '<circle cx=12 cy=12 r=9/><circle cx=12 cy=12 r=4/><circle cx=12 cy=12 r=1 fill=currentColor/>', color: '#FFF9F3', live: false },
   ]
 
   return (
@@ -27,7 +27,7 @@ export default async function Dashboard() {
           {nav.map(item => (
             <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
               <div style={{ background: '#0D0E12', border: '1px solid #26282E', borderRadius: '14px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', opacity: item.live ? 1 : 0.55 }}>
-                <span style={{ fontSize: '28px' }}>{item.icon}</span>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={item.color} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: item.svg }} />
                 <div style={{ flex: 1, textAlign: 'left' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <p style={{ fontSize: '17px', fontWeight: 700, color: '#FFF9F3', textTransform: 'uppercase', letterSpacing: '0.04em' }}>{item.label}</p>
