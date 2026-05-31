@@ -19,7 +19,14 @@ function genNicks(): string[] {
   return result
 }
 
-const LOCATIONS = ["Oerlikon", "Glattbrugg", "Langstrasse", "Basel", "Luzern", "St. Gallen"]
+const LOCATIONS = [
+  "Aargau","Appenzell Ausserrhoden","Appenzell Innerrhoden",
+  "Basel-Landschaft","Basel-Stadt","Bern","Freiburg","Genf",
+  "Glarus","Graubünden","Jura","Luzern","Neuenburg",
+  "Nidwalden","Obwalden","Schaffhausen","Schwyz",
+  "Solothurn","St. Gallen","Tessin","Thurgau","Uri",
+  "Waadt","Wallis","Zug","Zürich"
+]
 
 const LEVELS = [
   { name: "Locker", color: "#4ADE80", desc: "Einsteiger & Neueinsteiger", elo: 1000 },
@@ -168,7 +175,7 @@ export default function OnboardingPage() {
         </div>
       )}
       <select style={S.input} value={location} onChange={e => setLocation(e.target.value)}>
-        <option value="">Heimstandort wählen...</option>
+        <option value="">Kanton wählen...</option>
         {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
       </select>
       <button style={S.btn(!name.trim() || !location)} disabled={!name.trim() || !location} onClick={() => setStep(1)}>Weiter</button>
