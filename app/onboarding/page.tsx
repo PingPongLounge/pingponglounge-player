@@ -3,6 +3,22 @@ import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
 
+
+const NICK_PARTS = {
+  pre: ["Spin","Loop","Slice","Smash","Top","Quick","Ghost","Iron","Fire","Swift","Turbo","Power","Sharp","Ping","Ace"],
+  suf: ["Master","King","Pro","Wolf","Fox","Hawk","Storm","Blade","Force","Drive","Shot","Hero","Bull","Ace","Play"]
+}
+function genNicks(): string[] {
+  const result: string[] = []
+  while (result.length < 3) {
+    const p = NICK_PARTS.pre[Math.floor(Math.random()*NICK_PARTS.pre.length)]
+    const s = NICK_PARTS.suf[Math.floor(Math.random()*NICK_PARTS.suf.length)]
+    const n = p + s
+    if (!result.includes(n)) result.push(n)
+  }
+  return result
+}
+
 const LOCATIONS = ["Oerlikon", "Glattbrugg", "Langstrasse", "Basel", "Luzern", "St. Gallen"]
 
 const LEVELS = [
@@ -100,6 +116,7 @@ export default function OnboardingPage() {
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizScores, setQuizScores] = useState<number[]>([])
   const [saving, setSaving] = useState(false)
+  const [nicks, setNicks] = useState<string[]>([])
 
   const score = quizScores.reduce((a, b) => a + b, 0)
   const quizResult = calcLevel(score)
@@ -138,6 +155,18 @@ export default function OnboardingPage() {
       <h1 style={S.title}>Dein Profil</h1>
       <p style={S.sub}>Kurz einrichten — dann kann es losgehen.</p>
       <input style={S.input} placeholder="Dein Name / Spitzname" value={name} onChange={e => setName(e.target.value)} />
+      <button type="button" onClick={() => setNicks(genNicks())} style={{ background: "none", border: "1px solid #26282E", borderRadius: "8px", padding: "8px 14px", fontSize: "12px", color: "#6B6E7A", cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em" }}>
+        Vorschläge generieren
+      </button>
+      {nicks.length > 0 && (
+        <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
+          {nicks.map(n => (
+            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? "rgba(255,0,200,0.12)" : "#0D0E12", border: name === n ? "1px solid #FF00C8" : "1px solid #26282E", borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: name === n ? "#FF00C8" : "#FFF9F3", cursor: "pointer", fontWeight: name === n ? 700 : 400 }}>
+              {n}
+            </button>
+          ))}
+        </div>
+      )}
       <select style={S.input} value={location} onChange={e => setLocation(e.target.value)}>
         <option value="">Heimstandort wählen...</option>
         {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
