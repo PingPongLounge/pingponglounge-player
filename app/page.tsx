@@ -1,99 +1,162 @@
-import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
-import LogoutButton from './components/LogoutButton'
 
-export default async function Dashboard() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  const { data: profile } = await supabase.from('profiles').select('id,name,level,elo,matches_played').eq('id', user?.id ?? '').single()
-  if (!profile) redirect('/onboarding')
+export const metadata = {
+  title: 'Player — Dein Tischtennis-Hub',
+  description: 'Finde Mitspieler, spiel in der Liga und verfolge dein ELO-Ranking. by Ping Pong Lounge.',
+}
 
-  const name = profile?.name?.split(' ')[0] || 'Spieler'
-  const elo = profile?.elo ?? 1000
-  const level = profile?.level ?? 'Hobby'
-  const matchesPlayed = profile?.matches_played ?? 0
+const G = '#39FF14'
+const DARK = '#0A0A0C'
+const SURFACE = '#111214'
+const BORDER = '#26282E'
+const MUTED = '#6B6E7A'
+const TEXT = '#E8E6E1'
 
-  const DARK = "#0A0A0C"
-  const CARD = "#15161A"
-  const BORDER = "#26282E"
-  const TEXT = "#E8E6E1"
-  const MUTED = "#6B6E7A"
-  const G = "#39FF14"
+function Logo({ width = '220px' }: { width?: string }) {
+  return (
+    <svg viewBox="0 0 360 80" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width, height: 'auto' }}>
+      <path d="M 6 68 L 6 12 L 30 12 C 44 12 52 20 52 34 C 52 48 44 56 30 56 L 22 56 L 22 68 Z" fill={G}/>
+      <circle cx="62" cy="64" r="7" fill={G}/>
+      <text x="76" y="66" fontFamily="'League Spartan', system-ui, sans-serif" fontSize="58" fontWeight="900" letterSpacing="2" fill="none" stroke={G} strokeWidth="2.2" paintOrder="stroke">PLAYER</text>
+    </svg>
+  )
+}
+
+const FEATURES = [
+  {
+    title: 'Find a Match',
+    sub: 'Offene Spiele in deiner Nähe finden — nach Level gefiltert, sofort beitreten.',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>
+      </svg>
+    ),
+  },
+  {
+    title: 'Liga & Saisons',
+    sub: 'Stadtweise Ligen, Live-Tabelle, Auf- und Abstieg — saisonbasiert in Zürich, Basel, Luzern und mehr.',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>
+      </svg>
+    ),
+  },
+  {
+    title: 'Turniere',
+    sub: 'Anmelden, live mitspielen, Bracket per QR-Code — Ergebnis direkt am Tisch eingeben.',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 6H4v1a3 3 0 0 0 3 3"/><path d="M17 6h3v1a3 3 0 0 1-3 3"/><path d="M9.5 20h5"/><path d="M12 14v4"/>
+      </svg>
+    ),
+  },
+  {
+    title: 'ELO-Ranking',
+    sub: 'Dein persönliches Rating wächst mit jedem Match. Locker → Hobby → Fortgeschritten → Competitive.',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
+      </svg>
+    ),
+  },
+]
+
+const STEPS = [
+  { n: '1', title: 'Konto erstellen', sub: 'Mit Google oder Email — kein Passwort nötig. Dauert 60 Sekunden.' },
+  { n: '2', title: 'Level bestimmen', sub: '7 kurze Fragen — wir finden deinen Level automatisch und vergeben ein Start-ELO.' },
+  { n: '3', title: 'Spielen & aufsteigen', sub: 'Spiele finden, Liga beitreten, ELO sammeln. Alles direkt im Browser.' },
+]
+
+export default function LandingPage() {
+  const wrap: React.CSSProperties = { maxWidth: '480px', margin: '0 auto', padding: '0 20px' }
+  const divider: React.CSSProperties = { borderTop: `0.5px solid ${BORDER}` }
 
   return (
-    <main style={{ minHeight: '100vh', background: DARK }}>
+    <main style={{ background: DARK, minHeight: '100vh', color: TEXT }}>
 
-      {/* Header */}
-      <header style={{ padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '640px', margin: '0 auto', borderBottom: '1px solid ' + BORDER }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <svg width="20" height="20" viewBox="0 0 32 32" fill="none">
-            <circle cx="14" cy="14" r="11" fill="rgba(57,255,20,0.1)" stroke={G} strokeWidth="1.5"/>
-            <circle cx="14" cy="14" r="2" fill={G}/>
-            <rect x="22" y="20" width="7" height="3" rx="1.5" fill={G} transform="rotate(-40 22 20)"/>
-          </svg>
-          <span style={{ fontSize: '13px', fontWeight: 800, color: TEXT, textTransform: 'uppercase', letterSpacing: '0.08em' }}>PLAYER</span>
+      {/* ── HERO ── */}
+      <section style={{ ...wrap, paddingTop: '64px', paddingBottom: '48px', textAlign: 'center' }}>
+        <p style={{ fontSize: '10px', fontWeight: 700, color: MUTED, letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '20px' }}>
+          by Ping Pong Lounge
+        </p>
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
+          <Logo width="230px" />
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <Link href="/profil" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
-          <div style={{ background: CARD, border: '1px solid ' + BORDER, borderRadius: '999px', padding: '6px 12px', fontSize: '12px', color: MUTED }}>
-            {name}
-          </div>
+        <p style={{ fontSize: '15px', color: MUTED, lineHeight: 1.6, marginBottom: '36px', maxWidth: '320px', margin: '0 auto 36px' }}>
+          Finde Mitspieler · Spiel in der Liga<br />Verfolge dein ELO-Ranking
+        </p>
+        <Link href="/login" style={{ display: 'block', background: G, color: DARK, borderRadius: '10px', padding: '15px', fontSize: '14px', fontWeight: 700, textAlign: 'center', letterSpacing: '0.06em', textTransform: 'uppercase', textDecoration: 'none', marginBottom: '10px' }}>
+          Kostenlos starten →
         </Link>
-        <LogoutButton />
+        <Link href="/login" style={{ display: 'block', background: 'none', border: `1px solid ${BORDER}`, color: MUTED, borderRadius: '10px', padding: '12px', fontSize: '12px', textAlign: 'center', letterSpacing: '0.04em', textTransform: 'uppercase', textDecoration: 'none' }}>
+          Bereits registriert? Einloggen
+        </Link>
+      </section>
+
+      {/* ── STATS ── */}
+      <div style={{ ...divider, background: SURFACE }}>
+        <div style={{ ...wrap, display: 'grid', gridTemplateColumns: '1fr 1fr 1fr' }}>
+          {[
+            { n: '6', l: 'Standorte' },
+            { n: '4', l: 'Levels' },
+            { n: 'CH', l: 'Schweiz' },
+          ].map(s => (
+            <div key={s.l} style={{ padding: '20px 8px', textAlign: 'center', borderRight: `0.5px solid ${BORDER}` }}>
+              <div style={{ fontSize: '24px', fontWeight: 900, color: G, lineHeight: 1 }}>{s.n}</div>
+              <div style={{ fontSize: '11px', color: MUTED, marginTop: '4px', letterSpacing: '0.04em' }}>{s.l}</div>
+            </div>
+          ))}
+        </div>
       </div>
-      </header>
 
-      {/* ELO Hero */}
-      <section style={{ maxWidth: '640px', margin: '0 auto', padding: '40px 20px 24px', textAlign: 'center' }}>
-        <p style={{ fontSize: '11px', fontWeight: 700, color: MUTED, letterSpacing: '0.16em', textTransform: 'uppercase', marginBottom: '8px' }}>Dein Rating</p>
-        <div style={{ fontSize: '72px', fontWeight: 900, color: G, lineHeight: 1, marginBottom: '4px', letterSpacing: '-0.03em' }}>{elo}</div>
-        <p style={{ fontSize: '13px', color: MUTED }}>ELO · {level} · {matchesPlayed} Matches</p>
-      </section>
-
-      {/* Nav Cards */}
-      <section style={{ maxWidth: '640px', margin: '0 auto', padding: '0 20px 40px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-
-        <Link href="/profil" style={{ textDecoration: 'none' }}>
-          <div style={{ background: CARD, border: '1px solid ' + BORDER, borderRadius: '12px', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(57,255,20,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
-              </svg>
-            </div>
-            <div style={{ flex: 1 }}>
-              <p style={{ fontSize: '14px', fontWeight: 800, color: TEXT, textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '2px' }}>Profil</p>
-              <p style={{ fontSize: '12px', color: MUTED }}>ELO-Verlauf, Level, Statistiken</p>
-            </div>
-            <span style={{ color: G, fontSize: '16px', fontWeight: 700 }}>→</span>
-          </div>
-        </Link>
-
-        {[
-          { href: '/liga', label: 'Liga', sub: 'Stadtweise Saisons · Auf-/Abstieg · Live-Tabelle', icon: '<path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M7 6H4v1a3 3 0 0 0 3 3"/><path d="M17 6h3v1a3 3 0 0 1-3 3"/><path d="M9.5 20h5"/><path d="M12 14v4"/>' },
-          { href: '/turniere', label: 'Turniere', sub: 'Community Turniere · Gruppenphase · QR-Resultate', icon: '<rect x="3" y="3" width="18" height="4" rx="1"/><rect x="3" y="10" width="18" height="4" rx="1"/><rect x="3" y="17" width="18" height="4" rx="1"/>' },
-          { href: '/match', label: 'Find a Match', sub: 'Spontan mitspielen · Gegner nach Level finden', icon: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1" fill="#6B6E7A" stroke="none"/>' },
-        ].map(item => (
-          <div key={item.href} style={{ background: CARD, border: '1px solid ' + BORDER, borderRadius: '12px', padding: '18px 20px', display: 'flex', alignItems: 'center', gap: '16px', opacity: 0.45 }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: 'rgba(255,255,255,0.04)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6B6E7A" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: item.icon }} />
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '2px' }}>
-                <p style={{ fontSize: '14px', fontWeight: 800, color: TEXT, textTransform: 'uppercase', letterSpacing: '0.06em' }}>{item.label}</p>
-                <span style={{ fontSize: '9px', fontWeight: 700, color: MUTED, background: '#1A1B1F', borderRadius: '999px', padding: '2px 7px', letterSpacing: '0.08em' }}>Q3 2026</span>
+      {/* ── FEATURES ── */}
+      <section style={{ ...wrap, paddingTop: '40px', paddingBottom: '40px', ...divider }}>
+        <p style={{ fontSize: '10px', fontWeight: 700, color: G, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '24px' }}>Was du bekommst</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {FEATURES.map(f => (
+            <div key={f.title} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+              <div style={{ width: '38px', height: '38px', borderRadius: '10px', background: SURFACE, border: `0.5px solid ${BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {f.icon}
               </div>
-              <p style={{ fontSize: '12px', color: MUTED }}>{item.sub}</p>
+              <div>
+                <p style={{ fontSize: '13px', fontWeight: 700, color: TEXT, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '4px' }}>{f.title}</p>
+                <p style={{ fontSize: '12px', color: MUTED, lineHeight: 1.6 }}>{f.sub}</p>
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </section>
 
-      {/* Footer */}
-      <footer style={{ textAlign: 'center', padding: '20px', borderTop: '1px solid ' + BORDER }}>
-        <p style={{ fontSize: '11px', color: MUTED, letterSpacing: '0.1em', marginBottom: '10px' }}>PLAYER <span style={{ color: '#3A3C42' }}>·</span> by Ping Pong Lounge</p>
-        <a href='https://pingponglounge.ch' target='_blank' rel='noopener' style={{ fontSize: '12px', color: '#39FF14', textDecoration: 'none', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>↗ Zur Ping Pong Lounge</a>
-      </footer>
+      {/* ── HOW IT WORKS ── */}
+      <section style={{ ...wrap, paddingTop: '40px', paddingBottom: '40px', ...divider }}>
+        <p style={{ fontSize: '10px', fontWeight: 700, color: G, letterSpacing: '0.18em', textTransform: 'uppercase', marginBottom: '24px' }}>So einfach geht's</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {STEPS.map(s => (
+            <div key={s.n} style={{ display: 'flex', gap: '16px', alignItems: 'flex-start' }}>
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: G, color: DARK, fontSize: '13px', fontWeight: 900, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {s.n}
+              </div>
+              <div>
+                <p style={{ fontSize: '13px', fontWeight: 700, color: TEXT, marginBottom: '3px' }}>{s.title}</p>
+                <p style={{ fontSize: '12px', color: MUTED, lineHeight: 1.6 }}>{s.sub}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ── FOOTER CTA ── */}
+      <section style={{ ...wrap, paddingTop: '48px', paddingBottom: '64px', textAlign: 'center', ...divider }}>
+        <p style={{ fontSize: '22px', fontWeight: 900, color: TEXT, textTransform: 'uppercase', letterSpacing: '0.04em', marginBottom: '8px' }}>Bereit zu spielen?</p>
+        <p style={{ fontSize: '13px', color: MUTED, marginBottom: '28px' }}>Kostenlos · Kein Download · Direkt im Browser</p>
+        <Link href="/login" style={{ display: 'inline-block', background: G, color: DARK, borderRadius: '10px', padding: '15px 40px', fontSize: '14px', fontWeight: 700, textAlign: 'center', letterSpacing: '0.06em', textTransform: 'uppercase', textDecoration: 'none' }}>
+          Jetzt starten →
+        </Link>
+        <p style={{ fontSize: '11px', color: MUTED, marginTop: '20px' }}>
+          <a href="https://pingponglounge.ch" target="_blank" rel="noopener" style={{ color: G, textDecoration: 'none', fontWeight: 700 }}>↗ pingponglounge.ch</a>
+        </p>
+      </section>
+
     </main>
   )
 }
