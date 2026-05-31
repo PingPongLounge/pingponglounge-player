@@ -9,7 +9,7 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
   const iconSize = size === "sm" ? 48 : size === "lg" ? 80 : 64
   const textSize = size === "sm" ? "28px" : size === "lg" ? "48px" : "38px"
   const tagSize  = size === "sm" ? "9px"  : size === "lg" ? "13px" : "11px"
-  const G = "#39FF14"
+  const G = "#FFF9F3"
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
