@@ -29,7 +29,7 @@ export default function LoginPage() {
           <PlayerLogo size="lg" showTagline />
         </div>
 
-        <button onClick={signInWithGoogle} style={{ width: "100%", background: "#fff", color: "#0A0A0C", border: "none", borderRadius: "10px", padding: "15px", fontSize: "14px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginBottom: "14px", fontFamily: "inherit" }}>
+        <button onClick={signInWithGoogle} style={{ width: "100%", background: "#fff", color: "#0A0A0C", border: "none", borderRadius: "10px", padding: "10px 20px", fontSize: "13px", fontWeight: 600, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: "10px", marginBottom: "14px", fontFamily: "inherit" }}>
           <svg width="18" height="18" viewBox="0 0 24 24">
             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
             <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
@@ -58,7 +58,7 @@ export default function LoginPage() {
         ) : (
           <form onSubmit={handleLogin} style={{ display: "flex", flexDirection: "column", gap: "10px", width: "100%" }}>
             <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="deine@email.ch" required style={{ width: "100%", background: "#111214", border: "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "15px", color: "#E8E6E1", outline: "none", boxSizing: "border-box" as const, fontFamily: "inherit" }} />
-            <button type="submit" disabled={loading} style={{ width: "100%", background: G, color: "#0A0A0C", border: "none", borderRadius: "10px", padding: "15px", fontSize: "14px", fontWeight: 700, cursor: "pointer", textTransform: "uppercase" as const, letterSpacing: "0.06em", fontFamily: "inherit" }}>
+            <button type="submit" disabled={loading} style={{ width: "100%", background: G, color: '#FFFFFF', border: "none", borderRadius: "10px", padding: "10px 20px", fontSize: "13px", fontWeight: 700, cursor: "pointer", textTransform: "uppercase" as const, letterSpacing: "0.06em", fontFamily: "inherit" }}>
               {loading ? "Wird gesendet..." : "Login Link senden"}
             </button>
           </form>
