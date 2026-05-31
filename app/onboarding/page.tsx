@@ -124,6 +124,7 @@ export default function OnboardingPage() {
   const [quizScores, setQuizScores] = useState<number[]>([])
   const [saving, setSaving] = useState(false)
   const [nicks, setNicks] = useState<string[]>([])
+  const [loadingNicks, setLoadingNicks] = useState(false)
 
   const score = quizScores.reduce((a, b) => a + b, 0)
   const quizResult = calcLevel(score)
@@ -162,9 +163,14 @@ export default function OnboardingPage() {
       <h1 style={S.title}>Dein Profil</h1>
       <p style={S.sub}>Kurz einrichten — dann kann es losgehen.</p>
       <input style={S.input} placeholder="Dein Name / Spitzname" value={name} onChange={e => setName(e.target.value)} />
-      <button type="button" onClick={() => setNicks(genNicks())} style={{ background: "none", border: "1px solid #26282E", borderRadius: "8px", padding: "8px 14px", fontSize: "12px", color: "#6B6E7A", cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em" }}>
-        Vorschläge generieren
-      </button>
+      <button type="button" onClick={async () => {
+          setLoadingNicks(true)
+          const supabase = createClient()
+          const { data } = await supabase.from("profiles").select("name")
+          const taken = (data || []).map((p: {name: string}) => p.name)
+          setNicks(genNicks(taken))
+          setLoadingNicks(false)
+        }} style={{ background: "none", border: "1px solid #26282E", borderRadius: "8px", padding: "8px 14px", fontSize: "12px", color: "#6B6E7A", cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em" }}>{loadingNicks ? "..." : "Vorschläge generieren"}</button>
       {nicks.length > 0 && (
         <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
           {nicks.map(n => (
