@@ -1,25 +1,23 @@
 "use client"
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
-import { useRouter } from "next/navigation"
 
+const G = "#39FF14"
+const DARK = "#0A0A0C"
+const SURFACE = "#111214"
+const CARD = "#15161A"
+const BORDER = "#26282E"
+const TEXT = "#E8E6E1"
+const MUTED = "#6B6E7A"
 
-const NICK_PARTS = {
-  pre: ["Spin","Loop","Slice","Smash","Top","Quick","Ghost","Iron","Fire","Swift","Turbo","Power","Sharp","Ping","Ace"],
-  suf: ["Master","King","Pro","Wolf","Fox","Hawk","Storm","Blade","Force","Drive","Shot","Hero","Bull","Ace","Play"]
-}
-function genNicks(): string[] {
-  const result: string[] = []
-  while (result.length < 3) {
-    const p = NICK_PARTS.pre[Math.floor(Math.random()*NICK_PARTS.pre.length)]
-    const s = NICK_PARTS.suf[Math.floor(Math.random()*NICK_PARTS.suf.length)]
-    const n = p + s
-    if (!result.includes(n)) result.push(n)
-  }
-  return result
-}
+const LEVELS = [
+  { name: "Locker", color: "#3FA9FF", desc: "Einsteiger, spiele zum Spass", elo: 1000 },
+  { name: "Hobby", color: "#2FD08A", desc: "Regelmässiger Freizeitspieler", elo: 1100 },
+  { name: "Fortgeschritten", color: "#FF9F2E", desc: "Vereinserfahrung & Taktik", elo: 1300 },
+  { name: "Competitive", color: G, desc: "Turnierspieler & Wettkampf", elo: 1500 },
+]
 
-const LOCATIONS = [
+const CANTONS = [
   "Aargau","Appenzell Ausserrhoden","Appenzell Innerrhoden",
   "Basel-Landschaft","Basel-Stadt","Bern","Freiburg","Genf",
   "Glarus","Graubünden","Jura","Luzern","Neuenburg",
@@ -28,71 +26,41 @@ const LOCATIONS = [
   "Waadt","Wallis","Zug","Zürich"
 ]
 
-const LEVELS = [
-  { name: "Locker", color: "#4ADE80", desc: "Einsteiger & Neueinsteiger", elo: 1000 },
-  { name: "Hobby", color: "#FACC15", desc: "Regelmässiger Freizeitspieler", elo: 1100 },
-  { name: "Fortgeschritten", color: "#FB923C", desc: "Vereinserfahrung & Taktik", elo: 1300 },
-  { name: "Competitive", color: "#FF00C8", desc: "Turnierspieler & Wettkampf", elo: 1500 },
+const QUIZ = [
+  { q: "Wie lange spielst du schon Tischtennis?",
+    opts: [{ l: "Unter 6 Monate", p: 0 },{ l: "6 Monate – 2 Jahre", p: 1 },{ l: "2 – 5 Jahre", p: 2 },{ l: "Mehr als 5 Jahre", p: 3 }] },
+  { q: "Kannst du Topspin Vorhand spielen?",
+    opts: [{ l: "Ja, sicher", p: 2 },{ l: "Manchmal", p: 1 },{ l: "Nein", p: 0 }] },
+  { q: "Kannst du Topspin Rückhand spielen?",
+    opts: [{ l: "Ja, sicher", p: 2 },{ l: "Manchmal", p: 1 },{ l: "Nein", p: 0 }] },
+  { q: "Kannst du Backspin (Unterschnitt) spielen?",
+    opts: [{ l: "Ja, gezielt", p: 2 },{ l: "Manchmal", p: 1 },{ l: "Nein", p: 0 }] },
+  { q: "Kannst du Aufschläge mit Effet spielen?",
+    opts: [{ l: "Ja, verschiedene", p: 2 },{ l: "Einfache Varianten", p: 1 },{ l: "Nein", p: 0 }] },
+  { q: "Erkennst du den Spin deines Gegners?",
+    opts: [{ l: "Ja, meistens", p: 2 },{ l: "Manchmal", p: 1 },{ l: "Nein", p: 0 }] },
+  { q: "Spielst du in einem Verein oder an Turnieren?",
+    opts: [{ l: "Ja, an Turnieren", p: 3 },{ l: "Ja, im Verein", p: 2 },{ l: "Nein", p: 0 }] },
 ]
 
-const QUIZ = [
-  {
-    question: "Wie lange spielst du schon Tischtennis?",
-    options: [
-      { label: "Weniger als 6 Monate", points: 0 },
-      { label: "6 Monate bis 2 Jahre", points: 1 },
-      { label: "2 bis 5 Jahre", points: 2 },
-      { label: "Mehr als 5 Jahre", points: 3 },
-    ]
-  },
-  {
-    question: "Kannst du Topspin mit der Vorhand spielen?",
-    options: [
-      { label: "Ja, sicher", points: 2 },
-      { label: "Manchmal", points: 1 },
-      { label: "Nein", points: 0 },
-    ]
-  },
-  {
-    question: "Kannst du Topspin auch mit der Rückhand spielen?",
-    options: [
-      { label: "Ja, sicher", points: 2 },
-      { label: "Manchmal", points: 1 },
-      { label: "Nein", points: 0 },
-    ]
-  },
-  {
-    question: "Kannst du Backspin (Unterschnitt) spielen?",
-    options: [
-      { label: "Ja, gezielt einsetzen", points: 2 },
-      { label: "Manchmal", points: 1 },
-      { label: "Nein", points: 0 },
-    ]
-  },
-  {
-    question: "Kannst du Aufschläge mit Effet (Spin) spielen?",
-    options: [
-      { label: "Ja, verschiedene Varianten", points: 2 },
-      { label: "Einfache Varianten", points: 1 },
-      { label: "Nein", points: 0 },
-    ]
-  },
-  {
-    question: "Erkennst du den Spin deines Gegners und passt dein Spiel an?",
-    options: [
-      { label: "Ja, meistens", points: 2 },
-      { label: "Manchmal", points: 1 },
-      { label: "Nein", points: 0 },
-    ]
-  },
-  {
-    question: "Spielst du in einem Verein oder an Turnieren?",
-    options: [
-      { label: "Ja, an Turnieren", points: 3 },
-      { label: "Ja, in einem Verein", points: 2 },
-      { label: "Nein", points: 0 },
-    ]
-  },
+const ALL_NICKS = [
+  "TopspinKing","LoopMaster","BackspinPro","DropShotAce","FlickKing",
+  "ChopLord","SmashHero","ServeAce","PaddleNinja","TableWizard",
+  "NetKiller","CarbonBlade","LoopLegend","SpinDoctor","PenholdPro",
+  "RallyGod","LobMaster","BlockWall","CounterLoop","DriveForce",
+  "EffetKing","SidespinPro","GhostServe","MirrorLoop","PingKing",
+  "TableLion","NetHawk","PaddleFox","SpinShark","LoopWolf",
+  "SmashBull","ChopTiger","ServeEagle","BladeRunner","CarbonKing",
+  "ForehandFire","BackhandSteel","CrossCourtKing","SpeedGlue","PipsOut",
+  "ButterflyCut","DragonLoop","PhoenixSmash","TigerServe","PandaSpin",
+  "ZenSpin","DarkLoop","TableKing","NetAce","EdgeBall",
+  "SpinWizard","LoopArtist","SmashMachine","BlockMaster","ServeMaestro",
+  "ReturnKing","RallyMaster","MatchPoint","GamePoint","DeuceMaster",
+  "LoopDragon","SpinPhoenix","SmashHawk","ChopEagle","CarbonFox",
+  "TitaniumBlade","DiamondRubber","GoldPaddle","SpeedDemon","PowerLoop",
+  "DeadSpin","HeavySpin","LightTouch","IronWrist","TwistLoop",
+  "CurveKing","MagicSpin","SilentSmash","ShortGame","AllRoundPro",
+  "TableSamurai","PaddleKnight","SpinSensei","LoopShogun","SmashNinja"
 ]
 
 function calcLevel(score: number) {
@@ -102,22 +70,14 @@ function calcLevel(score: number) {
   return LEVELS[0]
 }
 
-const S = {
-  wrap: { minHeight: "100vh", background: "#0A0A0C", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" } as React.CSSProperties,
-  box: { maxWidth: "420px", width: "100%" } as React.CSSProperties,
-  chip: { fontSize: "11px", fontWeight: 700, color: "#FF00C8", letterSpacing: "0.14em", textTransform: "uppercase" as const, marginBottom: "8px", display: "block" },
-  title: { fontSize: "32px", fontWeight: 900, color: "#FFF9F3", textTransform: "uppercase" as const, lineHeight: 1.1, marginBottom: "8px" },
-  sub: { fontSize: "14px", color: "#6B6E7A", marginBottom: "28px", lineHeight: 1.6 },
-  input: { width: "100%", background: "#0D0E12", border: "1px solid #26282E", borderRadius: "10px", padding: "14px 16px", fontSize: "15px", color: "#FFF9F3", outline: "none", marginBottom: "10px", boxSizing: "border-box" as const },
-  btn: (disabled = false) => ({ width: "100%", background: disabled ? "#26282E" : "#FF00C8", color: disabled ? "#6B6E7A" : "#0A0A0C", border: "none", borderRadius: "10px", padding: "15px", fontSize: "14px", fontWeight: 700, cursor: disabled ? "not-allowed" : "pointer", textTransform: "uppercase" as const, letterSpacing: "0.06em", marginTop: "8px" } as React.CSSProperties),
-  opt: (selected: boolean) => ({ width: "100%", background: selected ? "rgba(255,0,200,0.1)" : "#0D0E12", border: selected ? "1px solid #FF00C8" : "1px solid #26282E", borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: selected ? "#FF00C8" : "#FFF9F3", cursor: "pointer", textAlign: "left" as const, marginBottom: "8px", fontWeight: selected ? 700 : 400 } as React.CSSProperties),
-}
+const inp: React.CSSProperties = { width: "100%", background: SURFACE, border: "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "15px", color: TEXT, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
+const primaryBtn = (disabled = false): React.CSSProperties => ({ width: "100%", background: disabled ? BORDER : G, color: disabled ? MUTED : DARK, border: "none", borderRadius: "10px", padding: "14px", fontSize: "14px", fontWeight: 800, cursor: disabled ? "not-allowed" : "pointer", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "10px", fontFamily: "inherit" })
+const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", background: sel ? "rgba(57,255,20,0.08)" : CARD, border: sel ? "1px solid " + G : "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: sel ? G : TEXT, cursor: "pointer", textAlign: "left", marginBottom: "8px", fontWeight: sel ? 700 : 400, fontFamily: "inherit", display: "block" })
 
 export default function OnboardingPage() {
-  const router = useRouter()
   const [step, setStep] = useState(0)
   const [name, setName] = useState("")
-  const [location, setLocation] = useState("")
+  const [canton, setCanton] = useState("")
   const [mode, setMode] = useState<"" | "know" | "quiz">("")
   const [manualLevel, setManualLevel] = useState("")
   const [quizIdx, setQuizIdx] = useState(0)
@@ -130,6 +90,17 @@ export default function OnboardingPage() {
   const quizResult = calcLevel(score)
   const chosenLevel = mode === "know" ? LEVELS.find(l => l.name === manualLevel) : quizResult
 
+  async function genNicknames() {
+    setLoadingNicks(true)
+    const supabase = createClient()
+    const { data } = await supabase.from("profiles").select("name")
+    const taken = (data || []).map((p: { name: string }) => p.name.toLowerCase())
+    const available = ALL_NICKS.filter(n => !taken.includes(n.toLowerCase()))
+    const shuffled = [...available].sort(() => Math.random() - 0.5)
+    setNicks(shuffled.slice(0, 3))
+    setLoadingNicks(false)
+  }
+
   async function handleSave() {
     if (!chosenLevel) return
     setSaving(true)
@@ -137,120 +108,127 @@ export default function OnboardingPage() {
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setSaving(false); return }
     const { error } = await supabase.from("profiles").upsert({
-      id: user.id,
-      name: name.trim(),
-      email: user.email,
-      location,
-      level: chosenLevel.name,
-      elo: chosenLevel.elo,
+      id: user.id, name: name.trim(), email: user.email,
+      location: canton, level: chosenLevel.name, elo: chosenLevel.elo,
     })
-    if (error) { alert("Fehler: " + error.message); setSaving(false); return; }
+    if (error) { alert("Fehler: " + error.message); setSaving(false); return }
     window.location.href = "/"
   }
 
   function answerQuiz(points: number) {
     const next = [...quizScores, points]
     setQuizScores(next)
-    if (quizIdx + 1 < QUIZ.length) {
-      setQuizIdx(quizIdx + 1)
-    } else {
-      setStep(3)
-    }
+    if (quizIdx + 1 < QUIZ.length) setQuizIdx(quizIdx + 1)
+    else setStep(3)
   }
 
+  const wrap: React.CSSProperties = { minHeight: "100vh", background: DARK, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }
+  const box: React.CSSProperties = { maxWidth: "400px", width: "100%" }
+
+  const Header = ({ step: s, total }: { step: number; total: number }) => (
+    <div style={{ marginBottom: "32px" }}>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
+        <span style={{ fontSize: "11px", fontWeight: 700, color: G, letterSpacing: "0.14em", textTransform: "uppercase" }}>Schritt {s} / {total}</span>
+        <span style={{ fontSize: "11px", color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em" }}>PLAYER</span>
+      </div>
+      <div style={{ background: BORDER, borderRadius: "4px", height: "3px" }}>
+        <div style={{ background: G, height: "3px", borderRadius: "4px", width: `${(s / total) * 100}%`, transition: "width 0.4s" }} />
+      </div>
+    </div>
+  )
+
   if (step === 0) return (
-    <div style={S.wrap}><div style={S.box}>
-      <span style={S.chip}>Willkommen</span>
-      <h1 style={S.title}>Dein Profil</h1>
-      <p style={S.sub}>Kurz einrichten — dann kann es losgehen.</p>
-      <input style={S.input} placeholder="Dein Name / Spitzname" value={name} onChange={e => setName(e.target.value)} />
-      <button type="button" onClick={async () => {
-          setLoadingNicks(true)
-          const supabase = createClient()
-          const { data } = await supabase.from("profiles").select("name")
-          const taken = (data || []).map((p: {name: string}) => p.name)
-          setNicks(genNicks(taken))
-          setLoadingNicks(false)
-        }} style={{ background: "none", border: "1px solid #26282E", borderRadius: "8px", padding: "8px 14px", fontSize: "12px", color: "#6B6E7A", cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em" }}>{loadingNicks ? "..." : "Vorschläge generieren"}</button>
+    <div style={wrap}><div style={box}>
+      <Header step={1} total={3} />
+      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", marginBottom: "6px" }}>Dein Profil</h2>
+      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>Kurz einrichten — dann geht es los.</p>
+
+      <input style={inp} placeholder="Dein Name oder Spitzname" value={name} onChange={e => setName(e.target.value)} />
+      <button type="button" onClick={genNicknames} style={{ background: "none", border: "1px solid " + BORDER, borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: MUTED, cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em", fontFamily: "inherit" }}>
+        {loadingNicks ? "..." : "Vorschläge generieren"}
+      </button>
       {nicks.length > 0 && (
         <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
           {nicks.map(n => (
-            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? "rgba(255,0,200,0.12)" : "#0D0E12", border: name === n ? "1px solid #FF00C8" : "1px solid #26282E", borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: name === n ? "#FF00C8" : "#FFF9F3", cursor: "pointer", fontWeight: name === n ? 700 : 400 }}>
+            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? "rgba(57,255,20,0.1)" : CARD, border: name === n ? "1px solid " + G : "1px solid " + BORDER, borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: name === n ? G : TEXT, cursor: "pointer", fontWeight: name === n ? 700 : 400, fontFamily: "inherit" }}>
               {n}
             </button>
           ))}
         </div>
       )}
-      <select style={S.input} value={location} onChange={e => setLocation(e.target.value)}>
+
+      <select style={{ ...inp, marginTop: "4px" }} value={canton} onChange={e => setCanton(e.target.value)}>
         <option value="">Kanton wählen...</option>
-        {LOCATIONS.map(l => <option key={l} value={l}>{l}</option>)}
+        {CANTONS.map(c => <option key={c} value={c}>{c}</option>)}
       </select>
-      <button style={S.btn(!name.trim() || !location)} disabled={!name.trim() || !location} onClick={() => setStep(1)}>Weiter</button>
+
+      <button style={primaryBtn(!name.trim() || !canton)} disabled={!name.trim() || !canton} onClick={() => setStep(1)}>Weiter</button>
     </div></div>
   )
 
   if (step === 1) return (
-    <div style={S.wrap}><div style={S.box}>
-      <span style={S.chip}>Schritt 2 / 3</span>
-      <h1 style={S.title}>Dein Level</h1>
-      <p style={S.sub}>Kennst du dein Spielniveau bereits?</p>
-      <button style={S.opt(mode === "know")} onClick={() => setMode("know")}>Ja, ich kenne mein Level</button>
-      <button style={S.opt(mode === "quiz")} onClick={() => setMode("quiz")}>Nein, hilf mir es herausfinden</button>
+    <div style={wrap}><div style={box}>
+      <Header step={2} total={3} />
+      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", marginBottom: "6px" }}>Dein Level</h2>
+      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>Kennst du dein Spielniveau?</p>
+
+      <button style={optBtn(mode === "know")} onClick={() => setMode("know")}>Ja, ich kenne mein Level</button>
+      <button style={optBtn(mode === "quiz")} onClick={() => setMode("quiz")}>Nein — hilf mir es herausfinden</button>
+
       {mode === "know" && (
         <div style={{ marginTop: "16px" }}>
           {LEVELS.map(l => (
-            <button key={l.name} style={S.opt(manualLevel === l.name)} onClick={() => setManualLevel(l.name)}>
-              <span style={{ color: l.color }}>{l.name}</span> — <span style={{ fontSize: "13px", color: "#6B6E7A" }}>{l.desc}</span>
+            <button key={l.name} style={optBtn(manualLevel === l.name)} onClick={() => setManualLevel(l.name)}>
+              <span style={{ color: l.color, fontWeight: 800 }}>{l.name}</span>
+              <span style={{ fontSize: "12px", color: MUTED, marginLeft: "8px" }}>{l.desc}</span>
             </button>
           ))}
         </div>
       )}
-      <button
-        style={S.btn(!mode || (mode === "know" && !manualLevel))}
-        disabled={!mode || (mode === "know" && !manualLevel)}
-        onClick={() => mode === "quiz" ? setStep(2) : setStep(3)}
-      >Weiter</button>
+
+      <button style={primaryBtn(!mode || (mode === "know" && !manualLevel))} disabled={!mode || (mode === "know" && !manualLevel)} onClick={() => mode === "quiz" ? setStep(2) : setStep(3)}>Weiter</button>
     </div></div>
   )
 
   if (step === 2) {
     const q = QUIZ[quizIdx]
-    const pct = Math.round((quizIdx / QUIZ.length) * 100)
     return (
-      <div style={S.wrap}><div style={S.box}>
-        <span style={S.chip}>Frage {quizIdx + 1} von {QUIZ.length}</span>
-        <div style={{ background: "#1A1B1F", borderRadius: "4px", height: "4px", marginBottom: "28px" }}>
-          <div style={{ background: "#FF00C8", height: "4px", borderRadius: "4px", width: `${pct}%`, transition: "width 0.3s" }} />
+      <div style={wrap}><div style={box}>
+        <div style={{ marginBottom: "28px" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: G, letterSpacing: "0.14em", textTransform: "uppercase" }}>Frage {quizIdx + 1} / {QUIZ.length}</span>
+          </div>
+          <div style={{ background: BORDER, borderRadius: "4px", height: "3px" }}>
+            <div style={{ background: G, height: "3px", borderRadius: "4px", width: `${((quizIdx) / QUIZ.length) * 100}%`, transition: "width 0.3s" }} />
+          </div>
         </div>
-        <h2 style={{ ...S.title, fontSize: "22px", marginBottom: "28px" }}>{q.question}</h2>
-        {q.options.map((o, i) => (
-          <button key={i} style={S.opt(false)} onClick={() => answerQuiz(o.points)}>{o.label}</button>
+        <h2 style={{ fontSize: "22px", fontWeight: 800, color: TEXT, marginBottom: "24px", lineHeight: 1.3 }}>{q.q}</h2>
+        {q.opts.map((o, i) => (
+          <button key={i} style={optBtn(false)} onClick={() => answerQuiz(o.p)}>{o.l}</button>
         ))}
       </div></div>
     )
   }
 
   if (step === 3 && chosenLevel) return (
-    <div style={S.wrap}><div style={S.box}>
-      <span style={S.chip}>{mode === "quiz" ? "Dein Ergebnis" : "Bestätigung"}</span>
-      <h1 style={{ ...S.title, color: chosenLevel.color, fontSize: "44px" }}>{chosenLevel.name}</h1>
-      <p style={S.sub}>{chosenLevel.desc}</p>
-      <div style={{ background: "#0D0E12", border: "1px solid #26282E", borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
-        {[
-          { label: "Name", value: name },
-          { label: "Standort", value: location },
-          { label: "Level", value: chosenLevel.name },
-          { label: "Start-ELO", value: String(chosenLevel.elo) },
-        ].map(row => (
-          <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "0.5px solid #1A1B1F" }}>
-            <span style={{ fontSize: "13px", color: "#6B6E7A" }}>{row.label}</span>
-            <span style={{ fontSize: "13px", color: "#FFF9F3", fontWeight: 700 }}>{row.value}</span>
+    <div style={wrap}><div style={box}>
+      <Header step={3} total={3} />
+      <p style={{ fontSize: "11px", fontWeight: 700, color: chosenLevel.color, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>{mode === "quiz" ? "Dein Ergebnis" : "Bestätigung"}</p>
+      <h2 style={{ fontSize: "40px", fontWeight: 900, color: chosenLevel.color, textTransform: "uppercase", marginBottom: "4px", letterSpacing: "-0.02em" }}>{chosenLevel.name}</h2>
+      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{chosenLevel.desc}</p>
+
+      <div style={{ background: CARD, border: "1px solid " + BORDER, borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
+        {[{ label: "Name", value: name }, { label: "Kanton", value: canton }, { label: "Level", value: chosenLevel.name }, { label: "Start-ELO", value: String(chosenLevel.elo) }].map(row => (
+          <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid " + BORDER }}>
+            <span style={{ fontSize: "13px", color: MUTED }}>{row.label}</span>
+            <span style={{ fontSize: "13px", color: TEXT, fontWeight: 700 }}>{row.value}</span>
           </div>
         ))}
       </div>
-      <p style={{ fontSize: "12px", color: "#6B6E7A", marginBottom: "16px" }}>Dein Level passt sich automatisch an je mehr du spielst.</p>
-      <button style={S.btn(saving)} disabled={saving} onClick={handleSave}>
-        {saving ? "Wird gespeichert..." : "Profil erstellen"}
+
+      <p style={{ fontSize: "12px", color: MUTED, marginBottom: "16px", lineHeight: 1.6 }}>Dein Level passt sich automatisch an je mehr du spielst — ELO startet bei {chosenLevel.elo}.</p>
+      <button style={primaryBtn(saving)} disabled={saving} onClick={handleSave}>
+        {saving ? "Wird gespeichert..." : "Profil erstellen →"}
       </button>
     </div></div>
   )

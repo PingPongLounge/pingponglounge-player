@@ -1,9 +1,29 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
+@import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@300;400;600;700;800;900&display=swap');
+
 :root {
-  --pink: #FF00C8;
-  --cream: #FFF9F3;
+  --green: #39FF14;
+  --green-dim: rgba(57,255,20,0.12);
+  --green-glow: rgba(57,255,20,0.25);
+  --cream: #F5F1E8;
   --dark: #0A0A0C;
-  --card: #0D0E12;
+  --surface: #111214;
+  --card: #15161A;
+  --raised: #1C1E23;
   --border: #26282E;
   --muted: #6B6E7A;
+  --text: #E8E6E1;
 }
+
+body {
+  font-family: 'League Spartan', 'Inter', system-ui, sans-serif;
+  background: var(--dark);
+  color: var(--text);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Level colors */
+.level-locker  { color: #3FA9FF; }
+.level-hobby   { color: #2FD08A; }
+.level-fortgeschritten { color: #FF9F2E; }
+.level-competitive { color: #39FF14; }
