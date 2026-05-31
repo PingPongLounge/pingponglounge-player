@@ -136,7 +136,7 @@ export default function OnboardingPage() {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setSaving(false); return }
-    await supabase.from("profiles").upsert({
+    const { error } = await supabase.from("profiles").upsert({
       id: user.id,
       name: name.trim(),
       email: user.email,
@@ -144,6 +144,7 @@ export default function OnboardingPage() {
       level: chosenLevel.name,
       elo: chosenLevel.elo,
     })
+    if (error) { alert("Fehler: " + error.message); setSaving(false); return; }
     window.location.href = "/"
   }
 
