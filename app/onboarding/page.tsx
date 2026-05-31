@@ -144,7 +144,7 @@ export default function OnboardingPage() {
       level: chosenLevel.name,
       elo: chosenLevel.elo,
     })
-    router.push("/")
+    window.location.href = "/"
   }
 
   function answerQuiz(points: number) {
