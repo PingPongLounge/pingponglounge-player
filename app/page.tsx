@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import LogoutButton from './components/LogoutButton'
 
 export default async function Dashboard() {
   const supabase = await createClient()
@@ -33,11 +34,14 @@ export default async function Dashboard() {
           </svg>
           <span style={{ fontSize: '13px', fontWeight: 800, color: TEXT, textTransform: 'uppercase', letterSpacing: '0.08em' }}>PLAYER</span>
         </div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
         <Link href="/profil" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
           <div style={{ background: CARD, border: '1px solid ' + BORDER, borderRadius: '999px', padding: '6px 12px', fontSize: '12px', color: MUTED }}>
             {name}
           </div>
         </Link>
+        <LogoutButton />
+      </div>
       </header>
 
       {/* ELO Hero */}
