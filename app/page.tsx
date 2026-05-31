@@ -91,7 +91,8 @@ export default async function Dashboard() {
 
       {/* Footer */}
       <footer style={{ textAlign: 'center', padding: '20px', borderTop: '1px solid ' + BORDER }}>
-        <p style={{ fontSize: '11px', color: MUTED, letterSpacing: '0.1em' }}>PLAYER <span style={{ color: '#3A3C42' }}>·</span> by Ping Pong Lounge</p>
+        <p style={{ fontSize: '11px', color: MUTED, letterSpacing: '0.1em', marginBottom: '10px' }}>PLAYER <span style={{ color: '#3A3C42' }}>·</span> by Ping Pong Lounge</p>
+        <a href='https://pingponglounge.ch' target='_blank' rel='noopener' style={{ fontSize: '12px', color: '#39FF14', textDecoration: 'none', fontWeight: 700, letterSpacing: '0.06em', textTransform: 'uppercase' }}>↗ Zur Ping Pong Lounge</a>
       </footer>
     </main>
   )
