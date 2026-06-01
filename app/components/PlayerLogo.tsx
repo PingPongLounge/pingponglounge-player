@@ -21,15 +21,27 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <filter id="pGlow" x="-50%" y="-50%" width="200%" height="200%">
-            <feGaussianBlur stdDeviation="2.5" result="blur"/>
-            <feMerge>
-              <feMergeNode in="blur"/>
-              <feMergeNode in="SourceGraphic"/>
-            </feMerge>
-          </filter>
-          <filter id="ballGlow" x="-100%" y="-100%" width="300%" height="300%">
-            <feGaussianBlur stdDeviation="4" result="blur"/>
+          <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+            {/* Gradient verschiebt sich sehr langsam */}
+            <stop offset="0%" stopColor="#39FF14">
+              <animate
+                attributeName="stop-color"
+                values="#39FF14;#00E5FF;#39FF14"
+                dur="8s"
+                repeatCount="indefinite"
+              />
+            </stop>
+            <stop offset="100%" stopColor="#00E5FF">
+              <animate
+                attributeName="stop-color"
+                values="#00E5FF;#39FF14;#00E5FF"
+                dur="8s"
+                repeatCount="indefinite"
+              />
+            </stop>
+          </linearGradient>
+          <filter id="ballGlow" x="-80%" y="-80%" width="260%" height="260%">
+            <feGaussianBlur stdDeviation="3" result="blur"/>
             <feMerge>
               <feMergeNode in="blur"/>
               <feMergeNode in="SourceGraphic"/>
@@ -37,89 +49,43 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
           </filter>
         </defs>
 
-        {/* P Basis — dunkel/dim */}
+        {/* P-Form — exakt wie bestätigt */}
         <path
-          d="M 20 62 L 20 10 L 44 10 C 58 10 66 19 66 30 C 66 41 58 50 44 50 L 20 50"
-          stroke="#1a2e1a"
-          strokeWidth="3.5"
+          d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z"
+          fill="none"
+          stroke="url(#logoGrad)"
+          strokeWidth="2.5"
           strokeLinejoin="round"
-          strokeLinecap="round"
+        />
+        {/* Innere Trennlinie */}
+        <path
+          d="M 36 10 L 36 50"
+          stroke="url(#logoGrad)"
+          strokeWidth="1"
+          strokeOpacity="0.4"
         />
 
-        {/* Licht das das P entlangwandert */}
-        <path
-          d="M 20 62 L 20 10 L 44 10 C 58 10 66 19 66 30 C 66 41 58 50 44 50 L 20 50"
-          stroke="#39FF14"
-          strokeWidth="3.5"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          pathLength="100"
-          strokeDasharray="14 86"
-          filter="url(#pGlow)"
-        >
-          {/* Licht bewegt sich entlang dem P */}
-          <animate
-            attributeName="stroke-dashoffset"
-            values="114;0;0"
-            keyTimes="0;0.72;1"
-            dur="2.8s"
-            repeatCount="indefinite"
-          />
-          {/* Farbwechsel Grün → Türkis während es wandert */}
-          <animate
-            attributeName="stroke"
-            values="#39FF14;#39FF14;#00E5FF;#39FF14;#39FF14"
-            keyTimes="0;0.3;0.6;0.72;1"
-            dur="2.8s"
-            repeatCount="indefinite"
-          />
-        </path>
-
-        {/* Ball — leuchtet am Ende jedes Zyklus auf */}
-        <circle cx="63" cy="58" r="5.5" fill="#39FF14">
+        {/* Ball — leuchtet kurz nach 5s sehr subtil auf */}
+        <circle cx="63" cy="58" r="6" fill="url(#logoGrad)" />
+        <circle cx="63" cy="58" r="6" fill="#39FF14" filter="url(#ballGlow)" opacity="0">
           <animate
             attributeName="opacity"
-            values="0.25;0.25;0.25;1;1;0.25"
-            keyTimes="0;0.6;0.72;0.82;0.92;1"
-            dur="2.8s"
+            values="0;0;0;0;0;0;0.5;0.2;0"
+            keyTimes="0;0.55;0.62;0.68;0.72;0.78;0.85;0.93;1"
+            dur="8s"
             repeatCount="indefinite"
           />
           <animate
             attributeName="r"
-            values="5.5;5.5;5.5;8.5;8.5;5.5"
-            keyTimes="0;0.6;0.72;0.82;0.92;1"
-            dur="2.8s"
-            repeatCount="indefinite"
-          />
-          <animate
-            attributeName="fill"
-            values="#39FF14;#39FF14;#39FF14;#00E5FF;#39FF14;#39FF14"
-            keyTimes="0;0.6;0.72;0.82;0.92;1"
-            dur="2.8s"
-            repeatCount="indefinite"
-          />
-        </circle>
-
-        {/* Ball Glow-Ring beim Aufleuchten */}
-        <circle cx="63" cy="58" r="5.5" fill="none" stroke="#39FF14" strokeWidth="2" filter="url(#ballGlow)">
-          <animate
-            attributeName="opacity"
-            values="0;0;0;0.8;0;0"
-            keyTimes="0;0.72;0.76;0.85;0.95;1"
-            dur="2.8s"
-            repeatCount="indefinite"
-          />
-          <animate
-            attributeName="r"
-            values="5.5;5.5;5.5;12;14;5.5"
-            keyTimes="0;0.72;0.76;0.85;0.95;1"
-            dur="2.8s"
+            values="6;6;6;6;6;6;9;7;6"
+            keyTimes="0;0.55;0.62;0.68;0.72;0.78;0.85;0.93;1"
+            dur="8s"
             repeatCount="indefinite"
           />
         </circle>
       </svg>
 
-      {/* PLAYER — weiss */}
+      {/* PLAYER — Gradient wie im bestätigten Logo */}
       <span style={{
         fontSize: textSize,
         fontWeight: 900,
@@ -128,7 +94,10 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
         lineHeight: 1,
         fontFamily: "'League Spartan', system-ui, sans-serif",
         userSelect: "none" as const,
-        color: "#FFFFFF",
+        background: "linear-gradient(135deg, #39FF14 0%, #00E5FF 100%)",
+        WebkitBackgroundClip: "text",
+        WebkitTextFillColor: "transparent",
+        backgroundClip: "text",
       }}>
         PLAYER
       </span>
