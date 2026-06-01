@@ -112,7 +112,11 @@ export default function OnboardingPage() {
       location: canton, level: chosenLevel.name, elo: chosenLevel.elo,
     })
     if (error) { alert("Fehler: " + error.message); setSaving(false); return }
-    window.location.href = "/"
+    // Signup-Credit vergeben
+      try {
+        await fetch("/api/credits/signup", { method: "POST" })
+      } catch { /* ignore */ }
+      window.location.href = "/"
   }
 
   function answerQuiz(points: number) {
