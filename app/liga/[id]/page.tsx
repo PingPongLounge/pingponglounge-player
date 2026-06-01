@@ -69,7 +69,7 @@ export default function SeasonPage({params}:{params:{id:string}}){
         reactions:(x.match_reactions||[]) as Reaction[],
         comments:((x.match_comments||[]) as Array<{id:string,user_id:string,text:string,created_at:string,profiles:{name:string}|null}>).map(c=>({...c,user_name:c.profiles?.name||"?"}))
       }))
-      setFeed(feedMapped as FeedItem[])
+      setFeed(feedMapped as unknown as FeedItem[])
       setLoading(false)
     }
     load()
@@ -98,7 +98,7 @@ export default function SeasonPage({params}:{params:{id:string}}){
     setCommentText(prev=>({...prev,[matchId]:""}))
     // Reload comments
     const {data}=await sb.from("match_comments").select("id,user_id,text,created_at,profiles(name)").eq("match_id",matchId).order("created_at")
-    setFeed(prev=>prev.map(f=>f.id===matchId?{...f,comments:((data||[]) as Array<{id:string,user_id:string,text:string,created_at:string,profiles:{name:string}|null}>).map(c=>({...c,user_name:c.profiles?.name||"?"}))}:f))
+    setFeed(prev=>prev.map(f=>f.id===matchId?{...f,comments:((data||[]) as unknown as Array<{id:string,user_id:string,text:string,created_at:string,profiles:{name:string}|null}>).map(c=>({...c,user_name:c.profiles?.name||"?"}))}:f))
   }
 
   if(loading||!season) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>Lädt...</p></main>

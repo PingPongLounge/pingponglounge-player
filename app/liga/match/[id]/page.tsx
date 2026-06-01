@@ -23,7 +23,7 @@ export default function MatchPage({params}:{params:{id:string}}){
       if(!user){window.location.href="/login";return}
       setUserId(user.id)
       const {data}=await sb.from("league_matches").select("id,season_id,round,p1_id,p2_id,sets,winner_id,status,p1:profiles!league_matches_p1_id_fkey(name),p2:profiles!league_matches_p2_id_fkey(name)").eq("id",params.id).single()
-      if(data) setMatch({...data,p1_name:(data.p1 as {name:string}|null)?.name||"?",p2_name:(data.p2 as {name:string}|null)?.name||"?"} as MatchData)
+      if(data) setMatch({...data,p1_name:((data.p1 as unknown as {name:string}[]|null)?.[0]?.name)||"?",p2_name:((data.p2 as unknown as {name:string}[]|null)?.[0]?.name)||"?"} as MatchData)
       setLoading(false)
     }
     load()
@@ -84,7 +84,7 @@ export default function MatchPage({params}:{params:{id:string}}){
         {/* Confirmed state */}
         {match.status==="confirmed"&&(
           <div style={{background:`${G}15`,border:`1px solid ${G}40`,borderRadius:12,padding:"20px",textAlign:"center"}}>
-            <p style={{fontSize:G,fontWeight:700,color:G,fontSize:"16px",marginBottom:8}}>✓ Bestätigt</p>
+            <p style={{fontSize:"16px",fontWeight:700,color:G,marginBottom:8}}>✓ Bestätigt</p>
             {match.sets&&<p style={{fontSize:13,color:M}}>{match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ")}</p>}
           </div>
         )}
