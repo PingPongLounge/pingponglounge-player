@@ -124,7 +124,7 @@ export default function StaffRedeemPage() {
               textTransform: "uppercase",
               letterSpacing: "0.06em",
             }}>
-              {result.hours as number} Stunde{(result.hours as number) > 1 ? "n" : ""} gewähren ✓
+              {result.hours as number} Stunde{(Number(result.hours)) > 1 ? "n" : ""} gewähren ✓
             </div>
           </div>
         )}
