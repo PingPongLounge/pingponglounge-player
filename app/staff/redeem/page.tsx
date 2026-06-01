@@ -10,7 +10,12 @@ const W  = "#E8E6E1"
 
 export default function StaffRedeemPage() {
   const [code, setCode]       = useState("")
-  const [result, setResult]   = useState<Record<string,unknown> | null>(null)
+  const [result, setResult] = useState<{
+    ok: boolean
+    player?: string
+    hours?: number
+    type?: string
+  } | null>(null)
   const [error, setError]     = useState("")
   const [loading, setLoading] = useState(false)
 
