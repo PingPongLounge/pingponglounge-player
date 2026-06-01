@@ -23,7 +23,29 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
       >
         <defs>
           <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#39FF14" />
+            
+      <style>{`
+        @keyframes gradShift {
+          0%   { stop-color: #39FF14; }
+          50%  { stop-color: #00E5FF; }
+          100% { stop-color: #39FF14; }
+        }
+        @keyframes gradShift2 {
+          0%   { stop-color: #00E5FF; }
+          50%  { stop-color: #39FF14; }
+          100% { stop-color: #00E5FF; }
+        }
+        @keyframes ballPulse {
+          0%, 100% { r: 6; opacity: 1; }
+          50%       { r: 7.5; opacity: 0.7; }
+        }
+        @keyframes textGrad {
+          0%   { background-position: 0% 50%; }
+          50%  { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+      `}</style>
+        <stop offset="0%" stopColor="#39FF14" />
             <stop offset="100%" stopColor="#00E5FF" />
           </linearGradient>
         </defs>
@@ -44,7 +66,7 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
           strokeOpacity="0.4"
         />
         {/* Punkt */}
-        <circle cx="63" cy="58" r="6" fill="url(#logoGrad)" />
+        <circle cx="63" cy="58" r="6" fill="url(#logoGrad)"><animate attributeName="r" values="6;8;6" dur="2s" repeatCount="indefinite"/></circle>
       </svg>
 
       {/* PLAYER — Gradient Text */}
@@ -56,7 +78,9 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
         lineHeight: 1,
         fontFamily: "'League Spartan', system-ui, sans-serif",
         userSelect: "none" as const,
-        background: "linear-gradient(135deg, #39FF14 0%, #00E5FF 100%)",
+        background: "linear-gradient(270deg, #39FF14, #00E5FF, #39FF14)",
+        backgroundSize: "200% 200%",
+        animation: "textGrad 3s ease infinite",
         WebkitBackgroundClip: "text",
         WebkitTextFillColor: "transparent",
         backgroundClip: "text",
