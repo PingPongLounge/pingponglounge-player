@@ -20,53 +20,25 @@ export default function ResetPage() {
   )
 
   useEffect(() => {
-    async function init() {
-      const params = new URLSearchParams(window.location.search)
-      const code = params.get("code")
-      const token_hash = params.get("token_hash")
-      const type = params.get("type")
-
-      // PKCE flow: code in URL → exchangeCodeForSession
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code)
-        if (!error) { setStatus("ready"); return }
-        setMsg("Link ungültig oder abgelaufen.")
-        setStatus("error")
-        return
-      }
-
-      // OTP flow: token_hash in URL
-      if (token_hash && type === "recovery") {
-        const { error } = await supabase.auth.verifyOtp({ token_hash, type: "recovery" })
-        if (!error) { setStatus("ready"); return }
-        setMsg("Link ungültig oder abgelaufen.")
-        setStatus("error")
-        return
-      }
-
-      // Implicit flow / bereits eingeloggt: Session prüfen
-      const { data: { session } } = await supabase.auth.getSession()
-      if (session) { setStatus("ready"); return }
-
-      // PASSWORD_RECOVERY event (implicit flow mit Hash)
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-        if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
-          setStatus("ready")
-          subscription.unsubscribe()
-        }
-      })
-
-      // Timeout: nach 5s aufgeben
-      setTimeout(() => {
-        if (status === "waiting") {
+    // Session wurde vom Callback bereits gesetzt — einfach prüfen
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setStatus("ready")
+      } else {
+        // Fallback: auf PASSWORD_RECOVERY Event warten (implicit flow)
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+          if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
+            setStatus("ready")
+            subscription.unsubscribe()
+          }
+        })
+        // Nach 6s aufgeben
+        setTimeout(() => {
           setMsg("Link ungültig oder abgelaufen.")
           setStatus("error")
-          subscription.unsubscribe()
-        }
-      }, 5000)
-    }
-
-    init()
+        }, 6000)
+      }
+    })
   }, [])
 
   async function handleReset(e: React.FormEvent) {
@@ -94,7 +66,8 @@ export default function ResetPage() {
 
   return (
     <div style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center",
-      justifyContent: "center", padding: 20, fontFamily: "'League Spartan', system-ui, sans-serif" }}>
+      justifyContent: "center", padding: 20,
+      fontFamily: "'League Spartan', system-ui, sans-serif" }}>
       <div style={{ width: "100%", maxWidth: 400 }}>
         <h1 style={{ color: G, fontSize: 28, fontWeight: 800, marginBottom: 8,
           textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "center" }}>
@@ -102,11 +75,12 @@ export default function ResetPage() {
         </h1>
 
         {status === "waiting" && (
-          <p style={{ color: "#888", textAlign: "center", marginTop: 40 }}>Link wird geprüft…</p>
+          <p style={{ color: "#888", textAlign: "center", marginTop: 40 }}>Lädt…</p>
         )}
 
         {status === "ready" && (
-          <form onSubmit={handleReset} style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 32 }}>
+          <form onSubmit={handleReset}
+            style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 32 }}>
             <input type="password" placeholder="Neues Passwort" value={password}
               onChange={e => setPassword(e.target.value)}
               style={{ background: "#1A1C1F", border: "1px solid #26282E", borderRadius: 10,
@@ -133,7 +107,9 @@ export default function ResetPage() {
         {status === "error" && (
           <div style={{ textAlign: "center", marginTop: 40 }}>
             <p style={{ color: "#FF6B6B", marginBottom: 16 }}>{msg}</p>
-            <button onClick={() => router.push("/login")} style={btn}>Zurück zum Login</button>
+            <button onClick={() => router.push("/login")} style={btn}>
+              Zurück zum Login
+            </button>
           </div>
         )}
       </div>
