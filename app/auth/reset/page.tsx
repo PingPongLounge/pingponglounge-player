@@ -29,9 +29,9 @@ export default async function ResetPage({ searchParams }: Props) {
     }
   )
 
-  const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
 
-  if (!user) {
+  if (!session) {
     return <ErrorPage msg="Link abgelaufen — bitte neuen Reset-Link anfordern." />
   }
 
