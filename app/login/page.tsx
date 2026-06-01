@@ -77,7 +77,7 @@ export default function LoginPage() {
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#111214", padding: "20px" }}>
       <div style={{ maxWidth: "380px", width: "100%", textAlign: "center" }}>
         <div style={{ marginBottom: "32px" }}>
-          <PlayerLogo size="md" animated={false} />
+          <PlayerLogo />
         </div>
 
         {sent ? (
