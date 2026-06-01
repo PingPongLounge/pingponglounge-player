@@ -1,136 +1,70 @@
-"use client"
-import { useEffect, useState } from "react"
-import { createBrowserClient } from "@supabase/ssr"
-import { useRouter, useSearchParams } from "next/navigation"
-import { Suspense } from "react"
+import { cookies } from 'next/headers'
+import { createServerClient } from '@supabase/ssr'
+import { redirect } from 'next/navigation'
+import ResetForm from './ResetForm'
 
 const G = "#39FF14"
 const BG = "#111214"
 
-function ResetContent() {
-  const router = useRouter()
-  const searchParams = useSearchParams()
-  const authError = searchParams.get("auth_error")
+interface Props {
+  searchParams: { auth_error?: string; msg?: string }
+}
 
-  const [password, setPassword] = useState("")
-  const [confirm, setConfirm] = useState("")
-  const [loading, setLoading] = useState(false)
-  const [status, setStatus] = useState<"waiting" | "ready" | "done" | "error">("waiting")
-  const [msg, setMsg] = useState("")
+export default async function ResetPage({ searchParams }: Props) {
+  const authError = searchParams.auth_error
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
-
-  useEffect(() => {
-    // Callback hat Fehler gemeldet
-    if (authError) {
-      setMsg("Fehler: " + authError)
-      setStatus("error")
-      return
-    }
-
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) {
-        setStatus("ready")
-        return
-      }
-      // Fallback: PASSWORD_RECOVERY event
-      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-        if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
-          setStatus("ready")
-          subscription.unsubscribe()
-        }
-      })
-      setTimeout(() => {
-        subscription.unsubscribe()
-        setMsg("Keine Session — bitte neuen Reset-Link anfordern.")
-        setStatus("error")
-      }, 6000)
-    })
-  }, [authError])
-
-  async function handleReset(e: React.FormEvent) {
-    e.preventDefault()
-    if (password !== confirm) { setMsg("Passwörter stimmen nicht überein."); return }
-    if (password.length < 6) { setMsg("Mindestens 6 Zeichen."); return }
-    setLoading(true)
-    const { error } = await supabase.auth.updateUser({ password })
-    setLoading(false)
-    if (error) { setMsg(error.message); return }
-    setStatus("done")
-    setTimeout(() => router.push("/dashboard"), 2000)
+  if (authError) {
+    return <ErrorPage msg={"Fehler: " + authError} />
   }
 
-  const btn: React.CSSProperties = {
-    border: "2px solid transparent",
-    background: loading
-      ? "linear-gradient(#111214, #111214) padding-box, linear-gradient(135deg, #26282E 0%, #26282E 100%) border-box"
-      : "linear-gradient(#111214, #111214) padding-box, linear-gradient(135deg, #39FF14 0%, #00E5FF 100%) border-box",
-    borderRadius: 10, padding: "14px", fontSize: "14px", fontWeight: 700,
-    cursor: "pointer", color: loading ? "#6B6E7A" : G,
-    textTransform: "uppercase" as const, letterSpacing: "0.06em",
-    width: "100%", fontFamily: "'League Spartan', system-ui, sans-serif",
+  const cookieStore = await cookies()
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll() },
+        setAll() {},
+      },
+    }
+  )
+
+  const { data: { user } } = await supabase.auth.getUser()
+
+  if (!user) {
+    return <ErrorPage msg="Link abgelaufen — bitte neuen Reset-Link anfordern." />
   }
 
   return (
-    <div style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center",
-      justifyContent: "center", padding: 20,
+    <div style={{ minHeight: "100vh", background: BG, display: "flex",
+      alignItems: "center", justifyContent: "center", padding: 20,
       fontFamily: "'League Spartan', system-ui, sans-serif" }}>
       <div style={{ width: "100%", maxWidth: 400 }}>
-        <h1 style={{ color: G, fontSize: 28, fontWeight: 800, marginBottom: 8,
+        <h1 style={{ color: G, fontSize: 28, fontWeight: 800,
           textTransform: "uppercase", letterSpacing: "0.08em", textAlign: "center" }}>
           Neues Passwort
         </h1>
-
-        {status === "waiting" && (
-          <p style={{ color: "#888", textAlign: "center", marginTop: 40 }}>Lädt…</p>
-        )}
-
-        {status === "ready" && (
-          <form onSubmit={handleReset}
-            style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 32 }}>
-            <input type="password" placeholder="Neues Passwort" value={password}
-              onChange={e => setPassword(e.target.value)}
-              style={{ background: "#1A1C1F", border: "1px solid #26282E", borderRadius: 10,
-                padding: "14px 16px", color: "#fff", fontSize: 15, outline: "none",
-                fontFamily: "'League Spartan', system-ui, sans-serif" }} />
-            <input type="password" placeholder="Passwort bestätigen" value={confirm}
-              onChange={e => setConfirm(e.target.value)}
-              style={{ background: "#1A1C1F", border: "1px solid #26282E", borderRadius: 10,
-                padding: "14px 16px", color: "#fff", fontSize: 15, outline: "none",
-                fontFamily: "'League Spartan', system-ui, sans-serif" }} />
-            {msg && <p style={{ color: "#FF6B6B", fontSize: 13, textAlign: "center" }}>{msg}</p>}
-            <button type="submit" disabled={loading} style={btn}>
-              {loading ? "Speichern…" : "Passwort speichern"}
-            </button>
-          </form>
-        )}
-
-        {status === "done" && (
-          <p style={{ color: G, textAlign: "center", marginTop: 40, fontSize: 16 }}>
-            ✓ Passwort geändert — wird weitergeleitet…
-          </p>
-        )}
-
-        {status === "error" && (
-          <div style={{ textAlign: "center", marginTop: 40 }}>
-            <p style={{ color: "#FF6B6B", marginBottom: 8, fontSize: 14 }}>{msg}</p>
-            <button onClick={() => router.push("/login")} style={{ ...btn, marginTop: 16 }}>
-              Zurück zum Login
-            </button>
-          </div>
-        )}
+        <ResetForm />
       </div>
     </div>
   )
 }
 
-export default function ResetPage() {
+function ErrorPage({ msg }: { msg: string }) {
   return (
-    <Suspense fallback={<div style={{ background: "#111214", minHeight: "100vh" }} />}>
-      <ResetContent />
-    </Suspense>
+    <div style={{ minHeight: "100vh", background: BG, display: "flex",
+      alignItems: "center", justifyContent: "center", padding: 20,
+      fontFamily: "'League Spartan', system-ui, sans-serif" }}>
+      <div style={{ textAlign: "center" }}>
+        <p style={{ color: "#FF6B6B", marginBottom: 24, fontSize: 15 }}>{msg}</p>
+        <a href="/login" style={{
+          border: "2px solid transparent",
+          background: "linear-gradient(#111214, #111214) padding-box, linear-gradient(135deg, #39FF14 0%, #00E5FF 100%) border-box",
+          borderRadius: 10, padding: "14px 24px", color: G, fontWeight: 700,
+          textTransform: "uppercase", letterSpacing: "0.06em", textDecoration: "none",
+          fontFamily: "'League Spartan', system-ui, sans-serif",
+        }}>Zurück zum Login</a>
+      </div>
+    </div>
   )
 }
