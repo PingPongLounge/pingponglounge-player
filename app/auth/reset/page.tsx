@@ -1,13 +1,17 @@
 "use client"
 import { useEffect, useState } from "react"
 import { createBrowserClient } from "@supabase/ssr"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 
 const G = "#39FF14"
 const BG = "#111214"
 
-export default function ResetPage() {
+function ResetContent() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const authError = searchParams.get("auth_error")
+
   const [password, setPassword] = useState("")
   const [confirm, setConfirm] = useState("")
   const [loading, setLoading] = useState(false)
@@ -20,26 +24,32 @@ export default function ResetPage() {
   )
 
   useEffect(() => {
-    // Session wurde vom Callback bereits gesetzt — einfach prüfen
+    // Callback hat Fehler gemeldet
+    if (authError) {
+      setMsg("Fehler: " + authError)
+      setStatus("error")
+      return
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setStatus("ready")
-      } else {
-        // Fallback: auf PASSWORD_RECOVERY Event warten (implicit flow)
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-          if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
-            setStatus("ready")
-            subscription.unsubscribe()
-          }
-        })
-        // Nach 6s aufgeben
-        setTimeout(() => {
-          setMsg("Link ungültig oder abgelaufen.")
-          setStatus("error")
-        }, 6000)
+        return
       }
+      // Fallback: PASSWORD_RECOVERY event
+      const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
+          setStatus("ready")
+          subscription.unsubscribe()
+        }
+      })
+      setTimeout(() => {
+        subscription.unsubscribe()
+        setMsg("Keine Session — bitte neuen Reset-Link anfordern.")
+        setStatus("error")
+      }, 6000)
     })
-  }, [])
+  }, [authError])
 
   async function handleReset(e: React.FormEvent) {
     e.preventDefault()
@@ -106,13 +116,21 @@ export default function ResetPage() {
 
         {status === "error" && (
           <div style={{ textAlign: "center", marginTop: 40 }}>
-            <p style={{ color: "#FF6B6B", marginBottom: 16 }}>{msg}</p>
-            <button onClick={() => router.push("/login")} style={btn}>
+            <p style={{ color: "#FF6B6B", marginBottom: 8, fontSize: 14 }}>{msg}</p>
+            <button onClick={() => router.push("/login")} style={{ ...btn, marginTop: 16 }}>
               Zurück zum Login
             </button>
           </div>
         )}
       </div>
     </div>
+  )
+}
+
+export default function ResetPage() {
+  return (
+    <Suspense fallback={<div style={{ background: "#111214", minHeight: "100vh" }} />}>
+      <ResetContent />
+    </Suspense>
   )
 }
