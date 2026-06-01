@@ -101,7 +101,7 @@ export default function FreundePage() {
         {/* Buttons */}
         <button onClick={handleShare} style={{
           width: "100%",
-          background: G,
+          border: "2px solid transparent", background: "linear-gradient(#111214, #111214) padding-box, linear-gradient(135deg, #39FF14 0%, #00E5FF 100%) border-box",
           color: "#0A0A0C",
           border: "none",
           borderRadius: 10,

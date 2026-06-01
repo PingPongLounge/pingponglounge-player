@@ -11,8 +11,8 @@ const MUTED = "#6B6E7A"
 const TEXT = "#E8E6E1"
 
 const outlineBtn = {
-  background: "transparent",
-  border: `2px solid ${G}`,
+  border: "2px solid transparent",
+  background: "linear-gradient(#111214, #111214) padding-box, linear-gradient(135deg, #39FF14 0%, #00E5FF 100%) border-box",
   borderRadius: "10px",
   padding: "14px 20px",
   fontSize: "14px",

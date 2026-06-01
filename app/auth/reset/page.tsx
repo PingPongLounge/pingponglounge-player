@@ -63,10 +63,11 @@ export default function ResetPage() {
               placeholder="Passwort bestätigen" required minLength={6} style={inputStyle} />
             {error && <p style={{ fontSize: "12px", color: "#FF4444", textAlign: "left" }}>{error}</p>}
             <button type="submit" disabled={loading} style={{
-              background: "transparent", border: `2px solid ${G}`, borderRadius: "10px",
-              padding: "14px", fontSize: "14px", fontWeight: 700, cursor: "pointer",
-              color: G, textTransform: "uppercase" as const, letterSpacing: "0.06em",
-              opacity: loading ? 0.5 : 1,
+              border: "2px solid transparent",
+              background: "linear-gradient(#111214, #111214) padding-box, linear-gradient(135deg, #39FF14 0%, #00E5FF 100%) border-box",
+              borderRadius: "10px", padding: "14px", fontSize: "14px", fontWeight: 700,
+              cursor: "pointer", color: "#39FF14", textTransform: "uppercase" as const,
+              letterSpacing: "0.06em", opacity: loading ? 0.5 : 1,
             }}>
               {loading ? "..." : "Passwort speichern"}
             </button>
