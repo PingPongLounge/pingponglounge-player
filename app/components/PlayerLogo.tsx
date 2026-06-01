@@ -6,14 +6,13 @@ interface PlayerLogoProps {
 }
 
 export default function PlayerLogo({ size = "md", showTagline = false }: PlayerLogoProps) {
-  const iconSize = size === "sm" ? 44  : size === "lg" ? 120 : 72
+  const iconSize = size === "sm" ? 44 : size === "lg" ? 120 : 72
   const textSize = size === "sm" ? "16px" : size === "lg" ? "32px" : "22px"
   const tagSize  = size === "sm" ? "8px"  : size === "lg" ? "11px" : "10px"
 
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "10px" }}>
 
-      {/* P-Mark Icon — exakter Pfad aus Mockup + Gradient */}
       <svg
         width={iconSize}
         height={iconSize}
@@ -22,54 +21,105 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-            
-      <style>{`
-        @keyframes gradShift {
-          0%   { stop-color: #39FF14; }
-          50%  { stop-color: #00E5FF; }
-          100% { stop-color: #39FF14; }
-        }
-        @keyframes gradShift2 {
-          0%   { stop-color: #00E5FF; }
-          50%  { stop-color: #39FF14; }
-          100% { stop-color: #00E5FF; }
-        }
-        @keyframes ballPulse {
-          0%, 100% { r: 6; opacity: 1; }
-          50%       { r: 7.5; opacity: 0.7; }
-        }
-        @keyframes textGrad {
-          0%   { background-position: 0% 50%; }
-          50%  { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-      `}</style>
-        <stop offset="0%" stopColor="#39FF14" />
-            <stop offset="100%" stopColor="#00E5FF" />
-          </linearGradient>
+          <filter id="pGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="2.5" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
+          <filter id="ballGlow" x="-100%" y="-100%" width="300%" height="300%">
+            <feGaussianBlur stdDeviation="4" result="blur"/>
+            <feMerge>
+              <feMergeNode in="blur"/>
+              <feMergeNode in="SourceGraphic"/>
+            </feMerge>
+          </filter>
         </defs>
 
-        {/* P-Form */}
+        {/* P Basis — dunkel/dim */}
         <path
-          d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z"
-          fill="none"
-          stroke="url(#logoGrad)"
-          strokeWidth="2.5"
+          d="M 20 62 L 20 10 L 44 10 C 58 10 66 19 66 30 C 66 41 58 50 44 50 L 20 50"
+          stroke="#1a2e1a"
+          strokeWidth="3.5"
           strokeLinejoin="round"
+          strokeLinecap="round"
         />
-        {/* Innere Trennlinie */}
+
+        {/* Licht das das P entlangwandert */}
         <path
-          d="M 36 10 L 36 50"
-          stroke="url(#logoGrad)"
-          strokeWidth="1"
-          strokeOpacity="0.4"
-        />
-        {/* Punkt */}
-        <circle cx="63" cy="58" r="6" fill="url(#logoGrad)"><animate attributeName="r" values="6;8;6" dur="2s" repeatCount="indefinite"/></circle>
+          d="M 20 62 L 20 10 L 44 10 C 58 10 66 19 66 30 C 66 41 58 50 44 50 L 20 50"
+          stroke="#39FF14"
+          strokeWidth="3.5"
+          strokeLinejoin="round"
+          strokeLinecap="round"
+          pathLength="100"
+          strokeDasharray="14 86"
+          filter="url(#pGlow)"
+        >
+          {/* Licht bewegt sich entlang dem P */}
+          <animate
+            attributeName="stroke-dashoffset"
+            values="114;0;0"
+            keyTimes="0;0.72;1"
+            dur="2.8s"
+            repeatCount="indefinite"
+          />
+          {/* Farbwechsel Grün → Türkis während es wandert */}
+          <animate
+            attributeName="stroke"
+            values="#39FF14;#39FF14;#00E5FF;#39FF14;#39FF14"
+            keyTimes="0;0.3;0.6;0.72;1"
+            dur="2.8s"
+            repeatCount="indefinite"
+          />
+        </path>
+
+        {/* Ball — leuchtet am Ende jedes Zyklus auf */}
+        <circle cx="63" cy="58" r="5.5" fill="#39FF14">
+          <animate
+            attributeName="opacity"
+            values="0.25;0.25;0.25;1;1;0.25"
+            keyTimes="0;0.6;0.72;0.82;0.92;1"
+            dur="2.8s"
+            repeatCount="indefinite"
+          />
+          <animate
+            attributeName="r"
+            values="5.5;5.5;5.5;8.5;8.5;5.5"
+            keyTimes="0;0.6;0.72;0.82;0.92;1"
+            dur="2.8s"
+            repeatCount="indefinite"
+          />
+          <animate
+            attributeName="fill"
+            values="#39FF14;#39FF14;#39FF14;#00E5FF;#39FF14;#39FF14"
+            keyTimes="0;0.6;0.72;0.82;0.92;1"
+            dur="2.8s"
+            repeatCount="indefinite"
+          />
+        </circle>
+
+        {/* Ball Glow-Ring beim Aufleuchten */}
+        <circle cx="63" cy="58" r="5.5" fill="none" stroke="#39FF14" strokeWidth="2" filter="url(#ballGlow)">
+          <animate
+            attributeName="opacity"
+            values="0;0;0;0.8;0;0"
+            keyTimes="0;0.72;0.76;0.85;0.95;1"
+            dur="2.8s"
+            repeatCount="indefinite"
+          />
+          <animate
+            attributeName="r"
+            values="5.5;5.5;5.5;12;14;5.5"
+            keyTimes="0;0.72;0.76;0.85;0.95;1"
+            dur="2.8s"
+            repeatCount="indefinite"
+          />
+        </circle>
       </svg>
 
-      {/* PLAYER — Gradient Text */}
+      {/* PLAYER — weiss */}
       <span style={{
         fontSize: textSize,
         fontWeight: 900,
@@ -78,17 +128,11 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
         lineHeight: 1,
         fontFamily: "'League Spartan', system-ui, sans-serif",
         userSelect: "none" as const,
-        background: "linear-gradient(270deg, #39FF14, #00E5FF, #39FF14)",
-        backgroundSize: "200% 200%",
-        animation: "textGrad 3s ease infinite",
-        WebkitBackgroundClip: "text",
-        WebkitTextFillColor: "transparent",
-        backgroundClip: "text",
+        color: "#FFFFFF",
       }}>
         PLAYER
       </span>
 
-      {/* Tagline */}
       {showTagline && (
         <span style={{
           fontSize: tagSize,
