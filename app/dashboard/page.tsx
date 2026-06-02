@@ -57,13 +57,28 @@ export default async function Dashboard() {
               <span style={{ color: G, fontSize: '18px' }}>→</span>
             </div>
           </Link>
+          {/* LIGA — LIVE */}
+          <Link href="/liga" style={{ textDecoration: 'none' }}>
+            <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: '14px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <p style={{ fontSize: '17px', fontWeight: 700, color: TEXT, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Liga</p>
+                  <span style={{ fontSize: '9px', fontWeight: 700, color: G, background: 'rgba(57,255,20,0.12)', borderRadius: '999px', padding: '2px 7px' }}>LIVE</span>
+                </div>
+                <p style={{ fontSize: '13px', color: MUTED, marginTop: '2px' }}>Stadtweise Saisons · Round Robin · ELO</p>
+              </div>
+              <span style={{ color: G, fontSize: '18px' }}>→</span>
+            </div>
+          </Link>
+
+          {/* Q3 2026 — Turniere & Find a Match */}
           {[
-            { href: '/liga', label: 'Liga', sub: 'Stadtweise Saisons', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></svg> },
-            { href: '/turniere', label: 'Turniere', sub: 'Anmelden & mitspielen', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M9.5 20h5"/><path d="M12 14v4"/></svg> },
+            { href: '/turniere', label: 'Turniere', sub: 'Community Turniere & Brackets', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M9.5 20h5"/><path d="M12 14v4"/></svg> },
             { href: '/match', label: 'Find a Match', sub: 'Spontan mitspielen', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg> },
           ].map(item => (
             <Link key={item.href} href={item.href} style={{ textDecoration: 'none' }}>
-              <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: '14px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', opacity: 0.55 }}>
+              <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: '14px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px', opacity: 0.5 }}>
                 {item.icon}
                 <div style={{ flex: 1, textAlign: 'left' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
