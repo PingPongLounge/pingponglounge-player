@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1"
-const CITIES=["Zürich","Basel","Luzern","St. Gallen"]
+const CITIES=["Oerlikon","Langstrasse","Glattbrugg","Basel","Luzern","St. Gallen","Bern","Zürich"]
 const LEVELS=["Locker","Hobby","Fortgeschritten","Competitive"]
 
 const STAFF_EMAILS=["info@pingponglounge.ch","elia@pingponglounge.ch"]

@@ -64,6 +64,8 @@ export default function MatchPage({params}:{params:{id:string}}){
   const isP1=match.p1_id===userId
   const isP2=match.p2_id===userId
   const sw=match.sets?{p1:match.sets.filter(s=>s.p1>s.p2).length,p2:match.sets.filter(s=>s.p2>s.p1).length}:{p1:0,p2:0}
+  const matchUrl=typeof window!=="undefined"?`${window.location.origin}/liga/match/${match.id}`:""
+  const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(matchUrl)}&color=39FF14&bgcolor=15161A&margin=8`
 
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -80,6 +82,16 @@ export default function MatchPage({params}:{params:{id:string}}){
           ):<span style={{fontSize:14,color:M}}>vs</span>}
           <span style={{fontSize:18,fontWeight:900,color:match.winner_id===match.p2_id?G:W}}>{match.p2_name}</span>
         </div>
+
+        {/* QR Code — nur wenn Match noch offen */}
+        {match.status!=="confirmed"&&!isP1&&!isP2&&(
+          <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,padding:"20px",textAlign:"center",marginBottom:16}}>
+            <p style={{fontSize:11,fontWeight:700,color:G,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:12}}>QR-Code für Spieler</p>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={qrUrl} alt="Match QR" style={{width:160,height:160,borderRadius:10,display:"block",margin:"0 auto 10px"}}/>
+            <p style={{fontSize:12,color:M}}>Spieler scannen diesen Code um das Resultat einzutragen</p>
+          </div>
+        )}
 
         {/* Confirmed state */}
         {match.status==="confirmed"&&(
