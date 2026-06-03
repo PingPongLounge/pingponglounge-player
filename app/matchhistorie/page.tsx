@@ -46,7 +46,13 @@ export default function MatchHistoriePage(){
       .order("confirmed_at",{ascending:false})
       .limit(200)
 
-    setMatches((m||[]) as Match[])
+    const mapped = (m||[]).map((x: Record<string,unknown>) => ({
+      ...x,
+      p1: Array.isArray(x.p1) ? (x.p1[0] || null) : x.p1,
+      p2: Array.isArray(x.p2) ? (x.p2[0] || null) : x.p2,
+      season: Array.isArray(x.season) ? (x.season[0] || null) : x.season,
+    }))
+    setMatches(mapped as unknown as Match[])
 
     // ELO history für delta
     const {data:eh}=await sb
