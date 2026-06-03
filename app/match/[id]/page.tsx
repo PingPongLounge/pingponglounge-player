@@ -19,7 +19,7 @@ type MatchDetail = {
   joiner: { name: string; elo: number } | null
 }
 
-export default function MatchDetailPage({ params }: { params: { id: string } }) {
+export default function MatchDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const [match, setMatch] = useState<MatchDetail | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
 
@@ -31,7 +31,7 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
       const { data } = await sb
         .from("open_matches")
         .select("id,level,city,proposed_time,message,status,creator_id,joiner_id,creator:profiles!open_matches_creator_id_fkey(name,elo),joiner:profiles!open_matches_joiner_id_fkey(name,elo)")
-        .eq("id", params.id)
+        .eq("id", (await params).id)
         .single()
       if (data) {
         setMatch({
@@ -42,7 +42,7 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
       }
     }
     load()
-  }, [params.id])
+  }, [(await params).id])
 
   if (!match) return (
     <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center" }}>
