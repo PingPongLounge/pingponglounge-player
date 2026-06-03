@@ -19,13 +19,11 @@ export async function POST(req: NextRequest) {
   if (match.status !== "p1_entered")
     return NextResponse.json({ error: "Nichts zu bestätigen" }, { status: 400 })
 
-  // Match bestätigen
   await sb
     .from("league_matches")
     .update({ status: "confirmed", confirmed_at: new Date().toISOString() })
     .eq("id", match_id)
 
-  // ELO + Stats update
   if (match.winner_id && match.sets) {
     const loserId = match.winner_id === match.p1_id ? match.p2_id : match.p1_id
 
@@ -44,17 +42,13 @@ export async function POST(req: NextRequest) {
     if (winner && loser) {
       const K = 32
       const winnerElo = winner.elo ?? 1000
-      const loserElo = loser.elo ?? 1000
-
-      // Erwartete Gewinnwahrscheinlichkeit
+      const loserElo  = loser.elo  ?? 1000
       const ea = 1 / (1 + Math.pow(10, (loserElo - winnerElo) / 400))
       const eb = 1 - ea
-
-      // Neue ELO-Werte — Floor bei 100
       const newWinnerElo = Math.max(100, Math.round(winnerElo + K * (1 - ea)))
       const newLoserElo  = Math.max(100, Math.round(loserElo  + K * (0 - eb)))
 
-      // Beide Profile updaten
+      // Profile updaten
       await sb.from("profiles").update({
         elo: newWinnerElo,
         matches_played: (winner.matches_played ?? 0) + 1,
@@ -65,6 +59,12 @@ export async function POST(req: NextRequest) {
         elo: newLoserElo,
         matches_played: (loser.matches_played ?? 0) + 1,
       }).eq("id", loserId)
+
+      // ELO-History loggen
+      await sb.from("elo_history").insert([
+        { player_id: match.winner_id, elo: newWinnerElo, delta: newWinnerElo - winnerElo, match_id },
+        { player_id: loserId,         elo: newLoserElo,  delta: newLoserElo  - loserElo,  match_id },
+      ])
     }
   }
 
