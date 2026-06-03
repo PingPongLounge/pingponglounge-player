@@ -72,6 +72,21 @@ export default async function Dashboard() {
             </div>
           </Link>
 
+          {/* FEED — LIVE */}
+          <Link href="/feed" style={{ textDecoration: 'none' }}>
+            <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, borderRadius: '14px', padding: '20px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              <div style={{ flex: 1, textAlign: 'left' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <p style={{ fontSize: '17px', fontWeight: 700, color: TEXT, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Activity Feed</p>
+                  <span style={{ fontSize: '9px', fontWeight: 700, color: G, background: 'rgba(57,255,20,0.12)', borderRadius: '999px', padding: '2px 7px' }}>LIVE</span>
+                </div>
+                <p style={{ fontSize: '13px', color: MUTED, marginTop: '2px' }}>Matches · Reaktionen · Kommentare</p>
+              </div>
+              <span style={{ color: G, fontSize: '18px' }}>→</span>
+            </div>
+          </Link>
+
           {/* Q3 2026 — Turniere & Find a Match */}
           {[
             { href: '/turniere', label: 'Turniere', sub: 'Community Turniere & Brackets', icon: <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M9.5 20h5"/><path d="M12 14v4"/></svg> },
