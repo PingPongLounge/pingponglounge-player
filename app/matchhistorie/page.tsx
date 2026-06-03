@@ -9,6 +9,9 @@ function dateLabel(d:string):string{
   return new Date(d).toLocaleDateString("de-CH",{day:"numeric",month:"short",year:"numeric"})
 }
 
+// Supabase gibt Joins als Arrays zurück — flexibler Typ
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type AnyProfile = any
 type Match={
   id:string
   sets:Array<{p1:number,p2:number}>|null
@@ -16,9 +19,15 @@ type Match={
   confirmed_at:string
   p1_id:string
   p2_id:string
-  p1:{name:string}|null
-  p2:{name:string}|null
-  season:{name:string,city:string,skill_class:string}|null
+  p1:AnyProfile
+  p2:AnyProfile
+  season:AnyProfile
+}
+
+function getName(p:AnyProfile):string{
+  if(!p) return "?"
+  if(Array.isArray(p)) return p[0]?.name||"?"
+  return p.name||"?"
 }
 
 type EloEntry={match_id:string,delta:number,elo:number}
@@ -40,21 +49,15 @@ export default function MatchHistoriePage(){
 
     const {data:m}=await sb
       .from("league_matches")
-      .select(`id,sets,winner_id,confirmed_at,p1_id,p2_id,p1:profiles!league_matches_p1_id_fkey(name),p2:profiles!league_matches_p2_id_fkey(name),season:league_seasons!league_matches_season_id_fkey(name,city,skill_class)`)
+      .select("id,sets,winner_id,confirmed_at,p1_id,p2_id,p1:profiles!league_matches_p1_id_fkey(name),p2:profiles!league_matches_p2_id_fkey(name),season:league_seasons!league_matches_season_id_fkey(name,city,skill_class)")
       .eq("status","confirmed")
       .or(`p1_id.eq.${user.id},p2_id.eq.${user.id}`)
       .order("confirmed_at",{ascending:false})
       .limit(200)
 
-    const mapped = (m||[]).map((x: Record<string,unknown>) => ({
-      ...x,
-      p1: Array.isArray(x.p1) ? (x.p1[0] || null) : x.p1,
-      p2: Array.isArray(x.p2) ? (x.p2[0] || null) : x.p2,
-      season: Array.isArray(x.season) ? (x.season[0] || null) : x.season,
-    }))
-    setMatches(mapped as unknown as unknown as Match[])
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    setMatches((m||[]) as any)
 
-    // ELO history für delta
     const {data:eh}=await sb
       .from("elo_history")
       .select("match_id,delta,elo")
@@ -99,7 +102,6 @@ export default function MatchHistoriePage(){
           ))}
         </div>
 
-        {/* List */}
         {loading?(
           <div style={{textAlign:"center",padding:"60px 0",color:M}}>
             <p style={{fontSize:14}}>Lädt...</p>
@@ -115,41 +117,31 @@ export default function MatchHistoriePage(){
             <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,overflow:"hidden"}}>
               {paginated.map((m,i)=>{
                 const isP1=m.p1_id===userId
-                const opponentName=isP1?m.p2?.name||"?":m.p1?.name||"?"
+                const opponentName=isP1?getName(m.p2):getName(m.p1)
                 const won=m.winner_id===userId
                 const elo=eloMap[m.id]
                 const setsStr=m.sets?m.sets.map(s=>isP1?`${s.p1}:${s.p2}`:`${s.p2}:${s.p1}`).join("  "):""
+                const city = Array.isArray(m.season)?m.season[0]?.city:m.season?.city
 
                 return(
                   <div key={m.id} style={{display:"flex",alignItems:"center",gap:12,padding:"13px 18px",borderBottom:i<paginated.length-1?`1px solid #1a1a1a`:"none"}}>
-
-                    {/* Icon */}
                     <div style={{width:32,height:32,borderRadius:9,background:won?`${G}18`:"#2d1111",border:`1px solid ${won?G+"30":"#3d1111"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0}}>
                       {won?"👑":"💀"}
                     </div>
-
-                    {/* Info */}
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3}}>
                         <span style={{fontSize:14,fontWeight:700,color:W}}>{opponentName}</span>
                         <span style={{fontSize:10,fontWeight:700,color:won?G:"#f87171",background:won?`${G}18`:"#2d1111",borderRadius:999,padding:"1px 7px"}}>{won?"SIEG":"NDLG"}</span>
                       </div>
                       <p style={{fontSize:11,color:M}}>
-                        {m.season?.city||""}{m.season?.city&&setsStr?" · ":""}{setsStr}
+                        {city||""}{city&&setsStr?" · ":""}{setsStr}
                       </p>
                     </div>
-
-                    {/* Right */}
                     <div style={{textAlign:"right",flexShrink:0}}>
-                      {elo&&(
-                        <p style={{fontSize:13,fontWeight:700,color:elo.delta>=0?"#4ADE80":"#f87171",marginBottom:2}}>
-                          {elo.delta>=0?"+":""}{elo.delta}
-                        </p>
-                      )}
+                      {elo&&(<p style={{fontSize:13,fontWeight:700,color:elo.delta>=0?"#4ADE80":"#f87171",marginBottom:2}}>{elo.delta>=0?"+":""}{elo.delta}</p>)}
                       {elo&&<p style={{fontSize:11,color:M}}>{elo.elo} ELO</p>}
                       {!elo&&<p style={{fontSize:11,color:M}}>{dateLabel(m.confirmed_at)}</p>}
                     </div>
-
                   </div>
                 )
               })}
@@ -162,7 +154,6 @@ export default function MatchHistoriePage(){
             )}
           </>
         )}
-
       </div>
     </main>
   )
