@@ -70,6 +70,16 @@ export default async function Dashboard() {
         </svg>
       ),
     },
+    {
+      href: '/match',
+      label: 'Find a Match',
+      sub: 'Open Matches · Spontan spielen',
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>
+        </svg>
+      ),
+    },
   ]
 
   const soonCards = [
@@ -82,18 +92,7 @@ export default async function Dashboard() {
           <path d="M7 4h10v5a5 5 0 0 1-10 0Z"/><path d="M9.5 20h5"/><path d="M12 14v4"/>
         </svg>
       ),
-    },
-    {
-      href: '/match',
-      label: 'Find a Match',
-      sub: 'Spontan Mitspieler finden',
-      icon: (
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>
-        </svg>
-      ),
-    },
-  ]
+    },  ]
 
   return (
     <main style={{ minHeight: '100vh', background: DARK, padding: '0 0 40px' }}>
