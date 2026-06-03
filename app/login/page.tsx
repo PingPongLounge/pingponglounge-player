@@ -1,5 +1,6 @@
 "use client"
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import PlayerLogo from "../components/PlayerLogo"
 
@@ -73,6 +74,7 @@ export default function LoginPage() {
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  const router = useRouter()
   const [msg, setMsg] = useState("")
 
   async function signInWithGoogle() {
@@ -89,7 +91,7 @@ export default function LoginPage() {
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) { setError(error.message); setLoading(false); return }
-    window.location.href = "/"
+    router.refresh(); router.push("/dashboard")
   }
 
   async function handleRegister(e: React.FormEvent) {
