@@ -57,8 +57,14 @@ export default function ProfilPage(){
   const [eloHistory,setEloHistory]=useState<EloPoint[]>([])
   const [recentMatches,setRecentMatches]=useState<RecentMatch[]>([])
   const [loading,setLoading]=useState(true)
+  const [badges,setBadges]=useState<{icon:string,title:string,earned:boolean,tier:string}[]>([])
+  const [earnedCount,setEarnedCount]=useState(0)
 
   useEffect(()=>{
+    fetch("/api/achievements").then(r=>r.json()).then(d=>{
+      setBadges((d.badges||[]).filter((b:{earned:boolean})=>b.earned).slice(0,6))
+      setEarnedCount(d.earned||0)
+    })
     fetch("/api/profil").then(r=>r.json()).then(d=>{
       setProfile(d.profile)
       setEloHistory(d.eloHistory||[])
