@@ -61,6 +61,16 @@ export default async function Dashboard() {
       ),
     },
     {
+      href: '/rangliste',
+      label: 'Rangliste',
+      sub: 'National · Kantonsweise · ELO',
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M18 20V10M12 20V4M6 20v-6"/>
+        </svg>
+      ),
+    },
+    {
       href: '/liga',
       label: 'Liga',
       sub: 'Stadtweise Saisons · Live-Tabelle',
