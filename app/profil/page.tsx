@@ -57,6 +57,7 @@ export default function ProfilPage(){
   const [eloHistory,setEloHistory]=useState<EloPoint[]>([])
   const [recentMatches,setRecentMatches]=useState<RecentMatch[]>([])
   const [loading,setLoading]=useState(true)
+  const [ppBalance,setPpBalance]=useState(0)
   const [badges,setBadges]=useState<{icon:string,title:string,earned:boolean,tier:string}[]>([])
   const [earnedCount,setEarnedCount]=useState(0)
 
@@ -65,6 +66,7 @@ export default function ProfilPage(){
       setBadges((d.badges||[]).filter((b:{earned:boolean})=>b.earned).slice(0,6))
       setEarnedCount(d.earned||0)
     })
+    fetch("/api/pingpoints").then(r=>r.json()).then(d=>setPpBalance(d.balance||0))
     fetch("/api/profil").then(r=>r.json()).then(d=>{
       setProfile(d.profile)
       setEloHistory(d.eloHistory||[])
@@ -133,12 +135,13 @@ export default function ProfilPage(){
         </div>
 
         {/* Stats Row */}
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr",gap:8,marginBottom:10}}>
+        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr 1fr 1fr",gap:8,marginBottom:10}}>
           {[
             {num:played,lbl:"Gespielt"},
             {num:won,lbl:"Siege"},
             {num:lost,lbl:"Niederlagen"},
             {num:winRate+"%",lbl:"Win Rate"},
+            {num:ppBalance+"PP",lbl:"PingPoints"},
           ].map(({num,lbl})=>(
             <div key={lbl} style={{background:C,border:`1px solid ${B}`,borderRadius:12,padding:"12px 8px",textAlign:"center"}}>
               <div style={{fontSize:20,fontWeight:900,color:W,lineHeight:1}}>{num}</div>

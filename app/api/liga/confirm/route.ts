@@ -19,51 +19,35 @@ export async function POST(req: NextRequest) {
   if (match.status !== "p1_entered")
     return NextResponse.json({ error: "Nichts zu bestätigen" }, { status: 400 })
 
-  await sb
-    .from("league_matches")
+  await sb.from("league_matches")
     .update({ status: "confirmed", confirmed_at: new Date().toISOString() })
     .eq("id", match_id)
 
   if (match.winner_id && match.sets) {
     const loserId = match.winner_id === match.p1_id ? match.p2_id : match.p1_id
 
-    const { data: winner } = await sb
-      .from("profiles")
-      .select("elo, matches_played, matches_won")
-      .eq("id", match.winner_id)
-      .single()
-
-    const { data: loser } = await sb
-      .from("profiles")
-      .select("elo, matches_played, matches_won")
-      .eq("id", loserId)
-      .single()
+    const { data: winner } = await sb.from("profiles").select("elo,matches_played,matches_won").eq("id", match.winner_id).single()
+    const { data: loser }  = await sb.from("profiles").select("elo,matches_played,matches_won").eq("id", loserId).single()
 
     if (winner && loser) {
       const K = 32
-      const winnerElo = winner.elo ?? 1000
-      const loserElo  = loser.elo  ?? 1000
-      const ea = 1 / (1 + Math.pow(10, (loserElo - winnerElo) / 400))
-      const eb = 1 - ea
-      const newWinnerElo = Math.max(100, Math.round(winnerElo + K * (1 - ea)))
-      const newLoserElo  = Math.max(100, Math.round(loserElo  + K * (0 - eb)))
+      const wElo = winner.elo ?? 1000, lElo = loser.elo ?? 1000
+      const ea = 1 / (1 + Math.pow(10, (lElo - wElo) / 400))
+      const newWElo = Math.max(100, Math.round(wElo + K * (1 - ea)))
+      const newLElo = Math.max(100, Math.round(lElo + K * (0 - (1 - ea))))
 
-      // Profile updaten
-      await sb.from("profiles").update({
-        elo: newWinnerElo,
-        matches_played: (winner.matches_played ?? 0) + 1,
-        matches_won:    (winner.matches_won    ?? 0) + 1,
-      }).eq("id", match.winner_id)
+      await sb.from("profiles").update({ elo: newWElo, matches_played: (winner.matches_played ?? 0) + 1, matches_won: (winner.matches_won ?? 0) + 1 }).eq("id", match.winner_id)
+      await sb.from("profiles").update({ elo: newLElo, matches_played: (loser.matches_played ?? 0) + 1 }).eq("id", loserId)
 
-      await sb.from("profiles").update({
-        elo: newLoserElo,
-        matches_played: (loser.matches_played ?? 0) + 1,
-      }).eq("id", loserId)
-
-      // ELO-History loggen
       await sb.from("elo_history").insert([
-        { player_id: match.winner_id, elo: newWinnerElo, delta: newWinnerElo - winnerElo, match_id },
-        { player_id: loserId,         elo: newLoserElo,  delta: newLoserElo  - loserElo,  match_id },
+        { player_id: match.winner_id, elo: newWElo, delta: newWElo - wElo, match_id },
+        { player_id: loserId, elo: newLElo, delta: newLElo - lElo, match_id },
+      ])
+
+      // PingPoints vergeben
+      await sb.from("ping_points_transactions").insert([
+        { player_id: match.winner_id, amount: 15, source: "liga_win",    description: "Liga-Match gewonnen",  ref_id: match_id },
+        { player_id: loserId,         amount: 5,  source: "liga_played", description: "Liga-Match gespielt",  ref_id: match_id },
       ])
     }
   }
