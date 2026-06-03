@@ -29,7 +29,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   if (action === "confirm") {
-    const { data: m } = await sb.from("tournament_matches").select("winner_id,sets,round,match_number,tournament_id").eq("id", match_id).single()
+    const { data: m } = await sb.from("tournament_matches").select("winner_id,sets,round,match_number,tournament_id,status,p1_id,p2_id").eq("id", match_id).single()
     if (!m || m.status !== "p1_entered") return NextResponse.json({ error: "Nichts zu bestätigen" }, { status: 400 })
     await sb.from("tournament_matches").update({ status: "confirmed" }).eq("id", match_id)
     // Gewinner in nächste Runde setzen
