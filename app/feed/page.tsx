@@ -1,211 +1,214 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 
-const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1"
+const BG="#111214", C="#15161A", B="#26282E", M="#6B6E7A", G="#39FF14", W="#E8E6E1", PK="#FF00C8"
 
-type FeedMatch = {
+const levelColor = (l: string): string =>
+  ({ Locker: "#4ADE80", Hobby: "#FACC15", Fortgeschritten: "#FB923C", Competitive: PK }[l] || G)
+
+function timeAgo(d: string): string {
+  const diff = Date.now() - new Date(d).getTime()
+  const m = Math.floor(diff / 60000)
+  if (m < 1) return "gerade eben"
+  if (m < 60) return `vor ${m}min`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `vor ${h}h`
+  return `vor ${Math.floor(h / 24)}d`
+}
+
+function setsLabel(sets: Array<{p1: number; p2: number}> | null): string {
+  if (!sets || !sets.length) return ""
+  return sets.map(s => `${s.p1}:${s.p2}`).join("  ")
+}
+
+type Profile = { id: string; name: string; elo: number }
+type Season  = { name: string; city: string; skill_class: string }
+type Reaction = { type: string; user_id: string }
+
+type Match = {
   id: string
+  round: number
+  sets: Array<{p1: number; p2: number}> | null
+  winner_id: string | null
+  confirmed_at: string
+  season_id: string
   p1_id: string
   p2_id: string
-  p1_name: string
-  p2_name: string
-  sets: Array<{p1:number,p2:number}> | null
-  winner_id: string | null
-  played_at: string | null
-  season_name: string
-  season_id: string
-  reactions: {type:string,user_id:string}[]
-  comments: {id:string,user_id:string,user_name:string,text:string,created_at:string}[]
-}
-
-function setsStr(sets: Array<{p1:number,p2:number}>|null): string {
-  if (!sets?.length) return ""
-  return sets.map(s=>`${s.p1}:${s.p2}`).join("  ")
-}
-function setsWins(sets: Array<{p1:number,p2:number}>|null) {
-  if (!sets) return {p1:0,p2:0}
-  return { p1: sets.filter(s=>s.p1>s.p2).length, p2: sets.filter(s=>s.p2>s.p1).length }
-}
-function ago(d: string): string {
-  const h = Math.floor((Date.now()-new Date(d).getTime())/3600000)
-  if (h < 1) return "gerade eben"
-  if (h < 24) return `vor ${h}h`
-  return `vor ${Math.floor(h/24)}d`
+  p1: Profile | null
+  p2: Profile | null
+  season: Season | null
+  match_reactions: Reaction[]
 }
 
 export default function FeedPage() {
-  const [items, setItems]       = useState<FeedMatch[]>([])
-  const [userId, setUserId]     = useState<string|null>(null)
+  const [matches, setMatches]   = useState<Match[]>([])
+  const [userId, setUserId]     = useState<string | null>(null)
   const [loading, setLoading]   = useState(true)
-  const [commentText, setCommentText] = useState<Record<string,string>>({})
+  const [reacting, setReacting] = useState<string | null>(null)
 
-  async function loadFeed() {
+  const load = useCallback(async () => {
     const sb = createClient()
     const { data: { user } } = await sb.auth.getUser()
     setUserId(user?.id || null)
 
-    const { data } = await sb
-      .from("league_matches")
-      .select(`
-        id, p1_id, p2_id, sets, winner_id, played_at,
-        p1:profiles!league_matches_p1_id_fkey(name),
-        p2:profiles!league_matches_p2_id_fkey(name),
-        season:league_seasons(id,name),
-        match_reactions(type,user_id),
-        match_comments(id,user_id,text,created_at,profiles(name))
-      `)
-      .eq("status", "confirmed")
-      .order("played_at", { ascending: false })
-      .limit(30)
-
-    const mapped = (data || []).map((m: Record<string,unknown>) => ({
-      id: m.id as string,
-      p1_id: m.p1_id as string,
-      p2_id: m.p2_id as string,
-      p1_name: (m.p1 as {name:string}|null)?.name || "?",
-      p2_name: (m.p2 as {name:string}|null)?.name || "?",
-      sets: m.sets as FeedMatch["sets"],
-      winner_id: m.winner_id as string|null,
-      played_at: m.played_at as string|null,
-      season_name: (m.season as {name:string}|null)?.name || "",
-      season_id: (m.season as {id:string}|null)?.id || "",
-      reactions: (m.match_reactions || []) as {type:string,user_id:string}[],
-      comments: ((m.match_comments || []) as Array<{id:string,user_id:string,text:string,created_at:string,profiles:{name:string}|null}>)
-        .map(c => ({ ...c, user_name: c.profiles?.name || "?" })),
-    }))
-    setItems(mapped)
+    const res = await fetch("/api/feed")
+    const json = await res.json()
+    setMatches(json.matches || [])
     setLoading(false)
-  }
+  }, [])
 
-  useEffect(() => { loadFeed() }, [])
+  useEffect(() => { load() }, [load])
 
-  async function handleReact(matchId: string, type: string) {
-    if (!userId) return
+  async function react(matchId: string, type: string) {
+    if (!userId || reacting) return
+    setReacting(matchId + type)
     const sb = createClient()
-    const item = items.find(i=>i.id===matchId)
-    const existing = item?.reactions.find(r=>r.user_id===userId&&r.type===type)
+    const match = matches.find(m => m.id === matchId)
+    const existing = match?.match_reactions?.find(r => r.user_id === userId && r.type === type)
+
     if (existing) {
-      await sb.from("match_reactions").delete().eq("match_id",matchId).eq("user_id",userId).eq("type",type)
+      await sb.from("match_reactions").delete()
+        .eq("match_id", matchId).eq("user_id", userId).eq("type", type)
     } else {
-      await sb.from("match_reactions").upsert({match_id:matchId,user_id:userId,type})
+      await sb.from("match_reactions").upsert({ match_id: matchId, user_id: userId, type })
     }
-    const { data } = await sb.from("match_reactions").select("type,user_id").eq("match_id",matchId)
-    setItems(prev=>prev.map(i=>i.id===matchId?{...i,reactions:(data||[]) as {type:string,user_id:string}[]}:i))
+
+    // Lokales State-Update ohne Re-Fetch
+    setMatches(prev => prev.map(m => {
+      if (m.id !== matchId) return m
+      const reactions = existing
+        ? m.match_reactions.filter(r => !(r.user_id === userId && r.type === type))
+        : [...m.match_reactions, { type, user_id: userId! }]
+      return { ...m, match_reactions: reactions }
+    }))
+    setReacting(null)
   }
 
-  async function handleComment(matchId: string) {
-    const text = commentText[matchId]?.trim()
-    if (!text || !userId) return
-    const sb = createClient()
-    await sb.from("match_comments").insert({match_id:matchId,user_id:userId,text})
-    setCommentText(p=>({...p,[matchId]:""}))
-    const { data } = await sb.from("match_comments").select("id,user_id,text,created_at,profiles(name)").eq("match_id",matchId).order("created_at")
-    setItems(prev=>prev.map(i=>i.id===matchId?{...i,comments:((data||[]) as unknown as Array<{id:string,user_id:string,text:string,created_at:string,profiles:{name:string}|null}>).map(c=>({...c,user_name:c.profiles?.name||"?"}))}:i))
-  }
+  const reactionCount = (m: Match, type: string) =>
+    m.match_reactions.filter(r => r.type === type).length
+
+  const hasReacted = (m: Match, type: string) =>
+    m.match_reactions.some(r => r.user_id === userId && r.type === type)
 
   return (
-    <main style={{ minHeight:"100vh", background:BG, padding:"0 0 80px" }}>
-      {/* Header */}
-      <div style={{ padding:"20px 20px 0", maxWidth:560, margin:"0 auto", display:"flex", justifyContent:"space-between", alignItems:"center" }}>
-        <Link href="/dashboard" style={{ fontSize:13, color:M, textDecoration:"none" }}>← Dashboard</Link>
-        <p style={{ fontSize:11, fontWeight:700, color:G, letterSpacing:"0.14em", textTransform:"uppercase" }}>Activity Feed</p>
-        <div style={{ width:60 }}/>
-      </div>
+    <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
+      <div style={{ maxWidth: 560, margin: "0 auto" }}>
 
-      <div style={{ maxWidth:560, margin:"0 auto", padding:"24px 20px 0" }}>
-        {loading && <p style={{ textAlign:"center", color:M, padding:40 }}>Lädt...</p>}
+        {/* Header */}
+        <Link href="/dashboard" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
+        <div style={{ margin: "20px 0 24px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+            <span style={{ fontSize: 11, fontWeight: 700, color: G, letterSpacing: "0.16em", textTransform: "uppercase" }}>Live</span>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: G, boxShadow: `0 0 6px ${G}`, display: "inline-block" }} />
+          </div>
+          <h1 style={{ fontSize: 32, fontWeight: 900, color: W, textTransform: "uppercase", lineHeight: 1 }}>FEED</h1>
+          <p style={{ fontSize: 13, color: M, marginTop: 6 }}>Alle Matches · alle Ligen · alle Städte</p>
+        </div>
 
-        {!loading && items.length === 0 && (
-          <div style={{ textAlign:"center", background:C, border:`1px solid ${B}`, borderRadius:16, padding:"48px 20px" }}>
-            <p style={{ fontSize:32, marginBottom:12 }}>🏓</p>
-            <p style={{ fontSize:16, fontWeight:700, color:W, marginBottom:8 }}>Noch keine Matches</p>
-            <p style={{ fontSize:13, color:M }}>Sobald Liga-Matches gespielt werden, erscheinen sie hier.</p>
+        {/* Content */}
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "60px 0", color: M }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>🏓</div>
+            <p style={{ fontSize: 14 }}>Lädt...</p>
+          </div>
+        ) : matches.length === 0 ? (
+          <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, padding: "40px 20px", textAlign: "center" }}>
+            <p style={{ fontSize: 32, marginBottom: 12 }}>🏓</p>
+            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>Noch keine Matches</p>
+            <p style={{ fontSize: 13, color: M }}>Sobald ein Match bestätigt wird, erscheint es hier.</p>
+          </div>
+        ) : (
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {matches.map(m => {
+              const isWinnerP1 = m.winner_id === m.p1_id
+              const claps = reactionCount(m, "👏")
+              const fire  = reactionCount(m, "🔥")
+              const myClap = hasReacted(m, "👏")
+              const myFire = hasReacted(m, "🔥")
+
+              return (
+                <div key={m.id} style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, overflow: "hidden" }}>
+
+                  {/* Liga Badge */}
+                  {m.season && (
+                    <div style={{ padding: "8px 16px", borderBottom: `1px solid ${B}`, display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ fontSize: 10, fontWeight: 700, color: levelColor(m.season.skill_class), background: `${levelColor(m.season.skill_class)}18`, border: `1px solid ${levelColor(m.season.skill_class)}30`, borderRadius: 999, padding: "2px 8px" }}>
+                        {m.season.skill_class}
+                      </span>
+                      <span style={{ fontSize: 11, color: M }}>{m.season.city} · {m.season.name}</span>
+                      <span style={{ fontSize: 11, color: M, marginLeft: "auto" }}>{timeAgo(m.confirmed_at)}</span>
+                    </div>
+                  )}
+
+                  {/* Match */}
+                  <div style={{ padding: "14px 16px" }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+
+                      {/* P1 */}
+                      <div style={{ flex: 1, textAlign: "left" }}>
+                        <p style={{ fontSize: 15, fontWeight: 800, color: isWinnerP1 ? G : W, lineHeight: 1.2 }}>
+                          {isWinnerP1 && <span style={{ fontSize: 11, marginRight: 4 }}>👑</span>}
+                          {m.p1?.name || "?"}
+                        </p>
+                        <p style={{ fontSize: 11, color: M, marginTop: 2 }}>ELO {m.p1?.elo ?? "—"}</p>
+                      </div>
+
+                      {/* Score */}
+                      <div style={{ textAlign: "center", flexShrink: 0 }}>
+                        <p style={{ fontSize: 18, fontWeight: 900, color: W, letterSpacing: 2 }}>
+                          {isWinnerP1 ? "3" : "—"} : {isWinnerP1 ? "—" : "3"}
+                        </p>
+                        {m.sets && (
+                          <p style={{ fontSize: 10, color: M, marginTop: 2 }}>{setsLabel(m.sets)}</p>
+                        )}
+                      </div>
+
+                      {/* P2 */}
+                      <div style={{ flex: 1, textAlign: "right" }}>
+                        <p style={{ fontSize: 15, fontWeight: 800, color: !isWinnerP1 && m.winner_id ? G : W, lineHeight: 1.2 }}>
+                          {!isWinnerP1 && m.winner_id && <span style={{ fontSize: 11, marginRight: 4 }}>👑</span>}
+                          {m.p2?.name || "?"}
+                        </p>
+                        <p style={{ fontSize: 11, color: M, marginTop: 2 }}>ELO {m.p2?.elo ?? "—"}</p>
+                      </div>
+
+                    </div>
+                  </div>
+
+                  {/* Reactions */}
+                  <div style={{ padding: "8px 16px 12px", display: "flex", gap: 8 }}>
+                    {(["👏", "🔥"] as const).map(emoji => {
+                      const count = emoji === "👏" ? claps : fire
+                      const active = emoji === "👏" ? myClap : myFire
+                      return (
+                        <button
+                          key={emoji}
+                          onClick={() => react(m.id, emoji)}
+                          style={{
+                            display: "flex", alignItems: "center", gap: 5,
+                            background: active ? `${G}18` : B,
+                            border: `1px solid ${active ? G + "40" : B}`,
+                            borderRadius: 999, padding: "5px 12px",
+                            fontSize: 13, color: active ? G : M,
+                            cursor: userId ? "pointer" : "default",
+                            transition: "all .15s"
+                          }}
+                        >
+                          <span>{emoji}</span>
+                          {count > 0 && <span style={{ fontSize: 12, fontWeight: 700 }}>{count}</span>}
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                </div>
+              )
+            })}
           </div>
         )}
 
-        <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
-          {items.map(item => {
-            const sw = setsWins(item.sets)
-            const counts: Record<string,number> = {}
-            item.reactions.forEach(r => { counts[r.type] = (counts[r.type]||0)+1 })
-            const myR = new Set(item.reactions.filter(r=>r.user_id===userId).map(r=>r.type))
-
-            return (
-              <div key={item.id} style={{ background:C, border:`1px solid ${B}`, borderRadius:16, padding:16, overflow:"hidden" }}>
-                {/* Liga-Tag */}
-                {item.season_name && (
-                  <Link href={`/liga/${item.season_id}`} style={{ fontSize:10, fontWeight:700, color:G, textDecoration:"none", letterSpacing:"0.1em", textTransform:"uppercase", display:"block", marginBottom:10 }}>
-                    🏆 {item.season_name}
-                  </Link>
-                )}
-
-                {/* Score */}
-                <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:6 }}>
-                  <span style={{ fontSize:16, fontWeight:700, color: item.winner_id===item.p1_id ? G : W, flex:1 }}>
-                    {item.p1_name}
-                  </span>
-                  <div style={{ textAlign:"center", padding:"0 12px" }}>
-                    <span style={{ fontSize:20, fontWeight:900, color:W, background:B, borderRadius:8, padding:"4px 12px" }}>
-                      {sw.p1}:{sw.p2}
-                    </span>
-                  </div>
-                  <span style={{ fontSize:16, fontWeight:700, color: item.winner_id===item.p2_id ? G : W, flex:1, textAlign:"right" }}>
-                    {item.p2_name}
-                  </span>
-                </div>
-
-                {/* Sätze + Zeit */}
-                <div style={{ display:"flex", justifyContent:"space-between", marginBottom:12 }}>
-                  <span style={{ fontSize:11, color:M }}>{setsStr(item.sets)}</span>
-                  {item.played_at && <span style={{ fontSize:11, color:M }}>{ago(item.played_at)}</span>}
-                </div>
-
-                {/* Reactions */}
-                <div style={{ display:"flex", gap:8, marginBottom:12 }}>
-                  {(["clap","fire","ping"] as const).map(type => (
-                    <button key={type} onClick={()=>handleReact(item.id,type)} style={{
-                      background: myR.has(type) ? `${G}18` : "none",
-                      border: `1px solid ${myR.has(type) ? G : B}`,
-                      borderRadius:8, padding:"6px 12px", cursor:"pointer", fontSize:13,
-                      color: myR.has(type) ? G : M, fontWeight: myR.has(type) ? 700 : 400
-                    }}>
-                      {type==="clap"?"👏":type==="fire"?"🔥":"🏓"} {counts[type]||0}
-                    </button>
-                  ))}
-                </div>
-
-                {/* Comments */}
-                {item.comments.length > 0 && (
-                  <div style={{ borderTop:`1px solid ${B}`, paddingTop:10, marginBottom:10 }}>
-                    {item.comments.map(c => (
-                      <div key={c.id} style={{ marginBottom:6, display:"flex", gap:6, alignItems:"flex-start" }}>
-                        <span style={{ fontSize:12, fontWeight:700, color:c.user_id===userId?G:W, flexShrink:0 }}>{c.user_name}</span>
-                        <span style={{ fontSize:12, color:M, lineHeight:1.4 }}>{c.text}</span>
-                        <span style={{ fontSize:10, color:M, marginLeft:"auto", flexShrink:0 }}>{ago(c.created_at)}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-
-                {/* Comment input */}
-                {userId && (
-                  <div style={{ display:"flex", gap:8 }}>
-                    <input
-                      value={commentText[item.id]||""}
-                      onChange={e=>setCommentText(p=>({...p,[item.id]:e.target.value}))}
-                      onKeyDown={e=>e.key==="Enter"&&handleComment(item.id)}
-                      placeholder="Kommentieren..."
-                      style={{ flex:1, background:BG, border:`1px solid ${B}`, borderRadius:8, padding:"8px 12px", fontSize:13, color:W, outline:"none", fontFamily:"inherit" }}
-                    />
-                    <button onClick={()=>handleComment(item.id)} style={{ background:G, color:"#0A0A0C", border:"none", borderRadius:8, padding:"8px 14px", cursor:"pointer", fontSize:13, fontWeight:700 }}>→</button>
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
       </div>
     </main>
   )
