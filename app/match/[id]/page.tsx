@@ -20,6 +20,7 @@ type MatchDetail = {
 }
 
 export default function MatchDetailPage({ params }: { params: { id: string } }) {
+  const matchId = params.id
   const [match, setMatch] = useState<MatchDetail | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
 
@@ -31,7 +32,7 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
       const { data } = await sb
         .from("open_matches")
         .select("id,level,city,proposed_time,message,status,creator_id,joiner_id,creator:profiles!open_matches_creator_id_fkey(name,elo),joiner:profiles!open_matches_joiner_id_fkey(name,elo)")
-        .eq("id", params.id)
+        .eq("id", matchId)
         .single()
       if (data) {
         setMatch({
@@ -42,7 +43,7 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
       }
     }
     load()
-  }, [params.id])
+  }, [matchId])
 
   if (!match) return (
     <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -62,13 +63,13 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
         <div style={{ margin: "20px 0 24px", textAlign: "center" }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: lc, letterSpacing: "0.14em", textTransform: "uppercase" }}>{match.level}</span>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: W, textTransform: "uppercase", margin: "6px 0 4px" }}>MATCH</h1>
-          <p style={{ fontSize: 13, color: M }}>📍 {match.city}{match.proposed_time ? ` · 🕐 ${new Date(match.proposed_time).toLocaleString("de-CH", { weekday: "short", hour: "2-digit", minute: "2-digit" })}` : ""}</p>
+          <p style={{ fontSize: 13, color: M }}>
+            📍 {match.city}{match.proposed_time ? ` · 🕐 ${new Date(match.proposed_time).toLocaleString("de-CH", { weekday: "short", hour: "2-digit", minute: "2-digit" })}` : ""}
+          </p>
         </div>
 
-        {/* Players */}
         <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, padding: "20px", marginBottom: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            {/* Creator */}
             <div style={{ flex: 1, textAlign: "center" }}>
               <div style={{ width: 48, height: 48, borderRadius: "50%", background: `${G}18`, border: `2px solid ${G}40`, margin: "0 auto 8px", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>🏓</div>
               <p style={{ fontSize: 14, fontWeight: 800, color: W }}>{match.creator?.name || "?"}</p>
@@ -78,7 +79,6 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
 
             <div style={{ fontSize: 20, fontWeight: 900, color: M }}>VS</div>
 
-            {/* Joiner */}
             <div style={{ flex: 1, textAlign: "center" }}>
               {match.joiner ? (
                 <>
@@ -103,14 +103,12 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
           </div>
         )}
 
-        {/* Status */}
         {match.status === "matched" && (
           <div style={{ background: `${G}12`, border: `1px solid ${G}30`, borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
             <p style={{ fontSize: 14, fontWeight: 800, color: G }}>✓ Match ist voll!</p>
             <p style={{ fontSize: 12, color: M, marginTop: 4 }}>Viel Spass beim Spielen 🏓</p>
           </div>
         )}
-
       </div>
     </main>
   )

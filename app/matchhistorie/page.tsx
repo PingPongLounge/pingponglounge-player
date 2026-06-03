@@ -52,7 +52,7 @@ export default function MatchHistoriePage(){
       p2: Array.isArray(x.p2) ? (x.p2[0] || null) : x.p2,
       season: Array.isArray(x.season) ? (x.season[0] || null) : x.season,
     }))
-    setMatches(mapped as unknown as Match[])
+    setMatches(mapped as unknown as unknown as Match[])
 
     // ELO history für delta
     const {data:eh}=await sb
