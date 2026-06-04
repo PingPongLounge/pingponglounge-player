@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import LogoutButton from '../components/LogoutButton'
+import PlayerLogo from '../components/PlayerLogo'
 
 export default async function Dashboard() {
   const supabase = await createClient()
@@ -80,11 +81,7 @@ export default async function Dashboard() {
     <main style={{ minHeight: '100vh', background: DARK, padding: '0 0 40px' }}>
 
       <header style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '700px', margin: '0 auto' }}>
-        <svg viewBox="0 0 360 80" fill="none" style={{ width: '110px', height: 'auto' }}>
-          <path d="M 6 68 L 6 12 L 30 12 C 44 12 52 20 52 34 C 52 48 44 56 30 56 L 22 56 L 22 68 Z" fill={G}/>
-          <circle cx="62" cy="64" r="7" fill={G}/>
-          <text x="76" y="66" fontFamily="'League Spartan', system-ui, sans-serif" fontSize="58" fontWeight="900" letterSpacing="2" fill="none" stroke={G} strokeWidth="2.2" paintOrder="stroke">PLAYER</text>
-        </svg>
+        <Link href="/dashboard" style={{ textDecoration: "none" }}><PlayerLogo size="sm" /></Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Link href="/profil" style={{ fontSize: '13px', color: MUTED, textDecoration: 'none' }}>{name} →</Link>
           <LogoutButton />
