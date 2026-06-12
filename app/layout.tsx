@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import "./globals.css"
 
 export const metadata: Metadata = {
-  title: "Player — by Ping Pong Lounge",
+  title: "Next Level Table Tennis",
   description: "Finde Mitspieler, spiel in der Liga und verfolge dein ELO-Ranking.",
   icons: {
     icon: "/favicon.svg",
