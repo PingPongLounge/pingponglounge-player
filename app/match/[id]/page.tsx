@@ -42,7 +42,7 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 80px" }}>
       <div style={{ maxWidth: 480, margin: "0 auto" }}>
-        <Link href="/match" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Open Matches</Link></div>
+        <Link href="/match" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Open Matches</Link>
         <div style={{ margin: "20px 0 24px", textAlign: "center" }}>
           <span style={{ fontSize: 11, fontWeight: 700, color: lc, letterSpacing: "0.14em", textTransform: "uppercase" }}>{match.level}</span>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: W, textTransform: "uppercase", margin: "6px 0 4px" }}>MATCH</h1>

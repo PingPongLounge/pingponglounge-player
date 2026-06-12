@@ -82,7 +82,7 @@ export default function MatchHistoriePage(){
     <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
 
-        <Link href="/profil" style={{color:M,textDecoration:"none",fontSize:13}}>← Profil</Link></div>
+        <Link href="/profil" style={{color:M,textDecoration:"none",fontSize:13}}>← Profil</Link>
 
         <div style={{margin:"20px 0 24px"}}>
           <h1 style={{fontSize:28,fontWeight:900,color:W,textTransform:"uppercase",lineHeight:1}}>MATCHHISTORIE</h1>

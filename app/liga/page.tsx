@@ -73,7 +73,7 @@ export default function LigaPage(){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 20px 80px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
-        <div style={{gridColumn:"2",justifySelf:"center"}}><Link href="/dashboard" style={{color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
+        <Link href="/dashboard" style={{position:"absolute",left:0,right:0,display:"flex",justifyContent:"center",color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
 
         {/* Header */}
         <div style={{textAlign:"center",margin:"28px 0 24px"}}>

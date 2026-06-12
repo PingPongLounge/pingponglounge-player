@@ -22,7 +22,7 @@ export default async function Dashboard() {
       {/* Header */}
       <header style={{ padding: '20px 20px 0', display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '700px', margin: '0 auto' }}>
         <PlayerLogo size="sm" />
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto' }}>
           <Link href="/profil" style={{ fontSize: '13px', color: MUTED, textDecoration: 'none' }}>{name}</Link>
           <LogoutButton />
         </div>

@@ -100,7 +100,7 @@ export default function ProfilPage(){
     <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
 
-        <div style={{gridColumn:"2",justifySelf:"center"}}><Link href="/dashboard" style={{color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
+        <Link href="/dashboard" style={{position:"absolute",left:0,right:0,display:"flex",justifyContent:"center",color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
 
         {/* Header */}
         <div style={{textAlign:"center",margin:"24px 0 28px"}}>
@@ -152,7 +152,7 @@ export default function ProfilPage(){
 
         {/* Letzte Matches */}
         <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,overflow:"hidden",marginBottom:10}}>
-          <div style={{padding:"14px 18px",borderBottom:`1px solid ${B}`,display:"grid",gridTemplateColumns:"1fr auto 1fr",alignItems:"center"}}>
+          <div style={{padding:"14px 18px",borderBottom:`1px solid ${B}`,display:"flex",alignItems:"center",position:"relative"}}>
             <span style={{fontSize:13,fontWeight:700,color:W}}>Letzte Matches</span>
             <Link href="/matchhistorie" style={{fontSize:12,color:G,textDecoration:"none",fontWeight:700}}>Alle →</Link>
           </div>
