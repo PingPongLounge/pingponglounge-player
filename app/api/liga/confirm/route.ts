@@ -19,9 +19,13 @@ export async function POST(req: NextRequest) {
   if (match.status !== "p1_entered")
     return NextResponse.json({ error: "Nichts zu bestätigen" }, { status: 400 })
 
-  await sb.from("league_matches")
+  const { data: updated } = await sb.from("league_matches")
     .update({ status: "confirmed", confirmed_at: new Date().toISOString() })
     .eq("id", match_id)
+    .eq("status", "p1_entered")
+    .select("id")
+    .single()
+  if (!updated) return NextResponse.json({ ok: true }) // idempotent
 
   if (match.winner_id && match.sets) {
     const loserId = match.winner_id === match.p1_id ? match.p2_id : match.p1_id

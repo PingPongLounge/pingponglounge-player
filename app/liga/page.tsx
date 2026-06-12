@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1"
-const levelColor=(l:string):string=>({Locker:"#4ADE80",Hobby:"#FACC15",Fortgeschritten:"#FB923C",Competitive:"#FF00C8"}[l]||G)
+const levelColor=(l:string):string=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:"#FF00C8"}[l]||G)
 
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number,start_date:string,description:string,_count?:number}
 const CITIES=["Zürich","Basel","Luzern","St. Gallen"]
@@ -32,7 +32,7 @@ export default function LigaPage(){
         <div style={{textAlign:"center",margin:"28px 0 32px"}}>
           <p style={{fontSize:11,fontWeight:700,color:G,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:8}}>Player Liga</p>
           <h1 style={{fontSize:42,fontWeight:900,color:W,textTransform:"uppercase",lineHeight:.95,marginBottom:8}}>LIGA</h1>
-          <p style={{fontSize:14,color:M}}>Stadtweise Saisons · Round Robin · Live-Tabelle</p>
+          <p style={{fontSize:14,color:M}}>Stadtweise Saisons · Live-Tabelle · Open Match</p>
         </div>
 
         {loading?<p style={{textAlign:"center",color:M}}>Lädt...</p>:

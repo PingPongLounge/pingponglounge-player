@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1"
-const levelColor=(l:string):string=>({Locker:"#4ADE80",Hobby:"#FACC15",Fortgeschritten:"#FB923C",Competitive:"#FF00C8"}[l]||G)
+const levelColor=(l:string):string=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:"#FF00C8"}[l]||G)
 
 type Standing={player_id:string,player_name:string,points:number,played:number,wins:number,losses:number,rank:number}
 type Match={id:string,round:number,p1_id:string,p1_name:string,p2_id:string,p2_name:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,status:string,deadline:string|null,played_at:string|null}

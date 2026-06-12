@@ -2,16 +2,17 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import { STAFF_EMAILS } from "@/lib/staff"
+import { STAFF_EMAILS } from "@/lib/staff"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1"
 const CITIES=["Oerlikon","Langstrasse","Glattbrugg","Basel","Luzern","St. Gallen","Bern","Zürich"]
-const LEVELS=["Locker","Hobby","Fortgeschritten","Competitive"]
+const LEVELS=["Rookie","Challenger","Advanced","Elite"]
 
-const STAFF_EMAILS=["info@pingponglounge.ch","elia@pingponglounge.ch"]
 
 export default function AdminLigaPage(){
   const [seasons,setSeasons]=useState<Record<string,unknown>[]>([])
-  const [form,setForm]=useState({name:"",city:"Zürich",skill_class:"Hobby",max_players:10,start_date:"",description:""})
+  const [form,setForm]=useState({name:"",city:"Zürich",skill_class:"Challenger",max_players:10,start_date:"",description:""})
   const [saving,setSaving]=useState(false)
   const [generating,setGenerating]=useState<string|null>(null)
   const [msg,setMsg]=useState("")

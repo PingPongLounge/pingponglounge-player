@@ -1,5 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
+import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 
@@ -10,13 +11,14 @@ export default function AnmeldenPage({params}:{params:{id:string}}){
   const [count,setCount]=useState(0)
   const [registered,setRegistered]=useState(false)
   const [loading,setLoading]=useState(true)
+  const router = useRouter()
   const [saving,setSaving]=useState(false)
 
   useEffect(()=>{
     async function load(){
       const sb=createClient()
       const {data:{user}}=await sb.auth.getUser()
-      if(!user){window.location.href="/login";return}
+      if(!user){router.push("/login");return}
       const {data:s}=await sb.from("league_seasons").select("*").eq("id",params.id).single()
       setSeason(s)
       const {count:c}=await sb.from("league_registrations").select("*",{count:"exact",head:true}).eq("season_id",params.id)
@@ -32,7 +34,7 @@ export default function AnmeldenPage({params}:{params:{id:string}}){
     setSaving(true)
     const sb=createClient()
     const {data:{user}}=await sb.auth.getUser()
-    if(!user){window.location.href="/login";return}
+    if(!user){router.push("/login");return}
     const res=await fetch("/api/liga/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:params.id})})
     if(res.ok){setRegistered(true);setCount(c=>c+1)}
     setSaving(false)
