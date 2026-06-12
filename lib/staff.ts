@@ -2,4 +2,5 @@
 export const STAFF_EMAILS = [
   "info@pingponglounge.ch",
   "elia@pingponglounge.ch",
+  "oliver.hinnen@gmail.com",
 ]
