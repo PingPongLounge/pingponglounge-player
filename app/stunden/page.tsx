@@ -139,7 +139,7 @@ export default function StundenPage() {
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 20px 80px" }}>
       <div style={{ maxWidth: 480, margin: "0 auto" }}>
-        <Link href="/dashboard" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
+        <div style={{gridColumn:"2",justifySelf:"center"}}><Link href="/dashboard" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link></div>
 
         <div style={{ textAlign: "center", margin: "32px 0 28px" }}>
           <p style={{ fontSize: 11, fontWeight: 700, color: G, letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 8 }}>Meine Stunden</p>

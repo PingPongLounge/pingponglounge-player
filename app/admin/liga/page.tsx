@@ -64,7 +64,7 @@ export default function AdminLigaPage(){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 20px 80px"}}>
       <div style={{maxWidth:600,margin:"0 auto"}}>
-        <Link href="/dashboard" style={{color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
+        <div style={{gridColumn:"2",justifySelf:"center"}}><Link href="/dashboard" style={{color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
         <h1 style={{fontSize:28,fontWeight:900,color:W,textTransform:"uppercase",margin:"16px 0 24px"}}>Liga Admin</h1>
 
         {/* Create form */}

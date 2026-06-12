@@ -38,7 +38,7 @@ export default function CreateMatchPage() {
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 80px" }}>
       <div style={{ maxWidth: 480, margin: "0 auto" }}>
 
-        <Link href="/match" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Open Matches</Link>
+        <Link href="/match" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Open Matches</Link></div>
 
         <div style={{ margin: "20px 0 28px" }}>
           <h1 style={{ fontSize: 28, fontWeight: 900, color: W, textTransform: "uppercase", lineHeight: 1 }}>MATCH ERSTELLEN</h1>

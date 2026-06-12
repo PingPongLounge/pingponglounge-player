@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { LIGA_CONFIG } from "@/lib/rewards"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
@@ -53,6 +54,13 @@ export async function POST(req: NextRequest) {
         { player_id: match.winner_id, amount: 15, source: "liga_win",    description: "Liga-Match gewonnen",  ref_id: match_id },
         { player_id: loserId,         amount: 5,  source: "liga_played", description: "Liga-Match gespielt",  ref_id: match_id },
       ])
+      // Upset-Bonus
+      if (lElo - wElo >= LIGA_CONFIG.upsetEloDiff) {
+        await sb.from("ping_points_transactions").insert({
+          player_id: match.winner_id, amount: LIGA_CONFIG.upsetPingPoints,
+          source: "liga_upset", description: `Upset-Sieg (+${lElo - wElo} ELO)`, ref_id: match_id
+        })
+      }
     }
   }
 

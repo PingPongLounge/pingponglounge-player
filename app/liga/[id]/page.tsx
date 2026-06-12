@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import { LIGA_CONFIG } from "@/lib/rewards"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
 const levelColor=(l:string):string=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
@@ -245,7 +246,7 @@ export default function SeasonPage({params}:{params:{id:string}}){
               const sw=m.sets?winsFromSets(m.sets):{p1:0,p2:0}
               return(
                 <div key={m.id} style={{background:C,border:`1px solid ${isMe?`${G}40`:B}`,borderRadius:12,padding:"14px 16px"}}>
-                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+                  <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",alignItems:"center",marginBottom:6}}>
                     <span style={{fontSize:10,color:M,fontWeight:700,textTransform:"uppercase"}}>{m.round>0?`Runde ${m.round}`:"Open Match"}</span>
                     <span style={{fontSize:10,color:confirmed?G:m.status==="p1_entered"?"#FACC15":M,fontWeight:700,textTransform:"uppercase"}}>{confirmed?"✓ Bestätigt":m.status==="p1_entered"?"Warten":"Ausstehend"}</span>
                   </div>
@@ -296,7 +297,7 @@ export default function SeasonPage({params}:{params:{id:string}}){
                 <p style={{fontSize:11,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Gesendet</p>
                 {outgoingChallenges.map(c=>(
                   <div key={c.id} style={{background:C,border:`1px solid ${B}`,borderRadius:12,padding:"14px 16px",marginBottom:8}}>
-                    <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",alignItems:"center"}}>
                       <p style={{fontSize:14,fontWeight:700,color:W}}>Challenge an <span style={{color:G}}>{c.p2_name}</span></p>
                       <span style={{fontSize:10,color:"#FACC15",fontWeight:700}}>⏳ Wartet</span>
                     </div>

@@ -29,12 +29,12 @@ function BracketMatch({m,userId,onResult}:{m:TMatch,userId:string|null,onResult:
 
   return(
     <div style={{background:C,border:`1px solid ${confirmed?G+"40":B}`,borderRadius:10,padding:"10px 12px",minWidth:160,flex:"0 0 160px"}}>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",alignItems:"center",marginBottom:4}}>
         <span style={{fontSize:11,fontWeight:700,color:m.winner_id===m.p1_id?G:W,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p1}</span>
         {confirmed&&m.sets&&<span style={{fontSize:10,color:M,marginLeft:4}}>{m.sets.filter(s=>s.p1>s.p2).length}</span>}
       </div>
       <div style={{borderTop:`1px solid ${B}`,margin:"4px 0"}}/>
-      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr auto 1fr",alignItems:"center"}}>
         <span style={{fontSize:11,fontWeight:700,color:m.winner_id===m.p2_id?G:W,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p2==="?"?"TBD":p2}</span>
         {confirmed&&m.sets&&<span style={{fontSize:10,color:M,marginLeft:4}}>{m.sets.filter(s=>s.p2>s.p1).length}</span>}
       </div>

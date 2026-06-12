@@ -61,7 +61,7 @@ export default function RanglistePage() {
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
 
-        <Link href="/dashboard" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
+        <div style={{gridColumn:"2",justifySelf:"center"}}><Link href="/dashboard" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
 
         {/* Header */}
         <div style={{ margin: "20px 0 24px" }}>

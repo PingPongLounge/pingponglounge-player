@@ -32,6 +32,10 @@ export default function LigaPage(){
   const [seasons,setSeasons]=useState<Season[]>([])
   const [loading,setLoading]=useState(true)
   const [filter,setFilter]=useState<string>("Alle")
+  const [showLigaForm,setShowLigaForm]=useState(false)
+  const [ligaForm,setLigaForm]=useState({name:"",email:"",firma:"",standort:"",liga_art:"Rookie",start_datum:"",end_datum:""})
+  const [ligaSending,setLigaSending]=useState(false)
+  const [ligaMsg,setLigaMsg]=useState("")
 
   useEffect(()=>{
     async function load(){
@@ -56,10 +60,20 @@ export default function LigaPage(){
 
   const byCity=(city:string)=>filtered.filter(s=>s.city===city)
 
+
+  async function submitLigaRequest(){
+    if(!ligaForm.name||!ligaForm.email||!ligaForm.firma){setLigaMsg("Name, Email und Firma sind Pflicht");return}
+    setLigaSending(true);setLigaMsg("")
+    const res=await fetch("/api/liga/request",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(ligaForm)})
+    if(res.ok){setLigaMsg("✓ Anfrage gesendet — wir melden uns!");setLigaForm({name:"",email:"",firma:"",standort:"",liga_art:"Rookie",start_datum:"",end_datum:""})}
+    else{const d=await res.json();setLigaMsg(d.error||"Fehler")}
+    setLigaSending(false)
+  }
+
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 20px 80px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
-        <Link href="/dashboard" style={{color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
+        <div style={{gridColumn:"2",justifySelf:"center"}}><Link href="/dashboard" style={{color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
 
         {/* Header */}
         <div style={{textAlign:"center",margin:"28px 0 24px"}}>
@@ -175,6 +189,70 @@ export default function LigaPage(){
           )
         }
       </div>
+
+      {/* Eigene Liga CTA */}
+      <div style={{textAlign:"center",marginTop:36,paddingTop:24,borderTop:`1px solid ${B}`}}>
+        <p style={{fontSize:13,color:M,marginBottom:4}}>Liga für dein Team oder deine Firma?</p>
+        <button onClick={()=>{setShowLigaForm(true);setLigaMsg("")}} style={{background:"none",border:"none",color:G,cursor:"pointer",fontSize:13,fontWeight:700,textDecoration:"underline",letterSpacing:"0.04em"}}>
+          Eigene Liga anfragen →
+        </button>
+      </div>
+
+      {/* Popup */}
+      {showLigaForm&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={e=>{if(e.target===e.currentTarget)setShowLigaForm(false)}}>
+          <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,padding:24,width:"100%",maxWidth:460,maxHeight:"90vh",overflowY:"auto"}}>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
+              <div>
+                <p style={{fontSize:11,fontWeight:700,color:G,textTransform:"uppercase",letterSpacing:"0.12em",marginBottom:4}}>Eigene Liga</p>
+                <h2 style={{fontSize:20,fontWeight:900,color:W,textTransform:"uppercase",margin:0}}>Anfrage stellen</h2>
+              </div>
+              <button onClick={()=>setShowLigaForm(false)} style={{background:"none",border:"none",color:M,cursor:"pointer",fontSize:22,lineHeight:1}}>×</button>
+            </div>
+
+            {[
+              ["Name","text","name","Dein Name"],
+              ["Email","email","email","deine@email.ch"],
+              ["Firma / Team","text","firma","Firma oder Team-Name"],
+              ["Standort","text","standort","z.B. Zürich"],
+            ].map(([label,type,key,ph])=>(
+              <div key={key} style={{marginBottom:10}}>
+                <label style={{fontSize:11,color:M,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:4}}>{label}</label>
+                <input
+                  type={type}
+                  value={ligaForm[key as keyof typeof ligaForm]}
+                  onChange={e=>setLigaForm(f=>({...f,[key]:e.target.value}))}
+                  placeholder={ph}
+                  style={{width:"100%",background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"11px 14px",fontSize:14,color:W,outline:"none",boxSizing:"border-box"}}
+                />
+              </div>
+            ))}
+
+            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
+              <div>
+                <label style={{fontSize:11,color:M,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:4}}>Liga-Level</label>
+                <select value={ligaForm.liga_art} onChange={e=>setLigaForm(f=>({...f,liga_art:e.target.value}))} style={{width:"100%",background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"11px 14px",fontSize:14,color:W,outline:"none"}}>
+                  {["Rookie","Challenger","Advanced","Elite","Gemischt"].map(l=><option key={l} value={l}>{l}</option>)}
+                </select>
+              </div>
+              <div>
+                <label style={{fontSize:11,color:M,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:4}}>Startdatum</label>
+                <input type="date" value={ligaForm.start_datum} onChange={e=>setLigaForm(f=>({...f,start_datum:e.target.value}))} style={{width:"100%",background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"11px 14px",fontSize:14,color:W,outline:"none"}}/>
+              </div>
+            </div>
+
+            {ligaMsg&&<p style={{fontSize:13,color:ligaMsg.startsWith("✓")?G:"#FF6666",marginBottom:10}}>{ligaMsg}</p>}
+
+            {ligaMsg.startsWith("✓")?(
+              <button onClick={()=>setShowLigaForm(false)} style={{width:"100%",background:G,color:"#0A0A0C",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>Schliessen</button>
+            ):(
+              <button onClick={submitLigaRequest} disabled={ligaSending} style={{width:"100%",background:ligaSending?B:G,color:ligaSending?M:"#0A0A0C",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:ligaSending?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
+                {ligaSending?"Sende...":"Anfrage senden"}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
     </main>
   )
 }

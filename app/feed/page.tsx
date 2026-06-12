@@ -97,7 +97,7 @@ export default function FeedPage() {
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
 
         {/* Header */}
-        <Link href="/dashboard" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
+        <div style={{gridColumn:"2",justifySelf:"center"}}><Link href="/dashboard" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link></div>
         <div style={{ margin: "20px 0 24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
             <span style={{ fontSize: 11, fontWeight: 700, color: G, letterSpacing: "0.16em", textTransform: "uppercase" }}>Live</span>
