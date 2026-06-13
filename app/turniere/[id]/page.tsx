@@ -56,6 +56,8 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
   const [registering,setRegistering]=useState(false)
   const [regError,setRegError]=useState("")
   const [resultError,setResultError]=useState("")
+  const [regError,setRegError]=useState("")
+  const [resultError,setResultError]=useState("")
   const [resultMatch,setResultMatch]=useState<TMatch|null>(null)
   const [sets,setSets]=useState([{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""}])
   const [tab,setTab]=useState<"bracket"|"spieler">("bracket")
