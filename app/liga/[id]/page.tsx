@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import BottomNav from "@/app/components/BottomNav"
 import { LIGA_CONFIG } from "@/lib/rewards"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
@@ -145,7 +146,8 @@ export default function SeasonPage({params}:{params:{id:string}}){
     setFeed(prev=>prev.map(f=>f.id===matchId?{...f,comments:((data||[]) as unknown as Array<{id:string,user_id:string,text:string,created_at:string,profiles:{name:string}|null}>).map(c=>({...c,user_name:c.profiles?.name||"?"}))}:f))
   }
 
-  if(loading||!season) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>Lädt...</p></main>
+  if(loading||!season) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>Lädt...</p>
+      <BottomNav /></main>
 
   const lc=levelColor(season.skill_class)
   const myMatches=matches.filter(m=>m.p1_id===userId||m.p2_id===userId)

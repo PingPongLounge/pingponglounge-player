@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import BottomNav from "@/app/components/BottomNav"
 
 const BG = "#111214"
 const C  = "#15161A"
@@ -72,6 +73,7 @@ export default function FreundePage() {
   if (loading) return (
     <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center" }}>
       <p style={{ color: M }}>Lädt...</p>
+      <BottomNav />
     </main>
   )
 

@@ -2,10 +2,11 @@
 import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
-const levelColor = (l: string) => ({ Locker: "#4ADE80", Hobby: "#FACC15", Fortgeschritten: "#FB923C", Competitive: PK }[l] || G)
+const levelColor = (l: string) => ({ Rookie: "#4ADE80", Challenger: "#FACC15", Advanced: "#FB923C", Elite: PK }[l] || G)
 
 function timeLabel(d: string): string {
   const dt = new Date(d)
@@ -215,6 +216,7 @@ export default function MatchPage() {
         )}
 
       </div>
+      <BottomNav />
     </main>
   )
 }

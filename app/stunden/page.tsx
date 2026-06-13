@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import BottomNav from "@/app/components/BottomNav"
 
 type Credit = {
   id: string
@@ -204,6 +205,7 @@ export default function StundenPage() {
           </Link>
         </div>
       </div>
+      <BottomNav />
     </main>
   )
 }

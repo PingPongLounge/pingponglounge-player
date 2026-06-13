@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import BottomNav from "@/app/components/BottomNav"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
 const levelColor=(l:string)=>({Locker:"#4ADE80",Hobby:"#FACC15",Fortgeschritten:"#FB923C",Competitive:PK}[l]||G)
@@ -70,6 +71,7 @@ export default function TurnierePage(){
           </div>
         )}
       </div>
+      <BottomNav />
     </main>
   )
 }

@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import BottomNav from "@/app/components/BottomNav"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
 const levelColor = (l: string) => ({ Locker: "#4ADE80", Hobby: "#FACC15", Fortgeschritten: "#FB923C", Competitive: PK }[l] || G)
@@ -31,7 +32,8 @@ export default function MatchDetailPage({ params }: { params: { id: string } }) 
     load()
   }, [matchId])
 
-  if (!match) return <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center" }}><p style={{ color: M }}>Lädt...</p></main>
+  if (!match) return <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center" }}><p style={{ color: M }}>Lädt...</p>
+      <BottomNav /></main>
 
   const lc = levelColor(match.level)
   const c_ = match.creator ? (Array.isArray(match.creator) ? match.creator[0] : match.creator) : null
