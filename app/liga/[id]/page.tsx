@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, use } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
@@ -31,7 +31,8 @@ function timeAgo(d:string):string{
   return `vor ${Math.floor(h/24)}d`
 }
 
-export default function SeasonPage({params}:{params:{id:string}}){
+export default function SeasonPage({params}:{params:Promise<{id:string}>}){
+  const {id:seasonId}=use(params)
   const [season,setSeason]=useState<Season|null>(null)
   const [standings,setStandings]=useState<Standing[]>([])
   const [matches,setMatches]=useState<Match[]>([])
@@ -46,7 +47,7 @@ export default function SeasonPage({params}:{params:{id:string}}){
   async function loadChallenges(sb:ReturnType<typeof createClient>,uid:string){
     const {data}=await sb.from("league_matches")
       .select(`id,p1_id,p2_id,status,p1:profiles!league_matches_p1_id_fkey(name),p2:profiles!league_matches_p2_id_fkey(name)`)
-      .eq("season_id",params.id)
+      .eq("season_id",seasonId)
       .eq("status","challenge_sent")
       .or(`p1_id.eq.${uid},p2_id.eq.${uid}`)
     const mapped=(data||[]).map((x:Record<string,unknown>)=>({
@@ -63,21 +64,21 @@ export default function SeasonPage({params}:{params:{id:string}}){
       const {data:{user}}=await sb.auth.getUser()
       setUserId(user?.id||null)
 
-      const {data:s}=await sb.from("league_seasons").select("*").eq("id",params.id).single()
+      const {data:s}=await sb.from("league_seasons").select("*").eq("id",seasonId).single()
       setSeason(s)
 
-      const {data:st}=await sb.rpc("get_league_standings",{season_id:params.id})
+      const {data:st}=await sb.rpc("get_league_standings",{season_id:seasonId})
       setStandings(st||[])
 
       const {data:m}=await sb.from("league_matches")
         .select(`id,round,p1_id,p2_id,sets,winner_id,status,deadline,played_at,p1:profiles!league_matches_p1_id_fkey(name),p2:profiles!league_matches_p2_id_fkey(name)`)
-        .eq("season_id",params.id).not("status","in","(challenge_sent,cancelled)").order("round",{ascending:true})
+        .eq("season_id",seasonId).not("status","in","(challenge_sent,cancelled)").order("round",{ascending:true})
       const mappedM=(m||[]).map((x:Record<string,unknown>)=>({...x,p1_name:((x.p1 as {name:string}[]|null)?.[0]?.name)||"?",p2_name:((x.p2 as {name:string}[]|null)?.[0]?.name)||"?"}))
       setMatches(mappedM as unknown as Match[])
 
       const {data:f}=await sb.from("league_matches")
         .select(`id,round,p1_id,p2_id,sets,winner_id,played_at,p1:profiles!league_matches_p1_id_fkey(name),p2:profiles!league_matches_p2_id_fkey(name),match_reactions(type,user_id),match_comments(id,user_id,text,created_at,profiles(name))`)
-        .eq("season_id",params.id).eq("status","confirmed").order("played_at",{ascending:false}).limit(20)
+        .eq("season_id",seasonId).eq("status","confirmed").order("played_at",{ascending:false}).limit(20)
       const feedMapped=(f||[]).map((x:Record<string,unknown>)=>({
         ...x,
         p1_name:((x.p1 as {name:string}[]|null)?.[0]?.name)||"?",
@@ -91,12 +92,12 @@ export default function SeasonPage({params}:{params:{id:string}}){
       setLoading(false)
     }
     load()
-  },[params.id])
+  },[seasonId])
 
   async function handleChallenge(opponentId:string){
     if(!userId||challenging) return
     setChallenging(opponentId)
-    const res=await fetch("/api/liga/challenge",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:params.id,challenged_id:opponentId})})
+    const res=await fetch("/api/liga/challenge",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,challenged_id:opponentId})})
     if(res.ok){
       const sb=createClient()
       await loadChallenges(sb,userId)
@@ -111,7 +112,7 @@ export default function SeasonPage({params}:{params:{id:string}}){
     // Spielplan neu laden
     const {data:m}=await sb.from("league_matches")
       .select(`id,round,p1_id,p2_id,sets,winner_id,status,deadline,played_at,p1:profiles!league_matches_p1_id_fkey(name),p2:profiles!league_matches_p2_id_fkey(name)`)
-      .eq("season_id",params.id).not("status","in","(challenge_sent,cancelled)").order("round",{ascending:true})
+      .eq("season_id",seasonId).not("status","in","(challenge_sent,cancelled)").order("round",{ascending:true})
     const mappedM=(m||[]).map((x:Record<string,unknown>)=>({...x,p1_name:((x.p1 as {name:string}[]|null)?.[0]?.name)||"?",p2_name:((x.p2 as {name:string}[]|null)?.[0]?.name)||"?"}))
     setMatches(mappedM as unknown as Match[])
     setTab("spielplan")

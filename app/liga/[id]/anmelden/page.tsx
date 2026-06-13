@@ -1,12 +1,13 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState , use} from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1"
 
-export default function AnmeldenPage({params}:{params:{id:string}}){
+export default function AnmeldenPage({params}:{params:Promise<{id:string}>}){
+  const {id:seasonId}=use(params)
   const [season,setSeason]=useState<Record<string,unknown>|null>(null)
   const [count,setCount]=useState(0)
   const [registered,setRegistered]=useState(false)
@@ -19,23 +20,23 @@ export default function AnmeldenPage({params}:{params:{id:string}}){
       const sb=createClient()
       const {data:{user}}=await sb.auth.getUser()
       if(!user){router.push("/login");return}
-      const {data:s}=await sb.from("league_seasons").select("*").eq("id",params.id).single()
+      const {data:s}=await sb.from("league_seasons").select("*").eq("id",seasonId).single()
       setSeason(s)
-      const {count:c}=await sb.from("league_registrations").select("*",{count:"exact",head:true}).eq("season_id",params.id)
+      const {count:c}=await sb.from("league_registrations").select("*",{count:"exact",head:true}).eq("season_id",seasonId)
       setCount(c||0)
-      const {data:r}=await sb.from("league_registrations").select("id").eq("season_id",params.id).eq("player_id",user.id).single()
+      const {data:r}=await sb.from("league_registrations").select("id").eq("season_id",seasonId).eq("player_id",user.id).single()
       setRegistered(!!r)
       setLoading(false)
     }
     load()
-  },[params.id])
+  },[seasonId])
 
   async function handleRegister(){
     setSaving(true)
     const sb=createClient()
     const {data:{user}}=await sb.auth.getUser()
     if(!user){router.push("/login");return}
-    const res=await fetch("/api/liga/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:params.id})})
+    const res=await fetch("/api/liga/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId})})
     if(res.ok){setRegistered(true);setCount(c=>c+1)}
     setSaving(false)
   }
@@ -45,14 +46,14 @@ export default function AnmeldenPage({params}:{params:{id:string}}){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
       <div style={{maxWidth:420,width:"100%"}}>
-        <Link href={`/liga/${params.id}`} style={{color:M,textDecoration:"none",fontSize:13,display:"block",marginBottom:24}}>← Zurück</Link>
+        <Link href={`/liga/${seasonId}`} style={{color:M,textDecoration:"none",fontSize:13,display:"block",marginBottom:24}}>← Zurück</Link>
 
         {registered?(
           <div style={{background:C,border:`1px solid ${G}40`,borderRadius:16,padding:"32px 24px",textAlign:"center"}}>
             <p style={{fontSize:40,marginBottom:12}}>✓</p>
             <p style={{fontSize:20,fontWeight:900,color:G,textTransform:"uppercase",marginBottom:8}}>Angemeldet!</p>
             <p style={{fontSize:14,color:M,marginBottom:24}}>Du bist für <strong style={{color:W}}>{season.name as string}</strong> registriert. Du wirst benachrichtigt sobald die Saison startet.</p>
-            <Link href={`/liga/${params.id}`} style={{display:"block",background:G,color:"#0A0A0C",textDecoration:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Zur Liga →</Link>
+            <Link href={`/liga/${seasonId}`} style={{display:"block",background:G,color:"#0A0A0C",textDecoration:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Zur Liga →</Link>
           </div>
         ):(
           <div>

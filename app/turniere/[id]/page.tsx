@@ -1,11 +1,11 @@
 "use client"
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, use } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
-const levelColor=(l:string)=>({Locker:"#4ADE80",Hobby:"#FACC15",Fortgeschritten:"#FB923C",Competitive:PK}[l]||G)
+const levelColor=(l:string)=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
 
 type Profile={name:string,elo:number,level?:string}
 type TMatch={id:string,round:number,match_number:number,p1_id:string|null,p2_id:string|null,winner_id:string|null,sets:Array<{p1:number,p2:number}>|null,status:string,p1:Profile|Profile[]|null,p2:Profile|Profile[]|null}
@@ -48,42 +48,45 @@ function BracketMatch({m,userId,onResult}:{m:TMatch,userId:string|null,onResult:
   )
 }
 
-export default function TurnierDetailPage({params}:{params:{id:string}}){
+export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}){
+  const {id:tournamentId}=use(params)
   const router=useRouter()
   const [data,setData]=useState<{tournament:Tournament,registrations:unknown[],matches:TMatch[],isRegistered:boolean,userId:string|null}|null>(null)
   const [loading,setLoading]=useState(true)
   const [registering,setRegistering]=useState(false)
+  const [regError,setRegError]=useState("")
+  const [resultError,setResultError]=useState("")
   const [resultMatch,setResultMatch]=useState<TMatch|null>(null)
-  const [sets,setSets]=useState(["","","","",""])
+  const [sets,setSets]=useState([{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""}])
   const [tab,setTab]=useState<"bracket"|"spieler">("bracket")
 
   const load=useCallback(async()=>{
-    const res=await fetch(`/api/turniere/${params.id}`)
+    const res=await fetch(`/api/turniere/${tournamentId}`)
     const json=await res.json()
     setData(json)
     setLoading(false)
-  },[params.id])
+  },[tournamentId])
 
   useEffect(()=>{load()},[load])
 
   async function register(){
     setRegistering(true)
-    const res=await fetch(`/api/turniere/${params.id}/register`,{method:"POST"})
+    const res=await fetch(`/api/turniere/${tournamentId}/register`,{method:"POST"})
     const json=await res.json()
-    if(!res.ok){alert(json.error);setRegistering(false);return}
+    if(!res.ok){setRegError(json.error||"Fehler bei der Anmeldung");setRegistering(false);return}
     load()
     setRegistering(false)
   }
 
   async function submitResult(action:"enter"|"confirm"){
     if(!resultMatch) return
-    const res=await fetch(`/api/turniere/${params.id}/result`,{
+    const res=await fetch(`/api/turniere/${tournamentId}/result`,{
       method:"POST",
       headers:{"Content-Type":"application/json"},
-      body:JSON.stringify({match_id:resultMatch.id,sets:sets.filter(s=>s.includes(":")),action})
+      body:JSON.stringify({match_id:resultMatch.id,sets:sets.filter(s=>s.p1!==""&&s.p2!=="").map(s=>`${s.p1}:${s.p2}`),action})
     })
     if(res.ok){setResultMatch(null);load()}
-    else{const j=await res.json();alert(j.error)}
+    else{const j=await res.json();setResultError(j.error||"Fehler beim Eintragen")}
   }
 
   if(loading||!data) return(
@@ -206,13 +209,16 @@ export default function TurnierDetailPage({params}:{params:{id:string}}){
                 </>
               ):(
                 <>
-                  <p style={{fontSize:12,color:M,marginBottom:12}}>Format: Sätze eingeben z.B. "11:7"</p>
+                  <p style={{fontSize:12,color:M,marginBottom:12}}>Punktestand pro Satz eintragen (optional leerlassen)</p>
                   {[0,1,2,3,4].map(i=>(
                     <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-                      <span style={{fontSize:12,color:M,minWidth:50}}>Satz {i+1}:</span>
-                      <input value={sets[i]} onChange={e=>{const s=[...sets];s[i]=e.target.value;setSets(s)}} placeholder="11:7" style={{flex:1,background:C,border:`1px solid ${B}`,borderRadius:8,padding:"8px 12px",fontSize:13,color:W,outline:"none"}}/>
+                      <span style={{fontSize:12,color:M,minWidth:52}}>Satz {i+1}:</span>
+                      <input type="number" min="0" max="30" value={sets[i].p1} onChange={e=>{const s=[...sets];s[i]={...s[i],p1:e.target.value};setSets(s)}} style={{width:52,background:C,border:`1px solid ${B}`,borderRadius:8,padding:"8px",fontSize:15,fontWeight:700,color:W,outline:"none",textAlign:"center"}}/>
+                      <span style={{fontSize:16,color:M,fontWeight:800}}>:</span>
+                      <input type="number" min="0" max="30" value={sets[i].p2} onChange={e=>{const s=[...sets];s[i]={...s[i],p2:e.target.value};setSets(s)}} style={{width:52,background:C,border:`1px solid ${B}`,borderRadius:8,padding:"8px",fontSize:15,fontWeight:700,color:W,outline:"none",textAlign:"center"}}/>
                     </div>
                   ))}
+                  {resultError&&<p style={{fontSize:12,color:"#f87171",marginTop:4}}>{resultError}</p>}
                   <div style={{display:"flex",gap:8,marginTop:8}}>
                     <button onClick={()=>setResultMatch(null)} style={{flex:1,padding:"12px",background:B,color:M,border:"none",borderRadius:10,fontSize:13,fontWeight:700,cursor:"pointer"}}>Abbrechen</button>
                     <button onClick={()=>submitResult("enter")} style={{flex:1,padding:"12px",background:G,color:"#0A0A0C",border:"none",borderRadius:10,fontSize:13,fontWeight:800,cursor:"pointer"}}>Eintragen →</button>
