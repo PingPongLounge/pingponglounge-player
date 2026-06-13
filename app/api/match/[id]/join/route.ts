@@ -14,11 +14,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
 
   await sb.from("open_matches").update({ joiner_id: user.id, status: "matched" }).eq("id", id)
 
-  // PingPoints für beide Spieler
-  await sb.from("ping_points_transactions").insert([
-    { player_id: user.id,         amount: 5, source: "open_match", description: "Open Match gespielt", ref_id: id },
-    { player_id: match.creator_id, amount: 5, source: "open_match", description: "Open Match gespielt", ref_id: id },
-  ])
+  // PingPoints werden beim bestätigten Resultat vergeben, nicht beim Join
 
   return NextResponse.json({ ok: true })
 }

@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
 
   const { data: match } = await sb
     .from("league_matches")
-    .select("p1_id,p2_id,status,winner_id,sets,season_id")
+    .select("p1_id,p2_id,status,winner_id,sets,season_id,entered_by")
     .eq("id", match_id)
     .single()
 
@@ -19,6 +19,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nicht berechtigt" }, { status: 403 })
   if (match.status !== "p1_entered")
     return NextResponse.json({ error: "Nichts zu bestätigen" }, { status: 400 })
+  // Nur der Gegner (nicht derjenige der eingetragen hat) kann bestätigen
+  if ((match as Record<string,unknown>).entered_by === user.id)
+    return NextResponse.json({ error: "Du kannst dein eigenes Ergebnis nicht bestätigen" }, { status: 403 })
 
   const { data: updated } = await sb.from("league_matches")
     .update({ status: "confirmed", confirmed_at: new Date().toISOString() })

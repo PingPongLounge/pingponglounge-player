@@ -6,7 +6,9 @@ export async function GET(request: NextRequest) {
   const code       = searchParams.get('code')
   const token_hash = searchParams.get('token_hash')
   const type       = searchParams.get('type') as 'recovery' | 'email' | 'signup' | null
-  const next       = searchParams.get('next') ?? '/dashboard'
+  // Open-Redirect-Schutz: nur relative Pfade akzeptieren
+  const nextRaw     = searchParams.get('next') ?? ''
+  const next        = nextRaw.startsWith('/') && !nextRaw.startsWith('//') ? nextRaw : '/dashboard'
 
   const response = NextResponse.redirect(`${origin}${next}`)
 
