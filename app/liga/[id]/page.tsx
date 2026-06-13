@@ -42,6 +42,8 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
   const [userId,setUserId]=useState<string|null>(null)
   const [commentText,setCommentText]=useState<{[k:string]:string}>({})
   const [challenging,setChallenging]=useState<string|null>(null)
+  const [confirmDecline,setConfirmDecline]=useState<string|null>(null)
+  const [confirmWithdraw,setConfirmWithdraw]=useState<string|null>(null)
   const [loading,setLoading]=useState(true)
 
   async function loadChallenges(sb:ReturnType<typeof createClient>,uid:string){
@@ -287,7 +289,15 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                     </p>
                     <div style={{display:"flex",gap:8,marginTop:10}}>
                       <button onClick={()=>handleAccept(c.id)} style={{flex:1,background:G,color:"#0A0A0C",border:"none",borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer",textTransform:"uppercase"}}>✓ Annehmen</button>
-                      <button onClick={()=>handleDecline(c.id)} style={{flex:1,background:"none",color:M,border:`1px solid ${B}`,borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer"}}>Ablehnen</button>
+                      {confirmDecline===c.id?(
+                        <div style={{flex:1,display:"flex",gap:6,alignItems:"center"}}>
+                          <span style={{fontSize:11,color:M,flex:1}}>Sicher?</span>
+                          <button onClick={()=>setConfirmDecline(null)} style={{background:"none",color:M,border:`1px solid ${B}`,borderRadius:6,padding:"6px 10px",fontSize:11,cursor:"pointer"}}>Nein</button>
+                          <button onClick={()=>{handleDecline(c.id);setConfirmDecline(null)}} style={{background:"#f8717120",color:"#f87171",border:"1px solid #f8717140",borderRadius:6,padding:"6px 10px",fontSize:11,fontWeight:700,cursor:"pointer"}}>Ablehnen</button>
+                        </div>
+                      ):(
+                        <button onClick={()=>setConfirmDecline(c.id)} style={{flex:1,background:"none",color:M,border:`1px solid ${B}`,borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer"}}>Ablehnen</button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -304,7 +314,15 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                       <p style={{fontSize:14,fontWeight:700,color:W}}>Challenge an <span style={{color:G}}>{c.p2_name}</span></p>
                       <span style={{fontSize:10,color:"#FACC15",fontWeight:700}}>⏳ Wartet</span>
                     </div>
-                    <button onClick={()=>handleDecline(c.id)} style={{marginTop:10,background:"none",color:M,border:`1px solid ${B}`,borderRadius:8,padding:"8px 14px",fontSize:11,cursor:"pointer"}}>Zurückziehen</button>
+                    {confirmWithdraw===c.id?(
+                      <div style={{display:"flex",gap:6,alignItems:"center",marginTop:10}}>
+                        <span style={{fontSize:11,color:M,flex:1}}>Zurückziehen?</span>
+                        <button onClick={()=>setConfirmWithdraw(null)} style={{background:"none",color:M,border:`1px solid ${B}`,borderRadius:6,padding:"5px 10px",fontSize:11,cursor:"pointer"}}>Nein</button>
+                        <button onClick={()=>{handleDecline(c.id);setConfirmWithdraw(null)}} style={{background:"#f8717120",color:"#f87171",border:"1px solid #f8717140",borderRadius:6,padding:"5px 10px",fontSize:11,fontWeight:700,cursor:"pointer"}}>Ja</button>
+                      </div>
+                    ):(
+                      <button onClick={()=>setConfirmWithdraw(c.id)} style={{marginTop:10,background:"none",color:M,border:`1px solid ${B}`,borderRadius:8,padding:"8px 14px",fontSize:11,cursor:"pointer"}}>Zurückziehen</button>
+                    )}
                   </div>
                 ))}
               </div>

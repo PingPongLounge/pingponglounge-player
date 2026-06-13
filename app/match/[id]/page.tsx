@@ -18,6 +18,8 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
   const { id: matchId } = use(params)
   const [match, setMatch] = useState<MatchDetail | null>(null)
   const [userId, setUserId] = useState<string | null>(null)
+  const [confirmDelete, setConfirmDelete] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -31,6 +33,12 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
     }
     load()
   }, [matchId])
+
+  async function handleDelete() {
+    setDeleting(true)
+    await fetch(`/api/match/${matchId}/cancel`, { method: "POST" })
+    window.history.back()
+  }
 
   if (!match) return <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center" }}><p style={{ color: M }}>Lädt...</p>
       <BottomNav /></main>
@@ -72,6 +80,22 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
         </div>
+        {isCreator && match.status !== "matched" && (
+          <div style={{ marginTop: 16 }}>
+            {confirmDelete ? (
+              <div style={{ background: "#f8717110", border: "1px solid #f8717140", borderRadius: 12, padding: "14px 16px" }}>
+                <p style={{ fontSize: 13, color: "#f87171", fontWeight: 700, marginBottom: 10 }}>Match wirklich löschen?</p>
+                <div style={{ display: "flex", gap: 8 }}>
+                  <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, background: "none", color: M, border: `1px solid ${B}`, borderRadius: 8, padding: "10px", fontSize: 13, fontWeight: 700, cursor: "pointer" }}>Abbrechen</button>
+                  <button onClick={handleDelete} disabled={deleting} style={{ flex: 1, background: "#f87171", color: "#fff", border: "none", borderRadius: 8, padding: "10px", fontSize: 13, fontWeight: 800, cursor: "pointer" }}>{deleting ? "..." : "Ja, löschen"}</button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={() => setConfirmDelete(true)} style={{ width: "100%", background: "none", color: M, border: `1px solid ${B}`, borderRadius: 10, padding: "11px", fontSize: 13, cursor: "pointer" }}>Match löschen</button>
+            )}
+          </div>
+        )}
+
         {match.status === "matched" && (
           <div style={{ background: `${G}12`, border: `1px solid ${G}30`, borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
             <p style={{ fontSize: 14, fontWeight: 800, color: G }}>✓ Match ist voll!</p>
