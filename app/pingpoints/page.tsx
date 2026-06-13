@@ -46,20 +46,27 @@ export default function PingPointsPage(){
   const [rewards,setRewards]=useState<Reward[]>([])
   const [tab,setTab]=useState<"history"|"earn"|"redeem">("history")
   const [loading,setLoading]=useState(true)
+  const [error,setError]=useState("")
   const [claiming,setClaiming]=useState<number|null>(null)
   const [claimMsg,setClaimMsg]=useState<{threshold:number,msg:string}|null>(null)
 
   async function loadData(){
-    const [histRes, rewRes] = await Promise.all([
-      fetch("/api/pingpoints"),
-      fetch("/api/pingpoints/rewards"),
-    ])
-    const hist = await histRes.json()
-    const rew  = await rewRes.json()
-    setBalance(rew.total ?? hist.balance ?? 0)
-    setTransactions(hist.transactions || [])
-    setRewards(rew.rewards || [])
-    setLoading(false)
+    setError("")
+    try {
+      const [histRes, rewRes] = await Promise.all([
+        fetch("/api/pingpoints"),
+        fetch("/api/pingpoints/rewards"),
+      ])
+      const hist = await histRes.json()
+      const rew  = await rewRes.json()
+      setBalance(rew.total ?? hist.balance ?? 0)
+      setTransactions(hist.transactions || [])
+      setRewards(rew.rewards || [])
+    } catch {
+      setError("PingPoints konnten nicht geladen werden")
+    } finally {
+      setLoading(false)
+    }
   }
 
   useEffect(()=>{ loadData() },[])

@@ -28,15 +28,23 @@ export default function AchievementsPage() {
   const [total,  setTotal]  = useState(0)
   const [filter, setFilter] = useState<"alle"|"earned"|"locked">("alle")
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState("")
 
-  useEffect(() => {
-    fetch("/api/achievements").then(r => r.json()).then(d => {
+  async function load() {
+    setError("")
+    try {
+      const r = await fetch("/api/achievements")
+      const d = await r.json()
       setBadges(d.badges || [])
       setEarned(d.earned || 0)
       setTotal(d.total || 0)
+    } catch {
+      setError("Achievements konnten nicht geladen werden")
+    } finally {
       setLoading(false)
-    })
-  }, [])
+    }
+  }
+  useEffect(() => { load() }, [])
 
   const filtered = badges.filter(b =>
     filter === "earned" ? b.earned :
@@ -44,6 +52,18 @@ export default function AchievementsPage() {
   )
 
   const pct = total > 0 ? Math.round((earned / total) * 100) : 0
+
+  if (error) return (
+    <main style={{ minHeight: "100vh", background: BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+      <div style={{ textAlign: "center" }}>
+        <p style={{ fontSize: 36, marginBottom: 12 }}>⚠️</p>
+        <p style={{ fontSize: 14, fontWeight: 700, color: W, marginBottom: 6 }}>Verbindungsfehler</p>
+        <p style={{ fontSize: 13, color: M, marginBottom: 20 }}>{error}</p>
+        <button onClick={load} style={{ background: G, color: "#0A0A0C", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>Nochmals versuchen</button>
+      </div>
+      <BottomNav />
+    </main>
+  )
 
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>

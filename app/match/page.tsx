@@ -54,30 +54,38 @@ export default function MatchPage() {
   const [filterCity, setFilterCity]   = useState("")
   const [loading, setLoading]   = useState(true)
   const [joining, setJoining]   = useState<string | null>(null)
+  const [error, setError]         = useState("")
+  const [joinError, setJoinError] = useState("")
 
   const load = useCallback(async () => {
-    const sb = createClient()
-    const { data: { user } } = await sb.auth.getUser()
-    setUserId(user?.id || null)
-
-    const res = await fetch("/api/match")
-    const json = await res.json()
-    const list: OpenMatch[] = json.matches || []
-    setMatches(list)
-    setMyOpen(list.find(m => m.creator_id === user?.id)?.id || null)
-    setLoading(false)
+    setError("")
+    try {
+      const sb = createClient()
+      const { data: { user } } = await sb.auth.getUser()
+      setUserId(user?.id || null)
+      const res = await fetch("/api/match")
+      const json = await res.json()
+      const list: OpenMatch[] = json.matches || []
+      setMatches(list)
+      setMyOpen(list.find(m => m.creator_id === user?.id)?.id || null)
+    } catch {
+      setError("Matches konnten nicht geladen werden")
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => { load() }, [load])
 
   async function join(id: string) {
     setJoining(id)
+    setJoinError("")
     const res = await fetch(`/api/match/${id}/join`, { method: "POST" })
     if (res.ok) {
       router.push(`/match/${id}`)
     } else {
       const json = await res.json()
-      alert(json.error || "Fehler")
+      setJoinError(json.error || "Fehler beim Beitreten")
       setJoining(null)
     }
   }
@@ -216,6 +224,9 @@ export default function MatchPage() {
         )}
 
       </div>
+      {joinError && (
+        <div style={{ position: "fixed", bottom: 80, left: 0, right: 0, padding: "12px 20px", background: "#f87171", color: "#fff", textAlign: "center", fontSize: 13, fontWeight: 700, zIndex: 200 }}>{joinError}</div>
+      )}
       <BottomNav />
     </main>
   )

@@ -4,7 +4,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
-const levelColor=(l:string)=>({Locker:"#4ADE80",Hobby:"#FACC15",Fortgeschritten:"#FB923C",Competitive:PK}[l]||G)
+const levelColor=(l:string)=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
 const statusLabel=(s:string)=>({open:"OFFEN",running:"LÄUFT",finished:"ABGESCHLOSSEN"}[s]||s)
 const statusColor=(s:string)=>({open:G,running:"#FACC15",finished:M}[s]||M)
 
@@ -13,13 +13,33 @@ type Tournament={id:string,name:string,date:string,city:string,skill_class:strin
 export default function TurnierePage(){
   const [tournaments,setTournaments]=useState<Tournament[]>([])
   const [loading,setLoading]=useState(true)
+  const [error,setError]=useState("")
 
-  useEffect(()=>{
-    fetch("/api/turniere").then(r=>r.json()).then(d=>{
+  async function load(){
+    setError("")
+    try {
+      const r = await fetch("/api/turniere")
+      const d = await r.json()
       setTournaments(d.tournaments||[])
+    } catch {
+      setError("Turniere konnten nicht geladen werden")
+    } finally {
       setLoading(false)
-    })
-  },[])
+    }
+  }
+  useEffect(()=>{ load() },[])
+
+  if(error) return(
+    <main style={{minHeight:"100vh",background:BG,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"20px"}}>
+      <div style={{textAlign:"center"}}>
+        <p style={{fontSize:36,marginBottom:12}}>⚠️</p>
+        <p style={{fontSize:14,fontWeight:700,color:W,marginBottom:6}}>Verbindungsfehler</p>
+        <p style={{fontSize:13,color:M,marginBottom:20}}>{error}</p>
+        <button onClick={load} style={{background:G,color:"#0A0A0C",border:"none",borderRadius:10,padding:"10px 24px",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>Nochmals versuchen</button>
+      </div>
+      <BottomNav />
+    </main>
+  )
 
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>

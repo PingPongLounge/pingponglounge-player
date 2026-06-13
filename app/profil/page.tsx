@@ -4,7 +4,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
-const levelColor=(l:string)=>({Locker:"#4ADE80",Hobby:"#FACC15",Fortgeschritten:"#FB923C",Competitive:PK}[l]||G)
+const levelColor=(l:string)=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
 
 function timeAgo(d:string):string{
   const diff=Date.now()-new Date(d).getTime()
@@ -61,20 +61,44 @@ export default function ProfilPage(){
   const [ppBalance,setPpBalance]=useState(0)
   const [badges,setBadges]=useState<{icon:string,title:string,earned:boolean,tier:string}[]>([])
   const [earnedCount,setEarnedCount]=useState(0)
+  const [error,setError]=useState("")
 
-  useEffect(()=>{
-    fetch("/api/achievements").then(r=>r.json()).then(d=>{
-      setBadges((d.badges||[]).filter((b:{earned:boolean})=>b.earned).slice(0,6))
-      setEarnedCount(d.earned||0)
-    })
-    fetch("/api/pingpoints").then(r=>r.json()).then(d=>setPpBalance(d.balance||0))
-    fetch("/api/profil").then(r=>r.json()).then(d=>{
-      setProfile(d.profile)
-      setEloHistory(d.eloHistory||[])
-      setRecentMatches(d.recentMatches||[])
+  async function load(){
+    setError("")
+    try {
+      const [achRes, ppRes, profRes] = await Promise.all([
+        fetch("/api/achievements"),
+        fetch("/api/pingpoints"),
+        fetch("/api/profil"),
+      ])
+      const ach  = await achRes.json()
+      const pp   = await ppRes.json()
+      const prof = await profRes.json()
+      setBadges((ach.badges||[]).filter((b:{earned:boolean})=>b.earned).slice(0,6))
+      setEarnedCount(ach.earned||0)
+      setPpBalance(pp.balance||0)
+      setProfile(prof.profile)
+      setEloHistory(prof.eloHistory||[])
+      setRecentMatches(prof.recentMatches||[])
+    } catch {
+      setError("Profil konnte nicht geladen werden")
+    } finally {
       setLoading(false)
-    })
-  },[])
+    }
+  }
+  useEffect(()=>{ load() },[])
+
+  if(error) return(
+    <main style={{minHeight:"100vh",background:BG,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"20px"}}>
+      <div style={{textAlign:"center"}}>
+        <p style={{fontSize:36,marginBottom:12}}>⚠️</p>
+        <p style={{fontSize:14,fontWeight:700,color:W,marginBottom:6}}>Verbindungsfehler</p>
+        <p style={{fontSize:13,color:M,marginBottom:20}}>{error}</p>
+        <button onClick={load} style={{background:G,color:"#0A0A0C",border:"none",borderRadius:10,padding:"10px 24px",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>Nochmals versuchen</button>
+      </div>
+      <BottomNav />
+    </main>
+  )
 
   if(loading) return(
     <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}>

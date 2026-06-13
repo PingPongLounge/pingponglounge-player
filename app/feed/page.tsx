@@ -48,16 +48,22 @@ export default function FeedPage() {
   const [userId, setUserId]     = useState<string | null>(null)
   const [loading, setLoading]   = useState(true)
   const [reacting, setReacting] = useState<string | null>(null)
+  const [error, setError] = useState("")
 
   const load = useCallback(async () => {
-    const sb = createClient()
-    const { data: { user } } = await sb.auth.getUser()
-    setUserId(user?.id || null)
-
-    const res = await fetch("/api/feed")
-    const json = await res.json()
-    setMatches(json.matches || [])
-    setLoading(false)
+    setError("")
+    try {
+      const sb = createClient()
+      const { data: { user } } = await sb.auth.getUser()
+      setUserId(user?.id || null)
+      const res = await fetch("/api/feed")
+      const json = await res.json()
+      setMatches(json.matches || [])
+    } catch {
+      setError("Feed konnte nicht geladen werden")
+    } finally {
+      setLoading(false)
+    }
   }, [])
 
   useEffect(() => { load() }, [load])
