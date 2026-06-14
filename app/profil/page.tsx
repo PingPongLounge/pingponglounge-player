@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
+import LogoutButton from "@/app/components/LogoutButton"
 
 const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
 const levelColor=(l:string)=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
@@ -51,7 +52,7 @@ function EloChart({history,current}:{history:{elo:number,delta:number,created_at
 
 type EloPoint={elo:number,delta:number,created_at:string}
 type RecentMatch={id:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,confirmed_at:string,p1_id:string,p2_id:string,p1:{name:string}|null,p2:{name:string}|null,season:{name:string,city:string}|null}
-type Profile={id:string,name:string,elo:number,level:string,matches_played:number,matches_won:number,canton:string|null,created_at:string}
+type Profile={id:string,name:string,elo:number,level:string,matches_played:number,matches_won:number,canton:string|null,created_at:string,avatar_url?:string|null}
 
 export default function ProfilPage(){
   const [profile,setProfile]=useState<Profile|null>(null)
@@ -131,9 +132,14 @@ export default function ProfilPage(){
         {/* Header */}
         <div style={{textAlign:"center",margin:"24px 0 28px"}}>
           {/* Avatar */}
-          <div style={{width:72,height:72,borderRadius:"50%",background:`${G}18`,border:`2px solid ${G}40`,margin:"0 auto 12px",display:"flex",alignItems:"center",justifyContent:"center",fontSize:28}}>
-            🏓
-          </div>
+          <Link href="/profil/avatar" style={{display:"inline-block",position:"relative",marginBottom:12}}>
+            <div style={{width:80,height:80,borderRadius:"50%",background:`${G}18`,border:`2px solid ${G}40`,overflow:"hidden",display:"flex",alignItems:"center",justifyContent:"center",fontSize:32}}>
+              {profile.avatar_url
+                ? <img src={profile.avatar_url} alt="Avatar" style={{width:"100%",height:"200%",objectFit:"cover",objectPosition:"top center"}}/>
+                : "🏓"}
+            </div>
+            <div style={{position:"absolute",bottom:0,right:0,width:22,height:22,borderRadius:"50%",background:PK,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,border:`2px solid ${BG}`}}>✏️</div>
+          </Link>
           <h1 style={{fontSize:22,fontWeight:900,color:W,marginBottom:4}}>{profile.name}</h1>
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,flexWrap:"wrap"}}>
             <span style={{fontSize:11,fontWeight:700,color:lc,background:`${lc}18`,border:`1px solid ${lc}40`,borderRadius:999,padding:"2px 10px"}}>{profile.level}</span>
@@ -210,21 +216,40 @@ export default function ProfilPage(){
           )}
         </div>
 
-        {/* Matchhistorie Link */}
-        <Link href="/matchhistorie" style={{display:"block",textDecoration:"none"}}>
-          <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-            <div style={{display:"flex",alignItems:"center",gap:12}}>
-              <div style={{width:38,height:38,borderRadius:10,background:`${G}18`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>📋</div>
-              <div>
-                <p style={{fontSize:13,fontWeight:700,color:W}}>Matchhistorie</p>
-                <p style={{fontSize:11,color:M}}>{played} Matches total</p>
+        {/* Menü */}
+        <div style={{display:"flex",flexDirection:"column",gap:8,marginBottom:10}}>
+          {[
+            {href:"/matchhistorie", icon:"📋", label:"Matchhistorie",   sub:`${played} Matches total`},
+            {href:"/achievements",  icon:"🏆", label:"Achievements",    sub:`${earnedCount} verdient`},
+            {href:"/pingpoints",    icon:"⚡", label:"PingPoints",      sub:`${ppBalance} PP Guthaben`},
+            {href:"/liga",          icon:"🏓", label:"Liga",            sub:"Saisons & Challenges"},
+            {href:"/freunde",       icon:"👥", label:"Freunde",         sub:"Spieler finden"},
+            {href:"/buchen",        icon:"📅", label:"Tisch buchen",    sub:"Standort & Zeit wählen"},
+            {href:"/profil/avatar", icon:"🎨", label:"Avatar ändern",   sub:"AI Comic Graffiti Stil"},
+          ].map(({href,icon,label,sub})=>(
+            <Link key={href} href={href} style={{display:"block",textDecoration:"none"}}>
+              <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{display:"flex",alignItems:"center",gap:12}}>
+                  <div style={{width:38,height:38,borderRadius:10,background:`${G}18`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{icon}</div>
+                  <div>
+                    <p style={{fontSize:13,fontWeight:700,color:W}}>{label}</p>
+                    <p style={{fontSize:11,color:M}}>{sub}</p>
+                  </div>
+                </div>
+                <span style={{color:G,fontWeight:700}}>→</span>
               </div>
-            </div>
-            <span style={{color:G,fontWeight:700}}>→</span>
-          </div>
-        </Link>
+            </Link>
+          ))}
+        </div>
+
+        {/* Logout */}
+        <div style={{marginTop:8,background:C,border:`1px solid #f8717130`,borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",gap:12}}>
+          <div style={{width:38,height:38,borderRadius:10,background:"#f8717118",display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>🚪</div>
+          <LogoutButton variant="menu" />
+        </div>
 
       </div>
+      <BottomNav/>
     </main>
   )
 }
