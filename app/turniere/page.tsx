@@ -44,7 +44,7 @@ export default function TurnierePage(){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
-        <Link href="/dashboard" style={{position:"absolute",left:0,right:0,display:"flex",justifyContent:"center",color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
+        <Link href="/dashboard" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
 
         <div style={{margin:"20px 0 24px"}}>
           <h1 style={{fontSize:28,fontWeight:900,color:W,textTransform:"uppercase",lineHeight:1}}>TURNIERE</h1>

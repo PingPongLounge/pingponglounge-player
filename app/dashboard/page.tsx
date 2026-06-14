@@ -90,7 +90,7 @@ export default async function Dashboard() {
     <main style={{ minHeight: '100vh', background: DARK, padding: '0 0 40px' }}>
 
       <header style={{ padding: '20px 20px 0', display: 'grid', gridTemplateColumns: '1fr auto 1fr', alignItems: 'center', maxWidth: '700px', margin: '0 auto' }}>
-        <Link href="/dashboard" style={{position:"absolute",left:0,right:0,display:"flex",justifyContent:"center", textDecoration: "none" }}><PlayerLogo size="sm" /></Link>
+        <Link href="/dashboard" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", textDecoration: "none" }}><PlayerLogo size="sm" /></Link>
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginLeft: 'auto', justifySelf: 'end' }}>
           <Link href="/profil" style={{ fontSize: '13px', color: MUTED, textDecoration: 'none' }}>{name} →</Link>
           <LogoutButton />
