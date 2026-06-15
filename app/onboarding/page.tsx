@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 
@@ -68,6 +68,15 @@ function calcLevel(score: number) {
   return LEVELS[0]
 }
 
+// Nächstkleineres Level zu einer ELO (für den /spielen Hook-Flow).
+function levelForElo(elo: number) {
+  let chosen = LEVELS[0]
+  for (const l of LEVELS) if (elo >= l.elo) chosen = l
+  return chosen
+}
+
+type PendingResult = { elo: number; won?: boolean; sets?: unknown; ort?: string; ts?: number }
+
 const inp: React.CSSProperties = { width: "100%", background: SURFACE, border: "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "15px", color: TEXT, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
 const primaryBtn = (disabled = false): React.CSSProperties => ({ width: "100%", background: disabled ? BORDER : G, color: disabled ? MUTED : DARK, border: "none", borderRadius: "10px", padding: "14px", fontSize: "14px", fontWeight: 800, cursor: disabled ? "not-allowed" : "pointer", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "10px", fontFamily: "inherit" })
 const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", background: sel ? "rgba(57,255,20,0.08)" : CARD, border: sel ? "1px solid " + G : "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: sel ? G : TEXT, cursor: "pointer", textAlign: "left", marginBottom: "8px", fontWeight: sel ? 700 : 400, fontFamily: "inherit", display: "block" })
@@ -85,10 +94,28 @@ export default function OnboardingPage() {
   const [saveError, setSaveError] = useState("")
   const [nicks, setNicks] = useState<string[]>([])
   const [loadingNicks, setLoadingNicks] = useState(false)
+  const [pending, setPending] = useState<PendingResult | null>(null)
+
+  // Pending-Resultat aus dem /spielen Hook-Flow lesen (best-effort).
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("ppl_pending_result")
+      if (!raw) return
+      const parsed = JSON.parse(raw) as PendingResult
+      if (parsed && typeof parsed.elo === "number" && Number.isFinite(parsed.elo)) {
+        setPending(parsed)
+      }
+    } catch { /* ungültiges JSON o.ä. → normaler Flow */ }
+  }, [])
 
   const score = quizScores.reduce((a, b) => a + b, 0)
   const quizResult = calcLevel(score)
-  const chosenLevel = mode === "know" ? LEVELS.find(l => l.name === manualLevel) : quizResult
+  // Bei vorhandenem Pending-Resultat kommt das Level/ELO direkt aus dem Match-Ergebnis
+  // und das Quiz/die Level-Auswahl entfällt.
+  const pendingLevel = pending
+    ? { ...levelForElo(pending.elo), elo: pending.elo }
+    : null
+  const chosenLevel = pendingLevel ?? (mode === "know" ? LEVELS.find(l => l.name === manualLevel) : quizResult)
 
   async function genNicknames() {
     setLoadingNicks(true)
@@ -112,6 +139,8 @@ export default function OnboardingPage() {
       level: chosenLevel.name, elo: chosenLevel.elo,
     })
     if (error) { setSaveError("Fehler: " + error.message); setSaving(false); return }
+    // Pending-Resultat aus dem /spielen Hook-Flow ist übernommen → aufräumen.
+    if (pending) { try { localStorage.removeItem("ppl_pending_result") } catch { /* ignore */ } }
     try { await fetch("/api/credits/signup", { method: "POST" }) } catch { /* ignore */ }
     router.push("/dashboard")
   }
@@ -140,9 +169,14 @@ export default function OnboardingPage() {
 
   if (step === 0) return (
     <div style={wrap}><div style={box}>
-      <Header step={1} total={3} />
+      <Header step={1} total={pending ? 2 : 3} />
+      {pending && (
+        <div style={{ background: "rgba(57,255,20,0.08)", border: "1px solid " + G + "55", borderRadius: "10px", padding: "12px 14px", marginBottom: "20px" }}>
+          <p style={{ fontSize: "13px", color: G, fontWeight: 700, lineHeight: 1.4 }}>Dein Resultat ist gespeichert — sichere jetzt deinen Rang.</p>
+        </div>
+      )}
       <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", marginBottom: "6px" }}>Dein Profil</h2>
-      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>Kurz einrichten — dann geht es los.</p>
+      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{pending ? "Nur noch Name + Kanton — dann ist dein Rang fix." : "Kurz einrichten — dann geht es los."}</p>
       <input style={inp} placeholder="Dein Name oder Spitzname" value={name} onChange={e => setName(e.target.value)} />
       <button type="button" onClick={genNicknames} style={{ background: "none", border: "1px solid " + BORDER, borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: MUTED, cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em", fontFamily: "inherit" }}>
         {loadingNicks ? "..." : "Vorschläge generieren"}
@@ -160,7 +194,7 @@ export default function OnboardingPage() {
         <option value="">Kanton wählen...</option>
         {CANTONS.map(c => <option key={c} value={c}>{c}</option>)}
       </select>
-      <button style={primaryBtn(!name.trim() || !canton)} disabled={!name.trim() || !canton} onClick={() => setStep(1)}>Weiter</button>
+      <button style={primaryBtn(!name.trim() || !canton)} disabled={!name.trim() || !canton} onClick={() => setStep(pending ? 3 : 1)}>Weiter</button>
     </div></div>
   )
 
@@ -207,8 +241,8 @@ export default function OnboardingPage() {
 
   if (step === 3 && chosenLevel) return (
     <div style={wrap}><div style={box}>
-      <Header step={3} total={3} />
-      <p style={{ fontSize: "11px", fontWeight: 700, color: chosenLevel.color, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>{mode === "quiz" ? "Dein Ergebnis" : "Bestätigung"}</p>
+      <Header step={pending ? 2 : 3} total={pending ? 2 : 3} />
+      <p style={{ fontSize: "11px", fontWeight: 700, color: chosenLevel.color, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>{pending ? "Dein Start-Rang" : mode === "quiz" ? "Dein Ergebnis" : "Bestätigung"}</p>
       <h2 style={{ fontSize: "40px", fontWeight: 900, color: chosenLevel.color, textTransform: "uppercase", marginBottom: "4px", letterSpacing: "-0.02em" }}>{chosenLevel.name}</h2>
       <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{chosenLevel.desc}</p>
       <div style={{ background: CARD, border: "1px solid " + BORDER, borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>

@@ -42,5 +42,15 @@ export async function POST(req: NextRequest) {
     if (error.code === "23505") return NextResponse.json({ already: true })
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
+
+  // Willkommens-PingPoints (+15) — macht das "+15 PingPoints"-Versprechen aus dem
+  // /spielen-Hook echt. Läuft nur einmal pro User (zusammen mit dem Signup-Credit).
+  await supabase.from("ping_points_transactions").insert({
+    player_id: user.id,
+    amount: 15,
+    source: "welcome",
+    description: "Willkommen bei Ping Pong Lounge",
+  })
+
   return NextResponse.json({ ok: true })
 }
