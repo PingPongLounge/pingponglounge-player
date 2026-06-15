@@ -33,6 +33,14 @@ export default function MatchPage({params}:{params:{id:string}}){
   function removeSet(i:number){setSets(s=>s.filter((_,j)=>j!==i))}
   function updateSet(i:number,side:"p1"|"p2",val:string){setSets(s=>s.map((x,j)=>j===i?{...x,[side]:val}:x))}
 
+  function handleDispute(){
+    if(!match) return
+    const scoreStr = match.sets ? match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ") : "—"
+    const subject = `Ergebnis anfechten · Liga-Match ${match.id}`
+    const body = `Ich möchte das eingetragene Ergebnis anfechten.\n\nMatch-ID: ${match.id}\nSpieler: ${match.p1_name} vs ${match.p2_name}\nEingetragenes Ergebnis: ${scoreStr}\n\nBegründung:\n`
+    window.location.href = `mailto:info@pingponglounge.ch?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+  }
+
   function validateSets():{valid:boolean,winner:string|null,parsedSets:Array<{p1:number,p2:number}>}{
     if(!match) return {valid:false,winner:null,parsedSets:[]}
     const parsed=sets.map(s=>({p1:parseInt(s.p1)||0,p2:parseInt(s.p2)||0})).filter(s=>s.p1>0||s.p2>0)
@@ -134,7 +142,7 @@ export default function MatchPage({params}:{params:{id:string}}){
             <button onClick={handleConfirm} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#0A0A0C",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>
               {saving?"...":"✓ Ergebnis bestätigen"}
             </button>
-            <button style={{width:"100%",background:"none",border:`1px solid ${B}`,color:M,borderRadius:10,padding:"14px",fontSize:13,cursor:"pointer"}}>Ergebnis anfechten</button>
+            <button onClick={handleDispute} style={{width:"100%",background:"none",border:`1px solid ${B}`,color:M,borderRadius:10,padding:"14px",fontSize:13,cursor:"pointer"}}>Ergebnis anfechten</button>
           </div>
         )}
 
