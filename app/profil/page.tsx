@@ -4,7 +4,8 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import LogoutButton from "@/app/components/LogoutButton"
 
-const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
+const BG="#0C0D10",C="#111318",B="#1E2230",M="rgba(255,255,255,0.35)",G="#39FF14",W="#FFFFFF",PK="#FF00C8"
+const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 const levelColor=(l:string)=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
 
 function timeAgo(d:string):string{
@@ -127,7 +128,7 @@ export default function ProfilPage(){
     <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
 
-        <Link href="/dashboard" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
+        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← entdecken</Link>
 
         {/* Header */}
         <div style={{textAlign:"center",margin:"24px 0 28px"}}>
@@ -151,7 +152,7 @@ export default function ProfilPage(){
         <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,padding:"20px 20px 14px",marginBottom:10,textAlign:"center"}}>
           <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:6}}>ELO Rating</p>
           <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:10}}>
-            <span style={{fontSize:56,fontWeight:900,color:G,lineHeight:1,letterSpacing:"-0.02em"}}>{profile.elo??1000}</span>
+            <span style={{fontSize:56,fontWeight:900,lineHeight:1,letterSpacing:"-0.02em",background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>{profile.elo??1000}</span>
             {lastDelta!==null&&(
               <span style={{fontSize:14,fontWeight:700,color:lastDelta>=0?"#4ADE80":"#f87171"}}>
                 {lastDelta>=0?"+":""}{lastDelta}

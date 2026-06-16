@@ -80,7 +80,7 @@ export default function FreundePage() {
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 20px 80px" }}>
       <div style={{ maxWidth: 480, margin: "0 auto" }}>
-        <Link href="/dashboard" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
+        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
 
         {/* Hero */}
         <div style={{ textAlign: "center", margin: "32px 0 32px" }}>

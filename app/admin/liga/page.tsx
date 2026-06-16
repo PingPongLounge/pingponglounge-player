@@ -22,7 +22,7 @@ export default function AdminLigaPage(){
     async function load(){
       const sb=createClient()
       const {data:{user}}=await sb.auth.getUser()
-      if(!user||!STAFF_EMAILS.includes(user.email||"")){window.location.href="/dashboard";return}
+      if(!user||!STAFF_EMAILS.includes(user.email||"")){window.location.href="/entdecken";return}
       setAuthed(true)
       const {data}=await sb.from("league_seasons").select("*,league_registrations(count)").order("created_at",{ascending:false})
       setSeasons(data||[])

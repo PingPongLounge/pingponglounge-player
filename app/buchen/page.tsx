@@ -403,7 +403,7 @@ export default function BuchenPage(){
               style={{background:G,color:"#0A0A0C",border:"none",borderRadius:10,padding:"14px 28px",fontSize:14,fontWeight:800,cursor:"pointer"}}>
               Neue Buchung
             </button>
-            <div style={{marginTop:16}}><Link href="/dashboard" style={{color:M,fontSize:13}}>← Dashboard</Link></div>
+            <div style={{marginTop:16}}><Link href="/entdecken" style={{color:M,fontSize:13}}>← Dashboard</Link></div>
           </div>
         )}
 

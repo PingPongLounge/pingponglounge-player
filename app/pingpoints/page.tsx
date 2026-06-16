@@ -95,7 +95,7 @@ export default function PingPointsPage(){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
-        <Link href="/dashboard" style={{color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
+        <Link href="/entdecken" style={{color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
 
         {/* Hero */}
         <div style={{textAlign:"center",margin:"24px 0 28px"}}>
