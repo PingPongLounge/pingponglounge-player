@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
+// Lazy init — verhindert Build-Crash wenn STRIPE_SECRET_KEY fehlt
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY
+  if (!key) throw new Error("STRIPE_SECRET_KEY nicht gesetzt")
+  return new Stripe(key)
+}
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://pingponglounge-player.vercel.app"
 const PLANYO_API_KEY = process.env.PLANYO_API_KEY || ""
 const PLANYO_BASE = "https://www.planyo.com/rest/"
@@ -54,7 +59,7 @@ export async function POST(req: NextRequest) {
 
     if (amount <= 0) return NextResponse.json({ error: "Ungültiger Betrag" }, { status: 400 })
 
-    const session = await stripe.checkout.sessions.create({
+    const session = await getStripe().checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [{ price_data: {
         currency: "chf",
