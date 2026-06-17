@@ -108,11 +108,6 @@ export default function OnboardingPage() {
     } catch { /* ungültiges JSON o.ä. → normaler Flow */ }
   }, [])
 
-  async function handleLogout() {
-    try { const supabase = createClient(); await supabase.auth.signOut() } catch { /* ignore */ }
-    router.replace("/login")
-  }
-
   const score = quizScores.reduce((a, b) => a + b, 0)
   const quizResult = calcLevel(score)
   // Bei vorhandenem Pending-Resultat kommt das Level/ELO direkt aus dem Match-Ergebnis
