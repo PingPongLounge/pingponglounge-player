@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { STAFF_EMAILS } from "@/lib/staff"
 
-const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1"
+const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
+const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 const CITIES=["Oerlikon","Langstrasse","Glattbrugg","Basel","Luzern","St. Gallen","Bern","Zürich"]
 const LEVELS=["Rookie","Challenger","Advanced","Elite"]
 
@@ -64,12 +65,12 @@ export default function AdminLigaPage(){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 20px 80px"}}>
       <div style={{maxWidth:600,margin:"0 auto"}}>
-        <Link href="/dashboard" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
-        <h1 style={{fontSize:28,fontWeight:900,color:W,textTransform:"uppercase",margin:"16px 0 24px"}}>Liga Admin</h1>
+        <Link href="/dashboard" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← dashboard</Link>
+        <h1 style={{fontSize:28,fontWeight:900,fontFamily:"'League Spartan', system-ui, sans-serif",textTransform:"uppercase",letterSpacing:".1em",margin:"16px 0 24px",background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>liga admin</h1>
 
         {/* Create form */}
         <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,padding:"20px",marginBottom:24}}>
-          <p style={{fontSize:12,fontWeight:700,color:G,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:16}}>Neue Saison erstellen</p>
+          <p style={{fontSize:12,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:16}}>neue saison erstellen</p>
           <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Name (z.B. PPL Zürich Frühling 2026)" style={{width:"100%",background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none",marginBottom:8,boxSizing:"border-box"}}/>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
             <select value={form.city} onChange={e=>setForm(f=>({...f,city:e.target.value}))} style={{background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none"}}>
@@ -85,8 +86,8 @@ export default function AdminLigaPage(){
           </div>
           <input value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="Beschreibung (optional)" style={{width:"100%",background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none",marginBottom:12,boxSizing:"border-box"}}/>
           {msg&&<p style={{fontSize:13,color:msg.startsWith("✓")?G:"#FF6666",marginBottom:8}}>{msg}</p>}
-          <button onClick={createSeason} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#14161A",border:"none",borderRadius:8,padding:"14px",fontSize:13,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
-            {saving?"Erstellen...":"Saison erstellen"}
+          <button onClick={createSeason} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#14161A",border:"none",borderRadius:8,padding:"14px",fontSize:13,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
+            {saving?"erstellen...":"saison erstellen"}
           </button>
         </div>
 

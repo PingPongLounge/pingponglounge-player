@@ -14,12 +14,13 @@ type Credit = {
   referred_name?: string
 }
 
-const BG = "#111214"
-const C  = "#15161A"
-const B  = "#26282E"
-const M  = "#6B6E7A"
+const BG = "#14161A"
+const C  = "#1B1E25"
+const B  = "#1E2230"
+const M  = "rgba(255,255,255,0.66)"
 const G  = "#39FF14"
-const W  = "#E8E6E1"
+const W  = "#FFFFFF"
+const GRAD = "linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 
 function formatDate(d: string) {
   return new Date(d).toLocaleDateString("de-CH", { month: "short", year: "numeric" })
@@ -31,7 +32,7 @@ function QRCode({ code }: { code: string }) {
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={url} alt="QR Code" width={100} height={100} style={{ borderRadius: 8, border: `1px solid ${B}` }} />
-      <span style={{ fontSize: 10, color: M, letterSpacing: "0.06em" }}>Am Empfang vorzeigen</span>
+      <span style={{ fontSize: 10, color: M, letterSpacing: "0.06em" }}>am empfang vorzeigen</span>
     </div>
   )
 }
@@ -55,18 +56,18 @@ function CreditCard({ c }: { c: Credit }) {
           <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
             <span style={{ fontSize: 16 }}>{c.type === "signup" ? "🎁" : "👥"}</span>
             <span style={{ fontSize: 15, fontWeight: 700, color: W }}>
-              {c.type === "signup" ? "Willkommensbonus" : "Freund geworben"}
+              {c.type === "signup" ? "willkommensbonus" : "freund geworben"}
             </span>
           </div>
           {c.referred_name && (
             <p style={{ fontSize: 12, color: M, margin: 0 }}>{c.referred_name} hat sich angemeldet</p>
           )}
           <p style={{ fontSize: 12, color: M, margin: "2px 0 0" }}>
-            Gültig bis {formatDate(c.expires_at)}
+            gültig bis {formatDate(c.expires_at)}
           </p>
           {redeemed && (
             <p style={{ fontSize: 12, color: M, margin: "2px 0 0" }}>
-              Eingelöst {formatDate(c.redeemed_at!)}
+              eingelöst {formatDate(c.redeemed_at!)}
             </p>
           )}
         </div>
@@ -140,38 +141,38 @@ export default function StundenPage() {
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 20px 80px" }}>
       <div style={{ maxWidth: 480, margin: "0 auto" }}>
-        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
+        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← dashboard</Link>
 
         <div style={{ textAlign: "center", margin: "32px 0 28px" }}>
-          <p style={{ fontSize: 11, fontWeight: 700, color: G, letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 8 }}>Meine Stunden</p>
-          <p style={{ fontSize: 11, color: M, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 4 }}>GUTHABEN</p>
-          <div style={{ fontSize: 72, fontWeight: 900, color: G, lineHeight: 1 }}>{total}h</div>
+          <p style={{ fontSize: 11, fontWeight: 700, color: M, letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 8 }}>meine stunden</p>
+          <p style={{ fontSize: 11, color: M, textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 4 }}>guthaben</p>
+          <div style={{ fontSize: 72, fontWeight: 900, lineHeight: 1, background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>{total}h</div>
           {credits.length > 0 && (
             <p style={{ fontSize: 13, color: M, marginTop: 8 }}>
-              {credits.filter(c => !c.redeemed_at && new Date(c.expires_at) > new Date()).length} aktive Gutscheine
+              {credits.filter(c => !c.redeemed_at && new Date(c.expires_at) > new Date()).length} aktive gutscheine
             </p>
           )}
         </div>
 
         {loading ? (
-          <p style={{ textAlign: "center", color: M }}>Lädt...</p>
+          <p style={{ textAlign: "center", color: M }}>lädt...</p>
         ) : credits.length === 0 ? (
           <div style={{ textAlign: "center", padding: "40px 20px", background: C, borderRadius: 16, border: `1px solid ${B}` }}>
             <p style={{ fontSize: 32, marginBottom: 12 }}>🎁</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>Noch keine Gutscheine</p>
-            <p style={{ fontSize: 13, color: M, marginBottom: 24 }}>Lade Freunde ein und verdiene je 2 Gratisstunden</p>
+            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>noch keine gutscheine</p>
+            <p style={{ fontSize: 13, color: M, marginBottom: 24 }}>lade freunde ein und verdiene je 2 gratisstunden</p>
             <Link href="/freunde" style={{
               display: "inline-block",
-              background: G,
+              background: "#fff",
               color: "#14161A",
               fontWeight: 700,
               fontSize: 13,
               textDecoration: "none",
               padding: "12px 24px",
               borderRadius: 8,
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
-            }}>Freunde einladen</Link>
+              textTransform: "lowercase",
+              letterSpacing: "0.02em",
+            }}>freunde einladen</Link>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -184,16 +185,16 @@ export default function StundenPage() {
             display: "inline-flex",
             alignItems: "center",
             gap: 8,
-            background: `${G}18`,
-            border: `1px solid ${G}44`,
-            color: G,
+            background: "transparent",
+            border: `1px solid #2A3340`,
+            color: W,
             fontWeight: 700,
             fontSize: 13,
             textDecoration: "none",
             padding: "12px 24px",
             borderRadius: 10,
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
+            textTransform: "lowercase",
+            letterSpacing: "0.02em",
           }}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
@@ -201,7 +202,7 @@ export default function StundenPage() {
               <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
               <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
             </svg>
-            Weitere Stunden verdienen →
+            weitere stunden verdienen →
           </Link>
         </div>
       </div>

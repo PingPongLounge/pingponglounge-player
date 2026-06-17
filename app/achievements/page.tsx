@@ -3,7 +3,8 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
+const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#FF00C8"
+const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 
 const tierColor = (t: string) => ({
   bronze:  "#CD7F32",
@@ -57,9 +58,9 @@ export default function AchievementsPage() {
     <main style={{ minHeight: "100vh", background: BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }}>
       <div style={{ textAlign: "center" }}>
         <p style={{ fontSize: 36, marginBottom: 12 }}>⚠️</p>
-        <p style={{ fontSize: 14, fontWeight: 700, color: W, marginBottom: 6 }}>Verbindungsfehler</p>
+        <p style={{ fontSize: 14, fontWeight: 700, color: W, marginBottom: 6 }}>verbindungsfehler</p>
         <p style={{ fontSize: 13, color: M, marginBottom: 20 }}>{error}</p>
-        <button onClick={load} style={{ background: G, color: "#14161A", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>Nochmals versuchen</button>
+        <button onClick={load} style={{ background: "#fff", color: "#14161A", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>nochmals versuchen</button>
       </div>
       <BottomNav />
     </main>
@@ -69,10 +70,10 @@ export default function AchievementsPage() {
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
 
-        <Link href="/profil" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← Profil</Link>
+        <Link href="/profil" style={{ color: M, textDecoration: "none", fontSize: 13 }}>← profil</Link>
 
         <div style={{ margin: "20px 0 24px" }}>
-          <h1 style={{ fontSize: 28, fontWeight: 900, color: W, textTransform: "uppercase", lineHeight: 1 }}>ACHIEVEMENTS</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 900, fontFamily: "'League Spartan', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: ".1em", lineHeight: 1, background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>achievements</h1>
           <p style={{ fontSize: 13, color: M, marginTop: 6 }}>{earned} / {total} freigeschaltet</p>
         </div>
 
@@ -92,10 +93,10 @@ export default function AchievementsPage() {
           {(["alle","earned","locked"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: "7px 16px", borderRadius: 999, fontSize: 12, fontWeight: 700, cursor: "pointer",
-              background: filter === f ? G : C, color: filter === f ? "#14161A" : M,
-              border: `1px solid ${filter === f ? G : B}`
+              background: filter === f ? "#fff" : C, color: filter === f ? "#14161A" : M,
+              border: `1px solid ${filter === f ? "#fff" : B}`
             }}>
-              {f === "alle" ? "Alle" : f === "earned" ? `✓ Earned (${earned})` : `🔒 Locked (${total - earned})`}
+              {f === "alle" ? "alle" : f === "earned" ? `✓ earned (${earned})` : `🔒 locked (${total - earned})`}
             </button>
           ))}
         </div>
@@ -103,7 +104,7 @@ export default function AchievementsPage() {
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px 0", color: M }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>🏅</div>
-            <p>Lädt...</p>
+            <p>lädt...</p>
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>

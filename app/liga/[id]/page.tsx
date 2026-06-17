@@ -5,7 +5,8 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { LIGA_CONFIG } from "@/lib/rewards"
 
-const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
+const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#FF00C8"
+const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 const levelColor=(l:string):string=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
 
 type Standing={player_id:string,player_name:string,points:number,played:number,wins:number,losses:number,rank:number}
@@ -149,7 +150,7 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
     setFeed(prev=>prev.map(f=>f.id===matchId?{...f,comments:((data||[]) as unknown as Array<{id:string,user_id:string,text:string,created_at:string,profiles:{name:string}|null}>).map(c=>({...c,user_name:c.profiles?.name||"?"}))}:f))
   }
 
-  if(loading||!season) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>Lädt...</p>
+  if(loading||!season) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>lädt...</p>
       <BottomNav /></main>
 
   const lc=levelColor(season.skill_class)
@@ -161,36 +162,36 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
   const busyOpponents=new Set(challenges.map(c=>c.p1_id===userId?c.p2_id:c.p1_id))
 
   const TABS=[
-    {key:"tabelle",label:"Tabelle"},
-    {key:"spielplan",label:"Spielplan"},
-    {key:"challenges",label:`Challenges${incomingChallenges.length>0?` (${incomingChallenges.length})`:""}` },
-    {key:"feed",label:"Feed"},
+    {key:"tabelle",label:"tabelle"},
+    {key:"spielplan",label:"spielplan"},
+    {key:"challenges",label:`challenges${incomingChallenges.length>0?` (${incomingChallenges.length})`:""}` },
+    {key:"feed",label:"feed"},
   ] as const
 
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 20px 80px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
-        <Link href="/liga" style={{color:M,textDecoration:"none",fontSize:13}}>← Liga</Link>
+        <Link href="/liga" style={{color:M,textDecoration:"none",fontSize:13}}>← liga</Link>
 
         {/* Header */}
         <div style={{margin:"16px 0 20px"}}>
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
-            <h1 style={{fontSize:22,fontWeight:900,color:W,textTransform:"uppercase"}}>{season.name}</h1>
+            <h1 style={{fontSize:22,fontWeight:900,fontFamily:"'League Spartan', system-ui, sans-serif",textTransform:"uppercase",letterSpacing:".1em",background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>{season.name}</h1>
             <span style={{fontSize:10,fontWeight:700,color:lc,background:`${lc}18`,border:`1px solid ${lc}40`,borderRadius:999,padding:"2px 8px"}}>{season.skill_class}</span>
           </div>
-          <p style={{fontSize:12,color:M}}>{season.city} · {standings.length} Spieler · {season.status==="running"?"Läuft gerade":"Offen für Anmeldung"}</p>
+          <p style={{fontSize:12,color:M}}>{season.city} · {standings.length} spieler · {season.status==="running"?"läuft gerade":"offen für anmeldung"}</p>
         </div>
 
         {/* Anmelden CTA */}
-        {season.status==="open"&&!myMatches.length&&<Link href={`/liga/${season.id}/anmelden`} style={{display:"block",background:G,color:"#14161A",textDecoration:"none",borderRadius:10,padding:"14px",textAlign:"center",fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:16}}>Kostenlos anmelden</Link>}
+        {season.status==="open"&&!myMatches.length&&<Link href={`/liga/${season.id}/anmelden`} style={{display:"block",background:"#fff",color:"#14161A",textDecoration:"none",borderRadius:10,padding:"14px",textAlign:"center",fontSize:13,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em",marginBottom:16}}>kostenlos anmelden</Link>}
 
         {/* Tabs */}
         <div style={{display:"flex",background:C,borderRadius:10,padding:3,marginBottom:16,gap:2}}>
           {TABS.map(t=>(
-            <button key={t.key} onClick={()=>setTab(t.key)} style={{flex:1,background:tab===t.key?BG:"none",border:"none",borderRadius:8,padding:"9px 4px",fontSize:11,fontWeight:700,color:tab===t.key?W:M,cursor:"pointer",textTransform:"uppercase",letterSpacing:"0.04em",transition:"all 0.2s",position:"relative"}}>
+            <button key={t.key} onClick={()=>setTab(t.key)} style={{flex:1,background:tab===t.key?"#fff":"none",border:"none",borderRadius:8,padding:"9px 4px",fontSize:11,fontWeight:700,color:tab===t.key?"#14161A":M,cursor:"pointer",textTransform:"lowercase",letterSpacing:"0.04em",transition:"all 0.2s",position:"relative"}}>
               {t.label}
               {t.key==="challenges"&&incomingChallenges.length>0&&tab!=="challenges"&&(
-                <span style={{position:"absolute",top:2,right:2,width:7,height:7,background:PK,borderRadius:"50%"}}/>
+                <span style={{position:"absolute",top:2,right:2,width:7,height:7,background:G,borderRadius:"50%"}}/>
               )}
             </button>
           ))}
@@ -199,15 +200,15 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
         {/* ── TABELLE ─────────────────────────────────────────── */}
         {tab==="tabelle"&&(
           <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,overflow:"hidden"}}>
-            <div style={{display:"grid",gridTemplateColumns:"28px 1fr 50px 52px 44px",padding:"10px 14px",borderBottom:`1px solid ${B}`,background:"#0D0E12"}}>
+            <div style={{display:"grid",gridTemplateColumns:"28px 1fr 50px 52px 44px",padding:"10px 14px",borderBottom:`1px solid ${B}`,background:"#14161A"}}>
               <span style={{fontSize:10,color:M,fontWeight:700}}>#</span>
-              <span style={{fontSize:10,color:M,fontWeight:700}}>SPIELER</span>
-              <span style={{fontSize:10,color:M,fontWeight:700,textAlign:"center"}}>S</span>
-              <span style={{fontSize:10,color:M,fontWeight:700,textAlign:"right"}}>PTS</span>
+              <span style={{fontSize:10,color:M,fontWeight:700}}>spieler</span>
+              <span style={{fontSize:10,color:M,fontWeight:700,textAlign:"center"}}>s</span>
+              <span style={{fontSize:10,color:M,fontWeight:700,textAlign:"right"}}>pts</span>
               <span style={{fontSize:10,color:M,fontWeight:700,textAlign:"center"}}>⚔</span>
             </div>
             {standings.length===0?(
-              <p style={{padding:"20px",textAlign:"center",color:M,fontSize:13}}>Noch keine Ergebnisse</p>
+              <p style={{padding:"20px",textAlign:"center",color:M,fontSize:13}}>noch keine ergebnisse</p>
             ):standings.map((s,i)=>{
               const isSelf=s.player_id===userId
               const isBusy=busyOpponents.has(s.player_id)
@@ -244,7 +245,7 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
         {/* ── SPIELPLAN ───────────────────────────────────────── */}
         {tab==="spielplan"&&(
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
-            {matches.length===0?<p style={{textAlign:"center",color:M,padding:"20px"}}>Noch keine Matches</p>:
+            {matches.length===0?<p style={{textAlign:"center",color:M,padding:"20px"}}>noch keine matches</p>:
             matches.map(m=>{
               const isMe=m.p1_id===userId||m.p2_id===userId
               const confirmed=m.status==="confirmed"
@@ -252,8 +253,8 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
               return(
                 <div key={m.id} style={{background:C,border:`1px solid ${isMe?`${G}40`:B}`,borderRadius:12,padding:"14px 16px"}}>
                   <div style={{display:"flex",alignItems:"center",position:"relative",marginBottom:6}}>
-                    <span style={{fontSize:10,color:M,fontWeight:700,textTransform:"uppercase"}}>{m.round>0?`Runde ${m.round}`:"Open Match"}</span>
-                    <span style={{fontSize:10,color:confirmed?G:m.status==="p1_entered"?"#FACC15":M,fontWeight:700,textTransform:"uppercase"}}>{confirmed?"✓ Bestätigt":m.status==="p1_entered"?"Warten":"Ausstehend"}</span>
+                    <span style={{fontSize:10,color:M,fontWeight:700,textTransform:"uppercase"}}>{m.round>0?`runde ${m.round}`:"open match"}</span>
+                    <span style={{fontSize:10,color:confirmed?G:m.status==="p1_entered"?"#FACC15":M,fontWeight:700,textTransform:"uppercase"}}>{confirmed?"✓ bestätigt":m.status==="p1_entered"?"warten":"ausstehend"}</span>
                   </div>
                   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                     <span style={{fontSize:15,fontWeight:700,color:m.winner_id===m.p1_id?G:W}}>{m.p1_name}</span>
@@ -264,8 +265,8 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                   </div>
                   {confirmed&&m.sets&&<p style={{fontSize:11,color:M,marginTop:6,textAlign:"center"}}>{setsToString(m.sets)}</p>}
                   {isMe&&!confirmed&&(
-                    <Link href={`/liga/match/${m.id}`} style={{display:"block",marginTop:10,background:G,color:"#14161A",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>
-                      {m.status==="p1_entered"&&m.p2_id===userId?"Bestätigen":"Resultat eingeben"}
+                    <Link href={`/liga/match/${m.id}`} style={{display:"block",marginTop:10,background:"#fff",color:"#14161A",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em"}}>
+                      {m.status==="p1_entered"&&m.p2_id===userId?"bestätigen":"resultat eingeben"}
                     </Link>
                   )}
                 </div>
@@ -281,22 +282,22 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
             {/* Incoming */}
             {incomingChallenges.length>0&&(
               <div>
-                <p style={{fontSize:11,fontWeight:700,color:PK,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Eingehend</p>
+                <p style={{fontSize:11,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>eingehend</p>
                 {incomingChallenges.map(c=>(
-                  <div key={c.id} style={{background:C,border:`1px solid ${PK}30`,borderRadius:12,padding:"14px 16px",marginBottom:8}}>
+                  <div key={c.id} style={{background:C,border:`1px solid ${B}`,borderRadius:12,padding:"14px 16px",marginBottom:8}}>
                     <p style={{fontSize:14,fontWeight:700,color:W,marginBottom:4}}>
-                      <span style={{color:PK}}>{c.p1_name}</span> fordert dich heraus
+                      <span style={{color:G}}>{c.p1_name}</span> fordert dich heraus
                     </p>
                     <div style={{display:"flex",gap:8,marginTop:10}}>
-                      <button onClick={()=>handleAccept(c.id)} style={{flex:1,background:G,color:"#14161A",border:"none",borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer",textTransform:"uppercase"}}>✓ Annehmen</button>
+                      <button onClick={()=>handleAccept(c.id)} style={{flex:1,background:"#fff",color:"#14161A",border:"none",borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer",textTransform:"lowercase"}}>✓ annehmen</button>
                       {confirmDecline===c.id?(
                         <div style={{flex:1,display:"flex",gap:6,alignItems:"center"}}>
-                          <span style={{fontSize:11,color:M,flex:1}}>Sicher?</span>
-                          <button onClick={()=>setConfirmDecline(null)} style={{background:"none",color:M,border:`1px solid ${B}`,borderRadius:6,padding:"6px 10px",fontSize:11,cursor:"pointer"}}>Nein</button>
-                          <button onClick={()=>{handleDecline(c.id);setConfirmDecline(null)}} style={{background:"#f8717120",color:"#f87171",border:"1px solid #f8717140",borderRadius:6,padding:"6px 10px",fontSize:11,fontWeight:700,cursor:"pointer"}}>Ablehnen</button>
+                          <span style={{fontSize:11,color:M,flex:1}}>sicher?</span>
+                          <button onClick={()=>setConfirmDecline(null)} style={{background:"none",color:M,border:`1px solid ${B}`,borderRadius:6,padding:"6px 10px",fontSize:11,cursor:"pointer"}}>nein</button>
+                          <button onClick={()=>{handleDecline(c.id);setConfirmDecline(null)}} style={{background:"#f8717120",color:"#f87171",border:"1px solid #f8717140",borderRadius:6,padding:"6px 10px",fontSize:11,fontWeight:700,cursor:"pointer"}}>ablehnen</button>
                         </div>
                       ):(
-                        <button onClick={()=>setConfirmDecline(c.id)} style={{flex:1,background:"none",color:M,border:`1px solid ${B}`,borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer"}}>Ablehnen</button>
+                        <button onClick={()=>setConfirmDecline(c.id)} style={{flex:1,background:"none",color:M,border:`1px solid ${B}`,borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer"}}>ablehnen</button>
                       )}
                     </div>
                   </div>
@@ -307,21 +308,21 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
             {/* Outgoing */}
             {outgoingChallenges.length>0&&(
               <div>
-                <p style={{fontSize:11,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Gesendet</p>
+                <p style={{fontSize:11,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>gesendet</p>
                 {outgoingChallenges.map(c=>(
                   <div key={c.id} style={{background:C,border:`1px solid ${B}`,borderRadius:12,padding:"14px 16px",marginBottom:8}}>
                     <div style={{display:"flex",alignItems:"center",position:"relative"}}>
-                      <p style={{fontSize:14,fontWeight:700,color:W}}>Challenge an <span style={{color:G}}>{c.p2_name}</span></p>
-                      <span style={{fontSize:10,color:"#FACC15",fontWeight:700}}>⏳ Wartet</span>
+                      <p style={{fontSize:14,fontWeight:700,color:W}}>challenge an <span style={{color:G}}>{c.p2_name}</span></p>
+                      <span style={{fontSize:10,color:"#FACC15",fontWeight:700}}>⏳ wartet</span>
                     </div>
                     {confirmWithdraw===c.id?(
                       <div style={{display:"flex",gap:6,alignItems:"center",marginTop:10}}>
-                        <span style={{fontSize:11,color:M,flex:1}}>Zurückziehen?</span>
-                        <button onClick={()=>setConfirmWithdraw(null)} style={{background:"none",color:M,border:`1px solid ${B}`,borderRadius:6,padding:"5px 10px",fontSize:11,cursor:"pointer"}}>Nein</button>
-                        <button onClick={()=>{handleDecline(c.id);setConfirmWithdraw(null)}} style={{background:"#f8717120",color:"#f87171",border:"1px solid #f8717140",borderRadius:6,padding:"5px 10px",fontSize:11,fontWeight:700,cursor:"pointer"}}>Ja</button>
+                        <span style={{fontSize:11,color:M,flex:1}}>zurückziehen?</span>
+                        <button onClick={()=>setConfirmWithdraw(null)} style={{background:"none",color:M,border:`1px solid ${B}`,borderRadius:6,padding:"5px 10px",fontSize:11,cursor:"pointer"}}>nein</button>
+                        <button onClick={()=>{handleDecline(c.id);setConfirmWithdraw(null)}} style={{background:"#f8717120",color:"#f87171",border:"1px solid #f8717140",borderRadius:6,padding:"5px 10px",fontSize:11,fontWeight:700,cursor:"pointer"}}>ja</button>
                       </div>
                     ):(
-                      <button onClick={()=>setConfirmWithdraw(c.id)} style={{marginTop:10,background:"none",color:M,border:`1px solid ${B}`,borderRadius:8,padding:"8px 14px",fontSize:11,cursor:"pointer"}}>Zurückziehen</button>
+                      <button onClick={()=>setConfirmWithdraw(c.id)} style={{marginTop:10,background:"none",color:M,border:`1px solid ${B}`,borderRadius:8,padding:"8px 14px",fontSize:11,cursor:"pointer"}}>zurückziehen</button>
                     )}
                   </div>
                 ))}
@@ -331,8 +332,8 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
             {incomingChallenges.length===0&&outgoingChallenges.length===0&&(
               <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,padding:"32px 20px",textAlign:"center"}}>
                 <p style={{fontSize:28,marginBottom:10}}>⚔️</p>
-                <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:6}}>Keine offenen Challenges</p>
-                <p style={{fontSize:13,color:M}}>Fordere einen Mitspieler in der Tabelle heraus.</p>
+                <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:6}}>keine offenen challenges</p>
+                <p style={{fontSize:13,color:M}}>fordere einen mitspieler in der tabelle heraus.</p>
               </div>
             )}
           </div>
@@ -341,7 +342,7 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
         {/* ── FEED ────────────────────────────────────────────── */}
         {tab==="feed"&&(
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
-            {feed.length===0?<p style={{textAlign:"center",color:M,padding:"20px"}}>Noch keine Ergebnisse</p>:
+            {feed.length===0?<p style={{textAlign:"center",color:M,padding:"20px"}}>noch keine ergebnisse</p>:
             feed.map(f=>{
               const sw=winsFromSets(f.sets)
               const reactionCounts:{[k:string]:number}={}
@@ -378,8 +379,8 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                   )}
                   {userId&&(
                     <div style={{display:"flex",gap:8}}>
-                      <input value={commentText[f.id]||""} onChange={e=>setCommentText(p=>({...p,[f.id]:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&handleComment(f.id)} placeholder="Kommentar..." style={{flex:1,background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"8px 12px",fontSize:13,color:W,outline:"none"}}/>
-                      <button onClick={()=>handleComment(f.id)} style={{background:G,color:"#14161A",border:"none",borderRadius:8,padding:"8px 14px",cursor:"pointer",fontSize:13,fontWeight:700}}>→</button>
+                      <input value={commentText[f.id]||""} onChange={e=>setCommentText(p=>({...p,[f.id]:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&handleComment(f.id)} placeholder="kommentar..." style={{flex:1,background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"8px 12px",fontSize:13,color:W,outline:"none"}}/>
+                      <button onClick={()=>handleComment(f.id)} style={{background:"#fff",color:"#14161A",border:"none",borderRadius:8,padding:"8px 14px",cursor:"pointer",fontSize:13,fontWeight:700}}>→</button>
                     </div>
                   )}
                 </div>

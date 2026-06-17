@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
+const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#FF00C8"
+const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 const levelColor=(l:string)=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
 
 const CANTONS = [
@@ -62,13 +63,13 @@ export default function RanglistePage() {
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
 
-        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
+        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← dashboard</Link>
 
         {/* Header */}
         <div style={{ margin: "20px 0 24px" }}>
-          <h1 style={{ fontSize: 28, fontWeight: 900, color: W, textTransform: "uppercase", lineHeight: 1 }}>RANGLISTE</h1>
+          <h1 style={{ fontSize: 28, fontWeight: 900, fontFamily: "'League Spartan', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: ".1em", lineHeight: 1, background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>rangliste</h1>
           <p style={{ fontSize: 13, color: M, marginTop: 6 }}>
-            {canton ? `Kanton ${canton}` : "Schweiz National"} · {players.length} Spieler
+            {canton ? `Kanton ${canton}` : "schweiz national"} · {players.length} spieler
           </p>
         </div>
 
@@ -77,7 +78,7 @@ export default function RanglistePage() {
           <div style={{ background: `${G}12`, border: `1px solid ${G}30`, borderRadius: 12, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
             <span style={{ fontSize: 18, fontWeight: 900, color: G, minWidth: 36 }}>#{myEntry.rank}</span>
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: G }}>Dein Rang</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: G }}>dein rang</p>
               <p style={{ fontSize: 11, color: M }}>{myEntry.elo} ELO · {myEntry.level}</p>
             </div>
             <span style={{ fontSize: 12, color: M }}>{myEntry.matches_played > 0 ? `${Math.round((myEntry.matches_won / myEntry.matches_played) * 100)}% WR` : "—"}</span>
@@ -89,12 +90,12 @@ export default function RanglistePage() {
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             <button onClick={() => setCanton("")} style={{
               padding: "6px 14px", borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: "pointer",
-              background: !canton ? `${G}18` : C, border: `1px solid ${!canton ? G : B}`, color: !canton ? G : M
-            }}>🇨🇭 National</button>
+              background: !canton ? "#fff" : C, border: `1px solid ${!canton ? "#fff" : B}`, color: !canton ? "#14161A" : M
+            }}>🇨🇭 national</button>
             {CANTONS.map(c => (
               <button key={c} onClick={() => setCanton(canton === c ? "" : c)} style={{
                 padding: "6px 12px", borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: "pointer",
-                background: canton === c ? `${G}18` : C, border: `1px solid ${canton === c ? G : B}`, color: canton === c ? G : M
+                background: canton === c ? "#fff" : C, border: `1px solid ${canton === c ? "#fff" : B}`, color: canton === c ? "#14161A" : M
               }}>{c}</button>
             ))}
           </div>
@@ -103,13 +104,13 @@ export default function RanglistePage() {
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px 0", color: M }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>🏓</div>
-            <p style={{ fontSize: 14 }}>Lädt...</p>
+            <p style={{ fontSize: 14 }}>lädt...</p>
           </div>
         ) : players.length === 0 ? (
           <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, padding: "40px 20px", textAlign: "center" }}>
             <p style={{ fontSize: 32, marginBottom: 12 }}>🏓</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>Noch keine Spieler</p>
-            <p style={{ fontSize: 13, color: M }}>Spiel dein erstes Match um auf die Rangliste zu kommen.</p>
+            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>noch keine spieler</p>
+            <p style={{ fontSize: 13, color: M }}>spiel dein erstes match um auf die rangliste zu kommen.</p>
           </div>
         ) : (
           <>
@@ -139,7 +140,7 @@ export default function RanglistePage() {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
                           <span style={{ fontSize: 15, fontWeight: 800, color: isMe ? G : W }}>{p.name}</span>
-                          {isMe && <span style={{ fontSize: 9, color: G, background: `${G}18`, borderRadius: 999, padding: "1px 6px", fontWeight: 700 }}>Du</span>}
+                          {isMe && <span style={{ fontSize: 9, color: G, background: `${G}18`, borderRadius: 999, padding: "1px 6px", fontWeight: 700 }}>du</span>}
                         </div>
                         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
                           <span style={{ fontSize: 10, fontWeight: 700, color: lc, background: `${lc}15`, borderRadius: 999, padding: "1px 7px" }}>{p.level}</span>
@@ -170,7 +171,7 @@ export default function RanglistePage() {
                     <div key={p.id} style={{
                       display: "flex", alignItems: "center", gap: 12,
                       padding: "11px 16px",
-                      borderBottom: i < rest.length - 1 ? `1px solid #1a1a1a` : "none",
+                      borderBottom: i < rest.length - 1 ? `1px solid ${B}` : "none",
                       background: isMe ? `${G}08` : "transparent"
                     }}>
                       {/* Rank */}
@@ -180,7 +181,7 @@ export default function RanglistePage() {
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
                           <span style={{ fontSize: 13, fontWeight: 700, color: isMe ? G : W }}>{p.name}</span>
-                          {isMe && <span style={{ fontSize: 9, color: G, background: `${G}18`, borderRadius: 999, padding: "1px 5px", fontWeight: 700 }}>Du</span>}
+                          {isMe && <span style={{ fontSize: 9, color: G, background: `${G}18`, borderRadius: 999, padding: "1px 5px", fontWeight: 700 }}>du</span>}
                         </div>
                         <div style={{ display: "flex", gap: 5, marginTop: 2 }}>
                           <span style={{ fontSize: 10, color: lc }}>{p.level}</span>

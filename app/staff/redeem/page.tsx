@@ -1,12 +1,13 @@
 "use client"
 import { useState } from "react"
 
-const BG = "#111214"
-const C  = "#15161A"
-const B  = "#26282E"
-const M  = "#6B6E7A"
+const BG = "#14161A"
+const C  = "#1B1E25"
+const B  = "#1E2230"
+const M  = "rgba(255,255,255,0.66)"
 const G  = "#39FF14"
-const W  = "#E8E6E1"
+const W  = "#FFFFFF"
+const GRAD = "linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 
 export default function StaffRedeemPage() {
   const [code, setCode]       = useState("")
@@ -37,9 +38,9 @@ export default function StaffRedeemPage() {
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ maxWidth: 420, width: "100%" }}>
-        <p style={{ fontSize: 11, fontWeight: 700, color: G, letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 8 }}>Staff Tool</p>
-        <h1 style={{ fontSize: 28, fontWeight: 900, color: W, textTransform: "uppercase", marginBottom: 4 }}>Code Einlösen</h1>
-        <p style={{ fontSize: 13, color: M, marginBottom: 28 }}>Gutscheincode des Kunden eintippen oder per Kamera scannen.</p>
+        <p style={{ fontSize: 11, fontWeight: 700, color: M, letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 8 }}>staff tool</p>
+        <h1 style={{ fontSize: 28, fontWeight: 900, fontFamily: "'League Spartan', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 4, background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>code einlösen</h1>
+        <p style={{ fontSize: 13, color: M, marginBottom: 28 }}>gutscheincode des kunden eintippen oder per kamera scannen.</p>
 
         <form onSubmit={handleCheck}>
           <input
@@ -73,7 +74,7 @@ export default function StaffRedeemPage() {
             disabled={loading || code.length < 6}
             style={{
               width: "100%",
-              background: code.length === 6 ? G : B,
+              background: code.length === 6 ? "#fff" : B,
               color: code.length === 6 ? "#14161A" : M,
               border: "none",
               borderRadius: 10,
@@ -81,12 +82,12 @@ export default function StaffRedeemPage() {
               fontSize: 14,
               fontWeight: 700,
               cursor: code.length === 6 ? "pointer" : "not-allowed",
-              textTransform: "uppercase",
-              letterSpacing: "0.06em",
+              textTransform: "lowercase",
+              letterSpacing: "0.02em",
               transition: "all 0.2s",
             }}
           >
-            {loading ? "Prüfen..." : "Code prüfen & einlösen"}
+            {loading ? "prüfen..." : "code prüfen & einlösen"}
           </button>
         </form>
 
@@ -135,7 +136,7 @@ export default function StaffRedeemPage() {
         )}
 
         <p style={{ marginTop: 32, fontSize: 11, color: M, textAlign: "center" }}>
-          Nur für PPL Mitarbeiter · playerapp.ch/staff/redeem
+          nur für ppl mitarbeiter · playerapp.ch/staff/redeem
         </p>
       </div>
     </main>

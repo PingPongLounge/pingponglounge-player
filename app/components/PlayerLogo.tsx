@@ -106,7 +106,7 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
         <span style={{
           fontSize: tagSize,
           fontWeight: 700,
-          color: "#6B6E7A",
+          color: "rgba(255,255,255,0.66)",
           letterSpacing: "0.18em",
           textTransform: "uppercase" as const,
         }}>
