@@ -141,10 +141,11 @@ export default async function EntdeckenPage() {
 
   const { data: openMatches } = await supabase
     .from('open_matches')
-    .select('id, scheduled_at, location, slots_total, slots_filled, price_per_player')
-    .gt('scheduled_at', new Date().toISOString())
-    .order('scheduled_at', { ascending: true })
-    .limit(2)
+    .select('id, city, level, proposed_time')
+    .eq('status', 'open')
+    .order('created_at', { ascending: false })
+    .limit(20)
+  const openCount = openMatches?.length ?? 0
 
   const { data: ppTx } = await supabase
     .from('ping_points_transactions')
@@ -192,21 +193,42 @@ export default async function EntdeckenPage() {
         <div style={{ padding: '0 15px' }}>
           <QuickActions loggedIn />
 
-          {openMatches && openMatches.length > 0 && (
-            <>
-              <div style={sec}>heute spielen</div>
-              {openMatches.map((m: { id: string; scheduled_at: string; location: string; slots_total: number; slots_filled: number; price_per_player: number }) => {
-                const time = new Date(m.scheduled_at).toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })
-                const free = m.slots_total - m.slots_filled
-                return (
-                  <Link key={m.id} href="/match" style={card}>
-                    <div><div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{time} · {m.location}</div><div style={{ fontSize: 10.5, color: SUB, marginTop: 1 }}>{free} {free === 1 ? 'platz' : 'plätze'} frei · CHF {m.price_per_player}</div></div>
-                    <span style={{ background: '#fff', color: BG, borderRadius: 8, padding: '6px 13px', fontSize: 11, fontWeight: 600 }}>mitspielen</span>
-                  </Link>
-                )
-              })}
-            </>
+          {/* Nudge: letztes Spiel eintragen */}
+          {hasProfile && (
+            <Link href="/spielen" style={{ ...card, background: 'rgba(57,255,20,0.07)', borderColor: 'rgba(57,255,20,0.3)' }}>
+              <div><div style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>trag dein letztes spiel ein</div><div style={{ fontSize: 10.5, color: SUB, marginTop: 1 }}>punkte sammeln &amp; rang aktualisieren</div></div>
+              <span style={{ color: SUB }}>→</span>
+            </Link>
           )}
+
+          {/* Feature: heute spielen */}
+          <Link href="/match" style={{ display: 'block', textDecoration: 'none', borderRadius: 14, overflow: 'hidden', position: 'relative', height: 132, margin: '8px 0 4px' }}>
+            <svg width="100%" height="132" viewBox="0 0 460 132" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+              <defs><linearGradient id="feat" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#1d3a2a" /><stop offset="1" stopColor="#0f2c2c" /></linearGradient></defs>
+              <rect width="460" height="132" fill="url(#feat)" />
+              <g stroke="#39FF14" strokeOpacity="0.45" fill="none" strokeWidth="2"><polygon points="150,104 310,104 340,46 120,46" /><line x1="230" y1="46" x2="230" y2="104" /></g>
+            </svg>
+            <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(20,22,26,0.05), rgba(20,22,26,0.85))' }} />
+            <div style={{ position: 'absolute', left: 15, right: 15, bottom: 13 }}>
+              <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>heute spielen</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.82)', marginTop: 2 }}>{openCount > 0 ? `${openCount} ${openCount === 1 ? 'offenes spiel' : 'offene spiele'} · finde einen gegner` : 'erstelle dein open game'}</div>
+              <span style={{ display: 'inline-block', marginTop: 9, background: '#fff', color: BG, borderRadius: 8, padding: '7px 16px', fontSize: 12, fontWeight: 700 }}>gegner finden</span>
+            </div>
+          </Link>
+
+          {/* Standorte */}
+          <div style={{ ...sec, display: 'flex', justifyContent: 'space-between' }}><span>standorte</span><Link href="/buchen" style={{ color: SUB, textDecoration: 'none' }}>alle</Link></div>
+          <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 4 }}>
+            {[{ n: 'oerlikon', d: '7 tische · zürich' }, { n: 'langstrasse', d: '5 tische · zürich' }, { n: 'basel', d: '5 tische' }, { n: 'st. gallen', d: '4 tische' }].map((loc, i) => (
+              <Link key={loc.n} href="/buchen" style={{ textDecoration: 'none', width: 124, flexShrink: 0 }}>
+                <div style={{ height: 70, borderRadius: 10, overflow: 'hidden' }}>
+                  <svg width="100%" height="70" viewBox="0 0 124 70" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg"><rect width="124" height="70" fill={i % 2 ? '#1c2620' : '#1b2230'} /><rect x="22" y="24" width="80" height="28" rx="3" fill="none" stroke={i % 2 ? '#39FF14' : '#1FD1C4'} strokeOpacity="0.4" /></svg>
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: TEXT, marginTop: 5 }}>{loc.n}</div>
+                <div style={{ fontSize: 9.5, color: SUB }}>{loc.d}</div>
+              </Link>
+            ))}
+          </div>
 
           {hasProfile && (
             <>
