@@ -78,8 +78,6 @@ export default async function EntdeckenPage() {
         <div style={{ maxWidth: 480, margin: '0 auto' }}>
           <Hero titleBig={'dein tischtennis-\nzuhause'} titleSub="rang sammeln · gegner finden · liga spielen" />
           <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: 15, margin: '-16px 15px 16px', position: 'relative', zIndex: 5 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 3 }}>jetzt loslegen</div>
-            <div style={{ fontSize: 11, color: SUB, marginBottom: 12 }}>anmelden und deinen rang freischalten</div>
             <Link href="/login" style={{ display: 'block', width: '100%', background: '#fff', color: BG, borderRadius: 10, padding: 13, fontSize: 13.5, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>login / registrieren</Link>
             <Link href="/spielen" style={{ display: 'block', width: '100%', background: 'transparent', border: '1px solid #2A3340', color: TEXT, borderRadius: 10, padding: 11, fontSize: 12.5, fontWeight: 500, textAlign: 'center', textDecoration: 'none', marginTop: 8 }}>schon gespielt? resultat eintragen</Link>
           </div>
