@@ -14,29 +14,28 @@ const EVERSPORTS_TRAINING = 'https://www.eversports.ch/widget/w/5a5zxf'
 
 function Hero({ greetTop, titleBig, titleSub }: { greetTop?: string; titleBig: string; titleSub: string }) {
   return (
-    <div style={{ position: 'relative', height: 184, overflow: 'hidden', borderRadius: '0 0 22px 22px' }}>
-      <svg width="100%" height="184" viewBox="0 0 400 184" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+    <div style={{ position: 'relative', height: 196, overflow: 'hidden', borderRadius: '0 0 22px 22px' }}>
+      <svg width="100%" height="196" viewBox="0 0 400 196" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
         <defs>
           <linearGradient id="ppl-hero" x1="0" y1="0" x2="1" y2="1">
             <stop offset="0" stopColor="#39FF14" /><stop offset="55%" stopColor="#00D4AA" /><stop offset="100%" stopColor="#1FD1C4" />
           </linearGradient>
         </defs>
-        <rect width="400" height="184" fill="url(#ppl-hero)" />
-        <g stroke="#06281c" strokeOpacity="0.5" fill="none" strokeWidth="2">
-          <polygon points="90,150 310,150 270,72 130,72" />
-          <line x1="200" y1="72" x2="200" y2="150" />
-          <line x1="120" y1="110" x2="280" y2="110" strokeWidth="2.5" />
-          <line x1="120" y1="110" x2="120" y2="124" />
-          <line x1="280" y1="110" x2="280" y2="124" />
+        <rect width="400" height="196" fill="url(#ppl-hero)" />
+        {/* dezente Tisch/Netz-Grafik nur im oberen Bereich — kreuzt den Titel nicht */}
+        <g stroke="#06281c" strokeOpacity="0.22" fill="none" strokeWidth="1.6">
+          <polygon points="128,96 272,96 244,44 156,44" />
+          <line x1="200" y1="44" x2="200" y2="96" />
+          <line x1="150" y1="72" x2="250" y2="72" strokeWidth="2" />
+          <line x1="150" y1="72" x2="150" y2="82" />
+          <line x1="250" y1="72" x2="250" y2="82" />
         </g>
       </svg>
-      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-between', padding: '16px 18px 0' }}>
-        <span style={{ fontSize: 13, fontWeight: 900, letterSpacing: '0.14em', color: '#06241a' }}>PLAYER</span>
-      </div>
-      <div style={{ position: 'absolute', left: 18, right: 18, bottom: 16 }}>
-        {greetTop && <div style={{ fontSize: 11, fontWeight: 600, color: '#0a2c20' }}>{greetTop}</div>}
-        <div style={{ fontSize: 24, fontWeight: 900, color: '#06241a', textTransform: 'uppercase', letterSpacing: '0.02em', lineHeight: 0.98, whiteSpace: 'pre-line' }}>{titleBig}</div>
-        <div style={{ fontSize: 12, fontWeight: 600, color: '#0a2c20', marginTop: 4 }}>{titleSub}</div>
+      <span style={{ position: 'absolute', top: 15, left: 18, fontSize: 12, fontWeight: 900, letterSpacing: '0.16em', color: '#06241a' }}>PLAYER</span>
+      <div style={{ position: 'absolute', left: 18, right: 18, bottom: 18 }}>
+        {greetTop && <div style={{ fontSize: 11, fontWeight: 600, color: '#0a2c20', marginBottom: 2 }}>{greetTop}</div>}
+        <div style={{ fontSize: 25, fontWeight: 900, color: '#06241a', textTransform: 'uppercase', letterSpacing: '0.01em', lineHeight: 0.98, whiteSpace: 'pre-line' }}>{titleBig}</div>
+        <div style={{ fontSize: 12, fontWeight: 600, color: '#0a2c20', marginTop: 5 }}>{titleSub}</div>
       </div>
     </div>
   )

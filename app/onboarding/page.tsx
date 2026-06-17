@@ -108,6 +108,24 @@ export default function OnboardingPage() {
     } catch { /* ungültiges JSON o.ä. → normaler Flow */ }
   }, [])
 
+  // Schon ein Profil vorhanden? Dann Onboarding überspringen (kein Festhängen).
+  useEffect(() => {
+    (async () => {
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) { router.replace("/login"); return }
+        const { data: prof } = await supabase.from("profiles").select("id").eq("id", user.id).maybeSingle()
+        if (prof) router.replace("/entdecken")
+      } catch { /* ignore */ }
+    })()
+  }, [router])
+
+  async function handleLogout() {
+    try { const supabase = createClient(); await supabase.auth.signOut() } catch { /* ignore */ }
+    router.replace("/login")
+  }
+
   const score = quizScores.reduce((a, b) => a + b, 0)
   const quizResult = calcLevel(score)
   // Bei vorhandenem Pending-Resultat kommt das Level/ELO direkt aus dem Match-Ergebnis
@@ -142,7 +160,7 @@ export default function OnboardingPage() {
     // Pending-Resultat aus dem /spielen Hook-Flow ist übernommen → aufräumen.
     if (pending) { try { localStorage.removeItem("ppl_pending_result") } catch { /* ignore */ } }
     try { await fetch("/api/credits/signup", { method: "POST" }) } catch { /* ignore */ }
-    router.push("/dashboard")
+    router.push("/entdecken")
   }
 
   function answerQuiz(points: number) {
