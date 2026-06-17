@@ -182,7 +182,7 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
         </div>
 
         {/* Anmelden CTA */}
-        {season.status==="open"&&!myMatches.length&&<Link href={`/liga/${season.id}/anmelden`} style={{display:"block",background:G,color:"#0A0A0C",textDecoration:"none",borderRadius:10,padding:"14px",textAlign:"center",fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:16}}>Kostenlos anmelden</Link>}
+        {season.status==="open"&&!myMatches.length&&<Link href={`/liga/${season.id}/anmelden`} style={{display:"block",background:G,color:"#14161A",textDecoration:"none",borderRadius:10,padding:"14px",textAlign:"center",fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:16}}>Kostenlos anmelden</Link>}
 
         {/* Tabs */}
         <div style={{display:"flex",background:C,borderRadius:10,padding:3,marginBottom:16,gap:2}}>
@@ -264,7 +264,7 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                   </div>
                   {confirmed&&m.sets&&<p style={{fontSize:11,color:M,marginTop:6,textAlign:"center"}}>{setsToString(m.sets)}</p>}
                   {isMe&&!confirmed&&(
-                    <Link href={`/liga/match/${m.id}`} style={{display:"block",marginTop:10,background:G,color:"#0A0A0C",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>
+                    <Link href={`/liga/match/${m.id}`} style={{display:"block",marginTop:10,background:G,color:"#14161A",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>
                       {m.status==="p1_entered"&&m.p2_id===userId?"Bestätigen":"Resultat eingeben"}
                     </Link>
                   )}
@@ -288,7 +288,7 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                       <span style={{color:PK}}>{c.p1_name}</span> fordert dich heraus
                     </p>
                     <div style={{display:"flex",gap:8,marginTop:10}}>
-                      <button onClick={()=>handleAccept(c.id)} style={{flex:1,background:G,color:"#0A0A0C",border:"none",borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer",textTransform:"uppercase"}}>✓ Annehmen</button>
+                      <button onClick={()=>handleAccept(c.id)} style={{flex:1,background:G,color:"#14161A",border:"none",borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer",textTransform:"uppercase"}}>✓ Annehmen</button>
                       {confirmDecline===c.id?(
                         <div style={{flex:1,display:"flex",gap:6,alignItems:"center"}}>
                           <span style={{fontSize:11,color:M,flex:1}}>Sicher?</span>
@@ -379,7 +379,7 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                   {userId&&(
                     <div style={{display:"flex",gap:8}}>
                       <input value={commentText[f.id]||""} onChange={e=>setCommentText(p=>({...p,[f.id]:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&handleComment(f.id)} placeholder="Kommentar..." style={{flex:1,background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"8px 12px",fontSize:13,color:W,outline:"none"}}/>
-                      <button onClick={()=>handleComment(f.id)} style={{background:G,color:"#0A0A0C",border:"none",borderRadius:8,padding:"8px 14px",cursor:"pointer",fontSize:13,fontWeight:700}}>→</button>
+                      <button onClick={()=>handleComment(f.id)} style={{background:G,color:"#14161A",border:"none",borderRadius:8,padding:"8px 14px",cursor:"pointer",fontSize:13,fontWeight:700}}>→</button>
                     </div>
                   )}
                 </div>

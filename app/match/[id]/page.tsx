@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#0C0D10",C="#111318",B="#1E2230",M="rgba(255,255,255,0.62)",G="#39FF14",W="#FFFFFF"
+const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.62)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
 type MatchDetail = {

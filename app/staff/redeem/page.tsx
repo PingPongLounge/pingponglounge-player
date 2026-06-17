@@ -74,7 +74,7 @@ export default function StaffRedeemPage() {
             style={{
               width: "100%",
               background: code.length === 6 ? G : B,
-              color: code.length === 6 ? "#0A0A0C" : M,
+              color: code.length === 6 ? "#14161A" : M,
               border: "none",
               borderRadius: 10,
               padding: "16px",
@@ -120,7 +120,7 @@ export default function StaffRedeemPage() {
             </p>
             <div style={{
               background: G,
-              color: "#0A0A0C",
+              color: "#14161A",
               borderRadius: 8,
               padding: "12px",
               textAlign: "center",

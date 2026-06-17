@@ -35,7 +35,7 @@ function JoinContent() {
         <Link href="/login" style={{
           display: "block",
           background: G,
-          color: "#0A0A0C",
+          color: "#14161A",
           fontWeight: 700,
           fontSize: 15,
           textDecoration: "none",

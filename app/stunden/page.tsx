@@ -163,7 +163,7 @@ export default function StundenPage() {
             <Link href="/freunde" style={{
               display: "inline-block",
               background: G,
-              color: "#0A0A0C",
+              color: "#14161A",
               fontWeight: 700,
               fontSize: 13,
               textDecoration: "none",

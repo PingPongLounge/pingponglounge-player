@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
-const BG="#0C0D10",C="#111318",B="#1E2230",M="rgba(255,255,255,0.62)",W="#FFFFFF"
+const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.62)",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
 const LEVELS = ["Locker", "Hobby", "Fortgeschritten", "Competitive"]
@@ -56,7 +56,7 @@ export default function CreateMatchPage() {
                   padding: "12px", borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, textTransform: "lowercase",
                   background: active ? "#fff" : C,
                   border: `1px solid ${active ? "#fff" : B}`,
-                  color: active ? "#0C0D10" : M, cursor: "pointer"
+                  color: active ? "#14161A" : M, cursor: "pointer"
                 }}>{l}</button>
               )
             })}
@@ -72,7 +72,7 @@ export default function CreateMatchPage() {
                 padding: "10px 8px", borderRadius: 10, fontSize: 12, fontWeight: city === c ? 600 : 400, textTransform: "lowercase",
                 background: city === c ? "#fff" : C,
                 border: `1px solid ${city === c ? "#fff" : B}`,
-                color: city === c ? "#0C0D10" : M, cursor: "pointer"
+                color: city === c ? "#14161A" : M, cursor: "pointer"
               }}>{c}</button>
             ))}
           </div>
@@ -109,7 +109,7 @@ export default function CreateMatchPage() {
           style={{
             width: "100%", padding: "16px", borderRadius: 12, fontSize: 15, fontWeight: 600,
             background: !level || !city ? B : "#fff",
-            color: !level || !city ? M : "#0C0D10",
+            color: !level || !city ? M : "#14161A",
             border: "none", cursor: !level || !city ? "default" : "pointer",
             textTransform: "lowercase"
           }}

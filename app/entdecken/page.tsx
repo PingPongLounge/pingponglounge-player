@@ -6,8 +6,8 @@ import BottomNav from '@/app/components/BottomNav'
 import PlayerLogo from '@/app/components/PlayerLogo'
 import LogoutButton from '@/app/components/LogoutButton'
 
-const BG     = '#0C0D10'
-const CARD   = '#111318'
+const BG     = '#14161A'
+const CARD   = '#1B1E25'
 const BORDER = '#1E2230'
 const TEXT   = '#FFFFFF'
 const SUB    = 'rgba(255,255,255,0.35)'
@@ -196,7 +196,7 @@ export default async function EntdeckenPage() {
                       <div style={{ fontSize: 14, fontWeight: 500, color: TEXT }}>{time} · {m.location}</div>
                       <div style={{ fontSize: 10, color: SUB, marginTop: 2 }}>{free} {free === 1 ? 'platz' : 'plätze'} frei · CHF {m.price_per_player}</div>
                     </div>
-                    <button style={{ background: '#fff', color: '#0C0D10', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 500, fontFamily: 'inherit', cursor: 'pointer' }}>
+                    <button style={{ background: '#fff', color: '#14161A', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 500, fontFamily: 'inherit', cursor: 'pointer' }}>
                       join
                     </button>
                   </div>

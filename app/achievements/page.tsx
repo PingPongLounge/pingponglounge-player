@@ -59,7 +59,7 @@ export default function AchievementsPage() {
         <p style={{ fontSize: 36, marginBottom: 12 }}>⚠️</p>
         <p style={{ fontSize: 14, fontWeight: 700, color: W, marginBottom: 6 }}>Verbindungsfehler</p>
         <p style={{ fontSize: 13, color: M, marginBottom: 20 }}>{error}</p>
-        <button onClick={load} style={{ background: G, color: "#0A0A0C", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>Nochmals versuchen</button>
+        <button onClick={load} style={{ background: G, color: "#14161A", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>Nochmals versuchen</button>
       </div>
       <BottomNav />
     </main>
@@ -92,7 +92,7 @@ export default function AchievementsPage() {
           {(["alle","earned","locked"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: "7px 16px", borderRadius: 999, fontSize: 12, fontWeight: 700, cursor: "pointer",
-              background: filter === f ? G : C, color: filter === f ? "#0A0A0C" : M,
+              background: filter === f ? G : C, color: filter === f ? "#14161A" : M,
               border: `1px solid ${filter === f ? G : B}`
             }}>
               {f === "alle" ? "Alle" : f === "earned" ? `✓ Earned (${earned})` : `🔒 Locked (${total - earned})`}

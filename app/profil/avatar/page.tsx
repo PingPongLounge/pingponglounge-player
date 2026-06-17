@@ -193,7 +193,7 @@ export default function AvatarPage() {
                   padding:"13px", fontSize:13, fontWeight:700, color:M, cursor:"pointer"
                 }}>🔄 Nochmals</button>
                 <button onClick={save} disabled={saving} style={{
-                  flex:2, background:G, color:"#0A0A0C", border:"none",
+                  flex:2, background:G, color:"#14161A", border:"none",
                   borderRadius:10, padding:"13px", fontSize:14, fontWeight:800,
                   cursor:saving ? "wait" : "pointer"
                 }}>

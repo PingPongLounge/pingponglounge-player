@@ -96,7 +96,7 @@ export default function MatchHistoriePage(){
             <button key={f} onClick={()=>{setFilter(f);setPage(0)}} style={{
               padding:"7px 16px",borderRadius:999,fontSize:12,fontWeight:700,cursor:"pointer",border:"1px solid",
               background:filter===f?G:C,
-              color:filter===f?"#0A0A0C":M,
+              color:filter===f?"#14161A":M,
               borderColor:filter===f?G:B,
               textTransform:"capitalize"
             }}>{f==="alle"?`Alle (${matches.length})`:f==="siege"?`Siege (${matches.filter(m=>m.winner_id===userId).length})`:`Niederlagen (${matches.filter(m=>m.winner_id!==null&&m.winner_id!==userId).length})`}</button>

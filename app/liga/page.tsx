@@ -177,7 +177,7 @@ export default function LigaPage(){
                           <div style={{display:"flex",gap:8}}>
                             <Link href={`/liga/${s.id}`} style={{flex:1,background:B,color:W,textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Tabelle →</Link>
                             {s.status==="open"&&(
-                              <Link href={`/liga/${s.id}/anmelden`} style={{flex:1,background:G,color:"#0A0A0C",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Anmelden</Link>
+                              <Link href={`/liga/${s.id}/anmelden`} style={{flex:1,background:G,color:"#14161A",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Anmelden</Link>
                             )}
                           </div>
                         </div>
@@ -245,9 +245,9 @@ export default function LigaPage(){
             {ligaMsg&&<p style={{fontSize:13,color:ligaMsg.startsWith("✓")?G:"#FF6666",marginBottom:10}}>{ligaMsg}</p>}
 
             {ligaMsg.startsWith("✓")?(
-              <button onClick={()=>setShowLigaForm(false)} style={{width:"100%",background:G,color:"#0A0A0C",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>Schliessen</button>
+              <button onClick={()=>setShowLigaForm(false)} style={{width:"100%",background:G,color:"#14161A",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>Schliessen</button>
             ):(
-              <button onClick={submitLigaRequest} disabled={ligaSending} style={{width:"100%",background:ligaSending?B:G,color:ligaSending?M:"#0A0A0C",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:ligaSending?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
+              <button onClick={submitLigaRequest} disabled={ligaSending} style={{width:"100%",background:ligaSending?B:G,color:ligaSending?M:"#14161A",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:ligaSending?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
                 {ligaSending?"Sende...":"Anfrage senden"}
               </button>
             )}

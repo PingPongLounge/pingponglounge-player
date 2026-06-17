@@ -3,7 +3,7 @@ import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 const G = "#39FF14"
-const DARK = "#0A0A0C"
+const DARK = "#14161A"
 const SURFACE = "#111214"
 const CARD = "#15161A"
 const BORDER = "#26282E"

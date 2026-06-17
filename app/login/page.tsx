@@ -164,7 +164,7 @@ export default function LoginPage() {
                 flex: 1, background: tab === t ? G : "transparent",
                 border: "none", borderRadius: "7px", padding: "9px 4px",
                 fontSize: "11px", fontWeight: 700, cursor: "pointer",
-                color: tab === t ? "#0A0A0C" : MUTED,
+                color: tab === t ? "#14161A" : MUTED,
                 textTransform: "uppercase" as const, letterSpacing: "0.06em",
                 fontFamily: "'League Spartan', system-ui, sans-serif",
               }}>

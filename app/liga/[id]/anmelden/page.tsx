@@ -53,7 +53,7 @@ export default function AnmeldenPage({params}:{params:Promise<{id:string}>}){
             <p style={{fontSize:40,marginBottom:12}}>✓</p>
             <p style={{fontSize:20,fontWeight:900,color:G,textTransform:"uppercase",marginBottom:8}}>Angemeldet!</p>
             <p style={{fontSize:14,color:M,marginBottom:24}}>Du bist für <strong style={{color:W}}>{season.name as string}</strong> registriert. Du wirst benachrichtigt sobald die Saison startet.</p>
-            <Link href={`/liga/${seasonId}`} style={{display:"block",background:G,color:"#0A0A0C",textDecoration:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Zur Liga →</Link>
+            <Link href={`/liga/${seasonId}`} style={{display:"block",background:G,color:"#14161A",textDecoration:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Zur Liga →</Link>
           </div>
         ):(
           <div>
@@ -76,7 +76,7 @@ export default function AnmeldenPage({params}:{params:Promise<{id:string}>}){
             {(count as number)>=(season.max_players as number)?(
               <div style={{background:`#FF444420`,border:"1px solid #FF444440",borderRadius:10,padding:"14px",textAlign:"center",color:"#FF6666",fontWeight:700}}>Liga ist voll</div>
             ):(
-              <button onClick={handleRegister} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#0A0A0C",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
+              <button onClick={handleRegister} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#14161A",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
                 {saving?"Anmeldung läuft...":"Jetzt kostenlos anmelden"}
               </button>
             )}

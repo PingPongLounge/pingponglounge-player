@@ -85,7 +85,7 @@ export default function AdminLigaPage(){
           </div>
           <input value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="Beschreibung (optional)" style={{width:"100%",background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none",marginBottom:12,boxSizing:"border-box"}}/>
           {msg&&<p style={{fontSize:13,color:msg.startsWith("✓")?G:"#FF6666",marginBottom:8}}>{msg}</p>}
-          <button onClick={createSeason} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#0A0A0C",border:"none",borderRadius:8,padding:"14px",fontSize:13,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
+          <button onClick={createSeason} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#14161A",border:"none",borderRadius:8,padding:"14px",fontSize:13,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
             {saving?"Erstellen...":"Saison erstellen"}
           </button>
         </div>
@@ -105,7 +105,7 @@ export default function AdminLigaPage(){
               </div>
               <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
                 <Link href={`/liga/${s.id as string}`} style={{fontSize:11,color:M,background:BG,border:`1px solid ${B}`,borderRadius:6,padding:"6px 10px",textDecoration:"none",fontWeight:700}}>Ansehen</Link>
-                {s.status==="open"&&<button onClick={()=>generateMatches(s.id as string)} disabled={generating===s.id} style={{fontSize:11,color:"#0A0A0C",background:G,border:"none",borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>{generating===s.id?"...":"Matches generieren"}</button>}
+                {s.status==="open"&&<button onClick={()=>generateMatches(s.id as string)} disabled={generating===s.id} style={{fontSize:11,color:"#14161A",background:G,border:"none",borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>{generating===s.id?"...":"Matches generieren"}</button>}
                 {s.status==="open"&&<button onClick={()=>updateStatus(s.id as string,"running")} style={{fontSize:11,color:W,background:B,border:"none",borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>→ Running</button>}
                 {s.status==="running"&&<button onClick={()=>updateStatus(s.id as string,"finished")} style={{fontSize:11,color:W,background:B,border:"none",borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>→ Finished</button>}
               </div>

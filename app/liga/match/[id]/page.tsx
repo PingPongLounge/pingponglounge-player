@@ -124,7 +124,7 @@ export default function MatchPage({params}:{params:{id:string}}){
             ))}
             {sets.length<5&&<button onClick={addSet} style={{width:"100%",background:"none",border:`1px dashed ${B}`,borderRadius:8,padding:"10px",color:M,cursor:"pointer",fontSize:13,marginBottom:12}}>+ Satz hinzufügen</button>}
             {error&&<p style={{color:"#FF6666",fontSize:13,marginBottom:8}}>{error}</p>}
-            <button onClick={handleSubmit} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#0A0A0C",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
+            <button onClick={handleSubmit} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#14161A",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
               {saving?"Wird gespeichert...":"Ergebnis einreichen"}
             </button>
           </div>
@@ -139,7 +139,7 @@ export default function MatchPage({params}:{params:{id:string}}){
               {match.sets&&<p style={{fontSize:15,fontWeight:700,color:W,marginTop:8}}>{match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ")}</p>}
             </div>
             {error&&<p style={{color:"#FF6666",fontSize:13,marginBottom:8}}>{error}</p>}
-            <button onClick={handleConfirm} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#0A0A0C",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>
+            <button onClick={handleConfirm} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#14161A",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>
               {saving?"...":"✓ Ergebnis bestätigen"}
             </button>
             <button onClick={handleDispute} style={{width:"100%",background:"none",border:`1px solid ${B}`,color:M,borderRadius:10,padding:"14px",fontSize:13,cursor:"pointer"}}>Ergebnis anfechten</button>

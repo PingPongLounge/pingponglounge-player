@@ -125,7 +125,7 @@ export default function PingPointsPage(){
           {(["history","earn","redeem"] as const).map(t_=>(
             <button key={t_} onClick={()=>setTab(t_)} style={{
               flex:1,padding:"9px",borderRadius:999,fontSize:12,fontWeight:700,cursor:"pointer",
-              background:tab===t_?PP:C,color:tab===t_?"#0A0A0C":M,border:`1px solid ${tab===t_?PP:B}`
+              background:tab===t_?PP:C,color:tab===t_?"#14161A":M,border:`1px solid ${tab===t_?PP:B}`
             }}>{t_==="history"?"📜 Verlauf":t_==="earn"?"⚡ Verdienen":"🎁 Einlösen"}</button>
           ))}
         </div>
@@ -208,7 +208,7 @@ export default function PingPointsPage(){
                       disabled={claiming===r.threshold}
                       style={{
                         background:claiming===r.threshold?B:PP,
-                        color:claiming===r.threshold?M:"#0A0A0C",
+                        color:claiming===r.threshold?M:"#14161A",
                         border:"none",borderRadius:8,padding:"9px 14px",
                         fontSize:12,fontWeight:800,cursor:"pointer",flexShrink:0,
                         whiteSpace:"nowrap"

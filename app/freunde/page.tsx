@@ -156,7 +156,7 @@ export default function FreundePage() {
             <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 16 }}>
               <div style={{
                 width: 28, height: 28, borderRadius: "50%",
-                background: G, color: "#0A0A0C",
+                background: G, color: "#14161A",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 13, fontWeight: 900, flexShrink: 0,
               }}>{i + 1}</div>

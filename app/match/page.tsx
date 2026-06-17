@@ -5,7 +5,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 
-const BG="#0C0D10",C="#111318",B="#1E2230",M="rgba(255,255,255,0.62)",W="#FFFFFF"
+const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.62)",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
 function timeLabel(d: string): string {
@@ -117,7 +117,7 @@ export default function MatchPage() {
           </div>
           {!myOpen ? (
             <Link href="/match/create" style={{ textDecoration: "none" }}>
-              <button style={{ background: "#fff", color: "#0C0D10", border: "none", borderRadius: 10, padding: "10px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>
+              <button style={{ background: "#fff", color: "#14161A", border: "none", borderRadius: 10, padding: "10px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>
                 + match
               </button>
             </Link>
@@ -135,7 +135,7 @@ export default function MatchPage() {
             return (
               <button key={l} onClick={() => setFilterLevel(active ? "" : l)} style={{
                 padding: "5px 12px", borderRadius: 999, fontSize: 11, fontWeight: active ? 600 : 400, cursor: "pointer", textTransform: "lowercase",
-                background: active ? "#fff" : C, border: `1px solid ${active ? "#fff" : B}`, color: active ? "#0C0D10" : M
+                background: active ? "#fff" : C, border: `1px solid ${active ? "#fff" : B}`, color: active ? "#14161A" : M
               }}>{l}</button>
             )
           })}
@@ -145,7 +145,7 @@ export default function MatchPage() {
             <button key={c} onClick={() => setFilterCity(filterCity === c ? "" : c)} style={{
               padding: "5px 12px", borderRadius: 999, fontSize: 11, fontWeight: filterCity === c ? 600 : 400, cursor: "pointer", textTransform: "lowercase",
               background: filterCity === c ? "#fff" : C, border: `1px solid ${filterCity === c ? "#fff" : B}`,
-              color: filterCity === c ? "#0C0D10" : M
+              color: filterCity === c ? "#14161A" : M
             }}>{c}</button>
           ))}
         </div>
@@ -162,7 +162,7 @@ export default function MatchPage() {
             <p style={{ fontSize: 16, fontWeight: 600, color: W, marginBottom: 8 }}>keine offenen spiele</p>
             <p style={{ fontSize: 13, color: M, marginBottom: 20, fontWeight: 400 }}>stell das erste ein!</p>
             <Link href="/match/create" style={{ textDecoration: "none" }}>
-              <button style={{ background: "#fff", color: "#0C0D10", border: "none", borderRadius: 10, padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>
+              <button style={{ background: "#fff", color: "#14161A", border: "none", borderRadius: 10, padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>
                 match erstellen
               </button>
             </Link>
@@ -208,7 +208,7 @@ export default function MatchPage() {
                       <button
                         onClick={() => join(m.id)}
                         disabled={joining === m.id}
-                        style={{ width: "100%", background: "#fff", color: "#0C0D10", border: "none", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}
+                        style={{ width: "100%", background: "#fff", color: "#14161A", border: "none", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}
                       >
                         {joining === m.id ? "trete bei..." : "mitspielen →"}
                       </button>

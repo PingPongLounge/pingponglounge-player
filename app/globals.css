@@ -1,4 +1,4 @@
 @import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@900;800;700;600&display=swap");
 * { box-sizing: border-box; margin: 0; padding: 0; }
-:root { --green: #39FF14; --dark: #0A0A0C; --card: #15161A; --border: #26282E; --muted: #6B6E7A; --text: #E8E6E1; }
-body { font-family: "League Spartan", system-ui, sans-serif; background: #0A0A0C; color: #E8E6E1; -webkit-font-smoothing: antialiased; }
+:root { --green: #39FF14; --dark: #14161A; --card: #15161A; --border: #26282E; --muted: #6B6E7A; --text: #E8E6E1; }
+body { font-family: "League Spartan", system-ui, sans-serif; background: #14161A; color: #E8E6E1; -webkit-font-smoothing: antialiased; }

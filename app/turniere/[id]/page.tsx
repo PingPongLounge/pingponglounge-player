@@ -4,7 +4,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 
-const BG="#0C0D10",C="#111318",B="#1E2230",M="rgba(255,255,255,0.62)",G="#39FF14",W="#FFFFFF"
+const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.62)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
 type Profile={name:string,elo:number,level?:string}
@@ -40,7 +40,7 @@ function BracketMatch({m,userId,onResult}:{m:TMatch,userId:string|null,onResult:
         {confirmed&&m.sets&&<span style={{fontSize:10,color:M,marginLeft:4}}>{m.sets.filter(s=>s.p2>s.p1).length}</span>}
       </div>
       {isMe&&!confirmed&&m.p1_id&&m.p2_id&&(
-        <button onClick={()=>onResult(m)} style={{marginTop:8,width:"100%",background:"#fff",color:"#0C0D10",border:"none",borderRadius:6,padding:"6px",fontSize:10,fontWeight:600,cursor:"pointer",textTransform:"lowercase"}}>
+        <button onClick={()=>onResult(m)} style={{marginTop:8,width:"100%",background:"#fff",color:"#14161A",border:"none",borderRadius:6,padding:"6px",fontSize:10,fontWeight:600,cursor:"pointer",textTransform:"lowercase"}}>
           {pending?"bestätigen →":"resultat →"}
         </button>
       )}
@@ -126,7 +126,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
                 <p style={{fontSize:11,color:M,marginTop:2,fontWeight:400,textTransform:"lowercase"}}>{(registrations as unknown[]).length}/{t.max_players} spieler</p>
               </div>
             ):(
-              <button onClick={register} disabled={registering} style={{width:"100%",background:"#fff",color:"#0C0D10",border:"none",borderRadius:12,padding:"14px",fontSize:14,fontWeight:600,cursor:"pointer",textTransform:"lowercase"}}>
+              <button onClick={register} disabled={registering} style={{width:"100%",background:"#fff",color:"#14161A",border:"none",borderRadius:12,padding:"14px",fontSize:14,fontWeight:600,cursor:"pointer",textTransform:"lowercase"}}>
                 {registering?"wird angemeldet...":"jetzt anmelden →"}
               </button>
             )}
@@ -136,7 +136,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
         {/* Tabs */}
         <div style={{display:"flex",gap:8,marginBottom:16}}>
           {(["bracket","spieler"] as const).map(t_=>
-            <button key={t_} onClick={()=>setTab(t_)} style={{padding:"8px 16px",borderRadius:999,fontSize:12,fontWeight:tab===t_?600:400,cursor:"pointer",background:tab===t_?"#fff":C,color:tab===t_?"#0C0D10":M,border:`1px solid ${tab===t_?"#fff":B}`,textTransform:"lowercase"}}>
+            <button key={t_} onClick={()=>setTab(t_)} style={{padding:"8px 16px",borderRadius:999,fontSize:12,fontWeight:tab===t_?600:400,cursor:"pointer",background:tab===t_?"#fff":C,color:tab===t_?"#14161A":M,border:`1px solid ${tab===t_?"#fff":B}`,textTransform:"lowercase"}}>
               {t_==="bracket"?"⚔️ bracket":"👥 spieler"}
             </button>
           )}
@@ -202,7 +202,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
                   </p>
                   <div style={{display:"flex",gap:8}}>
                     <button onClick={()=>setResultMatch(null)} style={{flex:1,padding:"12px",background:"transparent",color:"rgba(255,255,255,0.85)",border:"1px solid #2A2D38",borderRadius:10,fontSize:13,fontWeight:500,cursor:"pointer",textTransform:"lowercase"}}>abbrechen</button>
-                    <button onClick={()=>submitResult("confirm")} style={{flex:1,padding:"12px",background:"#fff",color:"#0C0D10",border:"none",borderRadius:10,fontSize:13,fontWeight:600,cursor:"pointer",textTransform:"lowercase"}}>bestätigen ✓</button>
+                    <button onClick={()=>submitResult("confirm")} style={{flex:1,padding:"12px",background:"#fff",color:"#14161A",border:"none",borderRadius:10,fontSize:13,fontWeight:600,cursor:"pointer",textTransform:"lowercase"}}>bestätigen ✓</button>
                   </div>
                 </>
               ):(
@@ -211,15 +211,15 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
                   {[0,1,2,3,4].map(i=>(
                     <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
                       <span style={{fontSize:12,color:M,minWidth:52,fontWeight:400,textTransform:"lowercase"}}>satz {i+1}:</span>
-                      <input type="number" min="0" max="30" value={sets[i].p1} onChange={e=>{const s=[...sets];s[i]={...s[i],p1:e.target.value};setSets(s)}} style={{width:52,background:"#0C0D10",border:`1px solid ${B}`,borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
+                      <input type="number" min="0" max="30" value={sets[i].p1} onChange={e=>{const s=[...sets];s[i]={...s[i],p1:e.target.value};setSets(s)}} style={{width:52,background:"#14161A",border:`1px solid ${B}`,borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
                       <span style={{fontSize:16,color:M,fontWeight:600}}>:</span>
-                      <input type="number" min="0" max="30" value={sets[i].p2} onChange={e=>{const s=[...sets];s[i]={...s[i],p2:e.target.value};setSets(s)}} style={{width:52,background:"#0C0D10",border:`1px solid ${B}`,borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
+                      <input type="number" min="0" max="30" value={sets[i].p2} onChange={e=>{const s=[...sets];s[i]={...s[i],p2:e.target.value};setSets(s)}} style={{width:52,background:"#14161A",border:`1px solid ${B}`,borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
                     </div>
                   ))}
                   {resultError&&<p style={{fontSize:12,color:"#f87171",marginTop:4}}>{resultError}</p>}
                   <div style={{display:"flex",gap:8,marginTop:8}}>
                     <button onClick={()=>setResultMatch(null)} style={{flex:1,padding:"12px",background:"transparent",color:"rgba(255,255,255,0.85)",border:"1px solid #2A2D38",borderRadius:10,fontSize:13,fontWeight:500,cursor:"pointer",textTransform:"lowercase"}}>abbrechen</button>
-                    <button onClick={()=>submitResult("enter")} style={{flex:1,padding:"12px",background:"#fff",color:"#0C0D10",border:"none",borderRadius:10,fontSize:13,fontWeight:600,cursor:"pointer",textTransform:"lowercase"}}>eintragen →</button>
+                    <button onClick={()=>submitResult("enter")} style={{flex:1,padding:"12px",background:"#fff",color:"#14161A",border:"none",borderRadius:10,fontSize:13,fontWeight:600,cursor:"pointer",textTransform:"lowercase"}}>eintragen →</button>
                   </div>
                 </>
               )}
