@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_PATHS = ['/', '/login', '/auth', '/spielen']
+const PUBLIC_PATHS = ['/', '/login', '/auth', '/spielen', '/entdecken']
 
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
@@ -26,14 +26,9 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   const { pathname } = request.nextUrl
 
-  // Öffentliche Pfade: immer zugänglich
+  // Öffentliche Pfade: immer zugänglich (auch ausgeloggt → /entdecken zeigt die Teaser-Startseite)
   const isPublic = PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith('/auth'))
   if (isPublic) return supabaseResponse
-
-  // Eingeloggte User auf / → direkt zum Dashboard
-  if (user && pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url))
-  }
 
   // Nicht eingeloggt → Login
   if (!user) {

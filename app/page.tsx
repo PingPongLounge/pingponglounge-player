@@ -1,9 +1,7 @@
-import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
-export default async function Root() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+export default function Root() {
+  // Startseite ist /entdecken — eingeloggt der echte Inhalt,
+  // ausgeloggt die öffentliche Teaser-Version mit Login-Button.
   redirect('/entdecken')
 }

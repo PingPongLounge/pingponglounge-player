@@ -1,24 +1,103 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 import BottomNav from '@/app/components/BottomNav'
-import PlayerLogo from '@/app/components/PlayerLogo'
-import LogoutButton from '@/app/components/LogoutButton'
 
 const BG     = '#14161A'
 const CARD   = '#1B1E25'
 const BORDER = '#1E2230'
 const TEXT   = '#FFFFFF'
-const SUB    = 'rgba(255,255,255,0.35)'
-const LABEL  = 'rgba(255,255,255,0.25)'
+const SUB    = 'rgba(255,255,255,0.66)'
+const LABEL  = 'rgba(255,255,255,0.6)'
 const GRAD   = 'linear-gradient(135deg, #39FF14 0%, #00D4AA 50%, #1FD1C4 100%)'
+const EVERSPORTS_TRAINING = 'https://www.eversports.ch/widget/w/5a5zxf'
+
+function Hero({ greetTop, titleBig, titleSub }: { greetTop?: string; titleBig: string; titleSub: string }) {
+  return (
+    <div style={{ position: 'relative', height: 184, overflow: 'hidden', borderRadius: '0 0 22px 22px' }}>
+      <svg width="100%" height="184" viewBox="0 0 400 184" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
+        <defs>
+          <linearGradient id="ppl-hero" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor="#39FF14" /><stop offset="55%" stopColor="#00D4AA" /><stop offset="100%" stopColor="#1FD1C4" />
+          </linearGradient>
+        </defs>
+        <rect width="400" height="184" fill="url(#ppl-hero)" />
+        <g stroke="#06281c" strokeOpacity="0.5" fill="none" strokeWidth="2">
+          <polygon points="90,150 310,150 270,72 130,72" />
+          <line x1="200" y1="72" x2="200" y2="150" />
+          <line x1="120" y1="110" x2="280" y2="110" strokeWidth="2.5" />
+          <line x1="120" y1="110" x2="120" y2="124" />
+          <line x1="280" y1="110" x2="280" y2="124" />
+        </g>
+      </svg>
+      <div style={{ position: 'absolute', top: 0, left: 0, right: 0, display: 'flex', justifyContent: 'space-between', padding: '16px 18px 0' }}>
+        <span style={{ fontSize: 13, fontWeight: 900, letterSpacing: '0.14em', color: '#06241a' }}>PLAYER</span>
+      </div>
+      <div style={{ position: 'absolute', left: 18, right: 18, bottom: 16 }}>
+        {greetTop && <div style={{ fontSize: 11, fontWeight: 600, color: '#0a2c20' }}>{greetTop}</div>}
+        <div style={{ fontSize: 24, fontWeight: 900, color: '#06241a', textTransform: 'uppercase', letterSpacing: '0.02em', lineHeight: 0.98, whiteSpace: 'pre-line' }}>{titleBig}</div>
+        <div style={{ fontSize: 12, fontWeight: 600, color: '#0a2c20', marginTop: 4 }}>{titleSub}</div>
+      </div>
+    </div>
+  )
+}
+
+function QuickActions({ loggedIn }: { loggedIn: boolean }) {
+  const href = (real: string) => (loggedIn ? real : '/login')
+  const Item = ({ link, label, external, children }: { link: string; label: string; external?: boolean; children: React.ReactNode }) => {
+    const inner = (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textDecoration: 'none', width: 64 }}>
+        <div style={{ width: 50, height: 50, borderRadius: '50%', background: CARD, border: `1px solid #2A3340`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{children}</div>
+        <span style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.82)', fontWeight: 600, textAlign: 'center', lineHeight: 1.1 }}>{label}</span>
+      </div>
+    )
+    if (external && loggedIn) return <a href={link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>{inner}</a>
+    return <Link href={external ? '/login' : link} style={{ textDecoration: 'none' }}>{inner}</Link>
+  }
+  const ico = (d: React.ReactNode) => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{d}</svg>
+  return (
+    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
+      <Item link={href('/buchen')} label="buchen">{ico(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></>)}</Item>
+      <Item link={href('/match')} label="open game">{ico(<><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4" /></>)}</Item>
+      <Item link={EVERSPORTS_TRAINING} label="training" external>{ico(<><path d="M3 3l4 4M3 10l7-7 4 4-7 7zM10 14l7 7 4-4-7-7z" /></>)}</Item>
+      <Item link={href('/liga')} label="liga">{ico(<><path d="M8 21h8M12 17v4M6 4h12v5a6 6 0 0 1-12 0z" /></>)}</Item>
+    </div>
+  )
+}
+
+const sec: React.CSSProperties = { fontSize: 10, color: LABEL, textTransform: 'lowercase', letterSpacing: '0.06em', margin: '14px 0 8px' }
+const card: React.CSSProperties = { background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '12px 14px', marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', textDecoration: 'none' }
 
 export default async function EntdeckenPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
 
+  // ── Ausgeloggt: öffentliche Startseite mit Login ──────────────────────────
+  if (!user) {
+    return (
+      <main style={{ minHeight: '100vh', background: BG, paddingBottom: 40 }}>
+        <div style={{ maxWidth: 480, margin: '0 auto' }}>
+          <Hero titleBig={'dein tischtennis-\nzuhause'} titleSub="rang sammeln · gegner finden · liga spielen" />
+          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: 15, margin: '-16px 15px 16px', position: 'relative', zIndex: 5 }}>
+            <div style={{ fontSize: 14, fontWeight: 700, marginBottom: 3 }}>jetzt loslegen</div>
+            <div style={{ fontSize: 11, color: SUB, marginBottom: 12 }}>anmelden und deinen rang freischalten</div>
+            <Link href="/login" style={{ display: 'block', width: '100%', background: '#fff', color: BG, borderRadius: 10, padding: 13, fontSize: 13.5, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>login / registrieren</Link>
+            <Link href="/spielen" style={{ display: 'block', width: '100%', background: 'transparent', border: '1px solid #2A3340', color: TEXT, borderRadius: 10, padding: 11, fontSize: 12.5, fontWeight: 500, textAlign: 'center', textDecoration: 'none', marginTop: 8 }}>schon gespielt? resultat eintragen</Link>
+          </div>
+          <div style={{ padding: '0 15px' }}>
+            <div style={sec}>das bekommst du</div>
+            <QuickActions loggedIn={false} />
+            <div style={sec}>heute · oerlikon</div>
+            <div style={card}><div><div style={{ fontSize: 13, fontWeight: 600 }}>spieler suchen gegner</div><div style={{ fontSize: 10.5, color: SUB, marginTop: 1 }}>jeden tag offene spiele</div></div><span style={{ fontSize: 10, color: SUB }}>🔒 login</span></div>
+            <div style={sec}>deine liga</div>
+            <div style={card}><div><div style={{ fontSize: 13, fontWeight: 600 }}>challenger league</div><div style={{ fontSize: 10.5, color: SUB, marginTop: 1 }}>spiel dich nach oben</div></div><span style={{ fontSize: 10, color: SUB }}>🔒 login</span></div>
+          </div>
+        </div>
+      </main>
+    )
+  }
+
+  // ── Eingeloggt ────────────────────────────────────────────────────────────
   const { data: profile } = await supabase
     .from('profiles')
     .select('id,name,level,elo,matches_played,matches_won,avatar_url')
@@ -26,7 +105,6 @@ export default async function EntdeckenPage() {
     .single()
   if (!profile) redirect('/onboarding')
 
-  // Aktuelle Liga
   const { data: membership } = await supabase
     .from('league_members')
     .select('season_id, seasons(name, leagues(name, city))')
@@ -34,7 +112,6 @@ export default async function EntdeckenPage() {
     .limit(1)
     .maybeSingle()
 
-  // Rang in der Liga
   let rang: number | null = null
   if (membership?.season_id) {
     const { data: members } = await supabase
@@ -48,7 +125,6 @@ export default async function EntdeckenPage() {
     }
   }
 
-  // Offene Matches
   const { data: openMatches } = await supabase
     .from('open_matches')
     .select('id, scheduled_at, location, slots_total, slots_filled, price_per_player')
@@ -56,197 +132,73 @@ export default async function EntdeckenPage() {
     .order('scheduled_at', { ascending: true })
     .limit(2)
 
+  const { data: ppTx } = await supabase
+    .from('ping_points_transactions')
+    .select('amount')
+    .eq('player_id', user.id)
+  const pingpoints = (ppTx || []).reduce((s: number, t: { amount: number }) => s + (t.amount || 0), 0)
+
   const name    = profile.name?.split(' ')[0] || 'Spieler'
   const elo     = profile.elo ?? 1000
   const played  = profile.matches_played ?? 0
   const won     = profile.matches_won ?? 0
   const winRate = played > 0 ? Math.round((won / played) * 100) : 0
-
-  // @ts-ignore
-  const ligaName = membership?.seasons?.leagues?.city ?? null
-  const top16    = rang !== null && rang <= 16
-
-  const hour = new Date().getHours()
+  // @ts-expect-error supabase nested typing
+  const ligaCity: string | null = membership?.seasons?.leagues?.city ?? null
+  const top16   = rang !== null && rang <= 16
+  const hour    = new Date().getHours()
   const greeting = hour < 12 ? 'guten morgen' : hour < 18 ? 'guten tag' : 'guten abend'
 
   return (
     <main style={{ minHeight: '100vh', background: BG, paddingBottom: 100 }}>
+      <div style={{ maxWidth: 480, margin: '0 auto' }}>
 
-      {/* Header */}
-      <header style={{
-        padding: '20px 20px 0',
-        display: 'grid', gridTemplateColumns: '1fr auto 1fr',
-        alignItems: 'center', maxWidth: 480, margin: '0 auto',
-      }}>
-        <div />
-        <Link href="/entdecken" style={{ display: 'flex', textDecoration: 'none' }}>
-          <PlayerLogo size="sm" />
+        <Hero greetTop={greeting} titleBig={name} titleSub={`${(profile.level || 'rookie').toLowerCase()} · elo ${elo}`} />
+
+        {/* Rang direkt unter dem Hero */}
+        <Link href="/profil" style={{ textDecoration: 'none' }}>
+          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: 16, margin: '-18px 15px 14px', position: 'relative', zIndex: 5, textAlign: 'center' }}>
+            <div style={{ fontSize: 10, color: LABEL, letterSpacing: '0.04em' }}>dein rang{ligaCity ? ` · ${ligaCity}` : ''}</div>
+            <div style={{ fontSize: 42, fontWeight: 900, lineHeight: 1, background: GRAD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{rang ? `#${rang}` : elo}</div>
+            <div style={{ fontSize: 11.5, color: SUB, marginTop: 5 }}>{winRate}% siege · {played} spiele</div>
+          </div>
         </Link>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginLeft: 'auto', justifySelf: 'end' }}>
-          <LogoutButton />
-        </div>
-      </header>
 
-      <div style={{ maxWidth: 480, margin: '0 auto', padding: '24px 16px 0' }}>
+        <div style={{ padding: '0 15px' }}>
+          <QuickActions loggedIn />
 
-        {/* Greeting */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-          <div>
-            <div style={{ fontSize: 10, color: LABEL, letterSpacing: '.04em', marginBottom: 3 }}>{greeting}</div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: TEXT }}>{name} 👋</div>
-          </div>
-          <Link href="/profil">
-            <div style={{
-              width: 38, height: 38, borderRadius: '50%',
-              background: CARD, border: `1px solid ${BORDER}`,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              fontSize: 18, textDecoration: 'none',
-              overflow: 'hidden',
-            }}>
-              {profile.avatar_url
-                ? <img src={profile.avatar_url} style={{ width: '100%', height: '100%', objectFit: 'cover' }} alt="" />
-                : '🏓'}
+          {openMatches && openMatches.length > 0 && (
+            <>
+              <div style={sec}>heute spielen</div>
+              {openMatches.map((m: { id: string; scheduled_at: string; location: string; slots_total: number; slots_filled: number; price_per_player: number }) => {
+                const time = new Date(m.scheduled_at).toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })
+                const free = m.slots_total - m.slots_filled
+                return (
+                  <Link key={m.id} href="/match" style={card}>
+                    <div><div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{time} · {m.location}</div><div style={{ fontSize: 10.5, color: SUB, marginTop: 1 }}>{free} {free === 1 ? 'platz' : 'plätze'} frei · CHF {m.price_per_player}</div></div>
+                    <span style={{ background: '#fff', color: BG, borderRadius: 8, padding: '6px 13px', fontSize: 11, fontWeight: 600 }}>mitspielen</span>
+                  </Link>
+                )
+              })}
+            </>
+          )}
+
+          <div style={sec}>deine liga</div>
+          <Link href="/liga" style={card}>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{ligaCity ? `challenger league · ${ligaCity}` : 'liga beitreten'}{rang ? ` · #${rang}` : ''}</div>
+              <div style={{ fontSize: 10.5, color: top16 ? 'rgba(57,255,20,0.85)' : SUB, marginTop: 1 }}>{top16 ? 'top 16 · turnier-qualifikation ✓' : 'top 16 → turnier-qualifikation'}</div>
             </div>
-          </Link>
-        </div>
-
-        {/* Photo Banner */}
-        <div style={{ borderRadius: 12, overflow: 'hidden', height: 90, position: 'relative', marginBottom: 20 }}>
-          <img
-            src="/loc-oerlikon.jpg"
-            alt="Ping Pong Lounge"
-            style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 40%', display: 'block' }}
-          />
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(12,13,16,0.1) 0%, rgba(12,13,16,0.6) 100%)' }} />
-        </div>
-
-        {/* Quick Actions */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 24 }}>
-
-          {/* Book */}
-          <Link href="/buchen" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
-            <div style={{ width: 52, height: 52, borderRadius: '50%', background: CARD, border: `1px solid ${BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
-              </svg>
-            </div>
-            <span style={{ fontSize: 9, color: SUB }}>book</span>
+            <span style={{ color: SUB }}>›</span>
           </Link>
 
-          {/* Learn */}
-          <Link href="/liga" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
-            <div style={{ width: 52, height: 52, borderRadius: '50%', background: CARD, border: `1px solid ${BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-              </svg>
-            </div>
-            <span style={{ fontSize: 9, color: SUB }}>learn</span>
+          <div style={sec}>pingpoints</div>
+          <Link href="/pingpoints" style={card}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{pingpoints} punkte</div>
+            <span style={{ background: '#fff', color: BG, borderRadius: 8, padding: '6px 13px', fontSize: 11, fontWeight: 600 }}>einlösen</span>
           </Link>
-
-          {/* Competition */}
-          <Link href="/liga" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
-            <div style={{ width: 52, height: 52, borderRadius: '50%', background: CARD, border: `1px solid ${BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/>
-                <path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/>
-                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/>
-                <path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/>
-              </svg>
-            </div>
-            <span style={{ fontSize: 9, color: SUB }}>competition</span>
-          </Link>
-
-          {/* Find a Match */}
-          <Link href="/match" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, textDecoration: 'none' }}>
-            <div style={{ width: 52, height: 52, borderRadius: '50%', background: CARD, border: `1px solid ${BORDER}`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>
-              </svg>
-            </div>
-            <span style={{ fontSize: 9, color: SUB }}>find a match</span>
-          </Link>
-
         </div>
-
-        {/* ELO Card */}
-        <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '14px 16px', marginBottom: 10, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div>
-            <div style={{ fontSize: 10, color: LABEL, marginBottom: 2 }}>dein rating</div>
-            <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: '-.02em', background: GRAD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>
-              {elo}
-            </div>
-            <div style={{ fontSize: 10, color: SUB, marginTop: 1 }}>{profile.level?.toLowerCase()} · {winRate}% wins</div>
-          </div>
-          <Link href="/profil" style={{ fontSize: 11, color: SUB, textDecoration: 'none' }}>profil →</Link>
-        </div>
-
-        {/* Open Games */}
-        {openMatches && openMatches.length > 0 && (
-          <>
-            <div style={{ fontSize: 10, color: LABEL, letterSpacing: '.08em', textTransform: 'uppercase' as const, marginBottom: 8, marginTop: 16 }}>
-              open games heute
-            </div>
-            {openMatches.map((m: any) => {
-              const time = new Date(m.scheduled_at).toLocaleTimeString('de-CH', { hour: '2-digit', minute: '2-digit' })
-              const free = m.slots_total - m.slots_filled
-              return (
-                <Link key={m.id} href="/match" style={{ textDecoration: 'none' }}>
-                  <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '12px 14px', marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <div>
-                      <div style={{ fontSize: 14, fontWeight: 500, color: TEXT }}>{time} · {m.location}</div>
-                      <div style={{ fontSize: 10, color: SUB, marginTop: 2 }}>{free} {free === 1 ? 'platz' : 'plätze'} frei · CHF {m.price_per_player}</div>
-                    </div>
-                    <button style={{ background: '#fff', color: '#14161A', border: 'none', borderRadius: 8, padding: '6px 14px', fontSize: 11, fontWeight: 500, fontFamily: 'inherit', cursor: 'pointer' }}>
-                      join
-                    </button>
-                  </div>
-                </Link>
-              )
-            })}
-          </>
-        )}
-
-        {/* Liga Card */}
-        {ligaName && (
-          <>
-            <div style={{ fontSize: 10, color: LABEL, letterSpacing: '.08em', textTransform: 'uppercase' as const, marginBottom: 8, marginTop: 16 }}>
-              deine liga
-            </div>
-            <Link href="/liga" style={{ textDecoration: 'none' }}>
-              <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '12px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 500, color: TEXT }}>{ligaName} · {rang ? `rang #${rang}` : 'aktiv'}</div>
-                  {top16
-                    ? <div style={{ fontSize: 10, color: 'rgba(57,255,20,0.7)', marginTop: 2 }}>top 16 · turnier-qualifikation ✓</div>
-                    : <div style={{ fontSize: 10, color: SUB, marginTop: 2 }}>top 16 → turnier-qualifikation</div>
-                  }
-                </div>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={SUB} strokeWidth="1.8"><path d="M9 18l6-6-6-6"/></svg>
-              </div>
-            </Link>
-          </>
-        )}
-
-        {/* No liga CTA */}
-        {!ligaName && (
-          <>
-            <div style={{ fontSize: 10, color: LABEL, letterSpacing: '.08em', textTransform: 'uppercase' as const, marginBottom: 8, marginTop: 16 }}>
-              liga
-            </div>
-            <Link href="/liga" style={{ textDecoration: 'none' }}>
-              <div style={{ background: CARD, border: `1px dashed ${BORDER}`, borderRadius: 12, padding: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 500, color: 'rgba(255,255,255,0.5)' }}>liga beitreten</div>
-                  <div style={{ fontSize: 10, color: LABEL, marginTop: 2 }}>zürich · basel · st. gallen · luzern · tessin</div>
-                </div>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={LABEL} strokeWidth="1.8"><path d="M9 18l6-6-6-6"/></svg>
-              </div>
-            </Link>
-          </>
-        )}
-
       </div>
-
       <BottomNav />
     </main>
   )
