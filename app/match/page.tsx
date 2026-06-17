@@ -5,8 +5,8 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 
-const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
-const levelColor = (l: string) => ({ Rookie: "#4ADE80", Challenger: "#FACC15", Advanced: "#FB923C", Elite: PK }[l] || G)
+const BG="#0C0D10",C="#111318",B="#1E2230",M="rgba(255,255,255,0.62)",W="#FFFFFF"
+const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
 function timeLabel(d: string): string {
   const dt = new Date(d)
@@ -107,23 +107,23 @@ export default function MatchPage() {
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
 
-        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
+        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← dashboard</Link>
 
         {/* Header */}
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", margin: "20px 0 20px" }}>
           <div>
-            <h1 style={{ fontSize: 28, fontWeight: 900, color: W, textTransform: "uppercase", lineHeight: 1 }}>OPEN MATCHES</h1>
-            <p style={{ fontSize: 13, color: M, marginTop: 6 }}>{matches.length} offen · {filtered.length} angezeigt</p>
+            <h1 style={{ fontSize: 28, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".1em", lineHeight: 1, ...GRAD }}>open game</h1>
+            <p style={{ fontSize: 13, color: M, marginTop: 8, fontWeight: 400 }}>{matches.length} offen · {filtered.length} angezeigt</p>
           </div>
           {!myOpen ? (
             <Link href="/match/create" style={{ textDecoration: "none" }}>
-              <button style={{ background: G, color: "#0A0A0C", border: "none", borderRadius: 10, padding: "10px 16px", fontSize: 13, fontWeight: 800, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.04em" }}>
-                + Match
+              <button style={{ background: "#fff", color: "#0C0D10", border: "none", borderRadius: 10, padding: "10px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>
+                + match
               </button>
             </Link>
           ) : (
-            <button onClick={() => cancel(myOpen)} style={{ background: C, color: "#f87171", border: "1px solid #3d1515", borderRadius: 10, padding: "10px 16px", fontSize: 12, fontWeight: 700, cursor: "pointer" }}>
-              Mein Match löschen
+            <button onClick={() => cancel(myOpen)} style={{ background: "transparent", color: "rgba(255,255,255,0.85)", border: "1px solid #2A2D38", borderRadius: 10, padding: "10px 16px", fontSize: 12, fontWeight: 500, cursor: "pointer", textTransform: "lowercase" }}>
+              mein match löschen
             </button>
           )}
         </div>
@@ -131,12 +131,11 @@ export default function MatchPage() {
         {/* Filter */}
         <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
           {LEVELS.map(l => {
-            const lc = levelColor(l)
             const active = filterLevel === l
             return (
               <button key={l} onClick={() => setFilterLevel(active ? "" : l)} style={{
-                padding: "5px 12px", borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: "pointer",
-                background: active ? `${lc}20` : C, border: `1px solid ${active ? lc : B}`, color: active ? lc : M
+                padding: "5px 12px", borderRadius: 999, fontSize: 11, fontWeight: active ? 600 : 400, cursor: "pointer", textTransform: "lowercase",
+                background: active ? "#fff" : C, border: `1px solid ${active ? "#fff" : B}`, color: active ? "#0C0D10" : M
               }}>{l}</button>
             )
           })}
@@ -144,9 +143,9 @@ export default function MatchPage() {
         <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}>
           {CITIES.map(c => (
             <button key={c} onClick={() => setFilterCity(filterCity === c ? "" : c)} style={{
-              padding: "5px 12px", borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: "pointer",
-              background: filterCity === c ? `${G}18` : C, border: `1px solid ${filterCity === c ? G : B}`,
-              color: filterCity === c ? G : M
+              padding: "5px 12px", borderRadius: 999, fontSize: 11, fontWeight: filterCity === c ? 600 : 400, cursor: "pointer", textTransform: "lowercase",
+              background: filterCity === c ? "#fff" : C, border: `1px solid ${filterCity === c ? "#fff" : B}`,
+              color: filterCity === c ? "#0C0D10" : M
             }}>{c}</button>
           ))}
         </div>
@@ -160,11 +159,11 @@ export default function MatchPage() {
         ) : filtered.length === 0 ? (
           <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, padding: "40px 20px", textAlign: "center" }}>
             <p style={{ fontSize: 32, marginBottom: 12 }}>🏓</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>Keine offenen Matches</p>
-            <p style={{ fontSize: 13, color: M, marginBottom: 20 }}>Stell das erste ein!</p>
+            <p style={{ fontSize: 16, fontWeight: 600, color: W, marginBottom: 8 }}>keine offenen spiele</p>
+            <p style={{ fontSize: 13, color: M, marginBottom: 20, fontWeight: 400 }}>stell das erste ein!</p>
             <Link href="/match/create" style={{ textDecoration: "none" }}>
-              <button style={{ background: G, color: "#0A0A0C", border: "none", borderRadius: 10, padding: "12px 24px", fontSize: 14, fontWeight: 800, cursor: "pointer" }}>
-                Match erstellen
+              <button style={{ background: "#fff", color: "#0C0D10", border: "none", borderRadius: 10, padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>
+                match erstellen
               </button>
             </Link>
           </div>
@@ -172,47 +171,46 @@ export default function MatchPage() {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {filtered.map(m => {
               const creator = creatorOf(m)
-              const lc = levelColor(m.level)
               const isMe = m.creator_id === userId
               return (
-                <div key={m.id} style={{ background: C, border: `1px solid ${isMe ? G + "40" : B}`, borderRadius: 16, overflow: "hidden" }}>
+                <div key={m.id} style={{ background: C, border: `1px solid ${isMe ? "rgba(255,255,255,0.25)" : B}`, borderRadius: 16, overflow: "hidden" }}>
 
                   {/* Top row */}
                   <div style={{ padding: "14px 16px 10px", display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
                     <div style={{ flex: 1 }}>
                       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 14, fontWeight: 800, color: W }}>{creator?.name || "?"}</span>
-                        <span style={{ fontSize: 11, color: M }}>ELO {creator?.elo ?? "—"}</span>
-                        {isMe && <span style={{ fontSize: 10, fontWeight: 700, color: G, background: `${G}18`, borderRadius: 999, padding: "1px 7px" }}>Dein Match</span>}
+                        <span style={{ fontSize: 14, fontWeight: 600, color: W }}>{creator?.name || "?"}</span>
+                        <span style={{ fontSize: 11, color: M, fontWeight: 400 }}>elo {creator?.elo ?? "—"}</span>
+                        {isMe && <span style={{ fontSize: 10, fontWeight: 500, color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.35)", borderRadius: 999, padding: "1px 8px", textTransform: "lowercase" }}>dein match</span>}
                       </div>
                       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                        <span style={{ fontSize: 11, fontWeight: 700, color: lc, background: `${lc}15`, border: `1px solid ${lc}30`, borderRadius: 999, padding: "2px 8px" }}>{m.level}</span>
-                        <span style={{ fontSize: 11, color: M, background: B, borderRadius: 999, padding: "2px 8px" }}>📍 {m.city}</span>
+                        <span style={{ fontSize: 11, fontWeight: 500, color: "rgba(255,255,255,0.85)", border: "1px solid rgba(255,255,255,0.35)", borderRadius: 999, padding: "2px 9px", textTransform: "lowercase" }}>{m.level}</span>
+                        <span style={{ fontSize: 11, color: M, background: "#1A1D24", borderRadius: 999, padding: "2px 8px", fontWeight: 400, textTransform: "lowercase" }}>📍 {m.city}</span>
                         {m.proposed_time && (
-                          <span style={{ fontSize: 11, color: M, background: B, borderRadius: 999, padding: "2px 8px" }}>🕐 {timeLabel(m.proposed_time)}</span>
+                          <span style={{ fontSize: 11, color: M, background: "#1A1D24", borderRadius: 999, padding: "2px 8px", fontWeight: 400, textTransform: "lowercase" }}>🕐 {timeLabel(m.proposed_time)}</span>
                         )}
                       </div>
                     </div>
-                    <span style={{ fontSize: 11, color: M, flexShrink: 0, marginTop: 2 }}>{postedAgo(m.created_at)}</span>
+                    <span style={{ fontSize: 11, color: M, flexShrink: 0, marginTop: 2, fontWeight: 400, textTransform: "lowercase" }}>{postedAgo(m.created_at)}</span>
                   </div>
 
                   {m.message && (
                     <div style={{ padding: "0 16px 10px" }}>
-                      <p style={{ fontSize: 12, color: M, fontStyle: "italic" }}>"{m.message}"</p>
+                      <p style={{ fontSize: 12, color: M, fontStyle: "italic", fontWeight: 400 }}>"{m.message}"</p>
                     </div>
                   )}
 
                   {/* Action */}
                   <div style={{ padding: "10px 16px 14px" }}>
                     {isMe ? (
-                      <p style={{ fontSize: 12, color: M, textAlign: "center" }}>Warte auf Mitspieler...</p>
+                      <p style={{ fontSize: 12, color: M, textAlign: "center", fontWeight: 400 }}>warte auf mitspieler...</p>
                     ) : (
                       <button
                         onClick={() => join(m.id)}
                         disabled={joining === m.id}
-                        style={{ width: "100%", background: G, color: "#0A0A0C", border: "none", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 800, cursor: "pointer", textTransform: "uppercase", letterSpacing: "0.04em" }}
+                        style={{ width: "100%", background: "#fff", color: "#0C0D10", border: "none", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}
                       >
-                        {joining === m.id ? "Trete bei..." : "Beitreten →"}
+                        {joining === m.id ? "trete bei..." : "mitspielen →"}
                       </button>
                     )}
                   </div>
