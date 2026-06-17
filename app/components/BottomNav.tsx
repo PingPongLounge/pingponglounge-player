@@ -52,27 +52,32 @@ export default function BottomNav() {
     <nav style={{
       position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100,
       background: BG, borderTop: `1px solid ${BORDER}`,
-      display: "flex", justifyContent: "space-around", alignItems: "center",
+      display: "flex", justifyContent: "center",
       padding: "10px 0 max(12px, env(safe-area-inset-bottom))",
     }}>
-      {tabs.map(tab => {
-        const active = path === tab.href || (tab.href !== "/entdecken" && path.startsWith(tab.href))
-        return (
-          <Link key={tab.href} href={tab.href} style={{
-            display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-            textDecoration: "none", padding: "2px 14px",
-          }}>
-            {tab.icon(active)}
-            <span style={{
-              fontSize: 9, fontWeight: 400,
-              color: active ? ACTIVE : INACTIVE,
-              letterSpacing: "0.02em",
+      <div style={{
+        width: "100%", maxWidth: 480, margin: "0 auto",
+        display: "flex", justifyContent: "space-around", alignItems: "center",
+      }}>
+        {tabs.map(tab => {
+          const active = path === tab.href || (tab.href !== "/entdecken" && path.startsWith(tab.href))
+          return (
+            <Link key={tab.href} href={tab.href} style={{
+              display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
+              textDecoration: "none", padding: "2px 14px",
             }}>
-              {tab.label}
-            </span>
-          </Link>
-        )
-      })}
+              {tab.icon(active)}
+              <span style={{
+                fontSize: 9, fontWeight: 400,
+                color: active ? ACTIVE : INACTIVE,
+                letterSpacing: "0.02em",
+              }}>
+                {tab.label}
+              </span>
+            </Link>
+          )
+        })}
+      </div>
     </nav>
   )
 }
