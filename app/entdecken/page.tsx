@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import BottomNav from '@/app/components/BottomNav'
 
@@ -95,12 +94,14 @@ export default async function EntdeckenPage() {
   }
 
   // ── Eingeloggt ────────────────────────────────────────────────────────────
+  // Kein Zwangs-Onboarding mehr: die Startseite lädt IMMER. Ohne Profil zeigt sie
+  // eine "profil einrichten"-Karte statt Rang.
   const { data: profile } = await supabase
     .from('profiles')
     .select('id,name,level,elo,matches_played,matches_won,avatar_url')
     .eq('id', user.id)
-    .single()
-  if (!profile) redirect('/onboarding')
+    .maybeSingle()
+  const hasProfile = !!profile
 
   const { data: membership } = await supabase
     .from('league_members')
@@ -135,10 +136,10 @@ export default async function EntdeckenPage() {
     .eq('player_id', user.id)
   const pingpoints = (ppTx || []).reduce((s: number, t: { amount: number }) => s + (t.amount || 0), 0)
 
-  const name    = profile.name?.split(' ')[0] || 'Spieler'
-  const elo     = profile.elo ?? 1000
-  const played  = profile.matches_played ?? 0
-  const won     = profile.matches_won ?? 0
+  const name    = profile?.name?.split(' ')[0] || user.email?.split('@')[0] || 'Spieler'
+  const elo     = profile?.elo ?? 1000
+  const played  = profile?.matches_played ?? 0
+  const won     = profile?.matches_won ?? 0
   const winRate = played > 0 ? Math.round((won / played) * 100) : 0
   // @ts-expect-error supabase nested typing
   const ligaCity: string | null = membership?.seasons?.leagues?.city ?? null
@@ -150,16 +151,27 @@ export default async function EntdeckenPage() {
     <main style={{ minHeight: '100vh', background: BG, paddingBottom: 100 }}>
       <div style={{ maxWidth: 480, margin: '0 auto' }}>
 
-        <Hero greetTop={greeting} titleBig={name} titleSub={`${(profile.level || 'rookie').toLowerCase()} · elo ${elo}`} />
+        <Hero greetTop={greeting} titleBig={name} titleSub={hasProfile ? `${(profile!.level || 'rookie').toLowerCase()} · elo ${elo}` : 'willkommen — richte kurz dein profil ein'} />
 
-        {/* Rang direkt unter dem Hero */}
-        <Link href="/profil" style={{ textDecoration: 'none' }}>
-          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: 16, margin: '-18px 15px 14px', position: 'relative', zIndex: 5, textAlign: 'center' }}>
-            <div style={{ fontSize: 10, color: LABEL, letterSpacing: '0.04em' }}>dein rang{ligaCity ? ` · ${ligaCity}` : ''}</div>
-            <div style={{ fontSize: 42, fontWeight: 900, lineHeight: 1, background: GRAD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{rang ? `#${rang}` : elo}</div>
-            <div style={{ fontSize: 11.5, color: SUB, marginTop: 5 }}>{winRate}% siege · {played} spiele</div>
-          </div>
-        </Link>
+        {hasProfile ? (
+          /* Rang direkt unter dem Hero */
+          <Link href="/profil" style={{ textDecoration: 'none' }}>
+            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: 16, margin: '-18px 15px 14px', position: 'relative', zIndex: 5, textAlign: 'center' }}>
+              <div style={{ fontSize: 10, color: LABEL, letterSpacing: '0.04em' }}>dein rang{ligaCity ? ` · ${ligaCity}` : ''}</div>
+              <div style={{ fontSize: 42, fontWeight: 900, lineHeight: 1, background: GRAD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{rang ? `#${rang}` : elo}</div>
+              <div style={{ fontSize: 11.5, color: SUB, marginTop: 5 }}>{winRate}% siege · {played} spiele</div>
+            </div>
+          </Link>
+        ) : (
+          /* Kein Profil → einrichten-Karte (kein Zwangs-Onboarding) */
+          <Link href="/onboarding" style={{ textDecoration: 'none' }}>
+            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: 16, margin: '-18px 15px 14px', position: 'relative', zIndex: 5 }}>
+              <div style={{ fontSize: 14, fontWeight: 700, color: TEXT }}>profil einrichten</div>
+              <div style={{ fontSize: 11.5, color: SUB, marginTop: 3, marginBottom: 12 }}>name &amp; level festlegen, dann hast du deinen rang</div>
+              <span style={{ display: 'block', width: '100%', background: '#fff', color: BG, borderRadius: 10, padding: 12, fontSize: 13, fontWeight: 700, textAlign: 'center' }}>los geht&apos;s</span>
+            </div>
+          </Link>
+        )}
 
         <div style={{ padding: '0 15px' }}>
           <QuickActions loggedIn />
@@ -180,20 +192,24 @@ export default async function EntdeckenPage() {
             </>
           )}
 
-          <div style={sec}>deine liga</div>
-          <Link href="/liga" style={card}>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{ligaCity ? `challenger league · ${ligaCity}` : 'liga beitreten'}{rang ? ` · #${rang}` : ''}</div>
-              <div style={{ fontSize: 10.5, color: top16 ? 'rgba(57,255,20,0.85)' : SUB, marginTop: 1 }}>{top16 ? 'top 16 · turnier-qualifikation ✓' : 'top 16 → turnier-qualifikation'}</div>
-            </div>
-            <span style={{ color: SUB }}>›</span>
-          </Link>
+          {hasProfile && (
+            <>
+              <div style={sec}>deine liga</div>
+              <Link href="/liga" style={card}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{ligaCity ? `challenger league · ${ligaCity}` : 'liga beitreten'}{rang ? ` · #${rang}` : ''}</div>
+                  <div style={{ fontSize: 10.5, color: top16 ? 'rgba(57,255,20,0.85)' : SUB, marginTop: 1 }}>{top16 ? 'top 16 · turnier-qualifikation ✓' : 'top 16 → turnier-qualifikation'}</div>
+                </div>
+                <span style={{ color: SUB }}>›</span>
+              </Link>
 
-          <div style={sec}>pingpoints</div>
-          <Link href="/pingpoints" style={card}>
-            <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{pingpoints} punkte</div>
-            <span style={{ background: '#fff', color: BG, borderRadius: 8, padding: '6px 13px', fontSize: 11, fontWeight: 600 }}>einlösen</span>
-          </Link>
+              <div style={sec}>pingpoints</div>
+              <Link href="/pingpoints" style={card}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{pingpoints} punkte</div>
+                <span style={{ background: '#fff', color: BG, borderRadius: 8, padding: '6px 13px', fontSize: 11, fontWeight: 600 }}>einlösen</span>
+              </Link>
+            </>
+          )}
         </div>
       </div>
       <BottomNav />
