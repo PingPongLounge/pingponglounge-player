@@ -81,8 +81,24 @@ export default async function EntdeckenPage() {
             <Link href="/spielen" style={{ display: 'block', width: '100%', background: 'transparent', border: '1px solid #2A3340', color: TEXT, borderRadius: 10, padding: 11, fontSize: 12.5, fontWeight: 500, textAlign: 'center', textDecoration: 'none', marginTop: 8 }}>schon gespielt? resultat eintragen</Link>
           </div>
           <div style={{ padding: '0 15px' }}>
-            <div style={sec}>das bekommst du</div>
-            <QuickActions loggedIn={false} />
+            <div style={sec}>so funktioniert player</div>
+            {[
+              { ic: (<><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></>), t: 'tisch buchen', d: 'reserviere deinen tisch an unseren standorten' },
+              { ic: (<><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></>), t: 'open game', d: 'spontan gegen andere spielen — finde mitspieler in deiner nähe' },
+              { ic: (<><path d="M8 21h8M12 17v4M6 4h12v5a6 6 0 0 1-12 0z"/></>), t: 'liga & turniere', d: 'spiel um deinen rang, steig auf und gewinn turniere' },
+              { ic: (<><path d="M3 3l4 4M3 10l7-7 4 4-7 7zM10 14l7 7 4-4-7-7z"/></>), t: 'training', d: 'jeden donnerstag training in glattbrugg' },
+            ].map((f) => (
+              <div key={f.t} style={{ display: 'flex', gap: 12, alignItems: 'center', padding: '11px 0', borderBottom: `1px solid ${BORDER}` }}>
+                <div style={{ width: 42, height: 42, flexShrink: 0, borderRadius: 11, background: CARD, border: '1px solid #2A3340', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{f.ic}</svg>
+                </div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: TEXT }}>{f.t}</div>
+                  <div style={{ fontSize: 11.5, color: SUB, marginTop: 1, lineHeight: 1.35 }}>{f.d}</div>
+                </div>
+              </div>
+            ))}
+
             <div style={sec}>heute · oerlikon</div>
             <div style={card}><div><div style={{ fontSize: 13, fontWeight: 600 }}>spieler suchen gegner</div><div style={{ fontSize: 10.5, color: SUB, marginTop: 1 }}>jeden tag offene spiele</div></div><span style={{ fontSize: 10, color: SUB }}>🔒 login</span></div>
             <div style={sec}>deine liga</div>
