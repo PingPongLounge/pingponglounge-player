@@ -10,7 +10,7 @@ const BORDER = "#1E2230"
 const tabs = [
   {
     href: "/entdecken",
-    label: "home",
+    label: "start",
     icon: (a: boolean) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/>
