@@ -35,6 +35,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
+  // Eingeloggt mit Profil, aber auf /onboarding → zur Startseite (kein Festhängen/Flackern in Safari)
+  if (pathname === '/onboarding') {
+    const { data: prof } = await supabase.from('profiles').select('id').eq('id', user.id).maybeSingle()
+    if (prof) return NextResponse.redirect(new URL('/entdecken', request.url))
+  }
+
   return supabaseResponse
 }
 

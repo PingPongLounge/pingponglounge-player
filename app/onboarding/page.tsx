@@ -108,19 +108,6 @@ export default function OnboardingPage() {
     } catch { /* ungültiges JSON o.ä. → normaler Flow */ }
   }, [])
 
-  // Schon ein Profil vorhanden? Dann Onboarding überspringen (kein Festhängen).
-  useEffect(() => {
-    (async () => {
-      try {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) { router.replace("/login"); return }
-        const { data: prof } = await supabase.from("profiles").select("id").eq("id", user.id).maybeSingle()
-        if (prof) router.replace("/entdecken")
-      } catch { /* ignore */ }
-    })()
-  }, [router])
-
   async function handleLogout() {
     try { const supabase = createClient(); await supabase.auth.signOut() } catch { /* ignore */ }
     router.replace("/login")
