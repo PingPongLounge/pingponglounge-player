@@ -95,7 +95,7 @@ export default function MatchPage() {
     load()
   }
 
-  const LEVELS = ["Locker", "Hobby", "Fortgeschritten", "Competitive"]
+  const LEVELS = ["Rookie", "Challenger", "Advanced", "Elite"]
   const CITIES = ["Zürich", "Basel", "Luzern", "St. Gallen", "Glattbrugg"]
 
   const filtered = matches.filter(m =>

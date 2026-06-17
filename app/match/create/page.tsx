@@ -6,7 +6,7 @@ import Link from "next/link"
 const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.62)",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
-const LEVELS = ["Locker", "Hobby", "Fortgeschritten", "Competitive"]
+const LEVELS = ["Rookie", "Challenger", "Advanced", "Elite"]
 const CITIES = ["Zürich", "Basel", "Luzern", "St. Gallen", "Glattbrugg", "Andere"]
 
 export default function CreateMatchPage() {
