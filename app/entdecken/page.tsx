@@ -120,7 +120,7 @@ export default async function EntdeckenPage() {
   }
 
   const { data: openMatches } = await supabase
-    .from('open_matches').select('id, city').eq('status', 'open').order('created_at', { ascending: false }).limit(20)
+    .from('open_games').select('id').eq('status', 'open').order('created_at', { ascending: false }).limit(20)
   const openCount = openMatches?.length ?? 0
 
   const { data: ppTx } = await supabase.from('ping_points_transactions').select('amount').eq('player_id', user.id)
