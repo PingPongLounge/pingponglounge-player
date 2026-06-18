@@ -6,7 +6,7 @@ export async function GET(req: NextRequest) {
   const canton = req.nextUrl.searchParams.get("canton")
 
   let query = sb
-    .from("profiles")
+    .from("public_profiles")
     .select("id,name,elo,level,matches_played,matches_won,canton")
     .gt("matches_played", 0)   // nur Spieler die schon gespielt haben
     .order("elo", { ascending: false })

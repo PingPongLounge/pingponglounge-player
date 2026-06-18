@@ -7,28 +7,55 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   const { data: { user } } = await sb.auth.getUser()
 
   const { data: t } = await sb
-    .from("tournaments")
+    .from("player_tournaments")
     .select("*")
     .eq("id", id)
     .single()
   if (!t) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 })
 
-  const { data: regs } = await sb
+  const { data: regsRaw } = await sb
     .from("tournament_registrations")
-    .select("player_id,seed,profiles(name,elo,level)")
+    .select("player_id,seed")
     .eq("tournament_id", id)
-    .order("seed", { ascending: true })
+    .order("seed", { ascending: true, nullsFirst: false })
 
-  const { data: matches } = await sb
+  const { data: matchesRaw } = await sb
     .from("tournament_matches")
-    .select("id,round,match_number,p1_id,p2_id,winner_id,sets,status,p1:profiles!tournament_matches_p1_id_fkey(name,elo),p2:profiles!tournament_matches_p2_id_fkey(name,elo)")
+    .select("id,round,match_number,p1_id,p2_id,winner_id,sets,status")
     .eq("tournament_id", id)
-    .order("round").order("match_number")
+    .order("round")
+    .order("match_number")
 
-  const isRegistered = user ? (regs || []).some(r => r.player_id === user.id) : false
-  const myMatch = user ? (matches || []).find(m =>
+  // Namen sicher über public_profiles (kein E-Mail-Leak) nachladen und einsetzen
+  const ids = new Set<string>()
+  ;(regsRaw || []).forEach(r => { if (r.player_id) ids.add(r.player_id) })
+  ;(matchesRaw || []).forEach(m => { if (m.p1_id) ids.add(m.p1_id); if (m.p2_id) ids.add(m.p2_id) })
+
+  const profMap: Record<string, { name: string; elo: number; level: string }> = {}
+  if (ids.size > 0) {
+    const { data: profs } = await sb
+      .from("public_profiles")
+      .select("id,name,elo,level")
+      .in("id", [...ids])
+    ;(profs || []).forEach(p => { profMap[p.id] = { name: p.name, elo: p.elo, level: p.level } })
+  }
+
+  const registrations = (regsRaw || []).map(r => ({
+    player_id: r.player_id,
+    seed: r.seed,
+    profiles: profMap[r.player_id] || null,
+  }))
+
+  const matches = (matchesRaw || []).map(m => ({
+    ...m,
+    p1: m.p1_id ? profMap[m.p1_id] || null : null,
+    p2: m.p2_id ? profMap[m.p2_id] || null : null,
+  }))
+
+  const isRegistered = user ? registrations.some(r => r.player_id === user.id) : false
+  const myMatch = user ? matches.find(m =>
     (m.p1_id === user.id || m.p2_id === user.id) && m.status === "p1_entered"
   ) : null
 
-  return NextResponse.json({ tournament: t, registrations: regs || [], matches: matches || [], isRegistered, myMatch, userId: user?.id })
+  return NextResponse.json({ tournament: t, registrations, matches, isRegistered, myMatch, userId: user?.id })
 }

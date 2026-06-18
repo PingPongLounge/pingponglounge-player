@@ -7,7 +7,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   const { data: { user } } = await sb.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { data: t } = await sb.from("tournaments").select("status,max_players").eq("id", id).single()
+  const { data: t } = await sb.from("player_tournaments").select("status,max_players").eq("id", id).single()
   if (!t || t.status !== "open") return NextResponse.json({ error: "Anmeldung nicht möglich" }, { status: 400 })
 
   const { count } = await sb.from("tournament_registrations").select("*", { count: "exact", head: true }).eq("tournament_id", id)

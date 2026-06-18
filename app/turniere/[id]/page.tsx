@@ -9,7 +9,7 @@ const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 10
 
 type Profile={name:string,elo:number,level?:string}
 type TMatch={id:string,round:number,match_number:number,p1_id:string|null,p2_id:string|null,winner_id:string|null,sets:Array<{p1:number,p2:number}>|null,status:string,p1:Profile|Profile[]|null,p2:Profile|Profile[]|null}
-type Tournament={id:string,name:string,date:string,city:string,skill_class:string,max_players:number,status:string,format:string,description:string}
+type Tournament={id:string,name:string,date:string,city:string,skill_class:string,max_players:number,status:string,format:string,description:string,created_by:string,entry_fee_chf?:number,counts_for_rank?:boolean}
 
 function getName(p:Profile|Profile[]|null):string{
   if(!p) return "?"
@@ -78,6 +78,18 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
     setRegistering(false)
   }
 
+  const [starting,setStarting]=useState(false)
+  const [startError,setStartError]=useState("")
+  async function startBracket(){
+    setStartError("")
+    setStarting(true)
+    const res=await fetch(`/api/turniere/${tournamentId}/start`,{method:"POST"})
+    const json=await res.json()
+    if(!res.ok){setStartError(json.error||"Fehler beim Starten");setStarting(false);return}
+    load()
+    setStarting(false)
+  }
+
   async function submitResult(action:"enter"|"confirm"){
     if(!resultMatch) return
     const res=await fetch(`/api/turniere/${tournamentId}/result`,{
@@ -111,7 +123,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
           <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
             <div>
               <h1 style={{fontSize:24,fontWeight:900,textTransform:"uppercase",letterSpacing:".1em",lineHeight:1.1,marginBottom:8,...GRAD}}>{t.name}</h1>
-              <p style={{fontSize:13,color:M,fontWeight:400,textTransform:"lowercase"}}>📍 {t.city} · 📅 {new Date(t.date).toLocaleDateString("de-CH",{weekday:"long",day:"numeric",month:"long"})}</p>
+              <p style={{fontSize:13,color:M,fontWeight:400,textTransform:"lowercase"}}>📍 {t.city||"standort offen"}{t.date?` · 📅 ${new Date(t.date).toLocaleDateString("de-CH",{weekday:"long",day:"numeric",month:"long"})}`:""}{t.entry_fee_chf?` · 💰 chf ${t.entry_fee_chf}`:" · gratis"}{t.counts_for_rank===false?" · nur spass":""}</p>
             </div>
             <span style={{fontSize:11,fontWeight:500,color:"rgba(255,255,255,0.85)",border:"1px solid rgba(255,255,255,0.35)",borderRadius:999,padding:"3px 10px",flexShrink:0,textTransform:"lowercase"}}>{t.skill_class}</span>
           </div>
@@ -130,6 +142,17 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
                 {registering?"wird angemeldet...":"jetzt anmelden →"}
               </button>
             )}
+          </div>
+        )}
+
+        {/* Ersteller: Bracket starten */}
+        {t.status==="open"&&t.created_by===userId&&(
+          <div style={{marginBottom:16}}>
+            <button onClick={startBracket} disabled={starting||(registrations as unknown[]).length<2} style={{width:"100%",background:starting||(registrations as unknown[]).length<2?"#2A2D38":G,color:starting||(registrations as unknown[]).length<2?M:"#06210a",border:"none",borderRadius:12,padding:"14px",fontSize:14,fontWeight:700,cursor:(registrations as unknown[]).length<2?"default":"pointer",textTransform:"lowercase"}}>
+              {starting?"bracket wird erstellt...":(registrations as unknown[]).length<2?"mind. 2 spieler nötig":"⚔️ bracket erstellen & starten"}
+            </button>
+            <p style={{fontSize:11,color:M,textAlign:"center",marginTop:8,fontWeight:400,textTransform:"lowercase"}}>setzliste automatisch nach elo · danach läuft das turnier</p>
+            {startError&&<p style={{fontSize:12,color:"#f87171",textAlign:"center",marginTop:6}}>{startError}</p>}
           </div>
         )}
 

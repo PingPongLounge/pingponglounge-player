@@ -45,10 +45,16 @@ export default function TurnierePage(){
       <div style={{maxWidth:560,margin:"0 auto"}}>
         <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← dashboard</Link>
 
-        <div style={{margin:"20px 0 24px"}}>
+        <div style={{margin:"20px 0 16px"}}>
           <h1 style={{fontSize:28,fontWeight:900,textTransform:"uppercase",letterSpacing:".1em",lineHeight:1,...GRAD}}>turniere</h1>
           <p style={{fontSize:13,color:M,marginTop:8,fontWeight:400}}>community turniere · ko-bracket · elo</p>
         </div>
+
+        <Link href="/turniere/neu" style={{textDecoration:"none"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,background:"#fff",color:"#14161A",borderRadius:12,padding:"13px",fontSize:14,fontWeight:700,marginBottom:20,textTransform:"lowercase"}}>
+            + eigenes turnier erstellen
+          </div>
+        </Link>
 
         {loading?(
           <div style={{textAlign:"center",padding:"60px 0",color:M}}>
