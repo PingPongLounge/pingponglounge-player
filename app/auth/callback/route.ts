@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   const type       = searchParams.get('type') as 'recovery' | 'email' | 'signup' | null
   // Open-Redirect-Schutz: nur relative Pfade akzeptieren
   const nextRaw     = searchParams.get('next') ?? ''
-  const next        = nextRaw.startsWith('/') && !nextRaw.startsWith('//') ? nextRaw : '/dashboard'
+  const next        = nextRaw.startsWith('/') && !nextRaw.startsWith('//') ? nextRaw : '/entdecken'
 
   const response = NextResponse.redirect(`${origin}${next}`)
 
