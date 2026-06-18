@@ -204,6 +204,8 @@ export default function BuchenPage() {
   const [step, setStep]             = useState<Step>("picker")
   const [location, setLocation]     = useState<Location | null>(null)
   const [selectedDate, setSelectedDate] = useState<Date>(() => { const d = new Date(); d.setHours(0,0,0,0); return d })
+  const [showCal, setShowCal]       = useState(false)
+  const [calMonth, setCalMonth]     = useState<Date>(() => { const d = new Date(); d.setDate(1); d.setHours(0,0,0,0); return d })
   const [duration, setDuration]     = useState(1)
   const [slots, setSlots]           = useState<Slot[]>([])
   const [slotsLoading, setSlotsLoading] = useState(false)
@@ -444,18 +446,56 @@ export default function BuchenPage() {
           <>
             {/* Datum */}
             <p style={{ fontSize: 10, color: LBL, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>datum</p>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: showCal ? 10 : 16 }}>
               <button onClick={() => {
                 const prev = addDays(selectedDate, -1)
                 const today = new Date(); today.setHours(0,0,0,0)
                 if (prev >= today) { setSelectedDate(prev); setSelectedSlot(null) }
               }} style={{ ...btnGhost, padding: "8px 14px", fontSize: 16, flexShrink: 0 }}>‹</button>
-              <div style={{ flex: 1, textAlign: "center", fontSize: 15, fontWeight: 900, color: TEXT, letterSpacing: "-.01em" }}>
+              <button onClick={() => { setCalMonth(() => { const d = new Date(selectedDate); d.setDate(1); return d }); setShowCal(v => !v) }}
+                style={{ flex: 1, textAlign: "center", fontSize: 15, fontWeight: 900, color: TEXT, letterSpacing: "-.01em", background: "transparent", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                 {dateLabel}
-              </div>
+                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={SUB} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showCal ? "rotate(180deg)" : "none" }}><path d="M6 9l6 6 6-6" /></svg>
+              </button>
               <button onClick={() => { setSelectedDate(addDays(selectedDate, 1)); setSelectedSlot(null) }}
                 style={{ ...btnGhost, padding: "8px 14px", fontSize: 16, flexShrink: 0 }}>›</button>
             </div>
+
+            {showCal && (() => {
+              const today = new Date(); today.setHours(0,0,0,0)
+              const y = calMonth.getFullYear(), m = calMonth.getMonth()
+              const firstDow = (new Date(y, m, 1).getDay() + 6) % 7
+              const daysIn = new Date(y, m + 1, 0).getDate()
+              const cells: (Date | null)[] = []
+              for (let i = 0; i < firstDow; i++) cells.push(null)
+              for (let d = 1; d <= daysIn; d++) cells.push(new Date(y, m, d))
+              const canPrevMonth = new Date(y, m, 1) > new Date(today.getFullYear(), today.getMonth(), 1)
+              return (
+                <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 12, padding: 12, marginBottom: 16 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                    <button onClick={() => canPrevMonth && setCalMonth(new Date(y, m - 1, 1))} style={{ ...btnGhost, padding: "4px 10px", fontSize: 14, opacity: canPrevMonth ? 1 : 0.3 }}>‹</button>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>{calMonth.toLocaleDateString("de-CH", { month: "long", year: "numeric" })}</span>
+                    <button onClick={() => setCalMonth(new Date(y, m + 1, 1))} style={{ ...btnGhost, padding: "4px 10px", fontSize: 14 }}>›</button>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3 }}>
+                    {["mo","di","mi","do","fr","sa","so"].map(w => <div key={w} style={{ textAlign: "center", fontSize: 9, color: LBL, padding: "2px 0" }}>{w}</div>)}
+                    {cells.map((d, i) => {
+                      if (!d) return <div key={i} />
+                      const past = d < today
+                      const isSel = isoDate(d) === isoDate(selectedDate)
+                      return (
+                        <button key={i} disabled={past}
+                          onClick={() => { setSelectedDate(d); setSelectedSlot(null); setShowCal(false) }}
+                          style={{ aspectRatio: "1", borderRadius: 8, border: "none", cursor: past ? "default" : "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: isSel ? 700 : 400,
+                            background: isSel ? "#fff" : "transparent", color: isSel ? "#14161A" : past ? "rgba(255,255,255,0.18)" : TEXT }}>
+                          {d.getDate()}
+                        </button>
+                      )
+                    })}
+                  </div>
+                </div>
+              )
+            })()}
 
             {/* Dauer */}
             <p style={{ fontSize: 10, color: LBL, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>dauer</p>
