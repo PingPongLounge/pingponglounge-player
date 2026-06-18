@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8"
+const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#FF00C8"
+const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 
 const levelColor=(l:string):string=>({
   Rookie:"#4ADE80",
@@ -74,35 +75,35 @@ export default function LigaPage(){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 20px 80px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
-        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
+        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← dashboard</Link>
 
         {/* Header */}
         <div style={{textAlign:"center",margin:"28px 0 24px"}}>
-          <p style={{fontSize:11,fontWeight:700,color:G,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:8}}>Player Liga</p>
-          <h1 style={{fontSize:42,fontWeight:900,color:W,textTransform:"uppercase",lineHeight:.95,marginBottom:8}}>LIGA</h1>
-          <p style={{fontSize:14,color:M}}>Stadtweise Saisons · Live-Tabelle · Open Match</p>
+          <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:8}}>player liga</p>
+          <h1 style={{fontSize:42,fontWeight:900,fontFamily:"'League Spartan', system-ui, sans-serif",textTransform:"uppercase",letterSpacing:".1em",lineHeight:.95,marginBottom:8,background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>liga</h1>
+          <p style={{fontSize:14,color:M}}>stadtweise saisons · live-tabelle · open match</p>
         </div>
 
         {/* Level-Filter */}
         <div style={{display:"flex",gap:6,marginBottom:24,flexWrap:"wrap"}}>
           {["Alle",...LEVELS].map(l=>{
             const active=filter===l
-            const lc=l==="Alle"?G:levelColor(l)
             return(
               <button
                 key={l}
                 onClick={()=>setFilter(l)}
                 style={{
-                  background:active?`${lc}20`:"none",
-                  border:`1px solid ${active?lc:B}`,
+                  background:active?"#fff":"none",
+                  border:`1px solid ${active?"#fff":B}`,
                   borderRadius:999,
                   padding:"7px 14px",
                   fontSize:12,
                   fontWeight:700,
-                  color:active?lc:M,
+                  color:active?"#14161A":M,
                   cursor:"pointer",
                   transition:"all 0.15s",
                   letterSpacing:"0.04em",
+                  textTransform:"lowercase",
                 }}
               >
                 {l}
@@ -126,14 +127,14 @@ export default function LigaPage(){
         )}
 
         {loading
-          ?<p style={{textAlign:"center",color:M}}>Lädt...</p>
+          ?<p style={{textAlign:"center",color:M}}>lädt...</p>
           :filtered.length===0?(
             <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,padding:"32px 20px",textAlign:"center"}}>
               <p style={{fontSize:32,marginBottom:12}}>🏓</p>
               <p style={{fontSize:16,fontWeight:700,color:W,marginBottom:8}}>
-                {filter==="Alle"?"Bald startet die erste Saison":`Keine ${filter}-Saison aktiv`}
+                {filter==="Alle"?"bald startet die erste saison":`keine ${filter}-saison aktiv`}
               </p>
-              <p style={{fontSize:13,color:M}}>Schau bald wieder rein — neue Saisons kommen laufend.</p>
+              <p style={{fontSize:13,color:M}}>schau bald wieder rein — neue saisons kommen laufend.</p>
             </div>
           ):(
             CITIES.map(city=>{
@@ -169,15 +170,15 @@ export default function LigaPage(){
                             </div>
                             <div style={{textAlign:"right",flexShrink:0,marginLeft:12}}>
                               <div style={{fontSize:11,fontWeight:700,color:s.status==="running"?G:M,background:s.status==="running"?`${G}18`:B,borderRadius:999,padding:"2px 10px",marginBottom:4}}>
-                                {s.status==="running"?"LÄUFT":"OFFEN"}
+                                {s.status==="running"?"läuft":"offen"}
                               </div>
                               <p style={{fontSize:11,color:M}}>{s._count||0}/{s.max_players}</p>
                             </div>
                           </div>
                           <div style={{display:"flex",gap:8}}>
-                            <Link href={`/liga/${s.id}`} style={{flex:1,background:B,color:W,textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Tabelle →</Link>
+                            <Link href={`/liga/${s.id}`} style={{flex:1,background:"transparent",border:"1px solid #2A3340",color:W,textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em"}}>tabelle →</Link>
                             {s.status==="open"&&(
-                              <Link href={`/liga/${s.id}/anmelden`} style={{flex:1,background:G,color:"#14161A",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em"}}>Anmelden</Link>
+                              <Link href={`/liga/${s.id}/anmelden`} style={{flex:1,background:"#fff",color:"#14161A",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em"}}>anmelden</Link>
                             )}
                           </div>
                         </div>
@@ -193,9 +194,9 @@ export default function LigaPage(){
 
       {/* Eigene Liga CTA */}
       <div style={{textAlign:"center",marginTop:36,paddingTop:24,borderTop:`1px solid ${B}`}}>
-        <p style={{fontSize:13,color:M,marginBottom:4}}>Liga für dein Team oder deine Firma?</p>
-        <button onClick={()=>{setShowLigaForm(true);setLigaMsg("")}} style={{background:"none",border:"none",color:G,cursor:"pointer",fontSize:13,fontWeight:700,textDecoration:"underline",letterSpacing:"0.04em"}}>
-          Eigene Liga anfragen →
+        <p style={{fontSize:13,color:M,marginBottom:4}}>liga für dein team oder deine firma?</p>
+        <button onClick={()=>{setShowLigaForm(true);setLigaMsg("")}} style={{background:"none",border:"none",color:W,cursor:"pointer",fontSize:13,fontWeight:700,textDecoration:"underline",letterSpacing:"0.04em"}}>
+          eigene liga anfragen →
         </button>
       </div>
 
@@ -205,8 +206,8 @@ export default function LigaPage(){
           <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,padding:24,width:"100%",maxWidth:460,maxHeight:"90vh",overflowY:"auto"}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
               <div>
-                <p style={{fontSize:11,fontWeight:700,color:G,textTransform:"uppercase",letterSpacing:"0.12em",marginBottom:4}}>Eigene Liga</p>
-                <h2 style={{fontSize:20,fontWeight:900,color:W,textTransform:"uppercase",margin:0}}>Anfrage stellen</h2>
+                <p style={{fontSize:11,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.12em",marginBottom:4}}>eigene liga</p>
+                <h2 style={{fontSize:20,fontWeight:900,fontFamily:"'League Spartan', system-ui, sans-serif",textTransform:"uppercase",letterSpacing:".1em",margin:0,background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>anfrage stellen</h2>
               </div>
               <button onClick={()=>setShowLigaForm(false)} style={{background:"none",border:"none",color:M,cursor:"pointer",fontSize:22,lineHeight:1}}>×</button>
             </div>
@@ -245,10 +246,10 @@ export default function LigaPage(){
             {ligaMsg&&<p style={{fontSize:13,color:ligaMsg.startsWith("✓")?G:"#FF6666",marginBottom:10}}>{ligaMsg}</p>}
 
             {ligaMsg.startsWith("✓")?(
-              <button onClick={()=>setShowLigaForm(false)} style={{width:"100%",background:G,color:"#14161A",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>Schliessen</button>
+              <button onClick={()=>setShowLigaForm(false)} style={{width:"100%",background:"#fff",color:"#14161A",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>schliessen</button>
             ):(
-              <button onClick={submitLigaRequest} disabled={ligaSending} style={{width:"100%",background:ligaSending?B:G,color:ligaSending?M:"#14161A",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:ligaSending?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
-                {ligaSending?"Sende...":"Anfrage senden"}
+              <button onClick={submitLigaRequest} disabled={ligaSending} style={{width:"100%",background:ligaSending?B:"#fff",color:ligaSending?M:"#14161A",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:ligaSending?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
+                {ligaSending?"sende...":"anfrage senden"}
               </button>
             )}
           </div>

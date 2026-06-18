@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 
-const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1"
+const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
 
 type SetScore={p1:string,p2:string}
 type MatchData={id:string,season_id:string,round:number,p1_id:string,p1_name:string,p2_id:string,p2_name:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,status:string}
@@ -67,7 +67,7 @@ export default function MatchPage({params}:{params:{id:string}}){
     else{const d=await res.json();setError(d.error||"Fehler");setSaving(false)}
   }
 
-  if(loading||!match) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>Lädt...</p></main>
+  if(loading||!match) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>lädt...</p></main>
 
   const isP1=match.p1_id===userId
   const isP2=match.p2_id===userId
@@ -78,9 +78,9 @@ export default function MatchPage({params}:{params:{id:string}}){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
       <div style={{maxWidth:440,width:"100%"}}>
-        <Link href={`/liga/${match.season_id}`} style={{color:M,textDecoration:"none",fontSize:13,display:"block",marginBottom:24}}>← Liga</Link>
+        <Link href={`/liga/${match.season_id}`} style={{color:M,textDecoration:"none",fontSize:13,display:"block",marginBottom:24}}>← liga</Link>
 
-        <p style={{fontSize:11,fontWeight:700,color:G,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:8}}>Runde {match.round}</p>
+        <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:8}}>runde {match.round}</p>
 
         {/* Players */}
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:C,border:`1px solid ${B}`,borderRadius:14,padding:"16px",marginBottom:16}}>
@@ -94,17 +94,17 @@ export default function MatchPage({params}:{params:{id:string}}){
         {/* QR Code — nur wenn Match noch offen */}
         {match.status!=="confirmed"&&!isP1&&!isP2&&(
           <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,padding:"20px",textAlign:"center",marginBottom:16}}>
-            <p style={{fontSize:11,fontWeight:700,color:G,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:12}}>QR-Code für Spieler</p>
+            <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:12}}>qr-code für spieler</p>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={qrUrl} alt="Match QR" style={{width:160,height:160,borderRadius:10,display:"block",margin:"0 auto 10px"}}/>
-            <p style={{fontSize:12,color:M}}>Spieler scannen diesen Code um das Resultat einzutragen</p>
+            <p style={{fontSize:12,color:M}}>spieler scannen diesen code um das resultat einzutragen</p>
           </div>
         )}
 
         {/* Confirmed state */}
         {match.status==="confirmed"&&(
           <div style={{background:`${G}15`,border:`1px solid ${G}40`,borderRadius:12,padding:"20px",textAlign:"center"}}>
-            <p style={{fontSize:"16px",fontWeight:700,color:G,marginBottom:8}}>✓ Bestätigt</p>
+            <p style={{fontSize:"16px",fontWeight:700,color:G,marginBottom:8}}>✓ bestätigt</p>
             {match.sets&&<p style={{fontSize:13,color:M}}>{match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ")}</p>}
           </div>
         )}
@@ -112,20 +112,20 @@ export default function MatchPage({params}:{params:{id:string}}){
         {/* P1: enter result */}
         {(isP1||isP2)&&match.status==="pending"&&(
           <div>
-            <p style={{fontSize:13,fontWeight:700,color:W,marginBottom:12}}>Ergebnis eingeben (Sätze)</p>
+            <p style={{fontSize:13,fontWeight:700,color:W,marginBottom:12}}>ergebnis eingeben (sätze)</p>
             {sets.map((s,i)=>(
               <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-                <span style={{fontSize:12,color:M,width:56,flexShrink:0}}>Satz {i+1}</span>
+                <span style={{fontSize:12,color:M,width:56,flexShrink:0}}>satz {i+1}</span>
                 <input value={s.p1} onChange={e=>updateSet(i,"p1",e.target.value)} placeholder="11" style={{flex:1,background:C,border:`1px solid ${B}`,borderRadius:8,padding:"10px",fontSize:18,fontWeight:700,color:W,outline:"none",textAlign:"center"}} type="number" min="0" max="20"/>
                 <span style={{color:M,fontSize:16}}>:</span>
                 <input value={s.p2} onChange={e=>updateSet(i,"p2",e.target.value)} placeholder="8" style={{flex:1,background:C,border:`1px solid ${B}`,borderRadius:8,padding:"10px",fontSize:18,fontWeight:700,color:W,outline:"none",textAlign:"center"}} type="number" min="0" max="20"/>
                 {i>=3&&<button onClick={()=>removeSet(i)} style={{background:"none",border:"none",color:M,cursor:"pointer",fontSize:16}}>×</button>}
               </div>
             ))}
-            {sets.length<5&&<button onClick={addSet} style={{width:"100%",background:"none",border:`1px dashed ${B}`,borderRadius:8,padding:"10px",color:M,cursor:"pointer",fontSize:13,marginBottom:12}}>+ Satz hinzufügen</button>}
+            {sets.length<5&&<button onClick={addSet} style={{width:"100%",background:"none",border:`1px dashed ${B}`,borderRadius:8,padding:"10px",color:M,cursor:"pointer",fontSize:13,marginBottom:12}}>+ satz hinzufügen</button>}
             {error&&<p style={{color:"#FF6666",fontSize:13,marginBottom:8}}>{error}</p>}
-            <button onClick={handleSubmit} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#14161A",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em"}}>
-              {saving?"Wird gespeichert...":"Ergebnis einreichen"}
+            <button onClick={handleSubmit} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#14161A",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
+              {saving?"wird gespeichert...":"ergebnis einreichen"}
             </button>
           </div>
         )}
@@ -134,15 +134,15 @@ export default function MatchPage({params}:{params:{id:string}}){
         {isP2&&match.status==="p1_entered"&&(
           <div>
             <div style={{background:C,border:`1px solid #FACC1540`,borderRadius:12,padding:"16px",marginBottom:16}}>
-              <p style={{fontSize:13,color:"#FACC15",fontWeight:700,marginBottom:4}}>⏳ Ergebnis eingereicht</p>
-              <p style={{fontSize:13,color:M}}>{match.p1_name} hat folgendes Ergebnis eingetragen:</p>
+              <p style={{fontSize:13,color:"#FACC15",fontWeight:700,marginBottom:4}}>⏳ ergebnis eingereicht</p>
+              <p style={{fontSize:13,color:M}}>{match.p1_name} hat folgendes ergebnis eingetragen:</p>
               {match.sets&&<p style={{fontSize:15,fontWeight:700,color:W,marginTop:8}}>{match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ")}</p>}
             </div>
             {error&&<p style={{color:"#FF6666",fontSize:13,marginBottom:8}}>{error}</p>}
-            <button onClick={handleConfirm} disabled={saving} style={{width:"100%",background:saving?B:G,color:saving?M:"#14161A",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"uppercase",letterSpacing:"0.06em",marginBottom:8}}>
-              {saving?"...":"✓ Ergebnis bestätigen"}
+            <button onClick={handleConfirm} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#14161A",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em",marginBottom:8}}>
+              {saving?"...":"✓ ergebnis bestätigen"}
             </button>
-            <button onClick={handleDispute} style={{width:"100%",background:"none",border:`1px solid ${B}`,color:M,borderRadius:10,padding:"14px",fontSize:13,cursor:"pointer"}}>Ergebnis anfechten</button>
+            <button onClick={handleDispute} style={{width:"100%",background:"transparent",border:`1px solid #2A3340`,color:W,borderRadius:10,padding:"14px",fontSize:13,cursor:"pointer",textTransform:"lowercase"}}>ergebnis anfechten</button>
           </div>
         )}
 
@@ -150,8 +150,8 @@ export default function MatchPage({params}:{params:{id:string}}){
         {isP1&&match.status==="p1_entered"&&(
           <div style={{background:C,border:`1px solid ${B}`,borderRadius:12,padding:"20px",textAlign:"center"}}>
             <p style={{fontSize:32,marginBottom:8}}>⏳</p>
-            <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:4}}>Warten auf {match.p2_name}</p>
-            <p style={{fontSize:13,color:M}}>Automatisch bestätigt nach 24h</p>
+            <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:4}}>warten auf {match.p2_name}</p>
+            <p style={{fontSize:13,color:M}}>automatisch bestätigt nach 24h</p>
           </div>
         )}
       </div>

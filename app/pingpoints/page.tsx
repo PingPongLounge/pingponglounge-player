@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#111214",C="#15161A",B="#26282E",M="#6B6E7A",G="#39FF14",W="#E8E6E1",PK="#FF00C8",PP="#FFD700"
+const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PP="#FFD700"
 
 const sourceIcon: Record<string,string> = {
   liga_win:"🏆", liga_played:"🏓", liga_upset:"⚡",
@@ -95,23 +95,23 @@ export default function PingPointsPage(){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
-        <Link href="/entdecken" style={{color:M,textDecoration:"none",fontSize:13}}>← Dashboard</Link>
+        <Link href="/entdecken" style={{color:M,textDecoration:"none",fontSize:13}}>← dashboard</Link>
 
         {/* Hero */}
         <div style={{textAlign:"center",margin:"24px 0 28px"}}>
-          <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:8}}>Dein Guthaben</p>
+          <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:8}}>dein guthaben</p>
           <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:10}}>
             <span style={{fontSize:64,fontWeight:900,color:PP,lineHeight:1,letterSpacing:"-0.02em"}}>{balance}</span>
             <span style={{fontSize:18,fontWeight:700,color:PP}}>PP</span>
           </div>
-          <p style={{fontSize:13,color:M,marginTop:8}}>PingPoints</p>
+          <p style={{fontSize:13,color:M,marginTop:8}}>pingpoints</p>
         </div>
 
         {/* Progress Bar */}
         {nextReward && (
           <div style={{background:C,border:`1px solid ${B}`,borderRadius:12,padding:"14px 16px",marginBottom:16}}>
             <div style={{display:"flex",justifyContent:"space-between",marginBottom:8}}>
-              <span style={{fontSize:12,color:W,fontWeight:700}}>Nächste: {nextReward.label}</span>
+              <span style={{fontSize:12,color:W,fontWeight:700}}>nächste: {nextReward.label}</span>
               <span style={{fontSize:12,color:M}}>{nextReward.threshold - balance} PP fehlen</span>
             </div>
             <div style={{height:6,background:B,borderRadius:3,overflow:"hidden"}}>
@@ -125,25 +125,25 @@ export default function PingPointsPage(){
           {(["history","earn","redeem"] as const).map(t_=>(
             <button key={t_} onClick={()=>setTab(t_)} style={{
               flex:1,padding:"9px",borderRadius:999,fontSize:12,fontWeight:700,cursor:"pointer",
-              background:tab===t_?PP:C,color:tab===t_?"#14161A":M,border:`1px solid ${tab===t_?PP:B}`
-            }}>{t_==="history"?"📜 Verlauf":t_==="earn"?"⚡ Verdienen":"🎁 Einlösen"}</button>
+              background:tab===t_?"#fff":C,color:tab===t_?"#14161A":M,border:`1px solid ${tab===t_?"#fff":B}`
+            }}>{t_==="history"?"📜 verlauf":t_==="earn"?"⚡ verdienen":"🎁 einlösen"}</button>
           ))}
         </div>
 
         {/* History */}
         {tab==="history"&&(
           loading?(
-            <div style={{textAlign:"center",padding:"40px 0",color:M}}>Lädt...</div>
+            <div style={{textAlign:"center",padding:"40px 0",color:M}}>lädt...</div>
           ):transactions.length===0?(
             <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,padding:"32px 20px",textAlign:"center"}}>
               <p style={{fontSize:28,marginBottom:12}}>⭐</p>
-              <p style={{fontSize:14,fontWeight:700,color:W,marginBottom:6}}>Noch keine Punkte</p>
-              <p style={{fontSize:12,color:M}}>Spiel dein erstes Match um PingPoints zu verdienen!</p>
+              <p style={{fontSize:14,fontWeight:700,color:W,marginBottom:6}}>noch keine punkte</p>
+              <p style={{fontSize:12,color:M}}>spiel dein erstes match um pingpoints zu verdienen!</p>
             </div>
           ):(
             <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,overflow:"hidden"}}>
               {transactions.map((t,i)=>(
-                <div key={t.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderBottom:i<transactions.length-1?`1px solid #1a1a1a`:"none"}}>
+                <div key={t.id} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderBottom:i<transactions.length-1?`1px solid ${B}`:"none"}}>
                   <div style={{width:34,height:34,borderRadius:9,background:t.amount>0?`${PP}18`:"#2d1111",display:"flex",alignItems:"center",justifyContent:"center",fontSize:16,flexShrink:0}}>
                     {sourceIcon[t.source]||"⭐"}
                   </div>
@@ -164,11 +164,11 @@ export default function PingPointsPage(){
         {tab==="earn"&&(
           <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,overflow:"hidden"}}>
             {EARN.map((e,i)=>(
-              <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderBottom:i<EARN.length-1?`1px solid #1a1a1a`:"none",opacity:e.soon?0.45:1}}>
+              <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderBottom:i<EARN.length-1?`1px solid ${B}`:"none",opacity:e.soon?0.45:1}}>
                 <span style={{fontSize:20,flexShrink:0}}>{e.icon}</span>
                 <div style={{flex:1}}>
                   <p style={{fontSize:13,fontWeight:600,color:W}}>{e.action}</p>
-                  {e.soon&&<p style={{fontSize:10,color:M}}>Bald verfügbar</p>}
+                  {e.soon&&<p style={{fontSize:10,color:M}}>bald verfügbar</p>}
                 </div>
                 <span style={{fontSize:14,fontWeight:800,color:PP}}>{e.points}</span>
               </div>
@@ -180,7 +180,7 @@ export default function PingPointsPage(){
         {tab==="redeem"&&(
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
             {loading?(
-              <div style={{textAlign:"center",padding:"40px 0",color:M}}>Lädt...</div>
+              <div style={{textAlign:"center",padding:"40px 0",color:M}}>lädt...</div>
             ):rewards.map(r=>(
               <div key={r.threshold} style={{
                 background:C,
@@ -196,10 +196,10 @@ export default function PingPointsPage(){
                   <div style={{flex:1,minWidth:0}}>
                     <p style={{fontSize:14,fontWeight:700,color:W}}>{r.label}</p>
                     <p style={{fontSize:11,color:M,marginTop:2}}>{r.description}</p>
-                    {r.claimed&&<p style={{fontSize:11,color:G,marginTop:4}}>✓ Bereits eingelöst</p>}
-                    {!r.claimed&&r.unlocked&&!claimMsg&&<p style={{fontSize:11,color:PP,marginTop:4}}>✓ Verfügbar — jetzt einlösen!</p>}
+                    {r.claimed&&<p style={{fontSize:11,color:G,marginTop:4}}>✓ bereits eingelöst</p>}
+                    {!r.claimed&&r.unlocked&&!claimMsg&&<p style={{fontSize:11,color:PP,marginTop:4}}>✓ verfügbar — jetzt einlösen!</p>}
                     {claimMsg?.threshold===r.threshold&&(
-                      <p style={{fontSize:12,color:claimMsg.msg.startsWith("✓")?G:PK,marginTop:4}}>{claimMsg.msg}</p>
+                      <p style={{fontSize:12,color:claimMsg.msg.startsWith("✓")?G:"#f87171",marginTop:4}}>{claimMsg.msg}</p>
                     )}
                   </div>
                   {!r.claimed&&r.unlocked&&(
@@ -207,13 +207,13 @@ export default function PingPointsPage(){
                       onClick={()=>claim(r.threshold)}
                       disabled={claiming===r.threshold}
                       style={{
-                        background:claiming===r.threshold?B:PP,
+                        background:claiming===r.threshold?B:"#fff",
                         color:claiming===r.threshold?M:"#14161A",
                         border:"none",borderRadius:8,padding:"9px 14px",
                         fontSize:12,fontWeight:800,cursor:"pointer",flexShrink:0,
                         whiteSpace:"nowrap"
                       }}>
-                      {claiming===r.threshold?"...":"Einlösen"}
+                      {claiming===r.threshold?"...":"einlösen"}
                     </button>
                   )}
                   {!r.unlocked&&(
@@ -226,7 +226,7 @@ export default function PingPointsPage(){
               </div>
             ))}
             <p style={{fontSize:11,color:M,textAlign:"center",marginTop:8}}>
-              Nach Einlösung meldet sich das Team per E-Mail.
+              nach einlösung meldet sich das team per e-mail.
             </p>
           </div>
         )}

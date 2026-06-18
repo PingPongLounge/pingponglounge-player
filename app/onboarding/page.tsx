@@ -4,19 +4,18 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 
 const G = "#39FF14"
-const DARK = "#0A0A0C"
-const SURFACE = "#111214"
-const CARD = "#15161A"
-const BORDER = "#26282E"
-const TEXT = "#E8E6E1"
-const MUTED = "#6B6E7A"
-const PK = "#FF00C8"
+const DARK = "#14161A"
+const SURFACE = "#14161A"
+const CARD = "#1B1E25"
+const BORDER = "#1E2230"
+const TEXT = "#FFFFFF"
+const MUTED = "rgba(255,255,255,0.66)"
 
 const LEVELS = [
   { name: "Rookie",     color: "#4ADE80", desc: "Einsteiger, spiele zum Spass",       elo: 1000 },
   { name: "Challenger", color: "#FACC15", desc: "Regelmässiger Freizeitspieler",       elo: 1100 },
   { name: "Advanced",   color: "#FB923C", desc: "Vereinserfahrung & Taktik",           elo: 1300 },
-  { name: "Elite",      color: PK,        desc: "Turnierspieler & Wettkampf",          elo: 1500 },
+  { name: "Elite",      color: "#1FD1C4", desc: "Turnierspieler & Wettkampf",          elo: 1500 },
 ]
 
 const CANTON_MAP: Record<string, string> = {
@@ -78,8 +77,8 @@ function levelForElo(elo: number) {
 type PendingResult = { elo: number; won?: boolean; sets?: unknown; ort?: string; ts?: number }
 
 const inp: React.CSSProperties = { width: "100%", background: SURFACE, border: "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "15px", color: TEXT, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
-const primaryBtn = (disabled = false): React.CSSProperties => ({ width: "100%", background: disabled ? BORDER : G, color: disabled ? MUTED : DARK, border: "none", borderRadius: "10px", padding: "14px", fontSize: "14px", fontWeight: 800, cursor: disabled ? "not-allowed" : "pointer", textTransform: "uppercase", letterSpacing: "0.08em", marginTop: "10px", fontFamily: "inherit" })
-const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", background: sel ? "rgba(57,255,20,0.08)" : CARD, border: sel ? "1px solid " + G : "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: sel ? G : TEXT, cursor: "pointer", textAlign: "left", marginBottom: "8px", fontWeight: sel ? 700 : 400, fontFamily: "inherit", display: "block" })
+const primaryBtn = (disabled = false): React.CSSProperties => ({ width: "100%", background: disabled ? BORDER : "#fff", color: disabled ? MUTED : "#14161A", border: "none", borderRadius: "10px", padding: "14px", fontSize: "14px", fontWeight: 800, cursor: disabled ? "not-allowed" : "pointer", textTransform: "lowercase", letterSpacing: "0.02em", marginTop: "10px", fontFamily: "inherit" })
+const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", background: sel ? "#fff" : CARD, border: sel ? "1px solid #fff" : "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: sel ? "#14161A" : TEXT, cursor: "pointer", textAlign: "left", marginBottom: "8px", fontWeight: sel ? 700 : 400, fontFamily: "inherit", display: "block" })
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -158,7 +157,7 @@ export default function OnboardingPage() {
   const Header = ({ step: s, total }: { step: number; total: number }) => (
     <div style={{ marginBottom: "32px" }}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-        <span style={{ fontSize: "11px", fontWeight: 700, color: G, letterSpacing: "0.14em", textTransform: "uppercase" }}>Schritt {s} / {total}</span>
+        <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>schritt {s} / {total}</span>
         <span style={{ fontSize: "11px", color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em" }}>PLAYER</span>
       </div>
       <div style={{ background: BORDER, borderRadius: "4px", height: "3px" }}>
@@ -172,19 +171,19 @@ export default function OnboardingPage() {
       <Header step={1} total={pending ? 2 : 3} />
       {pending && (
         <div style={{ background: "rgba(57,255,20,0.08)", border: "1px solid " + G + "55", borderRadius: "10px", padding: "12px 14px", marginBottom: "20px" }}>
-          <p style={{ fontSize: "13px", color: G, fontWeight: 700, lineHeight: 1.4 }}>Dein Resultat ist gespeichert — sichere jetzt deinen Rang.</p>
+          <p style={{ fontSize: "13px", color: G, fontWeight: 700, lineHeight: 1.4 }}>dein resultat ist gespeichert — sichere jetzt deinen rang.</p>
         </div>
       )}
-      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", marginBottom: "6px" }}>Dein Profil</h2>
-      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{pending ? "Nur noch Name + Kanton — dann ist dein Rang fix." : "Kurz einrichten — dann geht es los."}</p>
+      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "lowercase", marginBottom: "6px" }}>dein profil</h2>
+      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{pending ? "nur noch name + kanton — dann ist dein rang fix." : "kurz einrichten — dann geht es los."}</p>
       <input style={inp} placeholder="Dein Name oder Spitzname" value={name} onChange={e => setName(e.target.value)} />
       <button type="button" onClick={genNicknames} style={{ background: "none", border: "1px solid " + BORDER, borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: MUTED, cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em", fontFamily: "inherit" }}>
-        {loadingNicks ? "..." : "Vorschläge generieren"}
+        {loadingNicks ? "..." : "vorschläge generieren"}
       </button>
       {nicks.length > 0 && (
         <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
           {nicks.map(n => (
-            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? "rgba(57,255,20,0.1)" : CARD, border: name === n ? "1px solid " + G : "1px solid " + BORDER, borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: name === n ? G : TEXT, cursor: "pointer", fontWeight: name === n ? 700 : 400, fontFamily: "inherit" }}>
+            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? "#fff" : CARD, border: name === n ? "1px solid #fff" : "1px solid " + BORDER, borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: name === n ? "#14161A" : TEXT, cursor: "pointer", fontWeight: name === n ? 700 : 400, fontFamily: "inherit" }}>
               {n}
             </button>
           ))}
@@ -194,28 +193,28 @@ export default function OnboardingPage() {
         <option value="">Kanton wählen...</option>
         {CANTONS.map(c => <option key={c} value={c}>{c}</option>)}
       </select>
-      <button style={primaryBtn(!name.trim() || !canton)} disabled={!name.trim() || !canton} onClick={() => setStep(pending ? 3 : 1)}>Weiter</button>
+      <button style={primaryBtn(!name.trim() || !canton)} disabled={!name.trim() || !canton} onClick={() => setStep(pending ? 3 : 1)}>weiter</button>
     </div></div>
   )
 
   if (step === 1) return (
     <div style={wrap}><div style={box}>
       <Header step={2} total={3} />
-      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", marginBottom: "6px" }}>Dein Level</h2>
-      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>Kennst du dein Spielniveau?</p>
-      <button style={optBtn(mode === "know")} onClick={() => setMode("know")}>Ja, ich kenne mein Level</button>
-      <button style={optBtn(mode === "quiz")} onClick={() => setMode("quiz")}>Nein — hilf mir es herausfinden</button>
+      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "lowercase", marginBottom: "6px" }}>dein level</h2>
+      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>kennst du dein spielniveau?</p>
+      <button style={optBtn(mode === "know")} onClick={() => setMode("know")}>ja, ich kenne mein level</button>
+      <button style={optBtn(mode === "quiz")} onClick={() => setMode("quiz")}>nein — hilf mir es herausfinden</button>
       {mode === "know" && (
         <div style={{ marginTop: "16px" }}>
           {LEVELS.map(l => (
             <button key={l.name} style={optBtn(manualLevel === l.name)} onClick={() => setManualLevel(l.name)}>
-              <span style={{ color: l.color, fontWeight: 800 }}>{l.name}</span>
-              <span style={{ fontSize: "12px", color: MUTED, marginLeft: "8px" }}>{l.desc}</span>
+              <span style={{ color: manualLevel === l.name ? "#14161A" : l.color, fontWeight: 800 }}>{l.name}</span>
+              <span style={{ fontSize: "12px", color: manualLevel === l.name ? "rgba(20,22,26,0.7)" : MUTED, marginLeft: "8px" }}>{l.desc}</span>
             </button>
           ))}
         </div>
       )}
-      <button style={primaryBtn(!mode || (mode === "know" && !manualLevel))} disabled={!mode || (mode === "know" && !manualLevel)} onClick={() => mode === "quiz" ? setStep(2) : setStep(3)}>Weiter</button>
+      <button style={primaryBtn(!mode || (mode === "know" && !manualLevel))} disabled={!mode || (mode === "know" && !manualLevel)} onClick={() => mode === "quiz" ? setStep(2) : setStep(3)}>weiter</button>
     </div></div>
   )
 
@@ -225,7 +224,7 @@ export default function OnboardingPage() {
       <div style={wrap}><div style={box}>
         <div style={{ marginBottom: "28px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
-            <span style={{ fontSize: "11px", fontWeight: 700, color: G, letterSpacing: "0.14em", textTransform: "uppercase" }}>Frage {quizIdx + 1} / {QUIZ.length}</span>
+            <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>frage {quizIdx + 1} / {QUIZ.length}</span>
           </div>
           <div style={{ background: BORDER, borderRadius: "4px", height: "3px" }}>
             <div style={{ background: G, height: "3px", borderRadius: "4px", width: `${((quizIdx) / QUIZ.length) * 100}%`, transition: "width 0.3s" }} />
@@ -242,21 +241,21 @@ export default function OnboardingPage() {
   if (step === 3 && chosenLevel) return (
     <div style={wrap}><div style={box}>
       <Header step={pending ? 2 : 3} total={pending ? 2 : 3} />
-      <p style={{ fontSize: "11px", fontWeight: 700, color: chosenLevel.color, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>{pending ? "Dein Start-Rang" : mode === "quiz" ? "Dein Ergebnis" : "Bestätigung"}</p>
+      <p style={{ fontSize: "11px", fontWeight: 700, color: chosenLevel.color, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>{pending ? "dein start-rang" : mode === "quiz" ? "dein ergebnis" : "bestätigung"}</p>
       <h2 style={{ fontSize: "40px", fontWeight: 900, color: chosenLevel.color, textTransform: "uppercase", marginBottom: "4px", letterSpacing: "-0.02em" }}>{chosenLevel.name}</h2>
       <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{chosenLevel.desc}</p>
       <div style={{ background: CARD, border: "1px solid " + BORDER, borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
-        {[{ label: "Name", value: name }, { label: "Kanton", value: canton }, { label: "Level", value: chosenLevel.name }, { label: "Start-ELO", value: String(chosenLevel.elo) }].map(row => (
+        {[{ label: "name", value: name }, { label: "kanton", value: canton }, { label: "level", value: chosenLevel.name }, { label: "start-elo", value: String(chosenLevel.elo) }].map(row => (
           <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid " + BORDER }}>
             <span style={{ fontSize: "13px", color: MUTED }}>{row.label}</span>
             <span style={{ fontSize: "13px", color: TEXT, fontWeight: 700 }}>{row.value}</span>
           </div>
         ))}
       </div>
-      <p style={{ fontSize: "12px", color: MUTED, marginBottom: "16px", lineHeight: 1.6 }}>Dein Level passt sich automatisch an je mehr du spielst — ELO startet bei {chosenLevel.elo}.</p>
+      <p style={{ fontSize: "12px", color: MUTED, marginBottom: "16px", lineHeight: 1.6 }}>dein level passt sich automatisch an je mehr du spielst — elo startet bei {chosenLevel.elo}.</p>
       {saveError && <p style={{ fontSize: "13px", color: "#f87171", marginBottom: "10px" }}>{saveError}</p>}
       <button style={primaryBtn(saving)} disabled={saving} onClick={handleSave}>
-        {saving ? "Wird gespeichert..." : "Profil erstellen →"}
+        {saving ? "wird gespeichert..." : "profil erstellen →"}
       </button>
     </div></div>
   )

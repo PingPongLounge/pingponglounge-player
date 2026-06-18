@@ -4,7 +4,8 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#111214", C="#15161A", B="#26282E", M="#6B6E7A", G="#39FF14", W="#E8E6E1", PK="#FF00C8"
+const BG="#14161A", C="#1B1E25", B="#1E2230", M="rgba(255,255,255,0.66)", G="#39FF14", W="#FFFFFF", PK="#FF00C8"
+const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 
 const levelColor = (l: string): string =>
   ({ Rookie: "#4ADE80", Challenger: "#FACC15", Advanced: "#FB923C", Elite: PK }[l] || G)
@@ -104,27 +105,27 @@ export default function FeedPage() {
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
 
         {/* Header */}
-        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
+        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← dashboard</Link>
         <div style={{ margin: "20px 0 24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: G, letterSpacing: "0.16em", textTransform: "uppercase" }}>Live</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: G, letterSpacing: "0.16em", textTransform: "uppercase" }}>live</span>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: G, boxShadow: `0 0 6px ${G}`, display: "inline-block" }} />
           </div>
-          <h1 style={{ fontSize: 32, fontWeight: 900, color: W, textTransform: "uppercase", lineHeight: 1 }}>FEED</h1>
-          <p style={{ fontSize: 13, color: M, marginTop: 6 }}>Alle Matches · alle Ligen · alle Städte</p>
+          <h1 style={{ fontSize: 32, fontWeight: 900, fontFamily: "'League Spartan', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: ".1em", lineHeight: 1, background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>feed</h1>
+          <p style={{ fontSize: 13, color: M, marginTop: 6 }}>alle matches · alle ligen · alle städte</p>
         </div>
 
         {/* Content */}
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px 0", color: M }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>🏓</div>
-            <p style={{ fontSize: 14 }}>Lädt...</p>
+            <p style={{ fontSize: 14 }}>lädt...</p>
           </div>
         ) : matches.length === 0 ? (
           <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, padding: "40px 20px", textAlign: "center" }}>
             <p style={{ fontSize: 32, marginBottom: 12 }}>🏓</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>Noch keine Matches</p>
-            <p style={{ fontSize: 13, color: M }}>Sobald ein Match bestätigt wird, erscheint es hier.</p>
+            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>noch keine matches</p>
+            <p style={{ fontSize: 13, color: M }}>sobald ein match bestätigt wird, erscheint es hier.</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
