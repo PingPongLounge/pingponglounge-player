@@ -79,14 +79,9 @@ function AcademyCard() {
       <div style={secHead}><span style={hStyle}>academy</span><a href={EVERSPORTS_TRAINING} target="_blank" rel="noopener noreferrer" style={aStyle}>alle ansehen</a></div>
       <div style={subT}>from beginner to pro</div>
       <div style={wrap}><div style={{ ...card, padding:16 }}>
-        <div style={dateS}>do · wöchentlich</div>
+        <div style={dateS}>wöchentliches training</div>
         <div style={ttl}>LEVEL UP</div>
-        <div style={grid}>
-          <Cell icon={cellIcon(<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></>)} k="datum" v="donnerstag" />
-          <Cell icon={cellIcon(<><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>)} k="zeit" v="19:00–20:30" />
-          <Cell icon={cellIcon(<path d="M5 20V10M12 20V4M19 20v-7"/>)} k="levels" v="rookie–advanced" />
-          <Cell icon={cellIcon(<><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 5 0c0 2.5-2.5 2-2.5 4M12 17.5h.01"/></>)} k="kosten" v="chf 35" />
-        </div>
+        <div style={{ fontSize:12.5, color:SUB, fontWeight:300, lineHeight:1.45, margin:'10px 0 2px' }}>von beginner bis pro — ping pong lounge glattbrugg. termine &amp; preise live auf eversports.</div>
         <div style={arow}><div style={ev}>📍 ping pong lounge glattbrugg</div><a href={EVERSPORTS_TRAINING} target="_blank" rel="noopener noreferrer" style={moreS}>more</a></div>
       </div></div>
     </>
@@ -124,7 +119,7 @@ export default async function EntdeckenPage() {
   // ---------- DATEN ----------
   const { data: profile } = await sb.from('profiles').select('id,name,level,elo,matches_played,matches_won').eq('id', user.id).maybeSingle()
   const elo = profile?.elo ?? 1000
-  const { count: higher } = await sb.from('public_profiles').select('*', { count:'exact', head:true }).gt('elo', elo)
+  const { count: higher } = await sb.from('public_profiles').select('*', { count:'exact', head:true }).gt('elo', elo).gt('matches_played', 0)
   const rank = (higher ?? 0) + 1
   const NEXT = [{ n:'challenger', e:1100 }, { n:'advanced', e:1300 }, { n:'elite', e:1500 }].find(t => t.e > elo)
   const rankSub = NEXT ? `${(profile?.level||'rookie').toLowerCase()} · elo ${elo} · noch ${NEXT.e-elo} bis ${NEXT.n} ▲` : `${(profile?.level||'elite').toLowerCase()} · elo ${elo}`

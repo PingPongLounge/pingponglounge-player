@@ -31,16 +31,18 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const p2wins = parsed.filter(s => s.p2 > s.p1).length
     if (p1wins === p2wins) return NextResponse.json({ error: "Unentschieden ist nicht möglich" }, { status: 400 })
     const winner_id = p1wins > p2wins ? match.p1_id : match.p2_id
-    await admin.from("tournament_matches").update({ sets: parsed, winner_id, status: "p1_entered" }).eq("id", match_id)
+    await admin.from("tournament_matches").update({ sets: parsed, winner_id, status: "p1_entered", entered_by: user.id }).eq("id", match_id)
   }
 
   if (action === "confirm") {
     const { data: m } = await admin
       .from("tournament_matches")
-      .select("winner_id,sets,round,match_number,tournament_id,status,p1_id,p2_id")
+      .select("winner_id,sets,round,match_number,tournament_id,status,p1_id,p2_id,entered_by")
       .eq("id", match_id)
       .single()
     if (!m || m.status !== "p1_entered") return NextResponse.json({ error: "Nichts zu bestätigen" }, { status: 400 })
+    // Nur der Gegner darf bestätigen, nicht wer eingetragen hat
+    if (m.entered_by === user.id) return NextResponse.json({ error: "Du kannst dein eigenes Ergebnis nicht bestätigen — das muss dein Gegner tun" }, { status: 403 })
     await admin.from("tournament_matches").update({ status: "confirmed" }).eq("id", match_id)
 
     // Gewinner in nächste Runde setzen

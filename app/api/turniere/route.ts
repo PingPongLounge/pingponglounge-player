@@ -30,6 +30,14 @@ export async function POST(req: NextRequest) {
   const entry_fee_chf = Math.max(0, Math.min(999, Number(body.entry_fee_chf) || 0))
   const counts_for_rank = body.counts_for_rank !== false
 
+  // Spam-Schutz: max. 2 aktive selbst erstellte Turniere pro Person
+  const { count: mine } = await sb
+    .from("player_tournaments")
+    .select("*", { count: "exact", head: true })
+    .eq("created_by", user.id)
+    .in("status", ["open", "running"])
+  if ((mine ?? 0) >= 2) return NextResponse.json({ error: "Du hast bereits 2 aktive Turniere — beende oder lösche zuerst eines." }, { status: 409 })
+
   const { data, error } = await sb
     .from("player_tournaments")
     .insert({ name, city, date, skill_class, format, max_players, entry_fee_chf, counts_for_rank, created_by: user.id, status: "open" })
