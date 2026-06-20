@@ -8,18 +8,18 @@ export async function GET(req: NextRequest) {
 
   const { data: msgs } = await sb
     .from("league_messages")
-    .select("id,user_id,text,created_at")
+    .select("id,user_id,text,created_at,kind")
     .eq("season_id", seasonId)
     .order("created_at", { ascending: true })
     .limit(200)
 
-  const ids = [...new Set((msgs || []).map(m => m.user_id))]
+  const ids = [...new Set((msgs || []).map(m => m.user_id).filter(Boolean) as string[])]
   const names: Record<string, string> = {}
   if (ids.length > 0) {
     const { data: profs } = await sb.from("public_profiles").select("id,name").in("id", ids)
     ;(profs || []).forEach(p => { names[p.id] = p.name })
   }
-  const messages = (msgs || []).map(m => ({ ...m, name: names[m.user_id] || "Spieler" }))
+  const messages = (msgs || []).map(m => ({ ...m, name: m.user_id ? (names[m.user_id] || "Spieler") : "" }))
   return NextResponse.json({ messages })
 }
 

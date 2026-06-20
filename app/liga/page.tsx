@@ -7,7 +7,7 @@ import BottomNav from "@/app/components/BottomNav"
 const BG="#0E1013",C="#171A1F",B="#232833",M="rgba(255,255,255,0.85)",W="#FFFFFF"
 const GRAD="linear-gradient(135deg,#39FF14,#00E5FF)"
 const gt:React.CSSProperties={background:GRAD,WebkitBackgroundClip:"text",backgroundClip:"text",WebkitTextFillColor:"transparent"}
-const lvColor=(l:string):string=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:"#FF00C8"}[l]||"#39FF14")
+const lvColor=(l:string):string=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:"#00E5FF"}[l]||"#39FF14")
 
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number}
 type Row={user_id:string,name:string,elo:number,level:string}
@@ -26,7 +26,7 @@ export default function LigaPage(){
   const [showCity,setShowCity]=useState(false)
   // chat
   const [chatOpen,setChatOpen]=useState(false)
-  const [msgs,setMsgs]=useState<{id:string,user_id:string,name:string,text:string}[]>([])
+  const [msgs,setMsgs]=useState<{id:string,user_id:string|null,name:string,text:string,kind?:string}[]>([])
   const [msg,setMsg]=useState("")
   const meRef=useRef<HTMLDivElement|null>(null)
 
@@ -151,8 +151,9 @@ export default function LigaPage(){
           <div style={{display:"flex",gap:8,padding:"12px 14px 6px"}}>
             {citySeasons.map(s=>{
               const on=s.id===seasonId
+              const tabStyle:React.CSSProperties=on?{flex:1,borderRadius:12,padding:"10px 8px",textAlign:"center",cursor:"pointer",border:"1.5px solid transparent",background:"linear-gradient(#101319,#101319) padding-box, linear-gradient(135deg,#39FF14,#00E5FF) border-box"}:{flex:1,borderRadius:12,padding:"10px 8px",textAlign:"center",cursor:"pointer",border:`1px solid ${B}`,background:"#14171C"}
               return(
-                <button key={s.id} onClick={()=>setSeasonId(s.id)} style={{flex:1,borderRadius:12,border:`1px solid ${on?"#39FF14":B}`,background:on?"rgba(57,255,20,.08)":"#14171C",padding:"10px 8px",textAlign:"center",cursor:"pointer"}}>
+                <button key={s.id} onClick={()=>setSeasonId(s.id)} style={tabStyle}>
                   <div style={{fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:".03em",color:W}}>{isPro(s)?"pro":"einstieg"}</div>
                   <div style={{fontSize:9.5,color:"rgba(255,255,255,.6)",marginTop:2}}>{s.skill_class.replace("+"," · ").toLowerCase()}</div>
                   <div style={{fontSize:9,fontWeight:600,marginTop:4,color:isPro(s)?"#FF8A8A":"#39FF14"}}>{isPro(s)?`${count}/${s.max_players}`:"offen"}</div>
@@ -177,7 +178,7 @@ export default function LigaPage(){
                       <div style={{flex:1,minWidth:0}}>
                         <span style={{fontSize:14,fontWeight:500,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:"1px solid rgba(255,255,255,.3)",borderRadius:999,padding:"1px 5px",marginLeft:6,color:"rgba(255,255,255,.8)"}}>du</span>}</span>
                       </div>
-                      {r.level&&<span style={{fontSize:8.5,fontWeight:700,borderRadius:999,padding:"1px 7px",textTransform:"uppercase",color:lvColor(r.level),border:`1px solid ${lvColor(r.level)}55`}}>{r.level.slice(0,4)}</span>}
+                      {r.level&&<span style={{fontSize:9,fontWeight:700,borderRadius:999,padding:"2px 9px",textTransform:"uppercase",letterSpacing:".03em",color:lvColor(r.level),background:`${lvColor(r.level)}14`,border:`1px solid ${lvColor(r.level)}55`}}>{r.level}</span>}
                       <span style={{fontSize:14,fontWeight:700,...gt}}>{r.elo}</span>
                       {!me&&myReg&&(
                         <button onClick={()=>challenge(r.user_id)} title="herausfordern" style={{background:"transparent",border:`1px solid ${B}`,borderRadius:8,padding:"5px 8px",fontSize:13,cursor:"pointer"}}>⚔️</button>
@@ -200,14 +201,17 @@ export default function LigaPage(){
 
       {/* Chat */}
       {chatOpen&&(
-        <div onClick={()=>setChatOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:50,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
-          <div onClick={e=>e.stopPropagation()} style={{background:BG,borderTop:`1px solid ${B}`,borderRadius:"22px 22px 0 0",height:"72%",display:"flex",flexDirection:"column",maxWidth:480,margin:"0 auto",width:"100%"}}>
+        <div onClick={()=>setChatOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.4)",zIndex:50,display:"flex",justifyContent:"flex-end"}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:BG,borderLeft:`1px solid ${B}`,height:"100%",width:"83%",maxWidth:380,display:"flex",flexDirection:"column",boxShadow:"-22px 0 50px rgba(0,0,0,.55)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"15px 16px",borderBottom:`1px solid ${B}`}}>
               <span style={{fontSize:15,fontWeight:600}}>liga-chat · {sel?isPro(sel)?"pro":"einstieg":""}</span>
               <button onClick={()=>setChatOpen(false)} style={{background:"none",border:"none",color:M,fontSize:18,cursor:"pointer"}}>✕</button>
             </div>
             <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:10}}>
               {msgs.length===0?<p style={{textAlign:"center",color:M,fontSize:13,marginTop:20}}>noch keine nachrichten — schreib die erste 👋</p>:msgs.map(m=>{
+                if(m.kind==="feed") return(
+                  <div key={m.id} style={{alignSelf:"center",fontSize:11,color:"rgba(255,255,255,.65)",background:"#15181D",border:`1px solid ${B}`,borderRadius:999,padding:"5px 12px",textAlign:"center"}}>{m.text}</div>
+                )
                 const mine=m.user_id===userId
                 return(
                   <div key={m.id} style={{maxWidth:"80%",alignSelf:mine?"flex-end":"flex-start"}}>
