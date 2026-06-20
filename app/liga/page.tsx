@@ -1,260 +1,235 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#FF00C8"
-const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
+const BG="#0E1013",C="#171A1F",B="#232833",M="rgba(255,255,255,0.85)",W="#FFFFFF"
+const GRAD="linear-gradient(135deg,#39FF14,#00E5FF)"
+const gt:React.CSSProperties={background:GRAD,WebkitBackgroundClip:"text",backgroundClip:"text",WebkitTextFillColor:"transparent"}
+const lvColor=(l:string):string=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:"#FF00C8"}[l]||"#39FF14")
 
-const levelColor=(l:string):string=>({
-  Rookie:"#4ADE80",
-  Challenger:"#FACC15",
-  Advanced:"#FB923C",
-  Elite:PK
-}[l]||G)
-
-const LEVEL_DESC:{[k:string]:string}={
-  Rookie:    "Für Einsteiger. Keine Turniererfahrung nötig — einfach spielen und dazulernen.",
-  Challenger:"Für regelmässige Spieler mit Grundtechniken. Du kannst Rallys spielen und kennst die Regeln.",
-  Advanced:  "Für erfahrene Spieler mit Taktik und Konstanz. Vereins- oder Turniererfahrung von Vorteil.",
-  Elite:     "Für ambitionierte Wettkämpfer. Die härteste Liga — ELO zählt, jedes Match.",
-}
-
-const LEVELS=["Rookie","Challenger","Advanced","Elite"] as const
-const CITIES=["Zürich","Basel","Luzern","St. Gallen"]
-
-type Season={
-  id:string,name:string,city:string,skill_class:string,
-  status:string,max_players:number,start_date:string,
-  description:string,_count?:number
-}
+type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number}
+type Row={user_id:string,name:string,elo:number,level:string}
 
 export default function LigaPage(){
+  const [userId,setUserId]=useState<string|null>(null)
   const [seasons,setSeasons]=useState<Season[]>([])
+  const [city,setCity]=useState<string>("")
+  const [seasonId,setSeasonId]=useState<string>("")
+  const [rows,setRows]=useState<Row[]>([])
+  const [count,setCount]=useState(0)
+  const [myReg,setMyReg]=useState(false)
   const [loading,setLoading]=useState(true)
-  const [filter,setFilter]=useState<string>("Alle")
-  const [showLigaForm,setShowLigaForm]=useState(false)
-  const [ligaForm,setLigaForm]=useState({name:"",email:"",firma:"",standort:"",liga_art:"Rookie",start_datum:"",end_datum:""})
-  const [ligaSending,setLigaSending]=useState(false)
-  const [ligaMsg,setLigaMsg]=useState("")
+  const [busy,setBusy]=useState(false)
+  const [toast,setToast]=useState("")
+  const [showCity,setShowCity]=useState(false)
+  // chat
+  const [chatOpen,setChatOpen]=useState(false)
+  const [msgs,setMsgs]=useState<{id:string,user_id:string,name:string,text:string}[]>([])
+  const [msg,setMsg]=useState("")
+  const meRef=useRef<HTMLDivElement|null>(null)
 
-  useEffect(()=>{
-    async function load(){
-      const sb=createClient()
-      const {data}=await sb
-        .from("league_seasons")
-        .select("*,league_registrations(count)")
-        .in("status",["open","running"])
-        .order("start_date",{ascending:true})
-      const mapped=(data||[]).map((s:Season&{league_registrations?:{count:number}[]})=>({
-        ...s,_count:s.league_registrations?.[0]?.count||0
-      }))
-      setSeasons(mapped)
-      setLoading(false)
+  const flash=(t:string)=>{setToast(t);setTimeout(()=>setToast(""),2500)}
+
+  // Saisons laden
+  useEffect(()=>{(async()=>{
+    const sb=createClient()
+    const {data:{user}}=await sb.auth.getUser()
+    setUserId(user?.id||null)
+    const {data}=await sb.from("league_seasons").select("id,name,city,skill_class,status,max_players").in("status",["open","running"]).order("city").order("skill_class")
+    const ss=(data||[]) as Season[]
+    setSeasons(ss)
+    // Default-Stadt: wo der User angemeldet ist, sonst erste
+    let defCity=ss[0]?.city||""
+    let defSeason=ss[0]?.id||""
+    if(user){
+      const {data:myRegs}=await sb.from("league_registrations").select("season_id").eq("player_id",user.id)
+      const mySeason=ss.find(s=>(myRegs||[]).some(r=>r.season_id===s.id))
+      if(mySeason){defCity=mySeason.city;defSeason=mySeason.id}
     }
-    load()
+    setCity(defCity); setSeasonId(defSeason); setLoading(false)
+  })()},[])
+
+  const loadStandings=useCallback(async(sid:string)=>{
+    if(!sid) return
+    const sb=createClient()
+    const {data:regs}=await sb.from("league_registrations").select("player_id").eq("season_id",sid)
+    const ids=(regs||[]).map(r=>r.player_id)
+    setCount(ids.length)
+    setMyReg(!!userId&&ids.includes(userId))
+    if(ids.length===0){setRows([]);return}
+    const {data:profs}=await sb.from("public_profiles").select("id,name,elo,level").in("id",ids)
+    const list=(profs||[]).map(p=>({user_id:p.id,name:p.name,elo:p.elo??1000,level:p.level||""})).sort((a,b)=>b.elo-a.elo)
+    setRows(list)
+  },[userId])
+
+  useEffect(()=>{ if(seasonId) loadStandings(seasonId) },[seasonId,loadStandings])
+  // zu meinem Rang scrollen
+  useEffect(()=>{ if(rows.length&&meRef.current){ meRef.current.scrollIntoView({block:"center",behavior:"smooth"}) } },[rows])
+
+  // Chat laden + Poll
+  const loadChat=useCallback(async(sid:string)=>{
+    const r=await fetch(`/api/liga/chat?season_id=${sid}`); if(r.ok){const j=await r.json();setMsgs(j.messages||[])}
   },[])
+  useEffect(()=>{
+    if(!chatOpen||!seasonId) return
+    loadChat(seasonId)
+    const t=setInterval(()=>loadChat(seasonId),5000)
+    return ()=>clearInterval(t)
+  },[chatOpen,seasonId,loadChat])
 
-  const filtered=filter==="Alle"
-    ? seasons
-    : seasons.filter(s=>s.skill_class===filter)
-
-  const byCity=(city:string)=>filtered.filter(s=>s.city===city)
-
-
-  async function submitLigaRequest(){
-    if(!ligaForm.name||!ligaForm.email||!ligaForm.firma){setLigaMsg("Name, Email und Firma sind Pflicht");return}
-    setLigaSending(true);setLigaMsg("")
-    const res=await fetch("/api/liga/request",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(ligaForm)})
-    if(res.ok){setLigaMsg("✓ Anfrage gesendet — wir melden uns!");setLigaForm({name:"",email:"",firma:"",standort:"",liga_art:"Rookie",start_datum:"",end_datum:""})}
-    else{const d=await res.json();setLigaMsg(d.error||"Fehler")}
-    setLigaSending(false)
+  async function join(){
+    setBusy(true)
+    const r=await fetch("/api/liga/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId})})
+    const j=await r.json().catch(()=>({}))
+    if(r.ok){flash("✓ du bist dabei!");loadStandings(seasonId)} else flash(j.error||"Fehler")
+    setBusy(false)
+  }
+  async function challenge(pid:string){
+    const r=await fetch("/api/liga/challenge",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,challenged_id:pid})})
+    const j=await r.json().catch(()=>({}))
+    flash(r.ok?"⚔️ herausforderung gesendet!":(j.error||"Fehler"))
+  }
+  async function send(){
+    const t=msg.trim(); if(!t) return
+    setMsg("")
+    await fetch("/api/liga/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,text:t})})
+    loadChat(seasonId)
   }
 
-  return(
-    <main style={{minHeight:"100vh",background:BG,padding:"20px 20px 80px"}}>
-      <div style={{maxWidth:560,margin:"0 auto"}}>
-        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← dashboard</Link>
+  const cities=[...new Set(seasons.map(s=>s.city))]
+  const citySeasons=seasons.filter(s=>s.city===city)
+  const sel=seasons.find(s=>s.id===seasonId)
+  const isPro=(s:Season)=>/advanced|elite|pro/i.test(s.skill_class)
+  const medal=(i:number)=>i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}`
 
-        {/* Header */}
-        <div style={{textAlign:"center",margin:"28px 0 24px"}}>
-          <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:8}}>player liga</p>
-          <h1 style={{fontSize:42,fontWeight:900,fontFamily:"'League Spartan', system-ui, sans-serif",textTransform:"uppercase",letterSpacing:".1em",lineHeight:.95,marginBottom:8,background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>liga</h1>
-          <p style={{fontSize:14,color:M}}>stadtweise saisons · live-tabelle · open match</p>
+  return (
+    <main style={{minHeight:"100vh",background:BG,paddingBottom:90}}>
+      {/* Topbar */}
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",borderBottom:`1px solid ${B}`,background:"#0B0D10",position:"sticky",top:0,zIndex:10}}>
+        <Link href="/entdecken" style={{display:"flex",alignItems:"center",gap:8,textDecoration:"none"}}>
+          <svg width="22" height="22" viewBox="0 0 80 80" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#00E5FF"/></linearGradient></defs><path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="3.4" strokeLinejoin="round"/><circle cx="63" cy="58" r="6.5" fill="url(#lg)"/></svg>
+          <span style={{fontSize:13,fontWeight:800,letterSpacing:".20em",...gt}}>PLAYER <span style={{fontWeight:300,color:"rgba(255,255,255,.85)"}}>LIGA</span></span>
+        </Link>
+        <div style={{display:"flex",alignItems:"center",gap:10}}>
+          <button onClick={()=>setShowCity(v=>!v)} style={{background:"none",border:"none",color:M,fontSize:12,cursor:"pointer"}}>📍 {city||"stadt"} ▾</button>
+          <button onClick={()=>setChatOpen(true)} aria-label="chat" style={{width:36,height:36,borderRadius:10,background:C,border:`1px solid ${B}`,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#39FF14" strokeWidth="1.8"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
+          </button>
         </div>
-
-        {/* Level-Filter */}
-        <div style={{display:"flex",gap:6,marginBottom:24,flexWrap:"wrap"}}>
-          {["Alle",...LEVELS].map(l=>{
-            const active=filter===l
-            return(
-              <button
-                key={l}
-                onClick={()=>setFilter(l)}
-                style={{
-                  background:active?"#fff":"none",
-                  border:`1px solid ${active?"#fff":B}`,
-                  borderRadius:999,
-                  padding:"7px 14px",
-                  fontSize:12,
-                  fontWeight:700,
-                  color:active?"#14161A":M,
-                  cursor:"pointer",
-                  transition:"all 0.15s",
-                  letterSpacing:"0.04em",
-                  textTransform:"lowercase",
-                }}
-              >
-                {l}
-              </button>
-            )
-          })}
-        </div>
-
-        {/* Level-Beschreibung (wenn Filter aktiv) */}
-        {filter!=="Alle"&&LEVEL_DESC[filter]&&(
-          <div style={{
-            background:C,
-            border:`1px solid ${levelColor(filter)}30`,
-            borderRadius:12,
-            padding:"12px 16px",
-            marginBottom:20,
-          }}>
-            <span style={{fontSize:11,fontWeight:700,color:levelColor(filter),marginRight:8,textTransform:"uppercase"}}>{filter}</span>
-            <span style={{fontSize:13,color:M}}>{LEVEL_DESC[filter]}</span>
-          </div>
-        )}
-
-        {loading
-          ?<p style={{textAlign:"center",color:M}}>lädt...</p>
-          :filtered.length===0?(
-            <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,padding:"32px 20px",textAlign:"center"}}>
-              <p style={{fontSize:32,marginBottom:12}}>🏓</p>
-              <p style={{fontSize:16,fontWeight:700,color:W,marginBottom:8}}>
-                {filter==="Alle"?"bald startet die erste saison":`keine ${filter}-saison aktiv`}
-              </p>
-              <p style={{fontSize:13,color:M}}>schau bald wieder rein — neue saisons kommen laufend.</p>
-            </div>
-          ):(
-            CITIES.map(city=>{
-              const cs=byCity(city)
-              if(!cs.length) return null
-              return(
-                <div key={city} style={{marginBottom:28}}>
-                  <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.12em",textTransform:"uppercase",marginBottom:10}}>{city}</p>
-                  <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                    {cs.map(s=>{
-                      const lc=levelColor(s.skill_class)
-                      return(
-                        <div key={s.id} style={{background:C,border:`1px solid ${B}`,borderRadius:14,padding:"16px 18px"}}>
-                          <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:8}}>
-                            <div style={{flex:1,minWidth:0}}>
-                              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4,flexWrap:"wrap"}}>
-                                <span style={{fontSize:15,fontWeight:700,color:W}}>{s.name}</span>
-                                <span style={{fontSize:10,fontWeight:700,color:lc,background:`${lc}18`,border:`1px solid ${lc}40`,borderRadius:999,padding:"2px 8px",flexShrink:0}}>{s.skill_class}</span>
-                              </div>
-                              {/* Standardisierte Level-Beschreibung */}
-                              <p style={{fontSize:12,color:M,marginBottom:s.description?4:0,lineHeight:1.4}}>
-                                {LEVEL_DESC[s.skill_class]||""}
-                              </p>
-                              {/* Custom Admin-Beschreibung (falls vorhanden) */}
-                              {s.description&&(
-                                <p style={{fontSize:12,color:M,fontStyle:"italic"}}>{s.description}</p>
-                              )}
-                              {s.start_date&&(
-                                <p style={{fontSize:11,color:M,marginTop:4}}>
-                                  Start: {new Date(s.start_date).toLocaleDateString("de-CH",{day:"numeric",month:"long",year:"numeric"})}
-                                </p>
-                              )}
-                            </div>
-                            <div style={{textAlign:"right",flexShrink:0,marginLeft:12}}>
-                              <div style={{fontSize:11,fontWeight:700,color:s.status==="running"?G:M,background:s.status==="running"?`${G}18`:B,borderRadius:999,padding:"2px 10px",marginBottom:4}}>
-                                {s.status==="running"?"läuft":"offen"}
-                              </div>
-                              <p style={{fontSize:11,color:M}}>{s._count||0}/{s.max_players}</p>
-                            </div>
-                          </div>
-                          <div style={{display:"flex",gap:8}}>
-                            <Link href={`/liga/${s.id}`} style={{flex:1,background:"transparent",border:"1px solid #2A3340",color:W,textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em"}}>tabelle →</Link>
-                            {s.status==="open"&&(
-                              <Link href={`/liga/${s.id}/anmelden`} style={{flex:1,background:"#fff",color:"#14161A",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em"}}>anmelden</Link>
-                            )}
-                          </div>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )
-            })
-          )
-        }
       </div>
 
-      {/* Eigene Liga CTA */}
-      <div style={{textAlign:"center",marginTop:36,paddingTop:24,borderTop:`1px solid ${B}`}}>
-        <p style={{fontSize:13,color:M,marginBottom:4}}>liga für dein team oder deine firma?</p>
-        <button onClick={()=>{setShowLigaForm(true);setLigaMsg("")}} style={{background:"none",border:"none",color:W,cursor:"pointer",fontSize:13,fontWeight:700,textDecoration:"underline",letterSpacing:"0.04em"}}>
-          eigene liga anfragen →
-        </button>
-      </div>
-
-      {/* Popup */}
-      {showLigaForm&&(
-        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}} onClick={e=>{if(e.target===e.currentTarget)setShowLigaForm(false)}}>
-          <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,padding:24,width:"100%",maxWidth:460,maxHeight:"90vh",overflowY:"auto"}}>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:20}}>
-              <div>
-                <p style={{fontSize:11,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.12em",marginBottom:4}}>eigene liga</p>
-                <h2 style={{fontSize:20,fontWeight:900,fontFamily:"'League Spartan', system-ui, sans-serif",textTransform:"uppercase",letterSpacing:".1em",margin:0,background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>anfrage stellen</h2>
-              </div>
-              <button onClick={()=>setShowLigaForm(false)} style={{background:"none",border:"none",color:M,cursor:"pointer",fontSize:22,lineHeight:1}}>×</button>
-            </div>
-
-            {[
-              ["Name","text","name","Dein Name"],
-              ["Email","email","email","deine@email.ch"],
-              ["Firma / Team","text","firma","Firma oder Team-Name"],
-              ["Standort","text","standort","z.B. Zürich"],
-            ].map(([label,type,key,ph])=>(
-              <div key={key} style={{marginBottom:10}}>
-                <label style={{fontSize:11,color:M,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:4}}>{label}</label>
-                <input
-                  type={type}
-                  value={ligaForm[key as keyof typeof ligaForm]}
-                  onChange={e=>setLigaForm(f=>({...f,[key]:e.target.value}))}
-                  placeholder={ph}
-                  style={{width:"100%",background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"11px 14px",fontSize:14,color:W,outline:"none",boxSizing:"border-box"}}
-                />
-              </div>
+      {/* Stadt-Dropdown */}
+      {showCity&&(
+        <div onClick={()=>setShowCity(false)} style={{position:"fixed",inset:0,zIndex:20}}>
+          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:54,right:14,background:"#14171C",border:`1px solid ${B}`,borderRadius:14,padding:6,minWidth:160}}>
+            {cities.map(ci=>(
+              <div key={ci} onClick={()=>{const fs=seasons.find(s=>s.city===ci);setCity(ci);if(fs)setSeasonId(fs.id);setShowCity(false)}} style={{padding:"11px 12px",borderRadius:9,fontSize:14,fontWeight:ci===city?600:400,color:ci===city?"#39FF14":W,cursor:"pointer"}}>{ci}</div>
             ))}
+          </div>
+        </div>
+      )}
 
-            <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:10}}>
-              <div>
-                <label style={{fontSize:11,color:M,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:4}}>Liga-Level</label>
-                <select value={ligaForm.liga_art} onChange={e=>setLigaForm(f=>({...f,liga_art:e.target.value}))} style={{width:"100%",background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"11px 14px",fontSize:14,color:W,outline:"none"}}>
-                  {["Rookie","Challenger","Advanced","Elite","Gemischt"].map(l=><option key={l} value={l}>{l}</option>)}
-                </select>
-              </div>
-              <div>
-                <label style={{fontSize:11,color:M,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.08em",display:"block",marginBottom:4}}>Startdatum</label>
-                <input type="date" value={ligaForm.start_datum} onChange={e=>setLigaForm(f=>({...f,start_datum:e.target.value}))} style={{width:"100%",background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"11px 14px",fontSize:14,color:W,outline:"none"}}/>
+      <div style={{maxWidth:480,margin:"0 auto"}}>
+        {/* Foto-Hero */}
+        <div style={{position:"relative",height:130}}>
+          <img src="/liga-hero.jpg" alt="" style={{width:"100%",height:130,objectFit:"cover",display:"block"}}/>
+          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(14,16,19,.25),rgba(14,16,19,.9))"}}/>
+          <div style={{position:"absolute",left:16,bottom:12}}>
+            <div style={{fontSize:24,fontWeight:800,textTransform:"uppercase",letterSpacing:".04em",...gt}}>liga</div>
+            <div style={{fontSize:11.5,color:"rgba(255,255,255,.85)",fontWeight:300}}>steig auf · gewinne punkte · fordere heraus</div>
+          </div>
+        </div>
+
+        {loading?(
+          <p style={{textAlign:"center",color:M,padding:"40px 0"}}>lädt...</p>
+        ):seasons.length===0?(
+          <p style={{textAlign:"center",color:M,padding:"40px 16px"}}>noch keine liga aktiv.</p>
+        ):(<>
+          {/* Liga-Tabs */}
+          <div style={{display:"flex",gap:8,padding:"12px 14px 6px"}}>
+            {citySeasons.map(s=>{
+              const on=s.id===seasonId
+              return(
+                <button key={s.id} onClick={()=>setSeasonId(s.id)} style={{flex:1,borderRadius:12,border:`1px solid ${on?"#39FF14":B}`,background:on?"rgba(57,255,20,.08)":"#14171C",padding:"10px 8px",textAlign:"center",cursor:"pointer"}}>
+                  <div style={{fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:".03em",color:W}}>{isPro(s)?"pro":"einstieg"}</div>
+                  <div style={{fontSize:9.5,color:"rgba(255,255,255,.6)",marginTop:2}}>{s.skill_class.replace("+"," · ").toLowerCase()}</div>
+                  <div style={{fontSize:9,fontWeight:600,marginTop:4,color:isPro(s)?"#FF8A8A":"#39FF14"}}>{isPro(s)?`${count}/${s.max_players}`:"offen"}</div>
+                </button>
+              )
+            })}
+          </div>
+          <div style={{fontSize:11,color:"rgba(255,255,255,.7)",padding:"4px 16px 8px"}}>{sel?.city} · {sel?.status==="running"?"saison läuft":"anmeldung offen"} · zusammen, klar getrennt</div>
+
+          {/* Standings-Karte */}
+          <div style={{padding:"0 14px"}}>
+            <div style={{background:"#141821",border:`1px solid ${B}`,borderRadius:16,overflow:"hidden"}}>
+              <div style={{height:360,overflowY:"auto",padding:"4px 8px"}}>
+                {rows.length===0?(
+                  <p style={{textAlign:"center",color:M,padding:"40px 0",fontSize:13}}>noch keine spieler — sei die/der erste!</p>
+                ):rows.map((r,i)=>{
+                  const me=r.user_id===userId
+                  return(
+                    <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 10px",borderBottom:`1px solid #181B21`,...(me?{background:"linear-gradient(90deg,rgba(57,255,20,.12),rgba(31,209,196,.05))",border:"1px solid rgba(57,255,20,.35)",borderRadius:12}:{})}}>
+                      <span style={{width:24,textAlign:"center",fontSize:14,fontWeight:700,color:"rgba(255,255,255,.75)"}}>{medal(i)}</span>
+                      <span style={{width:32,height:32,borderRadius:"50%",background:"#1B1E25",border:"1px solid #2A3340",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,flexShrink:0}}>🏓</span>
+                      <div style={{flex:1,minWidth:0}}>
+                        <span style={{fontSize:14,fontWeight:500,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:"1px solid rgba(255,255,255,.3)",borderRadius:999,padding:"1px 5px",marginLeft:6,color:"rgba(255,255,255,.8)"}}>du</span>}</span>
+                      </div>
+                      {r.level&&<span style={{fontSize:8.5,fontWeight:700,borderRadius:999,padding:"1px 7px",textTransform:"uppercase",color:lvColor(r.level),border:`1px solid ${lvColor(r.level)}55`}}>{r.level.slice(0,4)}</span>}
+                      <span style={{fontSize:14,fontWeight:700,...gt}}>{r.elo}</span>
+                      {!me&&myReg&&(
+                        <button onClick={()=>challenge(r.user_id)} title="herausfordern" style={{background:"transparent",border:`1px solid ${B}`,borderRadius:8,padding:"5px 8px",fontSize:13,cursor:"pointer"}}>⚔️</button>
+                      )}
+                    </div>
+                  )
+                })}
               </div>
             </div>
+          </div>
 
-            {ligaMsg&&<p style={{fontSize:13,color:ligaMsg.startsWith("✓")?G:"#FF6666",marginBottom:10}}>{ligaMsg}</p>}
+          {/* Beitreten */}
+          {!myReg&&(
+            <div style={{padding:"12px 14px 0"}}>
+              <button onClick={join} disabled={busy} style={{width:"100%",background:"#fff",color:BG,border:"none",borderRadius:13,padding:14,fontSize:15,fontWeight:700,textTransform:"lowercase",cursor:"pointer"}}>{busy?"…":"+ liga beitreten"}</button>
+            </div>
+          )}
+        </>)}
+      </div>
 
-            {ligaMsg.startsWith("✓")?(
-              <button onClick={()=>setShowLigaForm(false)} style={{width:"100%",background:"#fff",color:"#14161A",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>schliessen</button>
+      {/* Chat */}
+      {chatOpen&&(
+        <div onClick={()=>setChatOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.5)",zIndex:50,display:"flex",flexDirection:"column",justifyContent:"flex-end"}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:BG,borderTop:`1px solid ${B}`,borderRadius:"22px 22px 0 0",height:"72%",display:"flex",flexDirection:"column",maxWidth:480,margin:"0 auto",width:"100%"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"15px 16px",borderBottom:`1px solid ${B}`}}>
+              <span style={{fontSize:15,fontWeight:600}}>liga-chat · {sel?isPro(sel)?"pro":"einstieg":""}</span>
+              <button onClick={()=>setChatOpen(false)} style={{background:"none",border:"none",color:M,fontSize:18,cursor:"pointer"}}>✕</button>
+            </div>
+            <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:10}}>
+              {msgs.length===0?<p style={{textAlign:"center",color:M,fontSize:13,marginTop:20}}>noch keine nachrichten — schreib die erste 👋</p>:msgs.map(m=>{
+                const mine=m.user_id===userId
+                return(
+                  <div key={m.id} style={{maxWidth:"80%",alignSelf:mine?"flex-end":"flex-start"}}>
+                    {!mine&&<div style={{fontSize:10,color:"rgba(255,255,255,.55)",margin:"0 0 3px 4px"}}>{m.name}</div>}
+                    <div style={{background:mine?"linear-gradient(135deg,rgba(57,255,20,.18),rgba(31,209,196,.10))":C,border:`1px solid ${mine?"rgba(57,255,20,.3)":B}`,borderRadius:14,padding:"9px 12px",fontSize:13,fontWeight:300}}>{m.text}</div>
+                  </div>
+                )
+              })}
+            </div>
+            {myReg?(
+              <div style={{display:"flex",gap:8,padding:"12px 14px",borderTop:`1px solid ${B}`}}>
+                <input value={msg} onChange={e=>setMsg(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")send()}} placeholder="nachricht an die liga…" style={{flex:1,background:C,border:`1px solid ${B}`,borderRadius:999,padding:"11px 14px",color:W,fontSize:13,outline:"none"}}/>
+                <button onClick={send} style={{width:42,borderRadius:999,background:"#fff",color:BG,border:"none",fontWeight:800,cursor:"pointer"}}>→</button>
+              </div>
             ):(
-              <button onClick={submitLigaRequest} disabled={ligaSending} style={{width:"100%",background:ligaSending?B:"#fff",color:ligaSending?M:"#14161A",border:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,cursor:ligaSending?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
-                {ligaSending?"sende...":"anfrage senden"}
-              </button>
+              <p style={{padding:"14px",textAlign:"center",color:M,fontSize:12}}>tritt der liga bei, um mitzuschreiben.</p>
             )}
           </div>
         </div>
       )}
+
+      {toast&&<div style={{position:"fixed",bottom:84,left:0,right:0,display:"flex",justifyContent:"center",zIndex:120}}><div style={{background:"#171A1F",border:`1px solid ${B}`,color:W,borderRadius:999,padding:"10px 18px",fontSize:13}}>{toast}</div></div>}
       <BottomNav />
     </main>
   )
