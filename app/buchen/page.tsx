@@ -5,7 +5,7 @@ import BottomNav from "@/app/components/BottomNav"
 import Link from "next/link"
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
-const BG   = "#14161A"
+const BG   = "#0E1013"
 const CARD = "#1B1E25"
 const BD   = "#1E2230"
 const TEXT = "#FFFFFF"

@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.62)",G="#39FF14",W="#FFFFFF"
+const BG="#0E1013",C="#171A1F",B="#232833",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"} as const
 const CITIES=["Glattbrugg","Oerlikon","Zürich","Winterthur","Baden","Tessin"]
 const LEVELS=["alle","Rookie","Challenger","Advanced","Elite"]
