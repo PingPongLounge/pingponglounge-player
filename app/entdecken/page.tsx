@@ -1,192 +1,235 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
 import BottomNav from '@/app/components/BottomNav'
+import StartMenu from '@/app/components/StartMenu'
 
-const BG     = '#14161A'
-const CARD   = '#1B1E25'
-const BORDER = '#1E2230'
-const TEXT   = '#FFFFFF'
-const SUB    = 'rgba(255,255,255,0.66)'
-const LABEL  = 'rgba(255,255,255,0.6)'
-const GRAD   = 'linear-gradient(135deg, #39FF14 0%, #00D4AA 50%, #1FD1C4 100%)'
-const EVERSPORTS_TRAINING = 'https://www.eversports.ch/widget/w/5a5zxf'
+const BG='#0E1013', CARD='#171A1F', BORDER='#232833', W='#FFFFFF'
+const SUB='rgba(255,255,255,.85)', GRAD='linear-gradient(135deg,#39FF14,#00E5FF)'
+const EVERSPORTS_TRAINING='https://www.eversports.ch/widget/w/5a5zxf'
 
-function Hero({ greetTop, titleBig, titleSub }: { greetTop?: string; titleBig: string; titleSub: string }) {
+const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip:'text', backgroundClip:'text', WebkitTextFillColor:'transparent' }
+const secHead: React.CSSProperties = { display:'flex', alignItems:'baseline', justifyContent:'space-between', margin:'26px 0 4px', padding:'0 16px' }
+const hStyle: React.CSSProperties = { fontSize:19, fontWeight:700, textTransform:'uppercase', letterSpacing:'.05em', ...gt }
+const aStyle: React.CSSProperties = { fontSize:12, fontWeight:500, textDecoration:'none', ...gt }
+const subT: React.CSSProperties = { fontSize:11.5, color:'rgba(255,255,255,.9)', fontWeight:300, margin:'0 16px 11px' }
+const wrap: React.CSSProperties = { padding:'0 16px' }
+const card: React.CSSProperties = { background:CARD, border:`1px solid ${BORDER}`, borderRadius:16, overflow:'hidden' }
+const dateS: React.CSSProperties = { fontSize:11, color:SUB, fontWeight:300 }
+const ttl: React.CSSProperties = { fontSize:23, fontWeight:700, marginTop:3, letterSpacing:'.03em', ...gt }
+const grid: React.CSSProperties = { display:'grid', gridTemplateColumns:'1fr 1fr', gap:9, marginTop:14 }
+const cell: React.CSSProperties = { display:'flex', alignItems:'center', gap:9, border:`1px solid ${BORDER}`, borderRadius:11, padding:'10px 11px' }
+const ck: React.CSSProperties = { fontSize:9, color:'rgba(255,255,255,.8)', fontWeight:300, textTransform:'uppercase', letterSpacing:'.04em' }
+const cv: React.CSSProperties = { fontSize:12, fontWeight:400, color:W }
+const arow: React.CSSProperties = { display:'flex', alignItems:'center', justifyContent:'space-between', borderTop:`1px solid ${BORDER}`, marginTop:14, paddingTop:13 }
+const ev: React.CSSProperties = { fontSize:12, color:SUB, fontWeight:300 }
+const moreS: React.CSSProperties = { background:'#fff', color:BG, borderRadius:9, padding:'8px 18px', fontSize:13, fontWeight:600, textTransform:'lowercase', textDecoration:'none' }
+const lrow: React.CSSProperties = { display:'flex', alignItems:'center', gap:12, padding:'13px 16px', borderTop:`1px solid #20242E`, textDecoration:'none' }
+const lt: React.CSSProperties = { fontSize:15, fontWeight:500, color:W }
+const ld: React.CSSProperties = { fontSize:11, color:SUB, fontWeight:300, marginTop:3 }
+const lmeta: React.CSSProperties = { fontSize:13, fontWeight:600, ...gt }
+const cellIcon = (d: React.ReactNode) => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{d}</svg>
+
+function Cell({ icon, k, v }: { icon: React.ReactNode; k: string; v: string }) {
+  return <div style={cell}>{icon}<div><div style={ck}>{k}</div><div style={cv}>{v}</div></div></div>
+}
+
+function Logo({ small }: { small?: boolean }) {
+  const s = small ? 40 : 64
   return (
-    <div style={{ position: 'relative', height: 162, overflow: 'hidden', borderRadius: '0 0 22px 22px' }}>
-      <svg width="100%" height="162" viewBox="0 0 400 162" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-        <defs><linearGradient id="ppl-hero" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14" /><stop offset="55%" stopColor="#00D4AA" /><stop offset="100%" stopColor="#1FD1C4" /></linearGradient></defs>
-        <rect width="400" height="162" fill="url(#ppl-hero)" />
-        <g stroke="#06281c" strokeOpacity="0.18" fill="none" strokeWidth="1.6">
-          <polygon points="150,86 250,86 224,40 176,40" /><line x1="200" y1="40" x2="200" y2="86" />
-        </g>
+    <div style={{ textAlign:'center' }}>
+      <svg width={s} height={s} viewBox="0 0 80 80" fill="none" style={{ display:'block', margin:'0 auto' }}>
+        <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#39FF14"><animate attributeName="stop-color" values="#39FF14;#00E5FF;#39FF14" dur="8s" repeatCount="indefinite"/></stop>
+          <stop offset="100%" stopColor="#00E5FF"><animate attributeName="stop-color" values="#00E5FF;#39FF14;#00E5FF" dur="8s" repeatCount="indefinite"/></stop>
+        </linearGradient></defs>
+        <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="2.5" strokeLinejoin="round"/>
+        <path d="M 36 10 L 36 50" stroke="url(#lg)" strokeWidth="1" strokeOpacity="0.4"/>
+        <circle cx="63" cy="58" r="6" fill="url(#lg)"/>
       </svg>
-      <span style={{ position: 'absolute', top: 14, left: 0, right: 0, textAlign: 'center', fontSize: 12, fontWeight: 900, letterSpacing: '0.16em', color: '#06241a' }}>PLAYER</span>
-      <div style={{ position: 'absolute', left: 16, right: 16, top: '50%', transform: 'translateY(-42%)', textAlign: 'center' }}>
-        {greetTop && <div style={{ fontSize: 11.5, fontWeight: 600, color: '#0a2c20', marginBottom: 2 }}>{greetTop}</div>}
-        <div style={{ fontSize: 26, fontWeight: 900, color: '#06241a', textTransform: 'uppercase', letterSpacing: '0.01em', lineHeight: 0.98, whiteSpace: 'pre-line' }}>{titleBig}</div>
-        <div style={{ fontSize: 12, fontWeight: 600, color: '#0a2c20', marginTop: 5 }}>{titleSub}</div>
-      </div>
+      <div style={{ fontSize: small?13:19, fontWeight:600, letterSpacing:'.26em', marginTop: small?5:8, ...gt }}>PLAYER</div>
+      <div style={{ fontSize: small?8:10, fontWeight:300, letterSpacing:'.22em', color:'rgba(255,255,255,.85)', textTransform:'uppercase', marginTop: small?3:6 }}>next level table tennis</div>
     </div>
   )
 }
-
-const ico = (d: React.ReactNode) => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={TEXT} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">{d}</svg>
 
 function Circles({ loggedIn }: { loggedIn: boolean }) {
-  const href = (real: string) => (loggedIn ? real : '/login')
-  const Item = ({ link, label, external, children }: { link: string; label: string; external?: boolean; children: React.ReactNode }) => {
-    const inner = (
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, width: 64 }}>
-        <div style={{ width: 50, height: 50, borderRadius: '50%', background: CARD, border: '1px solid #2A3340', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{children}</div>
-        <span style={{ fontSize: 9.5, color: 'rgba(255,255,255,0.82)', fontWeight: 600 }}>{label}</span>
-      </div>
-    )
-    if (external && loggedIn) return <a href={link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>{inner}</a>
-    return <Link href={external ? '/login' : link} style={{ textDecoration: 'none' }}>{inner}</Link>
-  }
+  const href = (r: string) => loggedIn ? r : '/login'
+  const items: [string,string,string][] = [
+    ['open game','/match','open-game'], ['liga','/liga','liga'], ['turniere','/turniere','turnier'], ['tisch buchen','/buchen','tisch'],
+  ]
   return (
-    <div style={{ display: 'flex', justifyContent: 'space-between', margin: '4px 0 6px' }}>
-      <Item link={href('/buchen')} label="buchen">{ico(<><rect x="3" y="4" width="18" height="18" rx="2" /><path d="M16 2v4M8 2v4M3 10h18" /></>)}</Item>
-      <Item link={href('/match')} label="open game">{ico(<><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="4" /></>)}</Item>
-      <Item link={EVERSPORTS_TRAINING} label="training" external>{ico(<path d="M3 3l4 4M3 10l7-7 4 4-7 7zM10 14l7 7 4-4-7-7z" />)}</Item>
-      <Item link={href('/liga')} label="liga">{ico(<path d="M8 21h8M12 17v4M6 4h12v5a6 6 0 0 1-12 0z" />)}</Item>
+    <div style={{ display:'flex', justifyContent:'space-between', margin:'22px 0 6px' }}>
+      {items.map(([label,link,icon]) => (
+        <Link key={label} href={href(link)} style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8, width:70, textDecoration:'none' }}>
+          <div style={{ width:62, height:62, borderRadius:'50%', background:'linear-gradient(135deg,#39FF14,#1FD1C4)', padding:2 }}>
+            <div style={{ width:'100%', height:'100%', borderRadius:'50%', background:'#13161B', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <img src={`/icons/${icon}.svg`} alt="" style={{ width:34, height:34 }} />
+            </div>
+          </div>
+          <div style={{ fontSize:9.5, color:'rgba(255,255,255,.95)', fontWeight:500, textAlign:'center', lineHeight:1.25, textTransform:'uppercase', letterSpacing:'.10em' }}>{label}</div>
+        </Link>
+      ))}
     </div>
   )
 }
 
-function FeatureCard({ href, line }: { href: string; line: string }) {
+function AcademyCard() {
   return (
-    <Link href={href} style={{ display: 'block', textDecoration: 'none', borderRadius: 14, overflow: 'hidden', position: 'relative', height: 130, margin: '14px 0 4px' }}>
-      <svg width="100%" height="130" viewBox="0 0 460 130" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg" style={{ display: 'block' }}>
-        <defs><linearGradient id="feat" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#1d3a2a" /><stop offset="1" stopColor="#0f2c2c" /></linearGradient></defs>
-        <rect width="460" height="130" fill="url(#feat)" />
-        <g stroke="#39FF14" strokeOpacity="0.42" fill="none" strokeWidth="2"><polygon points="150,104 310,104 340,44 120,44" /><line x1="230" y1="44" x2="230" y2="104" /></g>
-      </svg>
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg, rgba(20,22,26,0.05), rgba(20,22,26,0.86))' }} />
-      <div style={{ position: 'absolute', left: 15, right: 15, bottom: 13 }}>
-        <div style={{ fontSize: 16, fontWeight: 800, color: '#fff' }}>heute spielen</div>
-        <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.82)', marginTop: 2 }}>{line}</div>
-        <span style={{ display: 'inline-block', marginTop: 9, background: '#fff', color: BG, borderRadius: 8, padding: '7px 16px', fontSize: 12, fontWeight: 700 }}>gegner finden</span>
-      </div>
-    </Link>
+    <>
+      <div style={secHead}><span style={hStyle}>academy</span><a href={EVERSPORTS_TRAINING} target="_blank" rel="noopener noreferrer" style={aStyle}>alle ansehen</a></div>
+      <div style={subT}>from beginner to pro</div>
+      <div style={wrap}><div style={{ ...card, padding:16 }}>
+        <div style={dateS}>do · wöchentlich</div>
+        <div style={ttl}>LEVEL UP</div>
+        <div style={grid}>
+          <Cell icon={cellIcon(<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></>)} k="datum" v="donnerstag" />
+          <Cell icon={cellIcon(<><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>)} k="zeit" v="19:00–20:30" />
+          <Cell icon={cellIcon(<path d="M5 20V10M12 20V4M19 20v-7"/>)} k="levels" v="rookie–advanced" />
+          <Cell icon={cellIcon(<><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 5 0c0 2.5-2.5 2-2.5 4M12 17.5h.01"/></>)} k="kosten" v="chf 35" />
+        </div>
+        <div style={arow}><div style={ev}>📍 ping pong lounge glattbrugg</div><a href={EVERSPORTS_TRAINING} target="_blank" rel="noopener noreferrer" style={moreS}>more</a></div>
+      </div></div>
+    </>
   )
 }
 
-const sec: React.CSSProperties = { fontSize: 10, color: LABEL, textTransform: 'lowercase', letterSpacing: '0.06em', margin: '16px 0 8px' }
-const line: React.CSSProperties = { background: CARD, border: `1px solid ${BORDER}`, borderRadius: 12, padding: '12px 14px', marginBottom: 8, display: 'flex', justifyContent: 'space-between', alignItems: 'center', textDecoration: 'none' }
-const pill: React.CSSProperties = { background: '#fff', color: BG, borderRadius: 8, padding: '6px 13px', fontSize: 11, fontWeight: 600 }
+function fmtWhen(date: string | null, hour: number | null) {
+  let s = ''
+  if (date) { const d = new Date(date); s = d.toLocaleDateString('de-CH',{ weekday:'short', day:'numeric', month:'short' }) }
+  if (hour != null) s += `${s? ' · ':''}${String(hour).padStart(2,'0')}:00`
+  return s || 'zeit offen'
+}
 
 export default async function EntdeckenPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const sb = await createClient()
+  const { data: { user } } = await sb.auth.getUser()
 
-  // ── Ausgeloggt: öffentliche Startseite mit Login ──────────────────────────
+  // ---------- AUSGELOGGT ----------
   if (!user) {
     return (
-      <main style={{ minHeight: '100vh', background: BG, paddingBottom: 40 }}>
-        <div style={{ maxWidth: 480, margin: '0 auto' }}>
-          <Hero titleBig={'next level\ntable tennis'} titleSub="rang sammeln · gegner finden · liga spielen" />
-          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: 15, margin: '-16px 15px 8px', position: 'relative', zIndex: 5 }}>
-            <Link href="/login" style={{ display: 'block', width: '100%', background: '#fff', color: BG, borderRadius: 10, padding: 13, fontSize: 13.5, fontWeight: 700, textAlign: 'center', textDecoration: 'none' }}>login / registrieren</Link>
-            <Link href="/spielen" style={{ display: 'block', width: '100%', background: 'transparent', border: '1px solid #2A3340', color: TEXT, borderRadius: 10, padding: 11, fontSize: 12.5, fontWeight: 500, textAlign: 'center', textDecoration: 'none', marginTop: 8 }}>schon gespielt? resultat eintragen</Link>
+      <main style={{ minHeight:'100vh', background:BG, paddingBottom:40 }}>
+        <div style={{ maxWidth:480, margin:'0 auto', padding:'22px 16px 40px' }}>
+          <Logo />
+          <div style={{ marginTop:24 }}>
+            <Link href="/login" style={{ display:'block', textAlign:'center', background:'#fff', color:BG, borderRadius:13, padding:14, fontSize:15, fontWeight:700, textTransform:'lowercase', textDecoration:'none' }}>login / registrieren</Link>
+            <Link href="/spielen" style={{ display:'block', textAlign:'center', background:'transparent', border:'1px solid #2A3340', color:W, borderRadius:12, padding:12, fontSize:13, fontWeight:400, textTransform:'lowercase', textDecoration:'none', marginTop:10 }}>schon gespielt? resultat eintragen →</Link>
           </div>
-          <div style={{ padding: '0 15px' }}>
-            <FeatureCard href="/login" line="finde einen gegner in deiner nähe" />
-            <Circles loggedIn={false} />
-            <div style={sec}>deine liga</div>
-            <div style={line}><div><div style={{ fontSize: 13, fontWeight: 600 }}>challenger league</div><div style={{ fontSize: 10.5, color: SUB, marginTop: 1 }}>spiel dich nach oben</div></div><span style={{ fontSize: 10, color: SUB }}>🔒 login</span></div>
-            <div style={sec}>pingpoints</div>
-            <div style={line}><div><div style={{ fontSize: 13, fontWeight: 600 }}>punkte sammeln</div><div style={{ fontSize: 10.5, color: SUB, marginTop: 1 }}>für shop, tisch &amp; mehr</div></div><span style={{ fontSize: 10, color: SUB }}>🔒 login</span></div>
-          </div>
+          <Circles loggedIn={false} />
+          <AcademyCard />
         </div>
       </main>
     )
   }
 
-  // ── Eingeloggt ────────────────────────────────────────────────────────────
-  const { data: profile } = await supabase
-    .from('profiles').select('id,name,level,elo,matches_played,matches_won').eq('id', user.id).maybeSingle()
-  const hasProfile = !!profile
+  // ---------- DATEN ----------
+  const { data: profile } = await sb.from('profiles').select('id,name,level,elo,matches_played,matches_won').eq('id', user.id).maybeSingle()
+  const elo = profile?.elo ?? 1000
+  const { count: higher } = await sb.from('public_profiles').select('*', { count:'exact', head:true }).gt('elo', elo)
+  const rank = (higher ?? 0) + 1
+  const NEXT = [{ n:'challenger', e:1100 }, { n:'advanced', e:1300 }, { n:'elite', e:1500 }].find(t => t.e > elo)
+  const rankSub = NEXT ? `${(profile?.level||'rookie').toLowerCase()} · elo ${elo} · noch ${NEXT.e-elo} bis ${NEXT.n} ▲` : `${(profile?.level||'elite').toLowerCase()} · elo ${elo}`
 
-  const { data: membership } = await supabase
-    .from('league_members').select('season_id, seasons(name, leagues(name, city))').eq('player_id', user.id).limit(1).maybeSingle()
+  const { data: games } = await sb.from('open_games')
+    .select('id,location_name,date,start_hour,level,max_players,current_players,status')
+    .eq('status','open').order('date',{ ascending:true, nullsFirst:false }).order('created_at',{ ascending:false }).limit(3)
 
-  let rang: number | null = null
-  if (membership?.season_id) {
-    const { data: members } = await supabase
-      .from('league_members').select('player_id, elo').eq('season_id', membership.season_id).order('elo', { ascending: false })
-    if (members) { const idx = members.findIndex(m => m.player_id === user.id); rang = idx >= 0 ? idx + 1 : null }
-  }
+  const { data: tour } = await sb.from('player_tournaments')
+    .select('id,name,city,date,format,max_players,status,entry_fee_chf,tournament_registrations(count)')
+    .in('status',['open','running']).order('date',{ ascending:true, nullsFirst:false }).limit(1).maybeSingle()
+  const tourRegs = (tour?.tournament_registrations as { count:number }[] | undefined)?.[0]?.count ?? 0
 
-  const { data: openMatches } = await supabase
-    .from('open_games').select('id').eq('status', 'open').order('created_at', { ascending: false }).limit(20)
-  const openCount = openMatches?.length ?? 0
+  const { data: membership } = await sb.from('league_registrations')
+    .select('season_id, league_seasons(name,city,skill_class,status)').eq('player_id', user.id).limit(1).maybeSingle()
+  const season = (membership as { league_seasons?: { name:string; city:string; skill_class:string; status:string } } | null)?.league_seasons
 
-  const { data: ppTx } = await supabase.from('ping_points_transactions').select('amount').eq('player_id', user.id)
-  const pingpoints = (ppTx || []).reduce((s: number, t: { amount: number }) => s + (t.amount || 0), 0)
-
-  const name    = profile?.name?.split(' ')[0] || user.email?.split('@')[0] || 'Spieler'
-  const elo     = profile?.elo ?? 1000
-  const played  = profile?.matches_played ?? 0
-  const won     = profile?.matches_won ?? 0
-  const winRate = played > 0 ? Math.round((won / played) * 100) : 0
-  // @ts-expect-error supabase nested typing
-  const ligaCity: string | null = membership?.seasons?.leagues?.city ?? null
-  const top16   = rang !== null && rang <= 16
-  const hour    = new Date().getHours()
-  const greeting = hour < 12 ? 'guten morgen' : hour < 18 ? 'guten tag' : 'guten abend'
-
-  const NEXT = [{ n: 'challenger', e: 1100 }, { n: 'advanced', e: 1300 }, { n: 'elite', e: 1500 }].find(t => t.e > elo)
-  const rankSub = NEXT ? `elo ${elo} · noch ${NEXT.e - elo} bis ${NEXT.n} ▲` : `elo ${elo} · elite`
+  const firstName = profile?.name?.split(' ')[0] || 'Spieler'
 
   return (
-    <main style={{ minHeight: '100vh', background: BG, paddingBottom: 100 }}>
-      <div style={{ maxWidth: 480, margin: '0 auto' }}>
+    <main style={{ minHeight:'100vh', background:BG, paddingBottom:100 }}>
+      <div style={{ maxWidth:480, margin:'0 auto', padding:'22px 16px 80px', position:'relative' }}>
 
-        <Hero greetTop={greeting} titleBig={name} titleSub={hasProfile ? (profile!.level || 'rookie').toLowerCase() : 'willkommen'} />
+        <StartMenu name={firstName} sub={`${(profile?.level||'rookie').toLowerCase()} · #${rank}`} />
+        <Logo small />
 
-        {hasProfile ? (
-          <Link href="/profil" style={{ textDecoration: 'none' }}>
-            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: 16, margin: '-18px 15px 0', position: 'relative', zIndex: 5, textAlign: 'center' }}>
-              <div style={{ fontSize: 10, color: LABEL, letterSpacing: '0.04em' }}>dein rang{ligaCity ? ` · ${ligaCity}` : ''}</div>
-              <div style={{ fontSize: 42, fontWeight: 900, lineHeight: 1, background: GRAD, WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{rang ? `#${rang}` : elo}</div>
-              <div style={{ fontSize: 11.5, color: SUB, marginTop: 5 }}>{rankSub}{played > 0 ? ` · ${winRate}% siege` : ''}</div>
+        {/* Rang */}
+        <div style={{ ...card, textAlign:'center', padding:'18px 14px', margin:'16px 0 2px' }}>
+          <div style={{ fontSize:11, color:'rgba(255,255,255,.7)', letterSpacing:'.1em', textTransform:'uppercase' }}>dein rang</div>
+          <div style={{ fontSize:50, fontWeight:800, lineHeight:1, filter:'drop-shadow(0 0 14px rgba(57,255,20,.22))', ...gt }}>#{rank}</div>
+          <div style={{ fontSize:12.5, color:'rgba(255,255,255,.92)', fontWeight:300, marginTop:5 }}>{rankSub}</div>
+        </div>
+
+        <Circles loggedIn />
+
+        <AcademyCard />
+
+        {/* OPEN GAME */}
+        <div style={secHead}><span style={hStyle}>open game</span><Link href="/match" style={aStyle}>alle ansehen</Link></div>
+        <div style={subT}><span style={{ display:'inline-block', width:7, height:7, borderRadius:'50%', background:GRAD, marginRight:6, verticalAlign:'middle' }} />lerne neue leute kennen</div>
+        <div style={wrap}><div style={card}>
+          {(games && games.length>0) ? games.map((g, i) => (
+            <Link key={g.id} href={`/match/${g.id}`} style={{ ...lrow, borderTop: i===0?'none':lrow.borderTop }}>
+              <div style={{ flex:1 }}>
+                <div style={lt}>{g.location_name} · {fmtWhen(g.date, g.start_hour)}</div>
+                <div style={ld}>{g.level} · {Math.max(0,(g.max_players||2)-(g.current_players||1))} {((g.max_players||2)-(g.current_players||1))===1?'platz frei':'plätze frei'}</div>
+              </div>
+              <span style={lmeta}>{g.current_players||1}/{g.max_players||2}</span>
+            </Link>
+          )) : (
+            <Link href="/match/create" style={{ ...lrow, borderTop:'none' }}><div style={{ flex:1 }}><div style={lt}>noch keine offenen spiele</div><div style={ld}>erstelle das erste open game</div></div><span style={lmeta}>+</span></Link>
+          )}
+        </div></div>
+
+        {/* LIGA */}
+        <div style={secHead}><span style={hStyle}>liga</span><Link href="/liga" style={aStyle}>zur liga</Link></div>
+        <div style={subT}>spiel in deiner klasse, steig auf &amp; gewinne punkte</div>
+        <div style={wrap}>
+          {season ? (
+            <div style={{ ...card, padding:16 }}>
+              <div style={dateS}>saison läuft</div>
+              <div style={ttl}>{(season.skill_class||'liga').toUpperCase()} · {(season.city||'').toUpperCase()}</div>
+              <div style={grid}>
+                <Cell icon={cellIcon(<path d="M5 20V10M12 20V4M19 20v-7"/>)} k="klasse" v={season.skill_class||'—'} />
+                <Cell icon={cellIcon(<><path d="M12 21s-7-4.5-7-10a7 7 0 0 1 14 0c0 5.5-7 10-7 10z"/><circle cx="12" cy="11" r="2"/></>)} k="stadt" v={season.city||'—'} />
+                <Cell icon={cellIcon(<><circle cx="9" cy="8" r="3"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></>)} k="status" v="läuft" />
+                <Cell icon={cellIcon(<><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/></>)} k="ziel" v="top 16" />
+              </div>
+              <div style={arow}><div style={ev}>📍 {season.city}</div><Link href="/liga" style={moreS}>zur liga</Link></div>
             </div>
-          </Link>
-        ) : (
-          <Link href="/onboarding" style={{ textDecoration: 'none' }}>
-            <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: 16, padding: 16, margin: '-18px 15px 0', position: 'relative', zIndex: 5 }}>
-              <div style={{ fontSize: 14, fontWeight: 700, color: TEXT }}>profil einrichten</div>
-              <div style={{ fontSize: 11.5, color: SUB, marginTop: 3, marginBottom: 12 }}>name &amp; level festlegen, dann hast du deinen rang</div>
-              <span style={{ display: 'block', width: '100%', background: '#fff', color: BG, borderRadius: 10, padding: 12, fontSize: 13, fontWeight: 700, textAlign: 'center' }}>los geht&apos;s</span>
+          ) : (
+            <div style={{ ...card, padding:16 }}>
+              <div style={ttl}>LIGA BEITRETEN</div>
+              <div style={{ fontSize:12, color:SUB, fontWeight:300, margin:'8px 0 13px' }}>spiel in deiner klasse, steig auf und qualifiziere dich fürs turnier.</div>
+              <Link href="/liga" style={{ ...moreS, display:'inline-block' }}>liga ansehen</Link>
             </div>
-          </Link>
-        )}
-
-        <div style={{ padding: '0 15px' }}>
-          <FeatureCard href="/match" line={openCount > 0 ? `${openCount} ${openCount === 1 ? 'offenes spiel' : 'offene spiele'} · finde einen gegner` : 'erstelle dein open game'} />
-          <Circles loggedIn />
-
-          {hasProfile && (
-            <>
-              <div style={sec}>deine liga</div>
-              <Link href="/liga" style={line}>
-                <div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{ligaCity ? `challenger league · ${ligaCity}` : 'liga beitreten'}{rang ? ` · #${rang}` : ''}</div>
-                  <div style={{ fontSize: 10.5, color: top16 ? 'rgba(57,255,20,0.85)' : SUB, marginTop: 1 }}>{top16 ? 'top 16 · turnier-quali ✓' : 'top 16 → turnier-quali'}</div>
-                </div>
-                <span style={{ color: SUB }}>›</span>
-              </Link>
-
-              <div style={sec}>pingpoints</div>
-              <Link href="/pingpoints" style={line}>
-                <div><div style={{ fontSize: 13, fontWeight: 600, color: TEXT }}>{pingpoints} punkte</div><div style={{ fontSize: 10.5, color: SUB, marginTop: 1 }}>für shop, tisch &amp; mehr</div></div>
-                <span style={pill}>einlösen</span>
-              </Link>
-            </>
           )}
         </div>
+
+        {/* TURNIER */}
+        <div style={secHead}><span style={hStyle}>turnier</span><Link href="/turniere" style={aStyle}>alle ansehen</Link></div>
+        <div style={subT}>erstelle ein eigenes oder sieh das nächste</div>
+        <div style={wrap}>
+          {tour ? (
+            <div style={{ ...card, padding:16 }}>
+              <div style={dateS}>nächstes turnier · {tour.status==='open'?'anmeldung offen':'läuft'}</div>
+              <div style={ttl}>{(tour.name||'turnier').toUpperCase()}</div>
+              <div style={grid}>
+                <Cell icon={cellIcon(<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/></>)} k="datum" v={tour.date? new Date(tour.date).toLocaleDateString('de-CH',{ day:'numeric', month:'short' }) : 'offen'} />
+                <Cell icon={cellIcon(<path d="M3 6h5v5h4M3 16h5v-5M12 11h5"/>)} k="format" v={tour.format==='ko'?`${tour.max_players}er ko`:'gruppen+ko'} />
+                <Cell icon={cellIcon(<><circle cx="9" cy="8" r="3"/><circle cx="16" cy="9" r="2.4"/><path d="M3 20c0-3 3-5 6-5s6 2 6 5"/></>)} k="plätze" v={`${tourRegs} / ${tour.max_players}`} />
+                <Cell icon={cellIcon(<><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 5 0c0 2.5-2.5 2-2.5 4M12 17.5h.01"/></>)} k="startgeld" v={tour.entry_fee_chf? `chf ${tour.entry_fee_chf}`:'gratis'} />
+              </div>
+              <div style={arow}><div style={ev}>📍 {tour.city||'standort offen'}</div><Link href={`/turniere/${tour.id}`} style={moreS}>ansehen</Link></div>
+            </div>
+          ) : (
+            <div style={{ ...card, padding:16 }}>
+              <div style={ttl}>EIGENES TURNIER</div>
+              <div style={{ fontSize:12, color:SUB, fontWeight:300, margin:'8px 0 13px' }}>noch kein turnier geplant — erstelle in 30 sekunden dein eigenes.</div>
+              <Link href="/turniere/neu" style={{ ...moreS, display:'inline-block' }}>turnier erstellen</Link>
+            </div>
+          )}
+          <Link href="/turniere/neu" style={{ display:'block', textAlign:'center', background:'transparent', border:'1px solid #2A3340', color:W, borderRadius:12, padding:12, fontSize:13, fontWeight:400, textTransform:'lowercase', textDecoration:'none', marginTop:10 }}>+ eigenes turnier erstellen</Link>
+        </div>
+
       </div>
       <BottomNav />
     </main>

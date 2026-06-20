@@ -18,11 +18,11 @@ const tabs = [
     ),
   },
   {
-    href: "/buchen",
-    label: "book",
+    href: "/liga",
+    label: "liga",
     icon: (a: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M5 20v-4M12 20v-9M19 20v-13"/>
       </svg>
     ),
   },
@@ -30,8 +30,8 @@ const tabs = [
     href: "/match",
     label: "open game",
     icon: (a: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <ellipse cx="10" cy="9.8" rx="5.5" ry="4.8" transform="rotate(-42 10 9.8)"/><path d="M13.5 13.3 17.5 17.3" strokeWidth="3"/><circle cx="18.2" cy="6" r="1.4" fill={a ? ACTIVE : INACTIVE} stroke="none"/>
       </svg>
     ),
   },
