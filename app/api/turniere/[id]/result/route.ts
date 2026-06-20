@@ -60,6 +60,33 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       // Kein nächstes Match -> das war das Finale: Champion + Turnier beendet
       await admin.from("player_tournaments").update({ status: "finished", champion_id: m.winner_id, updated_at: new Date().toISOString() }).eq("id", m.tournament_id)
     }
+
+    // ELO + Statistik + PingPoints — nur wenn das Turnier für den Rang zählt
+    if (m.winner_id && m.p1_id && m.p2_id) {
+      const { data: t } = await admin.from("player_tournaments").select("counts_for_rank").eq("id", m.tournament_id).single()
+      if (t?.counts_for_rank) {
+        const loserId = m.winner_id === m.p1_id ? m.p2_id : m.p1_id
+        const { data: w } = await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", m.winner_id).single()
+        const { data: l } = await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", loserId).single()
+        if (w && l) {
+          const K = 32
+          const wElo = w.elo ?? 1000, lElo = l.elo ?? 1000
+          const ea = 1 / (1 + Math.pow(10, (lElo - wElo) / 400))
+          const newW = Math.max(100, Math.round(wElo + K * (1 - ea)))
+          const newL = Math.max(100, Math.round(lElo - K * (1 - ea)))
+          await admin.from("profiles").update({ elo: newW, matches_played: (w.matches_played ?? 0) + 1, matches_won: (w.matches_won ?? 0) + 1 }).eq("id", m.winner_id)
+          await admin.from("profiles").update({ elo: newL, matches_played: (l.matches_played ?? 0) + 1 }).eq("id", loserId)
+          await admin.from("elo_history").insert([
+            { player_id: m.winner_id, elo: newW, delta: newW - wElo, match_id, note: "turnier" },
+            { player_id: loserId, elo: newL, delta: newL - lElo, match_id, note: "turnier" },
+          ])
+          await admin.from("ping_points_transactions").insert([
+            { player_id: m.winner_id, amount: 15, source: "turnier_win", description: "Turnier-Match gewonnen", ref_id: match_id },
+            { player_id: loserId, amount: 5, source: "turnier_played", description: "Turnier-Match gespielt", ref_id: match_id },
+          ])
+        }
+      }
+    }
   }
 
   return NextResponse.json({ ok: true })
