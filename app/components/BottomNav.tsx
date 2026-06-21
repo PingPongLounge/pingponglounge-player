@@ -68,7 +68,7 @@ export default function BottomNav() {
             }}>
               {tab.icon(active)}
               <span style={{
-                fontSize: 9, fontWeight: 400,
+                fontSize: 9, fontWeight: 500,
                 color: active ? ACTIVE : INACTIVE,
                 letterSpacing: "0.02em",
               }}>

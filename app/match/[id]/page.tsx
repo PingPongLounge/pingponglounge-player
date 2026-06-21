@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#0E1013",C="#171A1F",B="#232833",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
+const BG="#15181E",C="#1E222A",B="#262B33",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
 function whenLabel(date: string | null, hour: number | null, dur: number): string {
@@ -38,7 +38,7 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
   async function leave() { setBusy(true); setErr(""); const r = await fetch(`/api/match/${matchId}/leave`, { method: "POST" }); if (!r.ok) { const j = await r.json(); setErr(j.error || "Fehler") } await load(); setBusy(false) }
   async function del() { setBusy(true); await fetch(`/api/match/${matchId}/cancel`, { method: "POST" }); router.push("/match") }
 
-  if (loading || !data) return <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center" }}><p style={{ color: M, fontWeight: 400, textTransform: "lowercase" }}>lädt...</p><BottomNav /></main>
+  if (loading || !data) return <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center" }}><p style={{ color: M, fontWeight: 500, textTransform: "lowercase" }}>lädt...</p><BottomNav /></main>
 
   const { game: g, players, isCreator, isJoined } = data
   const full = g.current_players >= g.max_players
@@ -53,8 +53,8 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
         <div style={{ margin: "20px 0 20px", textAlign: "center" }}>
           <span style={{ fontSize: 11, fontWeight: 500, color: "rgba(255,255,255,0.85)", letterSpacing: "0.04em", textTransform: "lowercase", border: "1px solid rgba(255,255,255,0.35)", borderRadius: 999, padding: "3px 10px" }}>{g.level}</span>
           <h1 style={{ fontSize: 26, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".1em", margin: "12px 0 8px", ...GRAD }}>open game</h1>
-          <p style={{ fontSize: 13, color: M, fontWeight: 400, textTransform: "lowercase" }}>📍 {g.location_name} · 🕐 {whenLabel(g.date, g.start_hour, g.duration_minutes)}</p>
-          <p style={{ fontSize: 13, color: g.price_per_player > 0 ? M : G, fontWeight: 400, marginTop: 4, textTransform: "lowercase" }}>{g.price_per_player > 0 ? `💰 chf ${g.price_per_player} pro spieler` : "gratis"}</p>
+          <p style={{ fontSize: 13, color: M, fontWeight: 500, textTransform: "lowercase" }}>📍 {g.location_name} · 🕐 {whenLabel(g.date, g.start_hour, g.duration_minutes)}</p>
+          <p style={{ fontSize: 13, color: g.price_per_player > 0 ? M : G, fontWeight: 500, marginTop: 4, textTransform: "lowercase" }}>{g.price_per_player > 0 ? `💰 chf ${g.price_per_player} pro spieler` : "gratis"}</p>
         </div>
 
         {cancelled ? (
@@ -64,7 +64,7 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
         ) : (<>
           {/* Spieler-Slots */}
           <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, padding: "16px", marginBottom: 12 }}>
-            <p style={{ fontSize: 12, color: M, marginBottom: 12, textTransform: "lowercase", fontWeight: 400 }}>{g.current_players}/{g.max_players} spieler dabei</p>
+            <p style={{ fontSize: 12, color: M, marginBottom: 12, textTransform: "lowercase", fontWeight: 500 }}>{g.current_players}/{g.max_players} spieler dabei</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
               {slots.map((_, i) => {
                 const p = players[i]
@@ -75,10 +75,10 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
                       <div style={{ flex: 1 }}>
                         <span style={{ fontSize: 14, fontWeight: 600, color: W }}>{p.name}</span>
                         {p.is_creator && <span style={{ fontSize: 9, color: "rgba(255,255,255,0.7)", marginLeft: 6, textTransform: "lowercase", border: "1px solid rgba(255,255,255,0.25)", borderRadius: 999, padding: "1px 6px" }}>host</span>}
-                        <p style={{ fontSize: 11, color: M, fontWeight: 400 }}>elo {p.elo} · {p.level}</p>
+                        <p style={{ fontSize: 11, color: M, fontWeight: 500 }}>elo {p.elo} · {p.level}</p>
                       </div>
                     ) : (
-                      <span style={{ flex: 1, fontSize: 13, color: M, fontWeight: 400, textTransform: "lowercase" }}>freier platz</span>
+                      <span style={{ flex: 1, fontSize: 13, color: M, fontWeight: 500, textTransform: "lowercase" }}>freier platz</span>
                     )}
                   </div>
                 )
@@ -86,7 +86,7 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
             </div>
           </div>
 
-          {g.notes && <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 12, padding: "12px 16px", marginBottom: 12 }}><p style={{ fontSize: 13, color: M, fontStyle: "italic", fontWeight: 400 }}>&quot;{g.notes}&quot;</p></div>}
+          {g.notes && <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 12, padding: "12px 16px", marginBottom: 12 }}><p style={{ fontSize: 13, color: M, fontStyle: "italic", fontWeight: 500 }}>&quot;{g.notes}&quot;</p></div>}
 
           {err && <p style={{ color: "#f87171", fontSize: 13, marginBottom: 12, textAlign: "center" }}>{err}</p>}
 

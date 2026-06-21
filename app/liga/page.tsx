@@ -110,7 +110,7 @@ export default function LigaPage(){
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",borderBottom:`1px solid ${B}`,background:"#0B0D10",position:"sticky",top:0,zIndex:10}}>
         <Link href="/entdecken" style={{display:"flex",alignItems:"center",gap:8,textDecoration:"none"}}>
           <svg width="22" height="22" viewBox="0 0 80 80" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#00E5FF"/></linearGradient></defs><path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="3.4" strokeLinejoin="round"/><circle cx="63" cy="58" r="6.5" fill="url(#lg)"/></svg>
-          <span style={{fontSize:13,fontWeight:800,letterSpacing:".20em",...gt}}>PLAYER <span style={{fontWeight:300,color:"rgba(255,255,255,.85)"}}>LIGA</span></span>
+          <span style={{fontSize:13,fontWeight:800,letterSpacing:".20em",...gt}}>PLAYER <span style={{fontWeight:500,color:"rgba(255,255,255,.85)"}}>LIGA</span></span>
         </Link>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button onClick={()=>setShowCity(v=>!v)} style={{background:"none",border:"none",color:M,fontSize:12,cursor:"pointer"}}>📍 {city||"stadt"} ▾</button>
@@ -138,7 +138,7 @@ export default function LigaPage(){
           <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(14,16,19,.25),rgba(14,16,19,.9))"}}/>
           <div style={{position:"absolute",left:16,bottom:12}}>
             <div style={{fontSize:24,fontWeight:800,textTransform:"uppercase",letterSpacing:".04em",...gt}}>liga</div>
-            <div style={{fontSize:11.5,color:"rgba(255,255,255,.85)",fontWeight:300}}>steig auf · gewinne punkte · fordere heraus</div>
+            <div style={{fontSize:11.5,color:"rgba(255,255,255,.85)",fontWeight:500}}>steig auf · gewinne punkte · fordere heraus</div>
           </div>
         </div>
 
@@ -216,7 +216,7 @@ export default function LigaPage(){
                 return(
                   <div key={m.id} style={{maxWidth:"80%",alignSelf:mine?"flex-end":"flex-start"}}>
                     {!mine&&<div style={{fontSize:10,color:"rgba(255,255,255,.55)",margin:"0 0 3px 4px"}}>{m.name}</div>}
-                    <div style={{background:mine?"linear-gradient(135deg,rgba(57,255,20,.18),rgba(31,209,196,.10))":C,border:`1px solid ${mine?"rgba(57,255,20,.3)":B}`,borderRadius:14,padding:"9px 12px",fontSize:13,fontWeight:300}}>{m.text}</div>
+                    <div style={{background:mine?"linear-gradient(135deg,rgba(57,255,20,.18),rgba(31,209,196,.10))":C,border:`1px solid ${mine?"rgba(57,255,20,.3)":B}`,borderRadius:14,padding:"9px 12px",fontSize:13,fontWeight:500}}>{m.text}</div>
                   </div>
                 )
               })}

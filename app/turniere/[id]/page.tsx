@@ -4,7 +4,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 
-const BG="#0E1013",C="#171A1F",B="#232833",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
+const BG="#15181E",C="#1E222A",B="#262B33",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
 type Profile={name:string,elo:number,level?:string}
@@ -103,7 +103,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
 
   if(loading||!data) return(
     <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <p style={{color:M,fontWeight:400,textTransform:"lowercase"}}>lädt...</p>
+      <p style={{color:M,fontWeight:500,textTransform:"lowercase"}}>lädt...</p>
       <BottomNav />
     </main>
   )
@@ -123,7 +123,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
           <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:12}}>
             <div>
               <h1 style={{fontSize:24,fontWeight:900,textTransform:"uppercase",letterSpacing:".1em",lineHeight:1.1,marginBottom:8,...GRAD}}>{t.name}</h1>
-              <p style={{fontSize:13,color:M,fontWeight:400,textTransform:"lowercase"}}>📍 {t.city||"standort offen"}{t.date?` · 📅 ${new Date(t.date).toLocaleDateString("de-CH",{weekday:"long",day:"numeric",month:"long"})}`:""}{t.entry_fee_chf?` · 💰 chf ${t.entry_fee_chf}`:" · gratis"}{t.counts_for_rank===false?" · nur spass":""}</p>
+              <p style={{fontSize:13,color:M,fontWeight:500,textTransform:"lowercase"}}>📍 {t.city||"standort offen"}{t.date?` · 📅 ${new Date(t.date).toLocaleDateString("de-CH",{weekday:"long",day:"numeric",month:"long"})}`:""}{t.entry_fee_chf?` · 💰 chf ${t.entry_fee_chf}`:" · gratis"}{t.counts_for_rank===false?" · nur spass":""}</p>
             </div>
             <span style={{fontSize:11,fontWeight:500,color:"rgba(255,255,255,0.85)",border:"1px solid rgba(255,255,255,0.35)",borderRadius:999,padding:"3px 10px",flexShrink:0,textTransform:"lowercase"}}>{t.skill_class}</span>
           </div>
@@ -135,7 +135,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
             {isRegistered?(
               <div style={{background:`${G}12`,border:`1px solid ${G}30`,borderRadius:12,padding:"12px 16px",textAlign:"center"}}>
                 <p style={{fontSize:13,fontWeight:600,color:G,textTransform:"lowercase"}}>✓ du bist angemeldet</p>
-                <p style={{fontSize:11,color:M,marginTop:2,fontWeight:400,textTransform:"lowercase"}}>{(registrations as unknown[]).length}/{t.max_players} spieler</p>
+                <p style={{fontSize:11,color:M,marginTop:2,fontWeight:500,textTransform:"lowercase"}}>{(registrations as unknown[]).length}/{t.max_players} spieler</p>
               </div>
             ):(
               <button onClick={register} disabled={registering} style={{width:"100%",background:"#fff",color:"#14161A",border:"none",borderRadius:12,padding:"14px",fontSize:14,fontWeight:600,cursor:"pointer",textTransform:"lowercase"}}>
@@ -151,7 +151,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
             <button onClick={startBracket} disabled={starting||(registrations as unknown[]).length<2} style={{width:"100%",background:starting||(registrations as unknown[]).length<2?"#2A2D38":G,color:starting||(registrations as unknown[]).length<2?M:"#06210a",border:"none",borderRadius:12,padding:"14px",fontSize:14,fontWeight:700,cursor:(registrations as unknown[]).length<2?"default":"pointer",textTransform:"lowercase"}}>
               {starting?"bracket wird erstellt...":(registrations as unknown[]).length<2?"mind. 2 spieler nötig":"⚔️ bracket erstellen & starten"}
             </button>
-            <p style={{fontSize:11,color:M,textAlign:"center",marginTop:8,fontWeight:400,textTransform:"lowercase"}}>setzliste automatisch nach elo · danach läuft das turnier</p>
+            <p style={{fontSize:11,color:M,textAlign:"center",marginTop:8,fontWeight:500,textTransform:"lowercase"}}>setzliste automatisch nach elo · danach läuft das turnier</p>
             {startError&&<p style={{fontSize:12,color:"#f87171",textAlign:"center",marginTop:6}}>{startError}</p>}
           </div>
         )}
@@ -171,14 +171,14 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
             <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,padding:"32px 20px",textAlign:"center"}}>
               <p style={{fontSize:28,marginBottom:12}}>⚔️</p>
               <p style={{fontSize:14,fontWeight:600,color:W,marginBottom:6}}>bracket noch nicht generiert</p>
-              <p style={{fontSize:12,color:M,fontWeight:400}}>wird nach ablauf der anmeldung erstellt.</p>
+              <p style={{fontSize:12,color:M,fontWeight:500}}>wird nach ablauf der anmeldung erstellt.</p>
             </div>
           ):(
             <div style={{overflowX:"auto",paddingBottom:12}}>
               <div style={{display:"flex",gap:20,alignItems:"flex-start",minWidth:"fit-content"}}>
                 {rounds.map(round=>(
                   <div key={round} style={{display:"flex",flexDirection:"column",gap:12}}>
-                    <p style={{fontSize:10,fontWeight:400,color:M,letterSpacing:"0.04em",textTransform:"lowercase",marginBottom:4,textAlign:"center"}}>{roundLabel(round,maxRound)}</p>
+                    <p style={{fontSize:10,fontWeight:500,color:M,letterSpacing:"0.04em",textTransform:"lowercase",marginBottom:4,textAlign:"center"}}>{roundLabel(round,maxRound)}</p>
                     {matches.filter(m=>m.round===round).map(m=>(
                       <BracketMatch key={m.id} m={m} userId={userId} onResult={setResultMatch}/>
                     ))}
@@ -193,17 +193,17 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
         {tab==="spieler"&&(
           <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,overflow:"hidden"}}>
             {(registrations as Array<{player_id:string,seed:number,profiles:{name:string,elo:number,level:string}|{name:string,elo:number,level:string}[]}>).length===0?(
-              <p style={{padding:"24px",textAlign:"center",color:M,fontSize:13,fontWeight:400,textTransform:"lowercase"}}>noch keine anmeldungen.</p>
+              <p style={{padding:"24px",textAlign:"center",color:M,fontSize:13,fontWeight:500,textTransform:"lowercase"}}>noch keine anmeldungen.</p>
             ):(registrations as Array<{player_id:string,seed:number,profiles:{name:string,elo:number,level:string}|{name:string,elo:number,level:string}[]}>).map((r,i)=>{
               const p=Array.isArray(r.profiles)?r.profiles[0]:r.profiles
               return(
                 <div key={r.player_id} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 16px",borderBottom:i<registrations.length-1?`1px solid ${B}`:"none",background:r.player_id===userId?"rgba(255,255,255,0.04)":"transparent"}}>
-                  <span style={{fontSize:12,color:M,minWidth:24,fontWeight:400}}>#{i+1}</span>
+                  <span style={{fontSize:12,color:M,minWidth:24,fontWeight:500}}>#{i+1}</span>
                   <div style={{flex:1}}>
                     <span style={{fontSize:13,fontWeight:600,color:r.player_id===userId?G:W}}>{p?.name||"?"}</span>
                     {r.player_id===userId&&<span style={{fontSize:9,color:"rgba(255,255,255,0.85)",marginLeft:6,border:"1px solid rgba(255,255,255,0.35)",borderRadius:999,padding:"1px 6px",textTransform:"lowercase"}}>du</span>}
                   </div>
-                  <span style={{fontSize:11,color:M,fontWeight:400,textTransform:"lowercase"}}>{p?.level}</span>
+                  <span style={{fontSize:11,color:M,fontWeight:500,textTransform:"lowercase"}}>{p?.level}</span>
                   <span style={{fontSize:13,fontWeight:600,color:W}}>{p?.elo}</span>
                 </div>
               )
@@ -216,10 +216,10 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
           <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.85)",display:"flex",alignItems:"flex-end",justifyContent:"center",zIndex:100,padding:"0 16px 24px"}}>
             <div style={{background:C,border:`1px solid ${B}`,borderRadius:20,padding:"24px 20px",width:"100%",maxWidth:400}}>
               <p style={{fontSize:16,fontWeight:600,color:W,marginBottom:4,textTransform:"lowercase"}}>resultat eintragen</p>
-              <p style={{fontSize:13,color:M,marginBottom:16,fontWeight:400}}>{getName(resultMatch.p1)} vs {getName(resultMatch.p2)}</p>
+              <p style={{fontSize:13,color:M,marginBottom:16,fontWeight:500}}>{getName(resultMatch.p1)} vs {getName(resultMatch.p2)}</p>
               {resultMatch.status==="p1_entered"?(
                 <>
-                  <p style={{fontSize:13,color:"rgba(255,255,255,0.7)",marginBottom:16,fontWeight:400,textTransform:"lowercase"}}>bitte bestätige das eingetragene resultat:</p>
+                  <p style={{fontSize:13,color:"rgba(255,255,255,0.7)",marginBottom:16,fontWeight:500,textTransform:"lowercase"}}>bitte bestätige das eingetragene resultat:</p>
                   <p style={{fontSize:13,color:W,marginBottom:16,textAlign:"center",fontWeight:600}}>
                     {resultMatch.sets?.map(s=>`${s.p1}:${s.p2}`).join("  ")}
                   </p>
@@ -230,10 +230,10 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
                 </>
               ):(
                 <>
-                  <p style={{fontSize:12,color:M,marginBottom:12,fontWeight:400,textTransform:"lowercase"}}>punktestand pro satz eintragen (optional leerlassen)</p>
+                  <p style={{fontSize:12,color:M,marginBottom:12,fontWeight:500,textTransform:"lowercase"}}>punktestand pro satz eintragen (optional leerlassen)</p>
                   {[0,1,2,3,4].map(i=>(
                     <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-                      <span style={{fontSize:12,color:M,minWidth:52,fontWeight:400,textTransform:"lowercase"}}>satz {i+1}:</span>
+                      <span style={{fontSize:12,color:M,minWidth:52,fontWeight:500,textTransform:"lowercase"}}>satz {i+1}:</span>
                       <input type="number" min="0" max="30" value={sets[i].p1} onChange={e=>{const s=[...sets];s[i]={...s[i],p1:e.target.value};setSets(s)}} style={{width:52,background:"#14161A",border:`1px solid ${B}`,borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
                       <span style={{fontSize:16,color:M,fontWeight:600}}>:</span>
                       <input type="number" min="0" max="30" value={sets[i].p2} onChange={e=>{const s=[...sets];s[i]={...s[i],p2:e.target.value};setSets(s)}} style={{width:52,background:"#14161A",border:`1px solid ${B}`,borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>

@@ -506,7 +506,7 @@ export default function BuchenPage() {
                     padding: "6px 14px", borderRadius: 20, cursor: "pointer",
                     border: `1px solid ${duration === d.val ? "rgba(255,255,255,0.7)" : BD}`,
                     background: duration === d.val ? "rgba(255,255,255,0.06)" : "transparent",
-                    fontFamily: "inherit", fontWeight: 400, fontSize: 13,
+                    fontFamily: "inherit", fontWeight: 500, fontSize: 13,
                     color: duration === d.val ? TEXT : SUB,
                   }}>
                   {d.label}
@@ -548,7 +548,7 @@ export default function BuchenPage() {
                     <button key={slot.hour}
                       onClick={() => { setSelectedSlot(sel ? null : slot); if (!sel) setTables(1) }}
                       style={{ background: sel ? TEXT : CARD, border: `1px solid ${sel ? TEXT : BD}`, borderRadius: 8, padding: "10px 4px", cursor: "pointer", textAlign: "center" }}>
-                      <div style={{ fontSize: 13, fontWeight: 400, color: sel ? "#14161A" : TEXT }}>{pad(slot.hour)}:00</div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: sel ? "#14161A" : TEXT }}>{pad(slot.hour)}:00</div>
                     </button>
                   )
                 })}

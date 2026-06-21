@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
-const BG="#0E1013",C="#171A1F",B="#232833",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
+const BG="#15181E",C="#1E222A",B="#262B33",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
 const LEVELS = ["Rookie", "Challenger", "Advanced", "Elite"]
@@ -40,7 +40,7 @@ export default function CreateMatchPage() {
     router.push(`/match/${json.id}`)
   }
 
-  const label = { fontSize: 11, fontWeight: 400, color: M, letterSpacing: "0.04em", textTransform: "lowercase" as const, marginBottom: 8, display: "block" }
+  const label = { fontSize: 11, fontWeight: 500, color: M, letterSpacing: "0.04em", textTransform: "lowercase" as const, marginBottom: 8, display: "block" }
   const input = { width: "100%", background: C, border: `1px solid ${B}`, borderRadius: 10, padding: "12px 14px", fontSize: 14, color: W, outline: "none" }
   const chip = (active: boolean) => ({
     padding: "10px 8px", borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, textTransform: "lowercase" as const,
@@ -54,7 +54,7 @@ export default function CreateMatchPage() {
 
         <div style={{ margin: "20px 0 24px" }}>
           <h1 style={{ fontSize: 28, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".1em", lineHeight: 1, ...GRAD }}>open game</h1>
-          <p style={{ fontSize: 13, color: M, marginTop: 8, fontWeight: 400, textTransform: "lowercase" }}>tisch + zeit eintragen, plätze freigeben — andere spielen mit</p>
+          <p style={{ fontSize: 13, color: M, marginTop: 8, fontWeight: 500, textTransform: "lowercase" }}>tisch + zeit eintragen, plätze freigeben — andere spielen mit</p>
         </div>
 
         {/* Level */}

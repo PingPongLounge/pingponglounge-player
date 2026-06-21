@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#0E1013",C="#171A1F",B="#232833",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
+const BG="#15181E",C="#1E222A",B="#262B33",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"} as const
 const CITIES=["Glattbrugg","Oerlikon","Zürich","Winterthur","Baden","Tessin"]
 const LEVELS=["alle","Rookie","Challenger","Advanced","Elite"]
@@ -58,7 +58,7 @@ export default function NeuesTurnierPage(){
 
         <div style={{margin:"20px 0 20px"}}>
           <h1 style={{fontSize:26,fontWeight:900,textTransform:"uppercase",letterSpacing:".08em",lineHeight:1,...GRAD}}>neues turnier</h1>
-          <p style={{fontSize:13,color:M,marginTop:8,fontWeight:400,textTransform:"lowercase"}}>jeder kann ein turnier erstellen · setzliste automatisch nach elo</p>
+          <p style={{fontSize:13,color:M,marginTop:8,fontWeight:500,textTransform:"lowercase"}}>jeder kann ein turnier erstellen · setzliste automatisch nach elo</p>
         </div>
 
         <Section n="1" title="eckdaten">
@@ -94,7 +94,7 @@ export default function NeuesTurnierPage(){
           <div onClick={()=>setCounts(!counts)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"12px",background:"#14161A",border:`1px solid ${counts?G+"40":B}`,borderRadius:10}}>
             <div>
               <p style={{fontSize:13,fontWeight:600,color:W,textTransform:"lowercase"}}>zählt für den rang</p>
-              <p style={{fontSize:11,color:M,marginTop:2,fontWeight:400,textTransform:"lowercase"}}>{counts?"resultate beeinflussen elo & rangliste":"nur zum spass — kein elo"}</p>
+              <p style={{fontSize:11,color:M,marginTop:2,fontWeight:500,textTransform:"lowercase"}}>{counts?"resultate beeinflussen elo & rangliste":"nur zum spass — kein elo"}</p>
             </div>
             <span style={{width:44,height:26,borderRadius:999,background:counts?G:"#2A2D38",position:"relative",flexShrink:0,transition:"background .15s"}}>
               <span style={{position:"absolute",top:3,left:counts?21:3,width:20,height:20,borderRadius:999,background:"#fff",transition:"left .15s"}}/>
@@ -107,7 +107,7 @@ export default function NeuesTurnierPage(){
         <button onClick={create} disabled={saving} style={{width:"100%",background:"#fff",color:"#14161A",border:"none",borderRadius:12,padding:"15px",fontSize:15,fontWeight:700,cursor:saving?"default":"pointer",textTransform:"lowercase",opacity:saving?0.6:1}}>
           {saving?"wird erstellt...":"turnier erstellen →"}
         </button>
-        <p style={{fontSize:11,color:M,textAlign:"center",marginTop:12,fontWeight:400,textTransform:"lowercase"}}>danach läuft die anmeldung · du startest das bracket, wenn genug spieler da sind</p>
+        <p style={{fontSize:11,color:M,textAlign:"center",marginTop:12,fontWeight:500,textTransform:"lowercase"}}>danach läuft die anmeldung · du startest das bracket, wenn genug spieler da sind</p>
       </div>
       <BottomNav />
     </main>
