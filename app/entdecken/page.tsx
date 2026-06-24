@@ -65,18 +65,20 @@ export default async function EntdeckenPage() {
 
   if (!user) {
     return (
-      <main style={{ minHeight: '100vh', background: BG, paddingBottom: 100 }}>
-        <div style={{ maxWidth: 480, margin: '0 auto', padding: '26px 0 90px' }}>
-          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}>
+      <main style={{ minHeight: '100vh', background: BG, paddingBottom: 100, position: 'relative' }}>
+        <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '0 18px 110px' }}>
+          {/* Foto-Hintergrund: Leute am Spielen */}
+          <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(180deg, rgba(14,16,20,.35) 0%, rgba(14,16,20,.72) 50%, rgba(14,16,20,.97) 100%), url('/hero-poster.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          <div style={{ position: 'relative', zIndex: 2 }}>
             <Logo />
-            <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '.26em', ...gt }}>PLAYER</div>
-            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '.22em', color: MUT, textTransform: 'uppercase' }}>Next Level Table Tennis</div>
+            <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '.26em', marginTop: 8, ...gt }}>PLAYER</div>
+            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '.22em', color: MUT, textTransform: 'uppercase', marginTop: 4 }}>Next Level Table Tennis</div>
+            <div style={{ marginTop: 26 }}>
+              <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 15, padding: 17, fontSize: 18, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.04em', color: '#08120a', background: GRAD, textDecoration: 'none' }}>Login / Registrieren</Link>
+              <Link href="/spielen" style={{ display: 'block', textAlign: 'center', marginTop: 12, color: SUB, fontSize: 14, fontWeight: 500, textDecoration: 'none' }}>Schon gespielt? Resultat eintragen →</Link>
+            </div>
+            <Circles loggedIn={false} />
           </div>
-          <div style={{ padding: '24px 18px 0' }}>
-            <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 15, padding: 17, fontSize: 18, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.04em', color: '#08120a', background: GRAD, textDecoration: 'none' }}>Login / Registrieren</Link>
-            <Link href="/spielen" style={{ display: 'block', textAlign: 'center', marginTop: 12, color: SUB, fontSize: 14, fontWeight: 500, textDecoration: 'none' }}>Schon gespielt? Resultat eintragen →</Link>
-          </div>
-          <Circles loggedIn={false} />
         </div>
         <BottomNav />
       </main>
