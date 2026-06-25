@@ -11,7 +11,7 @@ const EVERSPORTS_STUDIO = "https://www.eversports.ch/st/pingponglounge24"
 // Widget-ID aus dem Eversports Manager hier eintragen:
 // Manager → Widgets → gewünschtes Widget (Kursplan/Buchung) → Code kopieren
 // → die ID aus  data-eversports-widget-id="…"  hier einsetzen.
-const EVERSPORTS_WIDGET_ID = "" // z.B. "abcd1234"
+const EVERSPORTS_WIDGET_ID = "2662962e-ccc2-45ef-94c6-eaf9cf3c0b30"
 
 export default function TrainingPage() {
   useEffect(() => {
