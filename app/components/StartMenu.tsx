@@ -14,7 +14,7 @@ function Icon({ d, fillBall }: { d: string; fillBall?: string }) {
 
 const row: React.CSSProperties = { display: "flex", alignItems: "center", gap: 4, padding: "13px 15px", borderTop: `1px solid #20242E`, textDecoration: "none" }
 
-export default function StartMenu({ name = "Spieler", sub = "" }: { name?: string; sub?: string }) {
+export default function StartMenu({ name = "Spieler", sub = "", inline = false }: { name?: string; sub?: string; inline?: boolean }) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
 
@@ -32,7 +32,7 @@ export default function StartMenu({ name = "Spieler", sub = "" }: { name?: strin
 
   return (
     <>
-      <button onClick={() => setOpen(true)} aria-label="Menü" style={{ position: "absolute", top: 18, right: 16, background: C, border: `1px solid ${B}`, borderRadius: 11, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", zIndex: 20, cursor: "pointer" }}>
+      <button onClick={() => setOpen(true)} aria-label="Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), background: C, border: `1px solid ${B}`, borderRadius: 11, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#00E5FF"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
       </button>
 
