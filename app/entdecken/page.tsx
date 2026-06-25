@@ -8,7 +8,7 @@ const BG = '#0E1014', CARD = '#1A1D24', CELL = '#23272F', W = '#FFFFFF'
 const SUB = 'rgba(255,255,255,.82)', MUT = 'rgba(255,255,255,.5)'
 const LINE = 'rgba(255,255,255,.07)'
 const GRAD = 'linear-gradient(135deg,#39FF14,#00E5FF)'
-const EVERSPORTS_TRAINING = 'https://www.eversports.ch/widget/w/5a5zxf'
+const EVERSPORTS_TRAINING = 'https://www.eversports.ch/st/pingponglounge24'
 
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }
 const grp: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: '.22em', textTransform: 'uppercase', color: MUT, margin: '22px 18px 9px' }
