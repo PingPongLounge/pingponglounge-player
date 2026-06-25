@@ -8,7 +8,6 @@ const BG = '#0E1014', CARD = '#1A1D24', CELL = '#23272F', W = '#FFFFFF'
 const SUB = 'rgba(255,255,255,.82)', MUT = 'rgba(255,255,255,.5)'
 const LINE = 'rgba(255,255,255,.07)'
 const GRAD = 'linear-gradient(135deg,#39FF14,#00E5FF)'
-const EVERSPORTS_TRAINING = 'https://www.eversports.ch/st/pingponglounge24'
 
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }
 const grp: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: '.22em', textTransform: 'uppercase', color: MUT, margin: '22px 18px 9px' }
@@ -198,7 +197,7 @@ export default async function EntdeckenPage() {
         {/* TIER 4 — Mehr */}
         <div style={grp}>Mehr</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, margin: '0 18px' }}>
-          <Link href={EVERSPORTS_TRAINING} style={tile} target="_blank" rel="noopener noreferrer"><img src="/icons/paddles.svg" alt="" style={{ width: 30, height: 30, margin: '0 auto', display: 'block' }} /><div style={tileT}>Training</div></Link>
+          <Link href="/training" style={tile}><img src="/icons/paddles.svg" alt="" style={{ width: 30, height: 30, margin: '0 auto', display: 'block' }} /><div style={tileT}>Training</div></Link>
           <Link href="/freunde" style={tile}><img src="/icons/people.svg" alt="" style={{ width: 30, height: 30, margin: '0 auto', display: 'block' }} /><div style={tileT}>Freunde</div></Link>
           <Link href="/feed" style={tile}><img src="/icons/stats.svg" alt="" style={{ width: 30, height: 30, margin: '0 auto', display: 'block' }} /><div style={tileT}>Aktivität</div></Link>
           <Link href="/achievements" style={tile}><img src="/icons/levelup.svg" alt="" style={{ width: 30, height: 30, margin: '0 auto', display: 'block' }} /><div style={tileT}>Erfolge</div></Link>
