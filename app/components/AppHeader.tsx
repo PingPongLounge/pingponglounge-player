@@ -6,7 +6,7 @@ import StartMenu from "./StartMenu"
 // Auf diesen Seiten KEIN globaler Kopf (eigener Kopf / ausgeloggt / Flow)
 const HIDE = ["/", "/login", "/onboarding", "/spielen", "/join", "/auth", "/entdecken", "/staff"]
 
-const BG = "#0E1014"
+const BG = "#20242C"
 const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
 

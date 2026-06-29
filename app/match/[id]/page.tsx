@@ -70,7 +70,7 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
                 const p = players[i]
                 return (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", ...cell, border: p ? "none" : "1px dashed #3A3D48" }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: p ? "#222630" : "transparent", border: p ? "1px solid #23272F" : "1px dashed #3A3D48", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: M }}>{p ? "🏓" : "+"}</div>
+                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: p ? "#222630" : "transparent", border: p ? "1px solid #353B46" : "1px dashed #3A3D48", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: M }}>{p ? "🏓" : "+"}</div>
                     {p ? (
                       <div style={{ flex: 1 }}>
                         <span style={{ fontSize: 14, fontWeight: 700, color: W }}>{p.name}</span>

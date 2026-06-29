@@ -81,7 +81,7 @@ export default function AchievementsPage() {
             <span style={{ fontSize: 12, fontWeight: 700, color: W }}>{pct}% abgeschlossen</span>
             <span style={{ ...meta, fontSize: 12 }}>{earned} / {total}</span>
           </div>
-          <div style={{ height: 6, background: "#23272F", borderRadius: 3, overflow: "hidden" }}>
+          <div style={{ height: 6, background: "#353B46", borderRadius: 3, overflow: "hidden" }}>
             <div style={{ height: "100%", width: `${pct}%`, background: GRAD, borderRadius: 3, transition: "width .5s" }} />
           </div>
         </div>

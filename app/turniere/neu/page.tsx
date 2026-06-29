@@ -91,12 +91,12 @@ export default function NeuesTurnierPage(){
         <Section n="3" title="Startgeld & Rang">
           <Label>Startgeld pro Spieler (CHF)</Label>
           <input type="number" min="0" max="999" value={fee} onChange={e=>setFee(e.target.value)} style={{...inputStyle,marginBottom:14}}/>
-          <div onClick={()=>setCounts(!counts)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"12px",background:"#0E1014",border:`1px solid ${counts?G+"40":B}`,borderRadius:10}}>
+          <div onClick={()=>setCounts(!counts)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"12px",background:"#20242C",border:`1px solid ${counts?G+"40":B}`,borderRadius:10}}>
             <div>
               <p style={{fontSize:13,fontWeight:700,color:W}}>Zählt für den Rang</p>
               <p style={{...body,marginTop:2}}>{counts?"Resultate beeinflussen Elo & Rangliste":"Nur zum Spass — kein Elo"}</p>
             </div>
-            <span style={{width:44,height:26,borderRadius:999,background:counts?G:"#23272F",position:"relative",flexShrink:0,transition:"background .15s"}}>
+            <span style={{width:44,height:26,borderRadius:999,background:counts?G:"#353B46",position:"relative",flexShrink:0,transition:"background .15s"}}>
               <span style={{position:"absolute",top:3,left:counts?21:3,width:20,height:20,borderRadius:999,background:"#fff",transition:"left .15s"}}/>
             </span>
           </div>

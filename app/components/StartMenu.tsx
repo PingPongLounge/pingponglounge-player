@@ -70,7 +70,7 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false }
               <Link2 href="/buchen" label="tisch buchen" icon={<Icon d='<path d="M4 11h16M6 11v6M18 11v6M12 11V6M10 7.6h4M10 9.5h4"/>' />} />
             </div>
 
-            <button onClick={logout} style={{ width: "100%", marginTop: 20, background: "transparent", border: `1px solid #23272F`, color: W, borderRadius: 12, padding: 12, fontSize: 13, fontWeight: 500, textTransform: "lowercase", cursor: "pointer" }}>abmelden</button>
+            <button onClick={logout} style={{ width: "100%", marginTop: 20, background: "transparent", border: `1px solid #353B46`, color: W, borderRadius: 12, padding: 12, fontSize: 13, fontWeight: 500, textTransform: "lowercase", cursor: "pointer" }}>abmelden</button>
           </div>
         </div>
       )}

@@ -3,7 +3,7 @@
 // =====================================================================
 // Finale Regeln (von Oliver bestätigt, Referenz: Startseite /entdecken)
 //
-//  • Verlauf (#39FF14 → #00E5FF) NUR für Logo + Rang-Zahl. Sonst nie.
+//  • Verlauf (#39FF14 → #1FD1C4) NUR für Logo + Rang-Zahl. Sonst nie.
 //  • Überschriften/Titel extra fett (900), GROSSBUCHSTABEN, weiss.
 //  • Fliesstext leicht (300) aber weiss (~.85–.9) — Kontrast über Gewicht.
 //  • Karten randlos (kein Border), Füllung + dezenter Schatten.
@@ -17,19 +17,19 @@
 import type { CSSProperties } from 'react'
 
 /* ---------- Farben ---------- */
-export const BG     = '#0E1014'                 // Screen-Hintergrund (Startseiten-Referenz)
-export const CARD   = '#1A1D24'                 // Karten-Fläche (DAS Standard-Kästchen)
-export const CELL   = '#23272F'                 // Zellen / Chips innerhalb Karten
-export const INPUTBG= '#10131A'                 // Eingabefelder (etwas dunkler)
+export const BG     = '#20242C'                 // Screen-Hintergrund (Startseiten-Referenz)
+export const CARD   = '#2A2F39'                 // Karten-Fläche (DAS Standard-Kästchen)
+export const CELL   = '#353B46'                 // Zellen / Chips innerhalb Karten
+export const INPUTBG= '#20242C'                 // Eingabefelder (etwas dunkler)
 export const W      = '#FFFFFF'                  // Primärtext
-export const SUB    = 'rgba(255,255,255,.85)'   // Sekundärtext (gut lesbar)
-export const MUT    = 'rgba(255,255,255,.6)'    // Labels / gedämpft (Minimum für Text)
+export const SUB    = 'rgba(255,255,255,.9)'   // Sekundärtext (gut lesbar)
+export const MUT    = 'rgba(255,255,255,.72)'    // Labels / gedämpft (Minimum für Text)
 export const LINE   = 'rgba(255,255,255,.06)'   // ultra-dezente Trennlinie
 export const DANGER = '#E5484D'                 // Fehler / Löschen (klares, ruhiges Rot)
 
 export const GREEN  = '#39FF14'
-export const CYAN   = '#00E5FF'
-export const GRAD   = 'linear-gradient(135deg,#39FF14,#00E5FF)'   // DAS eine Leuchten (Logo + Rang)
+export const CYAN   = '#1FD1C4'
+export const GRAD   = 'linear-gradient(135deg,#39FF14,#1FD1C4)'   // DAS eine Leuchten (Logo + Rang)
 export const SHADOW = '0 4px 14px rgba(0,0,0,.35)'
 
 /* ---------- Level-Farben: gedämpfte Pastell-Metalle (Aufstieg Mint→Bronze→Silber→Gold) ----------

@@ -3,7 +3,7 @@ import { useEffect } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG = "#0E1014", CARD = "#1A1D24", W = "#FFFFFF"
+const BG = "#20242C", CARD = "#2A2F39", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.5)"
 const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 const EVERSPORTS_STUDIO = "https://www.eversports.ch/st/pingponglounge24"

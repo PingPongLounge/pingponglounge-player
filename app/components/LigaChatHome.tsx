@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useRef, useState, useCallback } from "react"
 
-const CARD = "#1A1D24", CELL = "#23272F", W = "#FFFFFF"
+const CARD = "#2A2F39", CELL = "#353B46", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.5)"
 const LINE = "rgba(255,255,255,.07)"
 const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
@@ -71,7 +71,7 @@ export default function LigaChatHome({
           <input
             value={text} onChange={e => setText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") send() }}
             placeholder="Nachricht an die Liga…"
-            style={{ flex: 1, background: "#10131a", border: `1px solid ${LINE}`, borderRadius: 12, padding: "11px 14px", color: W, fontSize: 13, outline: "none", fontFamily: "inherit" }}
+            style={{ flex: 1, background: "#20242C", border: `1px solid ${LINE}`, borderRadius: 12, padding: "11px 14px", color: W, fontSize: 13, outline: "none", fontFamily: "inherit" }}
           />
           <button onClick={send} disabled={sending} style={{ width: 44, border: "none", borderRadius: 12, background: GRAD, color: "#08120a", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>→</button>
         </div>

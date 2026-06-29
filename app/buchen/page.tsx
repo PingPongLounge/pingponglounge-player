@@ -107,8 +107,8 @@ function StepBar({ current }: { current: Step }) {
                 display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
                 {done
-                  ? <svg viewBox="0 0 10 8" style={{ width: 9 }}><path d="M1 4l2.5 2.5L9 1" stroke="#0E1014" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-                  : <span style={{ fontSize: 8, fontWeight: 900, color: active ? "#0E1014" : SUB }}>{i + 1}</span>
+                  ? <svg viewBox="0 0 10 8" style={{ width: 9 }}><path d="M1 4l2.5 2.5L9 1" stroke="#20242C" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+                  : <span style={{ fontSize: 8, fontWeight: 900, color: active ? "#20242C" : SUB }}>{i + 1}</span>
                 }
               </div>
               <span style={{
@@ -454,7 +454,7 @@ export default function BuchenPage() {
                         <button key={i} disabled={past}
                           onClick={() => { setSelectedDate(d); setSelectedSlot(null); setShowCal(false) }}
                           style={{ aspectRatio: "1", borderRadius: 8, border: "none", cursor: past ? "default" : "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: isSel ? 700 : 400,
-                            background: isSel ? "#fff" : "transparent", color: isSel ? "#0E1014" : past ? "rgba(255,255,255,0.18)" : TEXT }}>
+                            background: isSel ? "#fff" : "transparent", color: isSel ? "#20242C" : past ? "rgba(255,255,255,0.18)" : TEXT }}>
                           {d.getDate()}
                         </button>
                       )

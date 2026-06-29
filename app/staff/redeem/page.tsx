@@ -1,9 +1,9 @@
 "use client"
 import { useState } from "react"
 
-const BG = "#0E1014"
-const C  = "#1A1D24"
-const B  = "#1A1D24"
+const BG = "#20242C"
+const C  = "#2A2F39"
+const B  = "#2A2F39"
 const M  = "rgba(255,255,255,0.66)"
 const G  = "#39FF14"
 const W  = "#FFFFFF"
@@ -75,7 +75,7 @@ export default function StaffRedeemPage() {
             style={{
               width: "100%",
               background: code.length === 6 ? "#fff" : B,
-              color: code.length === 6 ? "#0E1014" : M,
+              color: code.length === 6 ? "#20242C" : M,
               border: "none",
               borderRadius: 10,
               padding: "16px",
@@ -121,7 +121,7 @@ export default function StaffRedeemPage() {
             </p>
             <div style={{
               background: G,
-              color: "#0E1014",
+              color: "#20242C",
               borderRadius: 8,
               padding: "12px",
               textAlign: "center",

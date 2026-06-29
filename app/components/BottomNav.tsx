@@ -4,16 +4,16 @@ import { usePathname } from "next/navigation"
 
 const ACTIVE = "#FFFFFF"
 const INACTIVE = "rgba(255,255,255,0.28)"
-const BG = "#0E1014"
-const BORDER = "#1A1D24"
+const BG = "#20242C"
+const BORDER = "#2A2F39"
 
 const tabs = [
   {
-    href: "/entdecken",
-    label: "start",
+    href: "/match",
+    label: "open game",
     icon: (a: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M3 12L12 3l9 9"/><path d="M9 21V12h6v9"/>
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+        <ellipse cx="10" cy="9.8" rx="5.5" ry="4.8" transform="rotate(-42 10 9.8)"/><path d="M13.5 13.3 17.5 17.3" strokeWidth="3"/><circle cx="18.2" cy="6" r="1.4" fill={a ? ACTIVE : INACTIVE} stroke="none"/>
       </svg>
     ),
   },
@@ -27,11 +27,11 @@ const tabs = [
     ),
   },
   {
-    href: "/match",
-    label: "open game",
+    href: "/turniere",
+    label: "turnier",
     icon: (a: boolean) => (
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        <ellipse cx="10" cy="9.8" rx="5.5" ry="4.8" transform="rotate(-42 10 9.8)"/><path d="M13.5 13.3 17.5 17.3" strokeWidth="3"/><circle cx="18.2" cy="6" r="1.4" fill={a ? ACTIVE : INACTIVE} stroke="none"/>
+        <path d="M6 4h12v5a6 6 0 0 1-12 0z"/><path d="M6 6H4a2 2 0 0 0 2 4M18 6h2a2 2 0 0 1-2 4M9 20h6M12 15v5"/>
       </svg>
     ),
   },
