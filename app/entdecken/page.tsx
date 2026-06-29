@@ -146,6 +146,24 @@ export default async function EntdeckenPage() {
         {/* Tisch buchen — subtil */}
         <Link href="/buchen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, margin: '10px 16px 0', color: MUT, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>Tisch buchen · 6 Standorte ›</Link>
 
+        {/* Spotlight */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '24px 20px 10px' }}>
+          <span style={slT}>Spotlight</span>
+        </div>
+        <Link href="/match" style={{ display: 'block', margin: '0 16px', borderRadius: 16, overflow: 'hidden', background: CARD, textDecoration: 'none', boxShadow: SHADOW }}>
+          <img src="/spotlight.jpg" alt="" style={{ width: '100%', height: 150, objectFit: 'cover', display: 'block' }} />
+          <div style={{ padding: '15px 16px 16px' }}>
+            <div style={{ display: 'flex', gap: 16, fontSize: 11.5, fontWeight: 700, color: MUT, textTransform: 'uppercase', letterSpacing: '.04em' }}>
+              <span>📅 Heute 19:00</span><span>📍 Glattbrugg</span>
+            </div>
+            <div style={{ fontSize: 21, fontWeight: 900, color: W, marginTop: 8, lineHeight: 1.05 }}>Open Game · 1 Platz frei</div>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 14 }}>
+              <span style={{ display: 'inline-block', borderRadius: 12, padding: '11px 22px', fontSize: 14, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: '#fff', border: '1.5px solid transparent', background: `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` }}>Mitspielen</span>
+              <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase', color: MUT }}>PPL · Open Game</span>
+            </div>
+          </div>
+        </Link>
+
       </div>
       <BottomNav />
     </main>
