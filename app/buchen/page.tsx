@@ -6,8 +6,8 @@ import Link from "next/link"
 
 // ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
 const BG   = "#0E1013"
-const CARD = "#1B1E25"
-const BD   = "#1E2230"
+const CARD = "#1A1D24"
+const BD   = "#1A1D24"
 const TEXT = "#FFFFFF"
 const SUB  = "rgba(255,255,255,0.35)"
 const LBL  = "rgba(255,255,255,0.5)"
@@ -15,7 +15,7 @@ const GRAD = "linear-gradient(135deg, #39FF14 0%, #00D4AA 50%, #1FD1C4 100%)"
 const G    = "#39FF14"
 
 const btnPrimary: React.CSSProperties = {
-  background: "#fff", color: "#14161A",
+  background: "#fff", color: "#0E1014",
   border: "none", borderRadius: 10,
   padding: "14px 24px", fontFamily: "inherit",
   fontWeight: 800, fontSize: 14,
@@ -132,8 +132,8 @@ function StepBar({ current }: { current: Step }) {
                 display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
                 {done
-                  ? <svg viewBox="0 0 10 8" style={{ width: 9 }}><path d="M1 4l2.5 2.5L9 1" stroke="#14161A" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
-                  : <span style={{ fontSize: 8, fontWeight: 900, color: active ? "#14161A" : SUB }}>{i + 1}</span>
+                  ? <svg viewBox="0 0 10 8" style={{ width: 9 }}><path d="M1 4l2.5 2.5L9 1" stroke="#0E1014" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" fill="none"/></svg>
+                  : <span style={{ fontSize: 8, fontWeight: 900, color: active ? "#0E1014" : SUB }}>{i + 1}</span>
                 }
               </div>
               <span style={{
@@ -487,7 +487,7 @@ export default function BuchenPage() {
                         <button key={i} disabled={past}
                           onClick={() => { setSelectedDate(d); setSelectedSlot(null); setShowCal(false) }}
                           style={{ aspectRatio: "1", borderRadius: 8, border: "none", cursor: past ? "default" : "pointer", fontFamily: "inherit", fontSize: 12, fontWeight: isSel ? 700 : 400,
-                            background: isSel ? "#fff" : "transparent", color: isSel ? "#14161A" : past ? "rgba(255,255,255,0.18)" : TEXT }}>
+                            background: isSel ? "#fff" : "transparent", color: isSel ? "#0E1014" : past ? "rgba(255,255,255,0.18)" : TEXT }}>
                           {d.getDate()}
                         </button>
                       )
@@ -548,7 +548,7 @@ export default function BuchenPage() {
                     <button key={slot.hour}
                       onClick={() => { setSelectedSlot(sel ? null : slot); if (!sel) setTables(1) }}
                       style={{ background: sel ? TEXT : CARD, border: `1px solid ${sel ? TEXT : BD}`, borderRadius: 8, padding: "10px 4px", cursor: "pointer", textAlign: "center" }}>
-                      <div style={{ fontSize: 13, fontWeight: 500, color: sel ? "#14161A" : TEXT }}>{pad(slot.hour)}:00</div>
+                      <div style={{ fontSize: 13, fontWeight: 500, color: sel ? "#0E1014" : TEXT }}>{pad(slot.hour)}:00</div>
                     </button>
                   )
                 })}

@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-const DARK='#14161A', SURFACE='#111214', BORDER='#26282E', G='#39FF14', MUTED='#6B6E7A', TEXT='#E8E6E1'
+const DARK='#0E1014', SURFACE='#111214', BORDER='#26282E', G='#39FF14', MUTED='#6B6E7A', TEXT='#E8E6E1'
 
 export default function ResetPasswordPage() {
   const router = useRouter()
@@ -72,7 +72,7 @@ export default function ResetPasswordPage() {
               style={{
                 padding: '14px', borderRadius: '10px', fontSize: '15px', fontWeight: 800,
                 background: !password || !confirm ? BORDER : G,
-                color: !password || !confirm ? MUTED : '#14161A',
+                color: !password || !confirm ? MUTED : '#0E1014',
                 border: 'none', cursor: !password || !confirm ? 'default' : 'pointer',
               }}
             >

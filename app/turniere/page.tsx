@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#15181E",C="#1E222A",B="#262B33",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
+const BG="#0E1014",C="#1A1D24",B="#23272F",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 const statusLabel=(s:string)=>({open:"offen",running:"läuft",finished:"beendet"}[s]||s)
 
@@ -34,7 +34,7 @@ export default function TurnierePage(){
         <p style={{fontSize:36,marginBottom:12}}>⚠️</p>
         <p style={{fontSize:14,fontWeight:600,color:W,marginBottom:6}}>verbindungsfehler</p>
         <p style={{fontSize:13,color:M,marginBottom:20,fontWeight:500}}>{error}</p>
-        <button onClick={load} style={{background:"#fff",color:"#14161A",border:"none",borderRadius:10,padding:"10px 24px",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",textTransform:"lowercase"}}>nochmals versuchen</button>
+        <button onClick={load} style={{background:"#fff",color:"#0E1014",border:"none",borderRadius:10,padding:"10px 24px",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",textTransform:"lowercase"}}>nochmals versuchen</button>
       </div>
       <BottomNav />
     </main>
@@ -51,7 +51,7 @@ export default function TurnierePage(){
         </div>
 
         <Link href="/turniere/neu" style={{textDecoration:"none"}}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,background:"#fff",color:"#14161A",borderRadius:12,padding:"13px",fontSize:14,fontWeight:700,marginBottom:20,textTransform:"lowercase"}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,background:"#fff",color:"#0E1014",borderRadius:12,padding:"13px",fontSize:14,fontWeight:700,marginBottom:20,textTransform:"lowercase"}}>
             + eigenes turnier erstellen
           </div>
         </Link>

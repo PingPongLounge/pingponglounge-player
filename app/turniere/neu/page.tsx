@@ -4,12 +4,12 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#15181E",C="#1E222A",B="#262B33",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
+const BG="#0E1014",C="#1A1D24",B="#23272F",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"} as const
 const CITIES=["Glattbrugg","Oerlikon","Zürich","Winterthur","Baden","Tessin"]
 const LEVELS=["alle","Rookie","Challenger","Advanced","Elite"]
 
-const inputStyle={width:"100%",background:"#14161A",border:`1px solid ${B}`,borderRadius:10,padding:"12px",fontSize:14,color:W,outline:"none",fontFamily:"inherit"} as const
+const inputStyle={width:"100%",background:"#0E1014",border:`1px solid ${B}`,borderRadius:10,padding:"12px",fontSize:14,color:W,outline:"none",fontFamily:"inherit"} as const
 
 export default function NeuesTurnierPage(){
   const router=useRouter()
@@ -48,7 +48,7 @@ export default function NeuesTurnierPage(){
     </div>
   )
   const Chip=({active,onClick,children}:{active:boolean,onClick:()=>void,children:React.ReactNode})=>(
-    <button onClick={onClick} style={{padding:"9px 14px",borderRadius:999,fontSize:13,fontWeight:active?700:400,cursor:"pointer",background:active?"#fff":"#14161A",color:active?"#14161A":M,border:`1px solid ${active?"#fff":B}`,textTransform:"lowercase"}}>{children}</button>
+    <button onClick={onClick} style={{padding:"9px 14px",borderRadius:999,fontSize:13,fontWeight:active?700:400,cursor:"pointer",background:active?"#fff":"#0E1014",color:active?"#0E1014":M,border:`1px solid ${active?"#fff":B}`,textTransform:"lowercase"}}>{children}</button>
   )
 
   return(
@@ -91,12 +91,12 @@ export default function NeuesTurnierPage(){
         <Section n="3" title="startgeld & rang">
           <Label>startgeld pro spieler (chf)</Label>
           <input type="number" min="0" max="999" value={fee} onChange={e=>setFee(e.target.value)} style={{...inputStyle,marginBottom:14}}/>
-          <div onClick={()=>setCounts(!counts)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"12px",background:"#14161A",border:`1px solid ${counts?G+"40":B}`,borderRadius:10}}>
+          <div onClick={()=>setCounts(!counts)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"12px",background:"#0E1014",border:`1px solid ${counts?G+"40":B}`,borderRadius:10}}>
             <div>
               <p style={{fontSize:13,fontWeight:600,color:W,textTransform:"lowercase"}}>zählt für den rang</p>
               <p style={{fontSize:11,color:M,marginTop:2,fontWeight:500,textTransform:"lowercase"}}>{counts?"resultate beeinflussen elo & rangliste":"nur zum spass — kein elo"}</p>
             </div>
-            <span style={{width:44,height:26,borderRadius:999,background:counts?G:"#2A2D38",position:"relative",flexShrink:0,transition:"background .15s"}}>
+            <span style={{width:44,height:26,borderRadius:999,background:counts?G:"#23272F",position:"relative",flexShrink:0,transition:"background .15s"}}>
               <span style={{position:"absolute",top:3,left:counts?21:3,width:20,height:20,borderRadius:999,background:"#fff",transition:"left .15s"}}/>
             </span>
           </div>
@@ -104,7 +104,7 @@ export default function NeuesTurnierPage(){
 
         {error&&<p style={{fontSize:13,color:"#f87171",margin:"4px 0 12px",textAlign:"center"}}>{error}</p>}
 
-        <button onClick={create} disabled={saving} style={{width:"100%",background:"#fff",color:"#14161A",border:"none",borderRadius:12,padding:"15px",fontSize:15,fontWeight:700,cursor:saving?"default":"pointer",textTransform:"lowercase",opacity:saving?0.6:1}}>
+        <button onClick={create} disabled={saving} style={{width:"100%",background:"#fff",color:"#0E1014",border:"none",borderRadius:12,padding:"15px",fontSize:15,fontWeight:700,cursor:saving?"default":"pointer",textTransform:"lowercase",opacity:saving?0.6:1}}>
           {saving?"wird erstellt...":"turnier erstellen →"}
         </button>
         <p style={{fontSize:11,color:M,textAlign:"center",marginTop:12,fontWeight:500,textTransform:"lowercase"}}>danach läuft die anmeldung · du startest das bracket, wenn genug spieler da sind</p>

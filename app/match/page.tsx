@@ -5,7 +5,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 
-const BG="#15181E",C="#1E222A",B="#262B33",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
+const BG="#0E1014",C="#1A1D24",B="#23272F",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
 function whenLabel(date: string | null, hour: number | null): string {
@@ -83,35 +83,35 @@ export default function MatchPage() {
           </div>
           {!myGame ? (
             <Link href="/match/create" style={{ textDecoration: "none" }}>
-              <button style={{ background: "#fff", color: "#14161A", border: "none", borderRadius: 10, padding: "10px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>+ spiel</button>
+              <button style={{ background: "#fff", color: "#0E1014", border: "none", borderRadius: 10, padding: "10px 16px", fontSize: 13, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>+ spiel</button>
             </Link>
           ) : (
-            <button onClick={() => cancel(myGame)} style={{ background: "transparent", color: "rgba(255,255,255,0.85)", border: "1px solid #2A2D38", borderRadius: 10, padding: "10px 16px", fontSize: 12, fontWeight: 500, cursor: "pointer", textTransform: "lowercase" }}>mein spiel löschen</button>
+            <button onClick={() => cancel(myGame)} style={{ background: "transparent", color: "rgba(255,255,255,0.85)", border: "1px solid #23272F", borderRadius: 10, padding: "10px 16px", fontSize: 12, fontWeight: 500, cursor: "pointer", textTransform: "lowercase" }}>mein spiel löschen</button>
           )}
         </div>
 
         {/* Filter */}
         <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
           {LEVELS.map(l => { const active = filterLevel === l; return (
-            <button key={l} onClick={() => setFilterLevel(active ? "" : l)} style={{ padding: "5px 12px", borderRadius: 999, fontSize: 11, fontWeight: active ? 600 : 400, cursor: "pointer", textTransform: "lowercase", background: active ? "#fff" : C, border: `1px solid ${active ? "#fff" : B}`, color: active ? "#14161A" : M }}>{l}</button>
+            <button key={l} onClick={() => setFilterLevel(active ? "" : l)} style={{ padding: "5px 12px", borderRadius: 999, fontSize: 11, fontWeight: active ? 600 : 400, cursor: "pointer", textTransform: "lowercase", background: active ? "#fff" : C, border: `1px solid ${active ? "#fff" : B}`, color: active ? "#0E1014" : M }}>{l}</button>
           )})}
         </div>
         <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}>
           {CITIES.map(c => (
-            <button key={c} onClick={() => setFilterCity(filterCity === c ? "" : c)} style={{ padding: "5px 12px", borderRadius: 999, fontSize: 11, fontWeight: filterCity === c ? 600 : 400, cursor: "pointer", textTransform: "lowercase", background: filterCity === c ? "#fff" : C, border: `1px solid ${filterCity === c ? "#fff" : B}`, color: filterCity === c ? "#14161A" : M }}>{c}</button>
+            <button key={c} onClick={() => setFilterCity(filterCity === c ? "" : c)} style={{ padding: "5px 12px", borderRadius: 999, fontSize: 11, fontWeight: filterCity === c ? 600 : 400, cursor: "pointer", textTransform: "lowercase", background: filterCity === c ? "#fff" : C, border: `1px solid ${filterCity === c ? "#fff" : B}`, color: filterCity === c ? "#0E1014" : M }}>{c}</button>
           ))}
         </div>
 
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px 0", color: M }}><div style={{ fontSize: 32, marginBottom: 12 }}>🏓</div><p style={{ fontSize: 14 }}>lädt...</p></div>
         ) : error ? (
-          <div style={{ textAlign: "center", padding: "40px 0", color: M }}><p style={{ marginBottom: 16 }}>{error}</p><button onClick={load} style={{ background: "#fff", color: "#14161A", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>nochmals</button></div>
+          <div style={{ textAlign: "center", padding: "40px 0", color: M }}><p style={{ marginBottom: 16 }}>{error}</p><button onClick={load} style={{ background: "#fff", color: "#0E1014", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>nochmals</button></div>
         ) : filtered.length === 0 ? (
           <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, padding: "40px 20px", textAlign: "center" }}>
             <p style={{ fontSize: 32, marginBottom: 12 }}>🏓</p>
             <p style={{ fontSize: 16, fontWeight: 600, color: W, marginBottom: 8 }}>keine offenen spiele</p>
             <p style={{ fontSize: 13, color: M, marginBottom: 20, fontWeight: 500 }}>erstell das erste!</p>
-            <Link href="/match/create" style={{ textDecoration: "none" }}><button style={{ background: "#fff", color: "#14161A", border: "none", borderRadius: 10, padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>open game erstellen</button></Link>
+            <Link href="/match/create" style={{ textDecoration: "none" }}><button style={{ background: "#fff", color: "#0E1014", border: "none", borderRadius: 10, padding: "12px 24px", fontSize: 14, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>open game erstellen</button></Link>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -146,12 +146,12 @@ export default function MatchPage() {
                   <div style={{ padding: "4px 16px 14px" }}>
                     {isMe || joined ? (
                       <Link href={`/match/${g.id}`} style={{ textDecoration: "none" }}>
-                        <div style={{ width: "100%", textAlign: "center", background: "transparent", color: "rgba(255,255,255,0.85)", border: "1px solid #2A2D38", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 500, cursor: "pointer", textTransform: "lowercase" }}>{isMe ? "dein spiel ansehen" : "du bist dabei · ansehen"}</div>
+                        <div style={{ width: "100%", textAlign: "center", background: "transparent", color: "rgba(255,255,255,0.85)", border: "1px solid #23272F", borderRadius: 10, padding: "11px", fontSize: 13, fontWeight: 500, cursor: "pointer", textTransform: "lowercase" }}>{isMe ? "dein spiel ansehen" : "du bist dabei · ansehen"}</div>
                       </Link>
                     ) : full ? (
                       <p style={{ fontSize: 12, color: M, textAlign: "center", fontWeight: 500, textTransform: "lowercase" }}>voll</p>
                     ) : (
-                      <button onClick={() => join(g.id)} disabled={joining === g.id} style={{ width: "100%", background: "#fff", color: "#14161A", border: "none", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>{joining === g.id ? "trete bei..." : "mitspielen →"}</button>
+                      <button onClick={() => join(g.id)} disabled={joining === g.id} style={{ width: "100%", background: "#fff", color: "#0E1014", border: "none", borderRadius: 10, padding: "12px", fontSize: 14, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>{joining === g.id ? "trete bei..." : "mitspielen →"}</button>
                     )}
                   </div>
                 </div>

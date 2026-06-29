@@ -3,7 +3,7 @@ import { useState, useRef, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 
-const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
+const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
 const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 
 const STYLES = [
@@ -103,7 +103,7 @@ export default function AvatarPage() {
               border: `1px solid ${style===s.id ? "#fff" : B}`,
               borderRadius:999, padding:"8px 14px",
               fontSize:13, fontWeight:700,
-              color: style===s.id ? "#14161A" : M,
+              color: style===s.id ? "#0E1014" : M,
               cursor:"pointer", whiteSpace:"nowrap"
             }}>
               {s.emoji} {s.label}
@@ -141,7 +141,7 @@ export default function AvatarPage() {
         {/* Generieren Button */}
         {photo && !loading && (
           <button onClick={generate} style={{
-            width:"100%", background:"#fff", color:"#14161A", border:"none",
+            width:"100%", background:"#fff", color:"#0E1014", border:"none",
             borderRadius:12, padding:"15px", fontSize:15, fontWeight:800,
             cursor:"pointer", textTransform:"lowercase", marginBottom:16
           }}>
@@ -190,11 +190,11 @@ export default function AvatarPage() {
             ) : (
               <div style={{ display:"flex", gap:10 }}>
                 <button onClick={generate} style={{
-                  flex:1, background:"transparent", border:`1px solid #2A3340`, borderRadius:10,
+                  flex:1, background:"transparent", border:`1px solid #23272F`, borderRadius:10,
                   padding:"13px", fontSize:13, fontWeight:700, color:W, cursor:"pointer"
                 }}>🔄 nochmals</button>
                 <button onClick={save} disabled={saving} style={{
-                  flex:2, background:"#fff", color:"#14161A", border:"none",
+                  flex:2, background:"#fff", color:"#0E1014", border:"none",
                   borderRadius:10, padding:"13px", fontSize:14, fontWeight:800,
                   cursor:saving ? "wait" : "pointer"
                 }}>

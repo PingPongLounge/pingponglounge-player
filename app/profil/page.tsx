@@ -4,7 +4,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import LogoutButton from "@/app/components/LogoutButton"
 
-const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.35)",G="#39FF14",W="#FFFFFF",PK="#FF00C8"
+const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.35)",G="#39FF14",W="#FFFFFF",PK="#00E5FF"
 const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 const levelColor=(l:string)=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
 
@@ -96,7 +96,7 @@ export default function ProfilPage(){
         <p style={{fontSize:36,marginBottom:12}}>⚠️</p>
         <p style={{fontSize:14,fontWeight:700,color:W,marginBottom:6}}>Verbindungsfehler</p>
         <p style={{fontSize:13,color:M,marginBottom:20}}>{error}</p>
-        <button onClick={load} style={{background:G,color:"#14161A",border:"none",borderRadius:10,padding:"10px 24px",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>Nochmals versuchen</button>
+        <button onClick={load} style={{background:G,color:"#0E1014",border:"none",borderRadius:10,padding:"10px 24px",fontSize:13,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>Nochmals versuchen</button>
       </div>
       <BottomNav />
     </main>

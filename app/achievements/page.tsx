@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#FF00C8"
+const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#00E5FF"
 const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 
 const tierColor = (t: string) => ({
@@ -60,7 +60,7 @@ export default function AchievementsPage() {
         <p style={{ fontSize: 36, marginBottom: 12 }}>⚠️</p>
         <p style={{ fontSize: 14, fontWeight: 700, color: W, marginBottom: 6 }}>verbindungsfehler</p>
         <p style={{ fontSize: 13, color: M, marginBottom: 20 }}>{error}</p>
-        <button onClick={load} style={{ background: "#fff", color: "#14161A", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>nochmals versuchen</button>
+        <button onClick={load} style={{ background: "#fff", color: "#0E1014", border: "none", borderRadius: 10, padding: "10px 24px", fontSize: 13, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>nochmals versuchen</button>
       </div>
       <BottomNav />
     </main>
@@ -93,7 +93,7 @@ export default function AchievementsPage() {
           {(["alle","earned","locked"] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)} style={{
               padding: "7px 16px", borderRadius: 999, fontSize: 12, fontWeight: 700, cursor: "pointer",
-              background: filter === f ? "#fff" : C, color: filter === f ? "#14161A" : M,
+              background: filter === f ? "#fff" : C, color: filter === f ? "#0E1014" : M,
               border: `1px solid ${filter === f ? "#fff" : B}`
             }}>
               {f === "alle" ? "alle" : f === "earned" ? `✓ earned (${earned})` : `🔒 locked (${total - earned})`}

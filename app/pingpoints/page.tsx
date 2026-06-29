@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PP="#FFD700"
+const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PP="#FFD700"
 
 const sourceIcon: Record<string,string> = {
   liga_win:"🏆", liga_played:"🏓", liga_upset:"⚡",
@@ -125,7 +125,7 @@ export default function PingPointsPage(){
           {(["history","earn","redeem"] as const).map(t_=>(
             <button key={t_} onClick={()=>setTab(t_)} style={{
               flex:1,padding:"9px",borderRadius:999,fontSize:12,fontWeight:700,cursor:"pointer",
-              background:tab===t_?"#fff":C,color:tab===t_?"#14161A":M,border:`1px solid ${tab===t_?"#fff":B}`
+              background:tab===t_?"#fff":C,color:tab===t_?"#0E1014":M,border:`1px solid ${tab===t_?"#fff":B}`
             }}>{t_==="history"?"📜 verlauf":t_==="earn"?"⚡ verdienen":"🎁 einlösen"}</button>
           ))}
         </div>
@@ -208,7 +208,7 @@ export default function PingPointsPage(){
                       disabled={claiming===r.threshold}
                       style={{
                         background:claiming===r.threshold?B:"#fff",
-                        color:claiming===r.threshold?M:"#14161A",
+                        color:claiming===r.threshold?M:"#0E1014",
                         border:"none",borderRadius:8,padding:"9px 14px",
                         fontSize:12,fontWeight:800,cursor:"pointer",flexShrink:0,
                         whiteSpace:"nowrap"

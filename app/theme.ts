@@ -17,10 +17,10 @@
 import type { CSSProperties } from 'react'
 
 /* ---------- Farben ---------- */
-export const BG     = '#15181E'                 // Screen-Hintergrund (heller als pechschwarz)
-export const CARD   = '#1E222A'                 // Karten-Fläche
-export const CELL   = '#262B33'                 // Zellen / Chips innerhalb Karten
-export const INPUTBG= '#14161A'                 // Eingabefelder (etwas dunkler)
+export const BG     = '#0E1014'                 // Screen-Hintergrund (Startseiten-Referenz)
+export const CARD   = '#1A1D24'                 // Karten-Fläche (DAS Standard-Kästchen)
+export const CELL   = '#23272F'                 // Zellen / Chips innerhalb Karten
+export const INPUTBG= '#10131A'                 // Eingabefelder (etwas dunkler)
 export const W      = '#FFFFFF'                  // Primärtext
 export const SUB    = 'rgba(255,255,255,.85)'   // Sekundärtext (gut lesbar)
 export const MUT    = 'rgba(255,255,255,.6)'    // Labels / gedämpft (Minimum für Text)
@@ -80,9 +80,12 @@ export const body: CSSProperties = { fontSize: 13, color: 'rgba(255,255,255,.9)'
 // Sekundärzeile / Meta
 export const meta: CSSProperties = { fontSize: 13, color: SUB, fontWeight: 300 }
 
-/* ---------- Karten ---------- */
-export const card: CSSProperties = { background: CARD, borderRadius: 18, boxShadow: SHADOW, overflow: 'hidden' }
+/* ---------- Karten (DER verbindliche Kästchen-Standard, app-weit gleich) ----------
+   Regel: Fläche CARD, borderRadius 18, KEIN Border, flach (kein Shadow).
+   Aktiver/ausgewählter Zustand: Verlauf-Outline via cardActive. */
+export const card: CSSProperties = { background: CARD, borderRadius: 18, border: 'none', overflow: 'hidden' }
 export const cardPad: CSSProperties = { ...card, padding: 18 }
+export const cardActive: CSSProperties = { borderRadius: 18, border: '1.5px solid transparent', background: `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` }
 
 /* ---------- Zellen-Raster (Wann/Wo/Levels/Preis) ---------- */
 export const grid2: CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 15 }

@@ -14,9 +14,9 @@ type Credit = {
   referred_name?: string
 }
 
-const BG = "#14161A"
-const C  = "#1B1E25"
-const B  = "#1E2230"
+const BG = "#0E1014"
+const C  = "#1A1D24"
+const B  = "#1A1D24"
 const M  = "rgba(255,255,255,0.66)"
 const G  = "#39FF14"
 const W  = "#FFFFFF"
@@ -164,7 +164,7 @@ export default function StundenPage() {
             <Link href="/freunde" style={{
               display: "inline-block",
               background: "#fff",
-              color: "#14161A",
+              color: "#0E1014",
               fontWeight: 700,
               fontSize: 13,
               textDecoration: "none",
@@ -186,7 +186,7 @@ export default function StundenPage() {
             alignItems: "center",
             gap: 8,
             background: "transparent",
-            border: `1px solid #2A3340`,
+            border: `1px solid #23272F`,
             color: W,
             fontWeight: 700,
             fontSize: 13,

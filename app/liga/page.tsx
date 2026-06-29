@@ -174,7 +174,7 @@ export default function LigaPage(){
                   return(
                     <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 10px",borderBottom:`1px solid #181B21`,...(me?{background:"linear-gradient(90deg,rgba(57,255,20,.12),rgba(31,209,196,.05))",border:"1px solid rgba(57,255,20,.35)",borderRadius:12}:{})}}>
                       <span style={{width:24,textAlign:"center",fontSize:14,fontWeight:700,color:"rgba(255,255,255,.75)"}}>{medal(i)}</span>
-                      <span style={{width:32,height:32,borderRadius:"50%",background:"#1B1E25",border:"1px solid #2A3340",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,flexShrink:0}}>🏓</span>
+                      <span style={{width:32,height:32,borderRadius:"50%",background:"#1A1D24",border:"1px solid #23272F",display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,flexShrink:0}}>🏓</span>
                       <div style={{flex:1,minWidth:0}}>
                         <span style={{fontSize:14,fontWeight:500,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:"1px solid rgba(255,255,255,.3)",borderRadius:999,padding:"1px 5px",marginLeft:6,color:"rgba(255,255,255,.8)"}}>du</span>}</span>
                       </div>

@@ -3,10 +3,10 @@ import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 const G = "#39FF14"
-const DARK = "#14161A"
-const SURFACE = "#1B1E25"
-const CARD = "#1B1E25"
-const BORDER = "#1E2230"
+const DARK = "#0E1014"
+const SURFACE = "#1A1D24"
+const CARD = "#1A1D24"
+const BORDER = "#1A1D24"
 const TEXT = "#FFFFFF"
 const MUTED = "rgba(255,255,255,0.66)"
 
@@ -28,7 +28,7 @@ function levelForElo(elo: number) {
 type SetScore = { you: string; opp: string }
 
 const inp: React.CSSProperties = { flex: 1, background: SURFACE, border: "1px solid " + BORDER, borderRadius: "8px", padding: "12px", fontSize: "18px", fontWeight: 700, color: TEXT, outline: "none", textAlign: "center", boxSizing: "border-box", fontFamily: "inherit" }
-const primaryBtn = (disabled = false): React.CSSProperties => ({ width: "100%", background: disabled ? BORDER : "#fff", color: disabled ? MUTED : "#14161A", border: "none", borderRadius: "10px", padding: "16px", fontSize: "14px", fontWeight: 800, cursor: disabled ? "not-allowed" : "pointer", textTransform: "lowercase", letterSpacing: "0.02em", marginTop: "14px", fontFamily: "inherit" })
+const primaryBtn = (disabled = false): React.CSSProperties => ({ width: "100%", background: disabled ? BORDER : "#fff", color: disabled ? MUTED : "#0E1014", border: "none", borderRadius: "10px", padding: "16px", fontSize: "14px", fontWeight: 800, cursor: disabled ? "not-allowed" : "pointer", textTransform: "lowercase", letterSpacing: "0.02em", marginTop: "14px", fontFamily: "inherit" })
 
 function SpielenInner() {
   const router = useRouter()

@@ -5,9 +5,9 @@ import { createClient } from "@/lib/supabase/client"
 import PlayerLogo from "../components/PlayerLogo"
 
 const G = "#39FF14"
-const DARK = "#14161A"
-const CARD = "#1B1E25"
-const BORDER = "#1E2230"
+const DARK = "#0E1014"
+const CARD = "#1A1D24"
+const BORDER = "#1A1D24"
 const MUTED = "rgba(255,255,255,0.66)"
 const TEXT = "#FFFFFF"
 
@@ -21,14 +21,14 @@ const outlineBtn = {
   cursor: "pointer",
   textTransform: "lowercase" as const,
   letterSpacing: "0.02em",
-  color: "#14161A",
+  color: "#0E1014",
   width: "100%",
   fontFamily: "'League Spartan', system-ui, sans-serif",
 } as React.CSSProperties
 
 const ghostBtn = {
   background: "transparent",
-  border: `1px solid #2A3340`,
+  border: `1px solid #23272F`,
   borderRadius: "10px",
   padding: "12px 20px",
   fontSize: "13px",
@@ -164,7 +164,7 @@ export default function LoginPage() {
                 flex: 1, background: tab === t ? "#fff" : "transparent",
                 border: "none", borderRadius: "7px", padding: "9px 4px",
                 fontSize: "11px", fontWeight: 700, cursor: "pointer",
-                color: tab === t ? "#14161A" : MUTED,
+                color: tab === t ? "#0E1014" : MUTED,
                 textTransform: "lowercase" as const, letterSpacing: "0.02em",
                 fontFamily: "'League Spartan', system-ui, sans-serif",
               }}>

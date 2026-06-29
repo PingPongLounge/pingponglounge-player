@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 
-const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
+const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
 const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 
 export default function AnmeldenPage({params}:{params:Promise<{id:string}>}){
@@ -54,7 +54,7 @@ export default function AnmeldenPage({params}:{params:Promise<{id:string}>}){
             <p style={{fontSize:40,marginBottom:12}}>✓</p>
             <p style={{fontSize:20,fontWeight:900,color:G,textTransform:"uppercase",marginBottom:8}}>angemeldet!</p>
             <p style={{fontSize:14,color:M,marginBottom:24}}>du bist für <strong style={{color:W}}>{season.name as string}</strong> registriert. du wirst benachrichtigt sobald die saison startet.</p>
-            <Link href={`/liga/${seasonId}`} style={{display:"block",background:"#fff",color:"#14161A",textDecoration:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em"}}>zur liga →</Link>
+            <Link href={`/liga/${seasonId}`} style={{display:"block",background:"#fff",color:"#0E1014",textDecoration:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em"}}>zur liga →</Link>
           </div>
         ):(
           <div>
@@ -77,7 +77,7 @@ export default function AnmeldenPage({params}:{params:Promise<{id:string}>}){
             {(count as number)>=(season.max_players as number)?(
               <div style={{background:`#FF444420`,border:"1px solid #FF444440",borderRadius:10,padding:"14px",textAlign:"center",color:"#FF6666",fontWeight:700}}>liga ist voll</div>
             ):(
-              <button onClick={handleRegister} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#14161A",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
+              <button onClick={handleRegister} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#0E1014",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
                 {saving?"anmeldung läuft...":"jetzt kostenlos anmelden"}
               </button>
             )}

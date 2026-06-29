@@ -3,7 +3,7 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
-const BG="#15181E",C="#1E222A",B="#262B33",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
+const BG="#0E1014",C="#1A1D24",B="#23272F",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
 const LEVELS = ["Rookie", "Challenger", "Advanced", "Elite"]
@@ -44,7 +44,7 @@ export default function CreateMatchPage() {
   const input = { width: "100%", background: C, border: `1px solid ${B}`, borderRadius: 10, padding: "12px 14px", fontSize: 14, color: W, outline: "none" }
   const chip = (active: boolean) => ({
     padding: "10px 8px", borderRadius: 10, fontSize: 13, fontWeight: active ? 600 : 400, textTransform: "lowercase" as const,
-    background: active ? "#fff" : C, border: `1px solid ${active ? "#fff" : B}`, color: active ? "#14161A" : M, cursor: "pointer",
+    background: active ? "#fff" : C, border: `1px solid ${active ? "#fff" : B}`, color: active ? "#0E1014" : M, cursor: "pointer",
   })
 
   return (
@@ -120,7 +120,7 @@ export default function CreateMatchPage() {
 
         <button onClick={submit} disabled={loading || !level || !city} style={{
           width: "100%", padding: "16px", borderRadius: 12, fontSize: 15, fontWeight: 600,
-          background: !level || !city ? B : "#fff", color: !level || !city ? M : "#14161A",
+          background: !level || !city ? B : "#fff", color: !level || !city ? M : "#0E1014",
           border: "none", cursor: !level || !city ? "default" : "pointer", textTransform: "lowercase",
         }}>
           {loading ? "wird erstellt..." : "open game veröffentlichen →"}

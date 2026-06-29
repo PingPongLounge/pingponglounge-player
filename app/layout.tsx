@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de">
-      <body style={{ margin: 0, background: "#14161A", color: "#E8E6E1", fontFamily: "system-ui, sans-serif", minHeight: "100vh" }}>
+      <body style={{ margin: 0, background: "#0E1014", color: "#E8E6E1", fontFamily: "system-ui, sans-serif", minHeight: "100vh" }}>
         <AppHeader />
         {children}
       </body>

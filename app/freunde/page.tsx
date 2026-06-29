@@ -4,9 +4,9 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG = "#14161A"
-const C  = "#1B1E25"
-const B  = "#1E2230"
+const BG = "#0E1014"
+const C  = "#1A1D24"
+const B  = "#1A1D24"
 const M  = "rgba(255,255,255,0.66)"
 const G  = "#39FF14"
 const W  = "#FFFFFF"
@@ -106,7 +106,7 @@ export default function FreundePage() {
           width: "100%",
           border: "none",
           background: "#fff",
-          color: "#14161A",
+          color: "#0E1014",
           borderRadius: 10,
           padding: "16px",
           fontSize: 15,
@@ -132,7 +132,7 @@ export default function FreundePage() {
           width: "100%",
           background: "transparent",
           color: copied ? G : W,
-          border: `1px solid ${copied ? G : "#2A3340"}`,
+          border: `1px solid ${copied ? G : "#23272F"}`,
           borderRadius: 10,
           padding: "14px",
           fontSize: 13,
@@ -157,7 +157,7 @@ export default function FreundePage() {
             <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 16 }}>
               <div style={{
                 width: 28, height: 28, borderRadius: "50%",
-                background: G, color: "#14161A",
+                background: G, color: "#0E1014",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 13, fontWeight: 900, flexShrink: 0,
               }}>{i + 1}</div>

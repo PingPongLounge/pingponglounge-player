@@ -5,7 +5,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { LIGA_CONFIG } from "@/lib/rewards"
 
-const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#FF00C8"
+const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#00E5FF"
 const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 const levelColor=(l:string):string=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
 
@@ -183,12 +183,12 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
         </div>
 
         {/* Anmelden CTA */}
-        {season.status==="open"&&!myMatches.length&&<Link href={`/liga/${season.id}/anmelden`} style={{display:"block",background:"#fff",color:"#14161A",textDecoration:"none",borderRadius:10,padding:"14px",textAlign:"center",fontSize:13,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em",marginBottom:16}}>kostenlos anmelden</Link>}
+        {season.status==="open"&&!myMatches.length&&<Link href={`/liga/${season.id}/anmelden`} style={{display:"block",background:"#fff",color:"#0E1014",textDecoration:"none",borderRadius:10,padding:"14px",textAlign:"center",fontSize:13,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em",marginBottom:16}}>kostenlos anmelden</Link>}
 
         {/* Tabs */}
         <div style={{display:"flex",background:C,borderRadius:10,padding:3,marginBottom:16,gap:2}}>
           {TABS.map(t=>(
-            <button key={t.key} onClick={()=>setTab(t.key)} style={{flex:1,background:tab===t.key?"#fff":"none",border:"none",borderRadius:8,padding:"9px 4px",fontSize:11,fontWeight:700,color:tab===t.key?"#14161A":M,cursor:"pointer",textTransform:"lowercase",letterSpacing:"0.04em",transition:"all 0.2s",position:"relative"}}>
+            <button key={t.key} onClick={()=>setTab(t.key)} style={{flex:1,background:tab===t.key?"#fff":"none",border:"none",borderRadius:8,padding:"9px 4px",fontSize:11,fontWeight:700,color:tab===t.key?"#0E1014":M,cursor:"pointer",textTransform:"lowercase",letterSpacing:"0.04em",transition:"all 0.2s",position:"relative"}}>
               {t.label}
               {t.key==="challenges"&&incomingChallenges.length>0&&tab!=="challenges"&&(
                 <span style={{position:"absolute",top:2,right:2,width:7,height:7,background:G,borderRadius:"50%"}}/>
@@ -200,7 +200,7 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
         {/* ── TABELLE ─────────────────────────────────────────── */}
         {tab==="tabelle"&&(
           <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,overflow:"hidden"}}>
-            <div style={{display:"grid",gridTemplateColumns:"28px 1fr 50px 52px 44px",padding:"10px 14px",borderBottom:`1px solid ${B}`,background:"#14161A"}}>
+            <div style={{display:"grid",gridTemplateColumns:"28px 1fr 50px 52px 44px",padding:"10px 14px",borderBottom:`1px solid ${B}`,background:"#0E1014"}}>
               <span style={{fontSize:10,color:M,fontWeight:700}}>#</span>
               <span style={{fontSize:10,color:M,fontWeight:700}}>spieler</span>
               <span style={{fontSize:10,color:M,fontWeight:700,textAlign:"center"}}>s</span>
@@ -265,7 +265,7 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                   </div>
                   {confirmed&&m.sets&&<p style={{fontSize:11,color:M,marginTop:6,textAlign:"center"}}>{setsToString(m.sets)}</p>}
                   {isMe&&!confirmed&&(
-                    <Link href={`/liga/match/${m.id}`} style={{display:"block",marginTop:10,background:"#fff",color:"#14161A",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em"}}>
+                    <Link href={`/liga/match/${m.id}`} style={{display:"block",marginTop:10,background:"#fff",color:"#0E1014",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em"}}>
                       {m.status==="p1_entered"&&m.p2_id===userId?"bestätigen":"resultat eingeben"}
                     </Link>
                   )}
@@ -289,7 +289,7 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                       <span style={{color:G}}>{c.p1_name}</span> fordert dich heraus
                     </p>
                     <div style={{display:"flex",gap:8,marginTop:10}}>
-                      <button onClick={()=>handleAccept(c.id)} style={{flex:1,background:"#fff",color:"#14161A",border:"none",borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer",textTransform:"lowercase"}}>✓ annehmen</button>
+                      <button onClick={()=>handleAccept(c.id)} style={{flex:1,background:"#fff",color:"#0E1014",border:"none",borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer",textTransform:"lowercase"}}>✓ annehmen</button>
                       {confirmDecline===c.id?(
                         <div style={{flex:1,display:"flex",gap:6,alignItems:"center"}}>
                           <span style={{fontSize:11,color:M,flex:1}}>sicher?</span>
@@ -380,7 +380,7 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                   {userId&&(
                     <div style={{display:"flex",gap:8}}>
                       <input value={commentText[f.id]||""} onChange={e=>setCommentText(p=>({...p,[f.id]:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&handleComment(f.id)} placeholder="kommentar..." style={{flex:1,background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"8px 12px",fontSize:13,color:W,outline:"none"}}/>
-                      <button onClick={()=>handleComment(f.id)} style={{background:"#fff",color:"#14161A",border:"none",borderRadius:8,padding:"8px 14px",cursor:"pointer",fontSize:13,fontWeight:700}}>→</button>
+                      <button onClick={()=>handleComment(f.id)} style={{background:"#fff",color:"#0E1014",border:"none",borderRadius:8,padding:"8px 14px",cursor:"pointer",fontSize:13,fontWeight:700}}>→</button>
                     </div>
                   )}
                 </div>

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
+const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
 const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 
 function dateLabel(d:string):string{
@@ -97,7 +97,7 @@ export default function MatchHistoriePage(){
             <button key={f} onClick={()=>{setFilter(f);setPage(0)}} style={{
               padding:"7px 16px",borderRadius:999,fontSize:12,fontWeight:700,cursor:"pointer",border:"1px solid",
               background:filter===f?"#fff":C,
-              color:filter===f?"#14161A":M,
+              color:filter===f?"#0E1014":M,
               borderColor:filter===f?"#fff":B,
               textTransform:"lowercase"
             }}>{f==="alle"?`alle (${matches.length})`:f==="siege"?`siege (${matches.filter(m=>m.winner_id===userId).length})`:`niederlagen (${matches.filter(m=>m.winner_id!==null&&m.winner_id!==userId).length})`}</button>

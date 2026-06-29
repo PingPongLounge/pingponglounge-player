@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#15181E",C="#1E222A",B="#262B33",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
+const BG="#0E1014",C="#1A1D24",B="#23272F",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
 const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
 
 function whenLabel(date: string | null, hour: number | null, dur: number): string {
@@ -70,7 +70,7 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
                 const p = players[i]
                 return (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", background: "#1A1D24", borderRadius: 10, border: p ? "none" : "1px dashed #3A3D48" }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: p ? "#222630" : "transparent", border: p ? "1px solid #2A2D38" : "1px dashed #3A3D48", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: M }}>{p ? "🏓" : "+"}</div>
+                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: p ? "#222630" : "transparent", border: p ? "1px solid #23272F" : "1px dashed #3A3D48", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: M }}>{p ? "🏓" : "+"}</div>
                     {p ? (
                       <div style={{ flex: 1 }}>
                         <span style={{ fontSize: 14, fontWeight: 600, color: W }}>{p.name}</span>
@@ -96,19 +96,19 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
               <div style={{ background: "#f8717110", border: "1px solid #f8717140", borderRadius: 12, padding: "14px 16px" }}>
                 <p style={{ fontSize: 13, color: "#f87171", fontWeight: 600, marginBottom: 10, textTransform: "lowercase" }}>spiel wirklich löschen?</p>
                 <div style={{ display: "flex", gap: 8 }}>
-                  <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, background: "transparent", color: "rgba(255,255,255,0.85)", border: `1px solid #2A2D38`, borderRadius: 8, padding: "10px", fontSize: 13, fontWeight: 500, cursor: "pointer", textTransform: "lowercase" }}>abbrechen</button>
+                  <button onClick={() => setConfirmDelete(false)} style={{ flex: 1, background: "transparent", color: "rgba(255,255,255,0.85)", border: `1px solid #23272F`, borderRadius: 8, padding: "10px", fontSize: 13, fontWeight: 500, cursor: "pointer", textTransform: "lowercase" }}>abbrechen</button>
                   <button onClick={del} disabled={busy} style={{ flex: 1, background: "#f87171", color: "#fff", border: "none", borderRadius: 8, padding: "10px", fontSize: 13, fontWeight: 600, cursor: "pointer", textTransform: "lowercase" }}>{busy ? "..." : "ja, löschen"}</button>
                 </div>
               </div>
             ) : (
-              <button onClick={() => setConfirmDelete(true)} style={{ width: "100%", background: "transparent", color: "rgba(255,255,255,0.85)", border: `1px solid #2A2D38`, borderRadius: 10, padding: "13px", fontSize: 13, cursor: "pointer", fontWeight: 500, textTransform: "lowercase" }}>spiel löschen</button>
+              <button onClick={() => setConfirmDelete(true)} style={{ width: "100%", background: "transparent", color: "rgba(255,255,255,0.85)", border: `1px solid #23272F`, borderRadius: 10, padding: "13px", fontSize: 13, cursor: "pointer", fontWeight: 500, textTransform: "lowercase" }}>spiel löschen</button>
             )
           ) : isJoined ? (
-            <button onClick={leave} disabled={busy} style={{ width: "100%", background: "transparent", color: "rgba(255,255,255,0.85)", border: `1px solid #2A2D38`, borderRadius: 12, padding: "14px", fontSize: 14, fontWeight: 500, cursor: "pointer", textTransform: "lowercase" }}>{busy ? "..." : "doch nicht · platz freigeben"}</button>
+            <button onClick={leave} disabled={busy} style={{ width: "100%", background: "transparent", color: "rgba(255,255,255,0.85)", border: `1px solid #23272F`, borderRadius: 12, padding: "14px", fontSize: 14, fontWeight: 500, cursor: "pointer", textTransform: "lowercase" }}>{busy ? "..." : "doch nicht · platz freigeben"}</button>
           ) : full ? (
             <div style={{ background: `${G}10`, border: `1px solid ${B}`, borderRadius: 12, padding: "14px", textAlign: "center" }}><p style={{ fontSize: 14, fontWeight: 600, color: M, textTransform: "lowercase" }}>spiel ist voll</p></div>
           ) : (
-            <button onClick={join} disabled={busy} style={{ width: "100%", background: "#fff", color: "#14161A", border: "none", borderRadius: 12, padding: "15px", fontSize: 15, fontWeight: 700, cursor: "pointer", textTransform: "lowercase" }}>{busy ? "trete bei..." : "mitspielen →"}</button>
+            <button onClick={join} disabled={busy} style={{ width: "100%", background: "#fff", color: "#0E1014", border: "none", borderRadius: 12, padding: "15px", fontSize: 15, fontWeight: 700, cursor: "pointer", textTransform: "lowercase" }}>{busy ? "trete bei..." : "mitspielen →"}</button>
           )}
         </>)}
       </div>

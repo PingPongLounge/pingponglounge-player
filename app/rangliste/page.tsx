@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
-const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#FF00C8"
+const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#00E5FF"
 const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 const levelColor=(l:string)=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
 
@@ -90,12 +90,12 @@ export default function RanglistePage() {
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
             <button onClick={() => setCanton("")} style={{
               padding: "6px 14px", borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: "pointer",
-              background: !canton ? "#fff" : C, border: `1px solid ${!canton ? "#fff" : B}`, color: !canton ? "#14161A" : M
+              background: !canton ? "#fff" : C, border: `1px solid ${!canton ? "#fff" : B}`, color: !canton ? "#0E1014" : M
             }}>🇨🇭 national</button>
             {CANTONS.map(c => (
               <button key={c} onClick={() => setCanton(canton === c ? "" : c)} style={{
                 padding: "6px 12px", borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: "pointer",
-                background: canton === c ? "#fff" : C, border: `1px solid ${canton === c ? "#fff" : B}`, color: canton === c ? "#14161A" : M
+                background: canton === c ? "#fff" : C, border: `1px solid ${canton === c ? "#fff" : B}`, color: canton === c ? "#0E1014" : M
               }}>{c}</button>
             ))}
           </div>

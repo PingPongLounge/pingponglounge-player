@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 
-const BG="#14161A",C="#1B1E25",B="#1E2230",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
+const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
 
 type SetScore={p1:string,p2:string}
 type MatchData={id:string,season_id:string,round:number,p1_id:string,p1_name:string,p2_id:string,p2_name:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,status:string}
@@ -124,7 +124,7 @@ export default function MatchPage({params}:{params:{id:string}}){
             ))}
             {sets.length<5&&<button onClick={addSet} style={{width:"100%",background:"none",border:`1px dashed ${B}`,borderRadius:8,padding:"10px",color:M,cursor:"pointer",fontSize:13,marginBottom:12}}>+ satz hinzufügen</button>}
             {error&&<p style={{color:"#FF6666",fontSize:13,marginBottom:8}}>{error}</p>}
-            <button onClick={handleSubmit} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#14161A",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
+            <button onClick={handleSubmit} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#0E1014",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
               {saving?"wird gespeichert...":"ergebnis einreichen"}
             </button>
           </div>
@@ -139,10 +139,10 @@ export default function MatchPage({params}:{params:{id:string}}){
               {match.sets&&<p style={{fontSize:15,fontWeight:700,color:W,marginTop:8}}>{match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ")}</p>}
             </div>
             {error&&<p style={{color:"#FF6666",fontSize:13,marginBottom:8}}>{error}</p>}
-            <button onClick={handleConfirm} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#14161A",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em",marginBottom:8}}>
+            <button onClick={handleConfirm} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#0E1014",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em",marginBottom:8}}>
               {saving?"...":"✓ ergebnis bestätigen"}
             </button>
-            <button onClick={handleDispute} style={{width:"100%",background:"transparent",border:`1px solid #2A3340`,color:W,borderRadius:10,padding:"14px",fontSize:13,cursor:"pointer",textTransform:"lowercase"}}>ergebnis anfechten</button>
+            <button onClick={handleDispute} style={{width:"100%",background:"transparent",border:`1px solid #23272F`,color:W,borderRadius:10,padding:"14px",fontSize:13,cursor:"pointer",textTransform:"lowercase"}}>ergebnis anfechten</button>
           </div>
         )}
 

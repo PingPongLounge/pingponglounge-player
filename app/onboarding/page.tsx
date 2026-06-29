@@ -4,10 +4,10 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 
 const G = "#39FF14"
-const DARK = "#14161A"
-const SURFACE = "#14161A"
-const CARD = "#1B1E25"
-const BORDER = "#1E2230"
+const DARK = "#0E1014"
+const SURFACE = "#0E1014"
+const CARD = "#1A1D24"
+const BORDER = "#1A1D24"
 const TEXT = "#FFFFFF"
 const MUTED = "rgba(255,255,255,0.66)"
 
@@ -77,8 +77,8 @@ function levelForElo(elo: number) {
 type PendingResult = { elo: number; won?: boolean; sets?: unknown; ort?: string; ts?: number }
 
 const inp: React.CSSProperties = { width: "100%", background: SURFACE, border: "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "15px", color: TEXT, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
-const primaryBtn = (disabled = false): React.CSSProperties => ({ width: "100%", background: disabled ? BORDER : "#fff", color: disabled ? MUTED : "#14161A", border: "none", borderRadius: "10px", padding: "14px", fontSize: "14px", fontWeight: 800, cursor: disabled ? "not-allowed" : "pointer", textTransform: "lowercase", letterSpacing: "0.02em", marginTop: "10px", fontFamily: "inherit" })
-const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", background: sel ? "#fff" : CARD, border: sel ? "1px solid #fff" : "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: sel ? "#14161A" : TEXT, cursor: "pointer", textAlign: "left", marginBottom: "8px", fontWeight: sel ? 700 : 400, fontFamily: "inherit", display: "block" })
+const primaryBtn = (disabled = false): React.CSSProperties => ({ width: "100%", background: disabled ? BORDER : "#fff", color: disabled ? MUTED : "#0E1014", border: "none", borderRadius: "10px", padding: "14px", fontSize: "14px", fontWeight: 800, cursor: disabled ? "not-allowed" : "pointer", textTransform: "lowercase", letterSpacing: "0.02em", marginTop: "10px", fontFamily: "inherit" })
+const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", background: sel ? "#fff" : CARD, border: sel ? "1px solid #fff" : "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: sel ? "#0E1014" : TEXT, cursor: "pointer", textAlign: "left", marginBottom: "8px", fontWeight: sel ? 700 : 400, fontFamily: "inherit", display: "block" })
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -183,7 +183,7 @@ export default function OnboardingPage() {
       {nicks.length > 0 && (
         <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
           {nicks.map(n => (
-            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? "#fff" : CARD, border: name === n ? "1px solid #fff" : "1px solid " + BORDER, borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: name === n ? "#14161A" : TEXT, cursor: "pointer", fontWeight: name === n ? 700 : 400, fontFamily: "inherit" }}>
+            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? "#fff" : CARD, border: name === n ? "1px solid #fff" : "1px solid " + BORDER, borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: name === n ? "#0E1014" : TEXT, cursor: "pointer", fontWeight: name === n ? 700 : 400, fontFamily: "inherit" }}>
               {n}
             </button>
           ))}
@@ -208,7 +208,7 @@ export default function OnboardingPage() {
         <div style={{ marginTop: "16px" }}>
           {LEVELS.map(l => (
             <button key={l.name} style={optBtn(manualLevel === l.name)} onClick={() => setManualLevel(l.name)}>
-              <span style={{ color: manualLevel === l.name ? "#14161A" : l.color, fontWeight: 800 }}>{l.name}</span>
+              <span style={{ color: manualLevel === l.name ? "#0E1014" : l.color, fontWeight: 800 }}>{l.name}</span>
               <span style={{ fontSize: "12px", color: manualLevel === l.name ? "rgba(20,22,26,0.7)" : MUTED, marginLeft: "8px" }}>{l.desc}</span>
             </button>
           ))}
