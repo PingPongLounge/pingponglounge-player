@@ -70,30 +70,27 @@ export default async function EntdeckenPage() {
   const wins = profile?.matches_won ?? 0
   const played = profile?.matches_played ?? 0
 
-  const { count: higher } = await sb.from('public_profiles').select('*', { count: 'exact', head: true }).gt('elo', elo).gt('matches_played', 0)
-  const rank = (higher ?? 0) + 1
+  // Alle unabhängigen Abfragen parallel (schneller)
+  const [higherRes, ppRes, gamesRes, tourRes, membershipRes] = await Promise.all([
+    sb.from('public_profiles').select('*', { count: 'exact', head: true }).gt('elo', elo).gt('matches_played', 0),
+    sb.from('ping_points_transactions').select('amount').eq('player_id', user.id),
+    sb.from('open_games').select('id,location_name,date,start_hour,level,max_players,current_players,status').eq('status', 'open').order('date', { ascending: true, nullsFirst: false }).order('created_at', { ascending: false }).limit(1),
+    sb.from('player_tournaments').select('id,name,date,format,status').in('status', ['open', 'running']).order('date', { ascending: true, nullsFirst: false }).limit(1).maybeSingle(),
+    sb.from('league_registrations').select('season_id, league_seasons(id,city,skill_class)').eq('player_id', user.id).limit(1).maybeSingle(),
+  ])
 
-  const { data: ppTx } = await sb.from('ping_points_transactions').select('amount').eq('player_id', user.id)
-  const ppBalance = (ppTx || []).reduce((s, t) => s + (t.amount || 0), 0)
-
-  const { data: games } = await sb.from('open_games')
-    .select('id,location_name,date,start_hour,level,max_players,current_players,status')
-    .eq('status', 'open').order('date', { ascending: true, nullsFirst: false }).order('created_at', { ascending: false }).limit(1)
-  const game = games?.[0]
+  const rank = (higherRes.count ?? 0) + 1
+  const ppBalance = (ppRes.data || []).reduce((s, t) => s + (t.amount || 0), 0)
+  const game = gamesRes.data?.[0]
   const gameFrei = game ? Math.max(0, (game.max_players || 2) - (game.current_players || 1)) : 0
   const gameWhen = game ? (() => { let s = ''; if (game.date) { s = new Date(game.date).toLocaleDateString('de-CH', { weekday: 'short', day: 'numeric', month: 'short' }) } if (game.start_hour != null) s += `${s ? ' · ' : ''}${String(game.start_hour).padStart(2, '0')}:00`; return s || 'Zeit offen' })() : ''
+  const tour = tourRes.data
 
   const next = LV.find(l => l.min > elo)
   const prevMin = [...LV].reverse().find(l => l.min <= elo)?.min ?? 0
   const pct = next ? Math.min(100, Math.max(5, Math.round((elo - prevMin) / (next.min - prevMin) * 100))) : 100
 
-  const { data: tour } = await sb.from('player_tournaments')
-    .select('id,name,date,format,status').in('status', ['open', 'running'])
-    .order('date', { ascending: true, nullsFirst: false }).limit(1).maybeSingle()
-
-  const { data: membership } = await sb.from('league_registrations')
-    .select('season_id, league_seasons(id,city,skill_class)').eq('player_id', user.id).limit(1).maybeSingle()
-  const season = (membership as { league_seasons?: { id: string; city: string; skill_class: string } } | null)?.league_seasons
+  const season = (membershipRes.data as { league_seasons?: { id: string; city: string; skill_class: string } } | null)?.league_seasons
   const seasonId = season?.id || null
 
   let leagueRank = 0, seasonLabel = ''
@@ -179,37 +176,6 @@ export default async function EntdeckenPage() {
 
         {/* Tisch buchen — subtil */}
         <Link href="/buchen" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 7, margin: '10px 16px 0', color: MUT, textDecoration: 'none', fontSize: 13, fontWeight: 600 }}>Tisch buchen · 6 Standorte ›</Link>
-
-        {/* Spotlight */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '24px 20px 10px' }}>
-          <span style={slT}>Spotlight</span>
-        </div>
-        <Link href="/match" style={{ display: 'block', margin: '0 16px', borderRadius: 16, overflow: 'hidden', background: CARD, textDecoration: 'none', boxShadow: SHADOW }}>
-          <img src="/spotlight.jpg" alt="" style={{ width: '100%', height: 150, objectFit: 'cover', display: 'block' }} />
-          <div style={{ padding: '15px 16px 16px' }}>
-            <div style={{ display: 'flex', gap: 16, fontSize: 11.5, fontWeight: 700, color: MUT, textTransform: 'uppercase', letterSpacing: '.04em' }}>
-              <span>📅 Heute 19:00</span><span>📍 Glattbrugg</span>
-            </div>
-            <div style={{ fontSize: 21, fontWeight: 900, color: W, marginTop: 8, lineHeight: 1.05 }}>Open Game · 1 Platz frei</div>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: 14 }}>
-              <span style={{ display: 'inline-block', borderRadius: 12, padding: '11px 22px', fontSize: 14, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: '#fff', border: '1.5px solid transparent', background: `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` }}>Mitspielen</span>
-              <span style={{ fontSize: 10.5, fontWeight: 800, letterSpacing: '.12em', textTransform: 'uppercase', color: MUT }}>PPL · Open Game</span>
-            </div>
-          </div>
-        </Link>
-
-        {/* Mehr */}
-        <div style={{ display: 'flex', alignItems: 'center', margin: '24px 20px 10px' }}>
-          <span style={slT}>Mehr</span>
-        </div>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10, margin: '0 16px' }}>
-          {([['/training', 'paddles', 'Training'], ['/freunde', 'people', 'Freunde'], ['/achievements', 'levelup', 'Erfolge'], ['/matchhistorie', 'stats', 'Historie']] as [string, string, string][]).map(([href, icon, label]) => (
-            <Link key={label} href={href} style={{ background: CARD, borderRadius: 14, padding: '14px 6px 11px', textAlign: 'center', textDecoration: 'none', boxShadow: SHADOW }}>
-              <img src={`/icons/${icon}.svg`} alt="" style={{ width: 28, height: 28, margin: '0 auto', display: 'block' }} />
-              <div style={{ fontSize: 10.5, fontWeight: 600, color: SUB, marginTop: 7 }}>{label}</div>
-            </Link>
-          ))}
-        </div>
 
       </div>
       <BottomNav />
