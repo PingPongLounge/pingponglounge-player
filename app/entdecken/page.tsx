@@ -63,13 +63,25 @@ export default async function EntdeckenPage() {
     )
   }
 
-  const { data: profile } = await sb.from('profiles').select('id,name,level,elo').eq('id', user.id).maybeSingle()
+  const { data: profile } = await sb.from('profiles').select('id,name,level,elo,matches_played,matches_won').eq('id', user.id).maybeSingle()
   const elo = profile?.elo ?? 1000
   const lvl = profile?.level || 'Rookie'
   const firstName = profile?.name?.split(' ')[0] || 'Spieler'
+  const wins = profile?.matches_won ?? 0
+  const played = profile?.matches_played ?? 0
 
   const { count: higher } = await sb.from('public_profiles').select('*', { count: 'exact', head: true }).gt('elo', elo).gt('matches_played', 0)
   const rank = (higher ?? 0) + 1
+
+  const { data: ppTx } = await sb.from('ping_points_transactions').select('amount').eq('player_id', user.id)
+  const ppBalance = (ppTx || []).reduce((s, t) => s + (t.amount || 0), 0)
+
+  const { data: games } = await sb.from('open_games')
+    .select('id,location_name,date,start_hour,level,max_players,current_players,status')
+    .eq('status', 'open').order('date', { ascending: true, nullsFirst: false }).order('created_at', { ascending: false }).limit(1)
+  const game = games?.[0]
+  const gameFrei = game ? Math.max(0, (game.max_players || 2) - (game.current_players || 1)) : 0
+  const gameWhen = game ? (() => { let s = ''; if (game.date) { s = new Date(game.date).toLocaleDateString('de-CH', { weekday: 'short', day: 'numeric', month: 'short' }) } if (game.start_hour != null) s += `${s ? ' · ' : ''}${String(game.start_hour).padStart(2, '0')}:00`; return s || 'Zeit offen' })() : ''
 
   const next = LV.find(l => l.min > elo)
   const prevMin = [...LV].reverse().find(l => l.min <= elo)?.min ?? 0
@@ -124,6 +136,28 @@ export default async function EntdeckenPage() {
           <Link href="/match" style={{ display: 'block', textAlign: 'center', marginTop: 14, background: GRAD, color: '#06210F', borderRadius: 13, padding: 14, fontSize: 15, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', textDecoration: 'none' }}>Jetzt spielen</Link>
         </div>
 
+        {/* Stats */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 10, margin: '12px 16px 0' }}>
+          {([[ppBalance.toLocaleString('de-CH'), 'PingPoints', true], [String(wins), 'Siege', false], [String(played), 'Spiele', false]] as [string, string, boolean][]).map(([v, l, g], i) => (
+            <div key={i} style={{ background: CARD, borderRadius: 14, padding: '13px 6px', textAlign: 'center', boxShadow: SHADOW }}>
+              <div style={{ fontSize: 22, fontWeight: 900, ...(g ? gt : { color: W }) }}>{v}</div>
+              <div style={{ fontSize: 9.5, fontWeight: 600, letterSpacing: '.08em', textTransform: 'uppercase', color: MUT, marginTop: 3 }}>{l}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Heute · Open Game */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '24px 20px 10px' }}>
+          <span style={slT}>Heute</span><Link href="/match" style={{ fontSize: 12, color: '#39FF14', textDecoration: 'none', fontWeight: 700 }}>alle ›</Link>
+        </div>
+        <Link href={game ? `/match/${game.id}` : '/match/create'} style={card}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span style={cardT}>{game ? `Open Game · ${game.location_name}` : 'Open Game erstellen'}</span>
+            <span style={{ fontSize: 16, fontWeight: 800, color: W }}>{game ? `${game.current_players || 1}/${game.max_players || 2}` : '+'}</span>
+          </div>
+          <div style={cardS}>{game ? `${gameWhen} · ${game.level} · ${gameFrei} ${gameFrei === 1 ? 'Platz frei' : 'Plätze frei'}` : 'Starte das erste Spiel heute'}</div>
+        </Link>
+
         {/* Wettkampf */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', margin: '24px 20px 10px' }}>
           <span style={slT}>Wettkampf</span><Link href="/liga" style={{ fontSize: 12, color: '#39FF14', textDecoration: 'none', fontWeight: 700 }}>zur Liga ›</Link>
@@ -163,6 +197,19 @@ export default async function EntdeckenPage() {
             </div>
           </div>
         </Link>
+
+        {/* Mehr */}
+        <div style={{ display: 'flex', alignItems: 'center', margin: '24px 20px 10px' }}>
+          <span style={slT}>Mehr</span>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10, margin: '0 16px' }}>
+          {([['/training', 'paddles', 'Training'], ['/freunde', 'people', 'Freunde'], ['/achievements', 'levelup', 'Erfolge'], ['/matchhistorie', 'stats', 'Historie']] as [string, string, string][]).map(([href, icon, label]) => (
+            <Link key={label} href={href} style={{ background: CARD, borderRadius: 14, padding: '14px 6px 11px', textAlign: 'center', textDecoration: 'none', boxShadow: SHADOW }}>
+              <img src={`/icons/${icon}.svg`} alt="" style={{ width: 28, height: 28, margin: '0 auto', display: 'block' }} />
+              <div style={{ fontSize: 10.5, fontWeight: 600, color: SUB, marginTop: 7 }}>{label}</div>
+            </Link>
+          ))}
+        </div>
 
       </div>
       <BottomNav />
