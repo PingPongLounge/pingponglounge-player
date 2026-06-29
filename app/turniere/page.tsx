@@ -2,9 +2,9 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
+import { BG, CARD, CELL, W, MUT, GREEN, cardPad, chip, btn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
 
-const BG="#0E1014",C="#1A1D24",B="#23272F",M="rgba(255,255,255,0.85)",G="#39FF14",W="#FFFFFF"
-const GRAD={background:"linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)",WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text",filter:"drop-shadow(0 0 10px rgba(57,255,20,0.2))"} as const
+const M=MUT, C=CARD, B=CELL, G=GREEN
 const statusLabel=(s:string)=>({open:"offen",running:"läuft",finished:"beendet"}[s]||s)
 
 type Tournament={id:string,name:string,date:string,city:string,skill_class:string,max_players:number,status:string,format:string,tournament_registrations:{count:number}[]}
@@ -32,9 +32,9 @@ export default function TurnierePage(){
     <main style={{minHeight:"100vh",background:BG,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:"20px"}}>
       <div style={{textAlign:"center"}}>
         <p style={{fontSize:36,marginBottom:12}}>⚠️</p>
-        <p style={{fontSize:14,fontWeight:600,color:W,marginBottom:6}}>verbindungsfehler</p>
-        <p style={{fontSize:13,color:M,marginBottom:20,fontWeight:500}}>{error}</p>
-        <button onClick={load} style={{background:"#fff",color:"#0E1014",border:"none",borderRadius:10,padding:"10px 24px",fontSize:13,fontWeight:600,cursor:"pointer",fontFamily:"inherit",textTransform:"lowercase"}}>nochmals versuchen</button>
+        <p style={{fontSize:14,fontWeight:700,color:W,marginBottom:6}}>Verbindungsfehler</p>
+        <p style={{...body,marginBottom:20}}>{error}</p>
+        <button onClick={load} style={{...btn,display:"inline-block",padding:"10px 24px"}}>Nochmals versuchen</button>
       </div>
       <BottomNav />
     </main>
@@ -43,29 +43,27 @@ export default function TurnierePage(){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
-        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← dashboard</Link>
+        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",...backLink}}>← Dashboard</Link>
 
         <div style={{margin:"20px 0 16px"}}>
-          <h1 style={{fontSize:28,fontWeight:900,textTransform:"uppercase",letterSpacing:".1em",lineHeight:1,...GRAD}}>turniere</h1>
-          <p style={{fontSize:13,color:M,marginTop:8,fontWeight:500}}>community turniere · ko-bracket · elo</p>
+          <h1 style={h1}>Turniere</h1>
+          <p style={{...body,marginTop:8}}>Community-Turniere · KO-Bracket · Elo</p>
         </div>
 
-        <Link href="/turniere/neu" style={{textDecoration:"none"}}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,background:"#fff",color:"#0E1014",borderRadius:12,padding:"13px",fontSize:14,fontWeight:700,marginBottom:20,textTransform:"lowercase"}}>
-            + eigenes turnier erstellen
-          </div>
+        <Link href="/turniere/neu" style={{...btn,marginBottom:20}}>
+          + Eigenes Turnier erstellen
         </Link>
 
         {loading?(
           <div style={{textAlign:"center",padding:"60px 0",color:M}}>
             <div style={{fontSize:32,marginBottom:12}}>🏆</div>
-            <p style={{fontWeight:500,textTransform:"lowercase"}}>lädt...</p>
+            <p style={body}>Lädt …</p>
           </div>
         ):tournaments.length===0?(
-          <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,padding:"40px 20px",textAlign:"center"}}>
+          <div style={{...cardPad,padding:"40px 20px",textAlign:"center"}}>
             <p style={{fontSize:32,marginBottom:12}}>🏆</p>
-            <p style={{fontSize:16,fontWeight:600,color:W,marginBottom:8}}>noch keine turniere</p>
-            <p style={{fontSize:13,color:M,fontWeight:500}}>bald startet das erste turnier — bleib dran!</p>
+            <p style={{fontSize:16,fontWeight:700,color:W,marginBottom:8}}>Noch keine Turniere</p>
+            <p style={body}>Bald startet das erste Turnier — bleib dran!</p>
           </div>
         ):(
           <div style={{display:"flex",flexDirection:"column",gap:10}}>
@@ -74,18 +72,18 @@ export default function TurnierePage(){
               const dateStr=t.date?new Date(t.date).toLocaleDateString("de-CH",{weekday:"short",day:"numeric",month:"short",year:"numeric"}):""
               return(
                 <Link key={t.id} href={`/turniere/${t.id}`} style={{textDecoration:"none"}}>
-                  <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,padding:"16px 18px"}}>
+                  <div style={{...cardPad,padding:"16px 18px"}}>
                     <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:10}}>
                       <div>
-                        <p style={{fontSize:16,fontWeight:600,color:W,marginBottom:4}}>{t.name}</p>
-                        <p style={{fontSize:12,color:M,fontWeight:500,textTransform:"lowercase"}}>📍 {t.city} · 📅 {dateStr}</p>
+                        <p style={{fontSize:16,fontWeight:700,color:W,marginBottom:4}}>{t.name}</p>
+                        <p style={body}>📍 {t.city} · 📅 {dateStr}</p>
                       </div>
-                      <span style={{fontSize:10,fontWeight:500,color:"rgba(255,255,255,0.85)",border:"1px solid rgba(255,255,255,0.35)",borderRadius:999,padding:"3px 10px",flexShrink:0,textTransform:"lowercase"}}>{statusLabel(t.status)}</span>
+                      <span style={{...statusPill,flexShrink:0}}>{statusLabel(t.status)}</span>
                     </div>
                     <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                      <span style={{fontSize:11,fontWeight:500,color:"rgba(255,255,255,0.85)",border:"1px solid rgba(255,255,255,0.35)",borderRadius:999,padding:"2px 9px",textTransform:"lowercase"}}>{t.skill_class}</span>
-                      <span style={{fontSize:11,color:M,background:"#1A1D24",borderRadius:999,padding:"2px 8px",fontWeight:500,textTransform:"lowercase"}}>⚔️ {t.format==="ko"?"ko-bracket":"gruppen"}</span>
-                      <span style={{fontSize:11,color:M,background:"#1A1D24",borderRadius:999,padding:"2px 8px",fontWeight:500,textTransform:"lowercase"}}>{regCount}/{t.max_players} spieler</span>
+                      <span style={levelBadge(t.skill_class)}>{t.skill_class}</span>
+                      <span style={chip}>⚔️ {t.format==="ko"?"KO-Bracket":"Gruppen"}</span>
+                      <span style={chip}>{regCount}/{t.max_players} Spieler</span>
                     </div>
                   </div>
                 </Link>

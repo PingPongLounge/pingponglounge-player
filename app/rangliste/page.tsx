@@ -3,10 +3,9 @@ import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
+import { BG, CARD, W, MUT, GRAD, gt, card, h1, meta, body, chipBtn, levelBadge, lvColor } from "@/app/theme"
 
-const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#1FD1C4"
-const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
-const levelColor=(l:string)=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
+const G="#39FF14"
 
 const CANTONS = [
   "AG","AI","AR","BE","BL","BS","FR","GE","GL","GR",
@@ -63,54 +62,48 @@ export default function RanglistePage() {
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
 
-        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← dashboard</Link>
+        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: MUT, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
 
         {/* Header */}
         <div style={{ margin: "20px 0 24px" }}>
-          <h1 style={{ fontSize: 28, fontWeight: 900, fontFamily: "'League Spartan', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: ".1em", lineHeight: 1, background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>rangliste</h1>
-          <p style={{ fontSize: 13, color: M, marginTop: 6 }}>
-            {canton ? `Kanton ${canton}` : "schweiz national"} · {players.length} spieler
+          <h1 style={{ ...h1, fontFamily: "'League Spartan', system-ui, sans-serif" }}>Rangliste</h1>
+          <p style={{ ...meta, marginTop: 6 }}>
+            {canton ? `Kanton ${canton}` : "Schweiz national"} · {players.length} Spieler
           </p>
         </div>
 
         {/* Mein Rang — oben fixiert wenn nicht in Top 3 */}
         {myEntry && myEntry.rank > 3 && (
-          <div style={{ background: `${G}12`, border: `1px solid ${G}30`, borderRadius: 12, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
-            <span style={{ fontSize: 18, fontWeight: 900, color: G, minWidth: 36 }}>#{myEntry.rank}</span>
+          <div style={{ ...card, padding: "12px 16px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
+            <span style={{ ...gt, fontSize: 18, fontWeight: 900, minWidth: 36 }}>#{myEntry.rank}</span>
             <div style={{ flex: 1 }}>
-              <p style={{ fontSize: 13, fontWeight: 700, color: G }}>dein rang</p>
-              <p style={{ fontSize: 11, color: M }}>{myEntry.elo} ELO · {myEntry.level}</p>
+              <p style={{ fontSize: 13, fontWeight: 700, color: W }}>Dein Rang</p>
+              <p style={{ ...meta, fontSize: 11 }}>{myEntry.elo} ELO · {myEntry.level}</p>
             </div>
-            <span style={{ fontSize: 12, color: M }}>{myEntry.matches_played > 0 ? `${Math.round((myEntry.matches_won / myEntry.matches_played) * 100)}% WR` : "—"}</span>
+            <span style={{ ...meta, fontSize: 12 }}>{myEntry.matches_played > 0 ? `${Math.round((myEntry.matches_won / myEntry.matches_played) * 100)}% WR` : "—"}</span>
           </div>
         )}
 
         {/* Filter Kantone */}
         <div style={{ marginBottom: 20 }}>
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-            <button onClick={() => setCanton("")} style={{
-              padding: "6px 14px", borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: "pointer",
-              background: !canton ? "#fff" : C, border: `1px solid ${!canton ? "#fff" : B}`, color: !canton ? "#0E1014" : M
-            }}>🇨🇭 national</button>
+            <button onClick={() => setCanton("")} style={chipBtn(!canton)}>🇨🇭 National</button>
             {CANTONS.map(c => (
-              <button key={c} onClick={() => setCanton(canton === c ? "" : c)} style={{
-                padding: "6px 12px", borderRadius: 999, fontSize: 11, fontWeight: 700, cursor: "pointer",
-                background: canton === c ? "#fff" : C, border: `1px solid ${canton === c ? "#fff" : B}`, color: canton === c ? "#0E1014" : M
-              }}>{c}</button>
+              <button key={c} onClick={() => setCanton(canton === c ? "" : c)} style={chipBtn(canton === c)}>{c}</button>
             ))}
           </div>
         </div>
 
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: M }}>
+          <div style={{ textAlign: "center", padding: "60px 0", color: MUT }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>🏓</div>
             <p style={{ fontSize: 14 }}>lädt...</p>
           </div>
         ) : players.length === 0 ? (
-          <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, padding: "40px 20px", textAlign: "center" }}>
+          <div style={{ ...card, padding: "40px 20px", textAlign: "center" }}>
             <p style={{ fontSize: 32, marginBottom: 12 }}>🏓</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>noch keine spieler</p>
-            <p style={{ fontSize: 13, color: M }}>spiel dein erstes match um auf die rangliste zu kommen.</p>
+            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>Noch keine Spieler</p>
+            <p style={{ ...body }}>Spiel dein erstes Match um auf die Rangliste zu kommen.</p>
           </div>
         ) : (
           <>
@@ -119,15 +112,14 @@ export default function RanglistePage() {
               <div style={{ marginBottom: 12 }}>
                 {top3.map(p => {
                   const isMe = p.id === userId
-                  const rc   = RANK_COLORS[p.rank] || G
+                  const rc   = RANK_COLORS[p.rank] || W
                   const emoji = RANK_EMOJI[p.rank] || ""
-                  const lc   = levelColor(p.level)
                   const wr   = p.matches_played > 0 ? Math.round((p.matches_won / p.matches_played) * 100) : 0
                   return (
                     <div key={p.id} style={{
-                      background: isMe ? `${G}08` : C,
-                      border: `1px solid ${isMe ? G + "40" : rc + "30"}`,
-                      borderRadius: 14, padding: "14px 16px", marginBottom: 8,
+                      ...card,
+                      ...(isMe ? { border: "1.5px solid transparent", background: `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` } : {}),
+                      padding: "14px 16px", marginBottom: 8,
                       display: "flex", alignItems: "center", gap: 14
                     }}>
                       {/* Rank */}
@@ -139,20 +131,20 @@ export default function RanglistePage() {
                       {/* Info */}
                       <div style={{ flex: 1, minWidth: 0 }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 3 }}>
-                          <span style={{ fontSize: 15, fontWeight: 800, color: isMe ? G : W }}>{p.name}</span>
+                          <span style={{ fontSize: 15, fontWeight: 800, color: W }}>{p.name}</span>
                           {isMe && <span style={{ fontSize: 9, color: G, background: `${G}18`, borderRadius: 999, padding: "1px 6px", fontWeight: 700 }}>du</span>}
                         </div>
-                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                          <span style={{ fontSize: 10, fontWeight: 700, color: lc, background: `${lc}15`, borderRadius: 999, padding: "1px 7px" }}>{p.level}</span>
-                          {p.canton && <span style={{ fontSize: 10, color: M }}>{p.canton}</span>}
-                          <span style={{ fontSize: 10, color: M }}>{p.matches_played} Matches · {wr}% WR</span>
+                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
+                          <span style={levelBadge(p.level)}>{p.level}</span>
+                          {p.canton && <span style={{ ...meta, fontSize: 10 }}>{p.canton}</span>}
+                          <span style={{ ...meta, fontSize: 10 }}>{p.matches_played} Matches · {wr}% WR</span>
                         </div>
                       </div>
 
                       {/* ELO */}
                       <div style={{ textAlign: "right", flexShrink: 0 }}>
-                        <div style={{ fontSize: 22, fontWeight: 900, color: rc, lineHeight: 1 }}>{p.elo}</div>
-                        <div style={{ fontSize: 10, color: M, marginTop: 2 }}>ELO</div>
+                        <div style={{ fontSize: 22, fontWeight: 900, color: W, lineHeight: 1 }}>{p.elo}</div>
+                        <div style={{ ...meta, fontSize: 10, marginTop: 2 }}>ELO</div>
                       </div>
                     </div>
                   )
@@ -162,20 +154,19 @@ export default function RanglistePage() {
 
             {/* Rest der Liste */}
             {rest.length > 0 && (
-              <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 14, overflow: "hidden" }}>
+              <div style={{ ...card }}>
                 {rest.map((p, i) => {
                   const isMe = p.id === userId
-                  const lc   = levelColor(p.level)
                   const wr   = p.matches_played > 0 ? Math.round((p.matches_won / p.matches_played) * 100) : 0
                   return (
                     <div key={p.id} style={{
                       display: "flex", alignItems: "center", gap: 12,
                       padding: "11px 16px",
-                      borderBottom: i < rest.length - 1 ? `1px solid ${B}` : "none",
+                      borderTop: i > 0 ? "1px solid rgba(255,255,255,.06)" : "none",
                       background: isMe ? `${G}08` : "transparent"
                     }}>
                       {/* Rank */}
-                      <span style={{ fontSize: 12, fontWeight: 700, color: isMe ? G : M, minWidth: 28, textAlign: "right" }}>#{p.rank}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: isMe ? G : MUT, minWidth: 28, textAlign: "right" }}>#{p.rank}</span>
 
                       {/* Name + Level */}
                       <div style={{ flex: 1, minWidth: 0 }}>
@@ -184,9 +175,9 @@ export default function RanglistePage() {
                           {isMe && <span style={{ fontSize: 9, color: G, background: `${G}18`, borderRadius: 999, padding: "1px 5px", fontWeight: 700 }}>du</span>}
                         </div>
                         <div style={{ display: "flex", gap: 5, marginTop: 2 }}>
-                          <span style={{ fontSize: 10, color: lc }}>{p.level}</span>
-                          {p.canton && <span style={{ fontSize: 10, color: M }}>· {p.canton}</span>}
-                          <span style={{ fontSize: 10, color: M }}>· {wr}% WR</span>
+                          <span style={{ fontSize: 10, color: lvColor(p.level) }}>{p.level}</span>
+                          {p.canton && <span style={{ ...meta, fontSize: 10 }}>· {p.canton}</span>}
+                          <span style={{ ...meta, fontSize: 10 }}>· {wr}% WR</span>
                         </div>
                       </div>
 

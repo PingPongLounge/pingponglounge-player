@@ -4,10 +4,13 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { LIGA_CONFIG } from "@/lib/rewards"
+import {
+  BG, CARD, CELL, W, MUT, GREEN, DANGER, LINE,
+  gt, card, cardPad, cardActive, chipBtn, btn, btnInCard, btnGhost,
+  input, h1, body, meta, backLink, levelBadge,
+} from "@/app/theme"
 
-const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF",PK="#1FD1C4"
-const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
-const levelColor=(l:string):string=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:PK}[l]||G)
+const G=GREEN, M=MUT
 
 type Standing={player_id:string,player_name:string,points:number,played:number,wins:number,losses:number,rank:number}
 type Match={id:string,round:number,p1_id:string,p1_name:string,p2_id:string,p2_name:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,status:string,deadline:string|null,played_at:string|null}
@@ -150,10 +153,9 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
     setFeed(prev=>prev.map(f=>f.id===matchId?{...f,comments:((data||[]) as unknown as Array<{id:string,user_id:string,text:string,created_at:string,profiles:{name:string}|null}>).map(c=>({...c,user_name:c.profiles?.name||"?"}))}:f))
   }
 
-  if(loading||!season) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>lädt...</p>
+  if(loading||!season) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>Lädt …</p>
       <BottomNav /></main>
 
-  const lc=levelColor(season.skill_class)
   const myMatches=matches.filter(m=>m.p1_id===userId||m.p2_id===userId)
   const incomingChallenges=challenges.filter(c=>c.p2_id===userId)
   const outgoingChallenges=challenges.filter(c=>c.p1_id===userId)
@@ -162,33 +164,33 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
   const busyOpponents=new Set(challenges.map(c=>c.p1_id===userId?c.p2_id:c.p1_id))
 
   const TABS=[
-    {key:"tabelle",label:"tabelle"},
-    {key:"spielplan",label:"spielplan"},
-    {key:"challenges",label:`challenges${incomingChallenges.length>0?` (${incomingChallenges.length})`:""}` },
-    {key:"feed",label:"feed"},
+    {key:"tabelle",label:"Tabelle"},
+    {key:"spielplan",label:"Spielplan"},
+    {key:"challenges",label:`Challenges${incomingChallenges.length>0?` (${incomingChallenges.length})`:""}` },
+    {key:"feed",label:"Feed"},
   ] as const
 
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 20px 80px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
-        <Link href="/liga" style={{color:M,textDecoration:"none",fontSize:13}}>← liga</Link>
+        <Link href="/liga" style={{...backLink}}>← Liga</Link>
 
         {/* Header */}
         <div style={{margin:"16px 0 20px"}}>
           <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:6}}>
-            <h1 style={{fontSize:22,fontWeight:900,fontFamily:"'League Spartan', system-ui, sans-serif",textTransform:"uppercase",letterSpacing:".1em",background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>{season.name}</h1>
-            <span style={{fontSize:10,fontWeight:700,color:lc,background:`${lc}18`,border:`1px solid ${lc}40`,borderRadius:999,padding:"2px 8px"}}>{season.skill_class}</span>
+            <h1 style={{...h1,fontSize:22}}>{season.name}</h1>
+            <span style={levelBadge(season.skill_class)}>{season.skill_class}</span>
           </div>
-          <p style={{fontSize:12,color:M}}>{season.city} · {standings.length} spieler · {season.status==="running"?"läuft gerade":"offen für anmeldung"}</p>
+          <p style={{...meta}}>{season.city} · {standings.length} Spieler · {season.status==="running"?"läuft gerade":"offen für Anmeldung"}</p>
         </div>
 
         {/* Anmelden CTA */}
-        {season.status==="open"&&!myMatches.length&&<Link href={`/liga/${season.id}/anmelden`} style={{display:"block",background:"#fff",color:"#0E1014",textDecoration:"none",borderRadius:10,padding:"14px",textAlign:"center",fontSize:13,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em",marginBottom:16}}>kostenlos anmelden</Link>}
+        {season.status==="open"&&!myMatches.length&&<Link href={`/liga/${season.id}/anmelden`} style={{...btn,marginBottom:16}}>Kostenlos anmelden</Link>}
 
         {/* Tabs */}
-        <div style={{display:"flex",background:C,borderRadius:10,padding:3,marginBottom:16,gap:2}}>
+        <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
           {TABS.map(t=>(
-            <button key={t.key} onClick={()=>setTab(t.key)} style={{flex:1,background:tab===t.key?"#fff":"none",border:"none",borderRadius:8,padding:"9px 4px",fontSize:11,fontWeight:700,color:tab===t.key?"#0E1014":M,cursor:"pointer",textTransform:"lowercase",letterSpacing:"0.04em",transition:"all 0.2s",position:"relative"}}>
+            <button key={t.key} onClick={()=>setTab(t.key)} style={{...chipBtn(tab===t.key),position:"relative"}}>
               {t.label}
               {t.key==="challenges"&&incomingChallenges.length>0&&tab!=="challenges"&&(
                 <span style={{position:"absolute",top:2,right:2,width:7,height:7,background:G,borderRadius:"50%"}}/>
@@ -199,28 +201,28 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
 
         {/* ── TABELLE ─────────────────────────────────────────── */}
         {tab==="tabelle"&&(
-          <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,overflow:"hidden"}}>
-            <div style={{display:"grid",gridTemplateColumns:"28px 1fr 50px 52px 44px",padding:"10px 14px",borderBottom:`1px solid ${B}`,background:"#0E1014"}}>
+          <div style={{...card}}>
+            <div style={{display:"grid",gridTemplateColumns:"28px 1fr 50px 52px 44px",padding:"10px 14px",borderBottom:`1px solid ${LINE}`,background:BG}}>
               <span style={{fontSize:10,color:M,fontWeight:700}}>#</span>
-              <span style={{fontSize:10,color:M,fontWeight:700}}>spieler</span>
-              <span style={{fontSize:10,color:M,fontWeight:700,textAlign:"center"}}>s</span>
-              <span style={{fontSize:10,color:M,fontWeight:700,textAlign:"right"}}>pts</span>
+              <span style={{fontSize:10,color:M,fontWeight:700}}>Spieler</span>
+              <span style={{fontSize:10,color:M,fontWeight:700,textAlign:"center"}}>S</span>
+              <span style={{fontSize:10,color:M,fontWeight:700,textAlign:"right"}}>Pts</span>
               <span style={{fontSize:10,color:M,fontWeight:700,textAlign:"center"}}>⚔</span>
             </div>
             {standings.length===0?(
-              <p style={{padding:"20px",textAlign:"center",color:M,fontSize:13}}>noch keine ergebnisse</p>
+              <p style={{padding:"20px",textAlign:"center",color:M,fontSize:13}}>Noch keine Ergebnisse</p>
             ):standings.map((s,i)=>{
               const isSelf=s.player_id===userId
               const isBusy=busyOpponents.has(s.player_id)
               return(
-                <div key={s.player_id} style={{display:"grid",gridTemplateColumns:"28px 1fr 50px 52px 44px",padding:"12px 14px",borderBottom:i<standings.length-1?`1px solid ${B}`:"none",background:isSelf?`${G}08`:"none",alignItems:"center"}}>
-                  <span style={{fontSize:13,fontWeight:i<3?700:400,color:i===0?G:i===1?"#A8AAB2":i===2?"#CD7F32":M}}>{i+1}</span>
+                <div key={s.player_id} style={{display:"grid",gridTemplateColumns:"28px 1fr 50px 52px 44px",padding:"12px 14px",borderBottom:i<standings.length-1?`1px solid ${LINE}`:"none",background:isSelf?`${G}08`:"none",alignItems:"center"}}>
+                  <span style={{fontSize:13,fontWeight:i<3?700:400,color:i===0?G:i===1?"#BFC6D0":i===2?"#CF9763":M}}>{i+1}</span>
                   <div>
                     <span style={{fontSize:14,fontWeight:700,color:isSelf?G:W}}>{s.player_name}</span>
-                    {isSelf&&<span style={{fontSize:10,color:G,marginLeft:6}}>du</span>}
+                    {isSelf&&<span style={{fontSize:10,color:G,marginLeft:6}}>Du</span>}
                   </div>
                   <span style={{fontSize:12,color:M,textAlign:"center"}}>{s.wins}W/{s.losses}L</span>
-                  <span style={{fontSize:18,fontWeight:900,color:G,textAlign:"right"}}>{s.points}</span>
+                  <span style={{fontSize:18,fontWeight:900,...gt,textAlign:"right"}}>{s.points}</span>
                   <div style={{textAlign:"center"}}>
                     {!isSelf&&userId&&(
                       isBusy?(
@@ -229,9 +231,9 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                         <button
                           onClick={()=>handleChallenge(s.player_id)}
                           disabled={challenging===s.player_id}
-                          style={{background:challenging===s.player_id?B:`${G}20`,border:`1px solid ${challenging===s.player_id?B:G}`,borderRadius:6,padding:"4px 8px",cursor:"pointer",fontSize:11,color:G,fontWeight:700}}
+                          style={{...btnInCard,padding:"4px 9px",fontSize:11,opacity:challenging===s.player_id?0.6:1}}
                         >
-                          {challenging===s.player_id?"...":"⚔"}
+                          {challenging===s.player_id?"…":"⚔"}
                         </button>
                       )
                     )}
@@ -245,28 +247,28 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
         {/* ── SPIELPLAN ───────────────────────────────────────── */}
         {tab==="spielplan"&&(
           <div style={{display:"flex",flexDirection:"column",gap:8}}>
-            {matches.length===0?<p style={{textAlign:"center",color:M,padding:"20px"}}>noch keine matches</p>:
+            {matches.length===0?<p style={{textAlign:"center",color:M,padding:"20px"}}>Noch keine Matches</p>:
             matches.map(m=>{
               const isMe=m.p1_id===userId||m.p2_id===userId
               const confirmed=m.status==="confirmed"
               const sw=m.sets?winsFromSets(m.sets):{p1:0,p2:0}
               return(
-                <div key={m.id} style={{background:C,border:`1px solid ${isMe?`${G}40`:B}`,borderRadius:12,padding:"14px 16px"}}>
-                  <div style={{display:"flex",alignItems:"center",position:"relative",marginBottom:6}}>
-                    <span style={{fontSize:10,color:M,fontWeight:700,textTransform:"uppercase"}}>{m.round>0?`runde ${m.round}`:"open match"}</span>
-                    <span style={{fontSize:10,color:confirmed?G:m.status==="p1_entered"?"#FACC15":M,fontWeight:700,textTransform:"uppercase"}}>{confirmed?"✓ bestätigt":m.status==="p1_entered"?"warten":"ausstehend"}</span>
+                <div key={m.id} style={isMe?{...cardActive,padding:"14px 16px"}:{...cardPad,padding:"14px 16px"}}>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",position:"relative",marginBottom:6}}>
+                    <span style={{fontSize:10,color:M,fontWeight:700,textTransform:"uppercase"}}>{m.round>0?`Runde ${m.round}`:"Open Match"}</span>
+                    <span style={{fontSize:10,color:confirmed?G:m.status==="p1_entered"?"#FACC15":M,fontWeight:700,textTransform:"uppercase"}}>{confirmed?"✓ Bestätigt":m.status==="p1_entered"?"Warten":"Ausstehend"}</span>
                   </div>
                   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                     <span style={{fontSize:15,fontWeight:700,color:m.winner_id===m.p1_id?G:W}}>{m.p1_name}</span>
                     {confirmed&&m.sets?(
-                      <span style={{fontSize:13,fontWeight:700,color:W,background:B,borderRadius:6,padding:"4px 10px"}}>{sw.p1}:{sw.p2}</span>
+                      <span style={{fontSize:13,fontWeight:700,color:W,background:CELL,borderRadius:6,padding:"4px 10px"}}>{sw.p1}:{sw.p2}</span>
                     ):<span style={{fontSize:12,color:M}}>vs</span>}
                     <span style={{fontSize:15,fontWeight:700,color:m.winner_id===m.p2_id?G:W}}>{m.p2_name}</span>
                   </div>
                   {confirmed&&m.sets&&<p style={{fontSize:11,color:M,marginTop:6,textAlign:"center"}}>{setsToString(m.sets)}</p>}
                   {isMe&&!confirmed&&(
-                    <Link href={`/liga/match/${m.id}`} style={{display:"block",marginTop:10,background:"#fff",color:"#0E1014",textDecoration:"none",borderRadius:8,padding:"10px",textAlign:"center",fontSize:12,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em"}}>
-                      {m.status==="p1_entered"&&m.p2_id===userId?"bestätigen":"resultat eingeben"}
+                    <Link href={`/liga/match/${m.id}`} style={{...btnInCard,display:"block",textAlign:"center",marginTop:10}}>
+                      {m.status==="p1_entered"&&m.p2_id===userId?"Bestätigen":"Resultat eingeben"}
                     </Link>
                   )}
                 </div>
@@ -282,22 +284,22 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
             {/* Incoming */}
             {incomingChallenges.length>0&&(
               <div>
-                <p style={{fontSize:11,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>eingehend</p>
+                <p style={{fontSize:11,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Eingehend</p>
                 {incomingChallenges.map(c=>(
-                  <div key={c.id} style={{background:C,border:`1px solid ${B}`,borderRadius:12,padding:"14px 16px",marginBottom:8}}>
+                  <div key={c.id} style={{...cardPad,padding:"14px 16px",marginBottom:8}}>
                     <p style={{fontSize:14,fontWeight:700,color:W,marginBottom:4}}>
                       <span style={{color:G}}>{c.p1_name}</span> fordert dich heraus
                     </p>
                     <div style={{display:"flex",gap:8,marginTop:10}}>
-                      <button onClick={()=>handleAccept(c.id)} style={{flex:1,background:"#fff",color:"#0E1014",border:"none",borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer",textTransform:"lowercase"}}>✓ annehmen</button>
+                      <button onClick={()=>handleAccept(c.id)} style={{...btnInCard,flex:1,textAlign:"center"}}>✓ Annehmen</button>
                       {confirmDecline===c.id?(
                         <div style={{flex:1,display:"flex",gap:6,alignItems:"center"}}>
-                          <span style={{fontSize:11,color:M,flex:1}}>sicher?</span>
-                          <button onClick={()=>setConfirmDecline(null)} style={{background:"none",color:M,border:`1px solid ${B}`,borderRadius:6,padding:"6px 10px",fontSize:11,cursor:"pointer"}}>nein</button>
-                          <button onClick={()=>{handleDecline(c.id);setConfirmDecline(null)}} style={{background:"#f8717120",color:"#f87171",border:"1px solid #f8717140",borderRadius:6,padding:"6px 10px",fontSize:11,fontWeight:700,cursor:"pointer"}}>ablehnen</button>
+                          <span style={{fontSize:11,color:M,flex:1}}>Sicher?</span>
+                          <button onClick={()=>setConfirmDecline(null)} style={{...btnGhost,padding:"6px 10px",fontSize:11}}>Nein</button>
+                          <button onClick={()=>{handleDecline(c.id);setConfirmDecline(null)}} style={{background:`${DANGER}20`,color:DANGER,border:`1px solid ${DANGER}40`,borderRadius:6,padding:"6px 10px",fontSize:11,fontWeight:700,cursor:"pointer"}}>Ablehnen</button>
                         </div>
                       ):(
-                        <button onClick={()=>setConfirmDecline(c.id)} style={{flex:1,background:"none",color:M,border:`1px solid ${B}`,borderRadius:8,padding:"10px",fontSize:12,fontWeight:700,cursor:"pointer"}}>ablehnen</button>
+                        <button onClick={()=>setConfirmDecline(c.id)} style={{...btnGhost,flex:1,padding:"10px"}}>Ablehnen</button>
                       )}
                     </div>
                   </div>
@@ -308,21 +310,21 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
             {/* Outgoing */}
             {outgoingChallenges.length>0&&(
               <div>
-                <p style={{fontSize:11,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>gesendet</p>
+                <p style={{fontSize:11,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:8}}>Gesendet</p>
                 {outgoingChallenges.map(c=>(
-                  <div key={c.id} style={{background:C,border:`1px solid ${B}`,borderRadius:12,padding:"14px 16px",marginBottom:8}}>
-                    <div style={{display:"flex",alignItems:"center",position:"relative"}}>
-                      <p style={{fontSize:14,fontWeight:700,color:W}}>challenge an <span style={{color:G}}>{c.p2_name}</span></p>
+                  <div key={c.id} style={{...cardPad,padding:"14px 16px",marginBottom:8}}>
+                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",position:"relative"}}>
+                      <p style={{fontSize:14,fontWeight:700,color:W}}>Challenge an <span style={{color:G}}>{c.p2_name}</span></p>
                       <span style={{fontSize:10,color:"#FACC15",fontWeight:700}}>⏳ wartet</span>
                     </div>
                     {confirmWithdraw===c.id?(
                       <div style={{display:"flex",gap:6,alignItems:"center",marginTop:10}}>
-                        <span style={{fontSize:11,color:M,flex:1}}>zurückziehen?</span>
-                        <button onClick={()=>setConfirmWithdraw(null)} style={{background:"none",color:M,border:`1px solid ${B}`,borderRadius:6,padding:"5px 10px",fontSize:11,cursor:"pointer"}}>nein</button>
-                        <button onClick={()=>{handleDecline(c.id);setConfirmWithdraw(null)}} style={{background:"#f8717120",color:"#f87171",border:"1px solid #f8717140",borderRadius:6,padding:"5px 10px",fontSize:11,fontWeight:700,cursor:"pointer"}}>ja</button>
+                        <span style={{fontSize:11,color:M,flex:1}}>Zurückziehen?</span>
+                        <button onClick={()=>setConfirmWithdraw(null)} style={{...btnGhost,padding:"5px 10px",fontSize:11}}>Nein</button>
+                        <button onClick={()=>{handleDecline(c.id);setConfirmWithdraw(null)}} style={{background:`${DANGER}20`,color:DANGER,border:`1px solid ${DANGER}40`,borderRadius:6,padding:"5px 10px",fontSize:11,fontWeight:700,cursor:"pointer"}}>Ja</button>
                       </div>
                     ):(
-                      <button onClick={()=>setConfirmWithdraw(c.id)} style={{marginTop:10,background:"none",color:M,border:`1px solid ${B}`,borderRadius:8,padding:"8px 14px",fontSize:11,cursor:"pointer"}}>zurückziehen</button>
+                      <button onClick={()=>setConfirmWithdraw(c.id)} style={{...btnGhost,marginTop:10,padding:"8px 14px",fontSize:11}}>Zurückziehen</button>
                     )}
                   </div>
                 ))}
@@ -330,10 +332,10 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
             )}
 
             {incomingChallenges.length===0&&outgoingChallenges.length===0&&(
-              <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,padding:"32px 20px",textAlign:"center"}}>
+              <div style={{...cardPad,padding:"32px 20px",textAlign:"center"}}>
                 <p style={{fontSize:28,marginBottom:10}}>⚔️</p>
-                <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:6}}>keine offenen challenges</p>
-                <p style={{fontSize:13,color:M}}>fordere einen mitspieler in der tabelle heraus.</p>
+                <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:6}}>Keine offenen Challenges</p>
+                <p style={{...body}}>Fordere einen Mitspieler in der Tabelle heraus.</p>
               </div>
             )}
           </div>
@@ -342,18 +344,18 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
         {/* ── FEED ────────────────────────────────────────────── */}
         {tab==="feed"&&(
           <div style={{display:"flex",flexDirection:"column",gap:12}}>
-            {feed.length===0?<p style={{textAlign:"center",color:M,padding:"20px"}}>noch keine ergebnisse</p>:
+            {feed.length===0?<p style={{textAlign:"center",color:M,padding:"20px"}}>Noch keine Ergebnisse</p>:
             feed.map(f=>{
               const sw=winsFromSets(f.sets)
               const reactionCounts:{[k:string]:number}={}
               f.reactions?.forEach(r=>{reactionCounts[r.type]=(reactionCounts[r.type]||0)+1})
               const myReactions=new Set(f.reactions?.filter(r=>r.user_id===userId).map(r=>r.type))
               return(
-                <div key={f.id} style={{background:C,border:`1px solid ${B}`,borderRadius:14,padding:"16px"}}>
+                <div key={f.id} style={{...cardPad,padding:"16px"}}>
                   <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:10}}>
                     <span style={{fontSize:14,fontWeight:700,color:f.winner_id===f.p1_id?G:W}}>{f.p1_name}</span>
                     <div style={{textAlign:"center"}}>
-                      <span style={{fontSize:18,fontWeight:900,color:W,background:B,borderRadius:8,padding:"4px 12px"}}>{sw.p1}:{sw.p2}</span>
+                      <span style={{fontSize:18,fontWeight:900,color:W,background:CELL,borderRadius:8,padding:"4px 12px"}}>{sw.p1}:{sw.p2}</span>
                     </div>
                     <span style={{fontSize:14,fontWeight:700,color:f.winner_id===f.p2_id?G:W}}>{f.p2_name}</span>
                   </div>
@@ -361,13 +363,13 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                   {f.played_at&&<p style={{fontSize:11,color:M,marginBottom:12}}>{timeAgo(f.played_at)}</p>}
                   <div style={{display:"flex",gap:8,marginBottom:12}}>
                     {[["clap","👏"],["fire","🔥"],["ping","🏓"]].map(([type,emoji])=>(
-                      <button key={type} onClick={()=>handleReact(f.id,type)} style={{background:myReactions.has(type)?`${G}20`:"none",border:`1px solid ${myReactions.has(type)?G:B}`,borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:13,color:myReactions.has(type)?G:M,fontWeight:myReactions.has(type)?700:400}}>
+                      <button key={type} onClick={()=>handleReact(f.id,type)} style={{background:myReactions.has(type)?`${G}20`:CELL,border:`1px solid ${myReactions.has(type)?G:CELL}`,borderRadius:8,padding:"6px 12px",cursor:"pointer",fontSize:13,color:myReactions.has(type)?G:M,fontWeight:myReactions.has(type)?700:400}}>
                         {emoji} {reactionCounts[type]||0}
                       </button>
                     ))}
                   </div>
                   {f.comments?.length>0&&(
-                    <div style={{borderTop:`1px solid ${B}`,paddingTop:10,marginBottom:10}}>
+                    <div style={{borderTop:`1px solid ${LINE}`,paddingTop:10,marginBottom:10}}>
                       {f.comments.map(c=>(
                         <div key={c.id} style={{marginBottom:8}}>
                           <span style={{fontSize:12,fontWeight:700,color:c.user_id===userId?G:W}}>{c.user_name}</span>
@@ -379,8 +381,8 @@ export default function SeasonPage({params}:{params:Promise<{id:string}>}){
                   )}
                   {userId&&(
                     <div style={{display:"flex",gap:8}}>
-                      <input value={commentText[f.id]||""} onChange={e=>setCommentText(p=>({...p,[f.id]:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&handleComment(f.id)} placeholder="kommentar..." style={{flex:1,background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"8px 12px",fontSize:13,color:W,outline:"none"}}/>
-                      <button onClick={()=>handleComment(f.id)} style={{background:"#fff",color:"#0E1014",border:"none",borderRadius:8,padding:"8px 14px",cursor:"pointer",fontSize:13,fontWeight:700}}>→</button>
+                      <input value={commentText[f.id]||""} onChange={e=>setCommentText(p=>({...p,[f.id]:e.target.value}))} onKeyDown={e=>e.key==="Enter"&&handleComment(f.id)} placeholder="Kommentar …" style={{...input,flex:1,padding:"8px 12px"}}/>
+                      <button onClick={()=>handleComment(f.id)} style={{...btnInCard,padding:"8px 14px"}}>→</button>
                     </div>
                   )}
                 </div>

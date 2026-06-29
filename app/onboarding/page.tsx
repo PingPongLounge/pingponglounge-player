@@ -2,20 +2,13 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-
-const G = "#39FF14"
-const DARK = "#0E1014"
-const SURFACE = "#0E1014"
-const CARD = "#1A1D24"
-const BORDER = "#1A1D24"
-const TEXT = "#FFFFFF"
-const MUTED = "rgba(255,255,255,0.66)"
+import { BG as DARK, CARD, CELL, W as TEXT, MUT as MUTED, GREEN as G, GRAD, lvColor, btn, input as inputBase } from "@/app/theme"
 
 const LEVELS = [
-  { name: "Rookie",     color: "#4ADE80", desc: "Einsteiger, spiele zum Spass",       elo: 1000 },
-  { name: "Challenger", color: "#FACC15", desc: "Regelmässiger Freizeitspieler",       elo: 1100 },
-  { name: "Advanced",   color: "#FB923C", desc: "Vereinserfahrung & Taktik",           elo: 1300 },
-  { name: "Elite",      color: "#1FD1C4", desc: "Turnierspieler & Wettkampf",          elo: 1500 },
+  { name: "Rookie",     color: lvColor("Rookie"),     desc: "Einsteiger, spiele zum Spass",  elo: 1000 },
+  { name: "Challenger", color: lvColor("Challenger"), desc: "Regelmässiger Freizeitspieler", elo: 1100 },
+  { name: "Advanced",   color: lvColor("Advanced"),   desc: "Vereinserfahrung & Taktik",     elo: 1300 },
+  { name: "Elite",      color: lvColor("Elite"),      desc: "Turnierspieler & Wettkampf",    elo: 1500 },
 ]
 
 const CANTON_MAP: Record<string, string> = {
@@ -76,9 +69,9 @@ function levelForElo(elo: number) {
 
 type PendingResult = { elo: number; won?: boolean; sets?: unknown; ort?: string; ts?: number }
 
-const inp: React.CSSProperties = { width: "100%", background: SURFACE, border: "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "15px", color: TEXT, outline: "none", boxSizing: "border-box", fontFamily: "inherit" }
-const primaryBtn = (disabled = false): React.CSSProperties => ({ width: "100%", background: disabled ? BORDER : "#fff", color: disabled ? MUTED : "#0E1014", border: "none", borderRadius: "10px", padding: "14px", fontSize: "14px", fontWeight: 800, cursor: disabled ? "not-allowed" : "pointer", textTransform: "lowercase", letterSpacing: "0.02em", marginTop: "10px", fontFamily: "inherit" })
-const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", background: sel ? "#fff" : CARD, border: sel ? "1px solid #fff" : "1px solid " + BORDER, borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: sel ? "#0E1014" : TEXT, cursor: "pointer", textAlign: "left", marginBottom: "8px", fontWeight: sel ? 700 : 400, fontFamily: "inherit", display: "block" })
+const inp: React.CSSProperties = { ...inputBase, padding: "14px 16px", fontSize: "15px", boxSizing: "border-box" }
+const primaryBtn = (disabled = false): React.CSSProperties => ({ ...btn, width: "100%", marginTop: "10px", opacity: disabled ? 0.5 : 1, cursor: disabled ? "not-allowed" : "pointer" })
+const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: TEXT, cursor: "pointer", textAlign: "left", marginBottom: "8px", fontWeight: sel ? 700 : 400, fontFamily: "inherit", display: "block", border: sel ? "1.5px solid transparent" : "1.5px solid transparent", background: sel ? `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` : CELL })
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -160,8 +153,8 @@ export default function OnboardingPage() {
         <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>schritt {s} / {total}</span>
         <span style={{ fontSize: "11px", color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em" }}>PLAYER</span>
       </div>
-      <div style={{ background: BORDER, borderRadius: "4px", height: "3px" }}>
-        <div style={{ background: G, height: "3px", borderRadius: "4px", width: `${(s / total) * 100}%`, transition: "width 0.4s" }} />
+      <div style={{ background: CELL, borderRadius: "4px", height: "3px" }}>
+        <div style={{ background: GRAD, height: "3px", borderRadius: "4px", width: `${(s / total) * 100}%`, transition: "width 0.4s" }} />
       </div>
     </div>
   )
@@ -170,20 +163,20 @@ export default function OnboardingPage() {
     <div style={wrap}><div style={box}>
       <Header step={1} total={pending ? 2 : 3} />
       {pending && (
-        <div style={{ background: "rgba(57,255,20,0.08)", border: "1px solid " + G + "55", borderRadius: "10px", padding: "12px 14px", marginBottom: "20px" }}>
-          <p style={{ fontSize: "13px", color: G, fontWeight: 700, lineHeight: 1.4 }}>dein resultat ist gespeichert — sichere jetzt deinen rang.</p>
+        <div style={{ background: "rgba(57,255,20,0.08)", borderRadius: "10px", padding: "12px 14px", marginBottom: "20px" }}>
+          <p style={{ fontSize: "13px", color: G, fontWeight: 700, lineHeight: 1.4 }}>Dein Resultat ist gespeichert — sichere jetzt deinen Rang.</p>
         </div>
       )}
-      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "lowercase", marginBottom: "6px" }}>dein profil</h2>
-      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{pending ? "nur noch name + kanton — dann ist dein rang fix." : "kurz einrichten — dann geht es los."}</p>
+      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "6px" }}>Dein Profil</h2>
+      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{pending ? "Nur noch Name + Kanton — dann ist dein Rang fix." : "Kurz einrichten — dann geht es los."}</p>
       <input style={inp} placeholder="Dein Name oder Spitzname" value={name} onChange={e => setName(e.target.value)} />
-      <button type="button" onClick={genNicknames} style={{ background: "none", border: "1px solid " + BORDER, borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: MUTED, cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em", fontFamily: "inherit" }}>
-        {loadingNicks ? "..." : "vorschläge generieren"}
+      <button type="button" onClick={genNicknames} style={{ background: "none", border: "1px solid " + CELL, borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: MUTED, cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em", fontFamily: "inherit" }}>
+        {loadingNicks ? "..." : "Vorschläge generieren"}
       </button>
       {nicks.length > 0 && (
         <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
           {nicks.map(n => (
-            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? "#fff" : CARD, border: name === n ? "1px solid #fff" : "1px solid " + BORDER, borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: name === n ? "#0E1014" : TEXT, cursor: "pointer", fontWeight: name === n ? 700 : 400, fontFamily: "inherit" }}>
+            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` : CELL, border: "1.5px solid transparent", borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: TEXT, cursor: "pointer", fontWeight: name === n ? 700 : 400, fontFamily: "inherit" }}>
               {n}
             </button>
           ))}
@@ -193,28 +186,28 @@ export default function OnboardingPage() {
         <option value="">Kanton wählen...</option>
         {CANTONS.map(c => <option key={c} value={c}>{c}</option>)}
       </select>
-      <button style={primaryBtn(!name.trim() || !canton)} disabled={!name.trim() || !canton} onClick={() => setStep(pending ? 3 : 1)}>weiter</button>
+      <button style={primaryBtn(!name.trim() || !canton)} disabled={!name.trim() || !canton} onClick={() => setStep(pending ? 3 : 1)}>Weiter</button>
     </div></div>
   )
 
   if (step === 1) return (
     <div style={wrap}><div style={box}>
       <Header step={2} total={3} />
-      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "lowercase", marginBottom: "6px" }}>dein level</h2>
-      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>kennst du dein spielniveau?</p>
-      <button style={optBtn(mode === "know")} onClick={() => setMode("know")}>ja, ich kenne mein level</button>
-      <button style={optBtn(mode === "quiz")} onClick={() => setMode("quiz")}>nein — hilf mir es herausfinden</button>
+      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "6px" }}>Dein Level</h2>
+      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>Kennst du dein Spielniveau?</p>
+      <button style={optBtn(mode === "know")} onClick={() => setMode("know")}>Ja, ich kenne mein Level</button>
+      <button style={optBtn(mode === "quiz")} onClick={() => setMode("quiz")}>Nein — hilf mir es herauszufinden</button>
       {mode === "know" && (
         <div style={{ marginTop: "16px" }}>
           {LEVELS.map(l => (
             <button key={l.name} style={optBtn(manualLevel === l.name)} onClick={() => setManualLevel(l.name)}>
-              <span style={{ color: manualLevel === l.name ? "#0E1014" : l.color, fontWeight: 800 }}>{l.name}</span>
-              <span style={{ fontSize: "12px", color: manualLevel === l.name ? "rgba(20,22,26,0.7)" : MUTED, marginLeft: "8px" }}>{l.desc}</span>
+              <span style={{ color: l.color, fontWeight: 800 }}>{l.name}</span>
+              <span style={{ fontSize: "12px", color: MUTED, marginLeft: "8px" }}>{l.desc}</span>
             </button>
           ))}
         </div>
       )}
-      <button style={primaryBtn(!mode || (mode === "know" && !manualLevel))} disabled={!mode || (mode === "know" && !manualLevel)} onClick={() => mode === "quiz" ? setStep(2) : setStep(3)}>weiter</button>
+      <button style={primaryBtn(!mode || (mode === "know" && !manualLevel))} disabled={!mode || (mode === "know" && !manualLevel)} onClick={() => mode === "quiz" ? setStep(2) : setStep(3)}>Weiter</button>
     </div></div>
   )
 
@@ -226,8 +219,8 @@ export default function OnboardingPage() {
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
             <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>frage {quizIdx + 1} / {QUIZ.length}</span>
           </div>
-          <div style={{ background: BORDER, borderRadius: "4px", height: "3px" }}>
-            <div style={{ background: G, height: "3px", borderRadius: "4px", width: `${((quizIdx) / QUIZ.length) * 100}%`, transition: "width 0.3s" }} />
+          <div style={{ background: CELL, borderRadius: "4px", height: "3px" }}>
+            <div style={{ background: GRAD, height: "3px", borderRadius: "4px", width: `${((quizIdx) / QUIZ.length) * 100}%`, transition: "width 0.3s" }} />
           </div>
         </div>
         <h2 style={{ fontSize: "22px", fontWeight: 800, color: TEXT, marginBottom: "24px", lineHeight: 1.3 }}>{q.q}</h2>
@@ -241,21 +234,21 @@ export default function OnboardingPage() {
   if (step === 3 && chosenLevel) return (
     <div style={wrap}><div style={box}>
       <Header step={pending ? 2 : 3} total={pending ? 2 : 3} />
-      <p style={{ fontSize: "11px", fontWeight: 700, color: chosenLevel.color, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>{pending ? "dein start-rang" : mode === "quiz" ? "dein ergebnis" : "bestätigung"}</p>
+      <p style={{ fontSize: "11px", fontWeight: 700, color: chosenLevel.color, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>{pending ? "Dein Start-Rang" : mode === "quiz" ? "Dein Ergebnis" : "Bestätigung"}</p>
       <h2 style={{ fontSize: "40px", fontWeight: 900, color: chosenLevel.color, textTransform: "uppercase", marginBottom: "4px", letterSpacing: "-0.02em" }}>{chosenLevel.name}</h2>
       <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{chosenLevel.desc}</p>
-      <div style={{ background: CARD, border: "1px solid " + BORDER, borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
-        {[{ label: "name", value: name }, { label: "kanton", value: canton }, { label: "level", value: chosenLevel.name }, { label: "start-elo", value: String(chosenLevel.elo) }].map(row => (
-          <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid " + BORDER }}>
+      <div style={{ background: CARD, borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
+        {[{ label: "Name", value: name }, { label: "Kanton", value: canton }, { label: "Level", value: chosenLevel.name }, { label: "Start-ELO", value: String(chosenLevel.elo) }].map(row => (
+          <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
             <span style={{ fontSize: "13px", color: MUTED }}>{row.label}</span>
             <span style={{ fontSize: "13px", color: TEXT, fontWeight: 700 }}>{row.value}</span>
           </div>
         ))}
       </div>
-      <p style={{ fontSize: "12px", color: MUTED, marginBottom: "16px", lineHeight: 1.6 }}>dein level passt sich automatisch an je mehr du spielst — elo startet bei {chosenLevel.elo}.</p>
-      {saveError && <p style={{ fontSize: "13px", color: "#f87171", marginBottom: "10px" }}>{saveError}</p>}
+      <p style={{ fontSize: "12px", color: MUTED, marginBottom: "16px", lineHeight: 1.6 }}>Dein Level passt sich automatisch an, je mehr du spielst — ELO startet bei {chosenLevel.elo}.</p>
+      {saveError && <p style={{ fontSize: "13px", color: "#E5484D", marginBottom: "10px" }}>{saveError}</p>}
       <button style={primaryBtn(saving)} disabled={saving} onClick={handleSave}>
-        {saving ? "wird gespeichert..." : "profil erstellen →"}
+        {saving ? "Wird gespeichert…" : "Profil erstellen"}
       </button>
     </div></div>
   )

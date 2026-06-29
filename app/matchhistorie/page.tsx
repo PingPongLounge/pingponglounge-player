@@ -3,9 +3,7 @@ import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-
-const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
-const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
+import { BG, W, MUT, GREEN, DANGER, card, cardPad, h1, meta, chipBtn, btnGhost } from "@/app/theme"
 
 function dateLabel(d:string):string{
   return new Date(d).toLocaleDateString("de-CH",{day:"numeric",month:"short",year:"numeric"})
@@ -84,39 +82,33 @@ export default function MatchHistoriePage(){
     <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
 
-        <Link href="/profil" style={{color:M,textDecoration:"none",fontSize:13}}>← profil</Link>
+        <Link href="/profil" style={{color:MUT,textDecoration:"none",fontSize:13}}>← Profil</Link>
 
         <div style={{margin:"20px 0 24px"}}>
-          <h1 style={{fontSize:28,fontWeight:900,fontFamily:"'League Spartan', system-ui, sans-serif",textTransform:"uppercase",letterSpacing:".1em",lineHeight:1,background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>matchhistorie</h1>
-          <p style={{fontSize:13,color:M,marginTop:6}}>{matches.length} matches total</p>
+          <h1 style={{...h1}}>Matchhistorie</h1>
+          <p style={{...meta,marginTop:6}}>{matches.length} Matches total</p>
         </div>
 
         {/* Filter */}
         <div style={{display:"flex",gap:8,marginBottom:16}}>
           {(["alle","siege","niederlagen"] as const).map(f=>(
-            <button key={f} onClick={()=>{setFilter(f);setPage(0)}} style={{
-              padding:"7px 16px",borderRadius:999,fontSize:12,fontWeight:700,cursor:"pointer",border:"1px solid",
-              background:filter===f?"#fff":C,
-              color:filter===f?"#0E1014":M,
-              borderColor:filter===f?"#fff":B,
-              textTransform:"lowercase"
-            }}>{f==="alle"?`alle (${matches.length})`:f==="siege"?`siege (${matches.filter(m=>m.winner_id===userId).length})`:`niederlagen (${matches.filter(m=>m.winner_id!==null&&m.winner_id!==userId).length})`}</button>
+            <button key={f} onClick={()=>{setFilter(f);setPage(0)}} style={chipBtn(filter===f)}>{f==="alle"?`Alle (${matches.length})`:f==="siege"?`Siege (${matches.filter(m=>m.winner_id===userId).length})`:`Niederlagen (${matches.filter(m=>m.winner_id!==null&&m.winner_id!==userId).length})`}</button>
           ))}
         </div>
 
         {loading?(
-          <div style={{textAlign:"center",padding:"60px 0",color:M}}>
-            <p style={{fontSize:14}}>lädt...</p>
+          <div style={{textAlign:"center",padding:"60px 0"}}>
+            <p style={{...meta}}>Lädt …</p>
           </div>
         ):filtered.length===0?(
-          <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,padding:"40px 20px",textAlign:"center"}}>
+          <div style={{...cardPad,padding:"40px 20px",textAlign:"center"}}>
             <p style={{fontSize:28,marginBottom:12}}>🏓</p>
-            <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:6}}>keine matches</p>
-            <p style={{fontSize:13,color:M}}>meld dich in einer liga an und spiel los.</p>
+            <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:6}}>Keine Matches</p>
+            <p style={{...meta}}>Meld dich in einer Liga an und spiel los.</p>
           </div>
         ):(
           <>
-            <div style={{background:C,border:`1px solid ${B}`,borderRadius:16,overflow:"hidden"}}>
+            <div style={{...card}}>
               {paginated.map((m,i)=>{
                 const isP1=m.p1_id===userId
                 const opponentName=isP1?getName(m.p2):getName(m.p1)
@@ -126,23 +118,23 @@ export default function MatchHistoriePage(){
                 const city = Array.isArray(m.season)?m.season[0]?.city:m.season?.city
 
                 return(
-                  <div key={m.id} style={{display:"flex",alignItems:"center",gap:12,padding:"13px 18px",borderBottom:i<paginated.length-1?`1px solid ${B}`:"none"}}>
-                    <div style={{width:32,height:32,borderRadius:9,background:won?`${G}18`:"#2d1111",border:`1px solid ${won?G+"30":"#3d1111"}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0}}>
+                  <div key={m.id} style={{display:"flex",alignItems:"center",gap:12,padding:"13px 18px",borderTop:i>0?`1px solid rgba(255,255,255,.06)`:"none"}}>
+                    <div style={{width:32,height:32,borderRadius:9,background:won?`${GREEN}18`:"#2d1111",display:"flex",alignItems:"center",justifyContent:"center",fontSize:15,flexShrink:0}}>
                       {won?"👑":"💀"}
                     </div>
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3}}>
                         <span style={{fontSize:14,fontWeight:700,color:W}}>{opponentName}</span>
-                        <span style={{fontSize:10,fontWeight:700,color:won?G:"#f87171",background:won?`${G}18`:"#2d1111",borderRadius:999,padding:"1px 7px"}}>{won?"sieg":"ndlg"}</span>
+                        <span style={{fontSize:10,fontWeight:700,color:won?GREEN:DANGER,background:won?`${GREEN}18`:`${DANGER}22`,borderRadius:999,padding:"1px 7px"}}>{won?"Sieg":"Ndlg"}</span>
                       </div>
-                      <p style={{fontSize:11,color:M}}>
+                      <p style={{...meta,fontSize:11}}>
                         {city||""}{city&&setsStr?" · ":""}{setsStr}
                       </p>
                     </div>
                     <div style={{textAlign:"right",flexShrink:0}}>
-                      {elo&&(<p style={{fontSize:13,fontWeight:700,color:elo.delta>=0?"#4ADE80":"#f87171",marginBottom:2}}>{elo.delta>=0?"+":""}{elo.delta}</p>)}
-                      {elo&&<p style={{fontSize:11,color:M}}>{elo.elo} ELO</p>}
-                      {!elo&&<p style={{fontSize:11,color:M}}>{dateLabel(m.confirmed_at)}</p>}
+                      {elo&&(<p style={{fontSize:13,fontWeight:700,color:elo.delta>=0?GREEN:DANGER,marginBottom:2}}>{elo.delta>=0?"+":""}{elo.delta}</p>)}
+                      {elo&&<p style={{...meta,fontSize:11}}>{elo.elo} ELO</p>}
+                      {!elo&&<p style={{...meta,fontSize:11}}>{dateLabel(m.confirmed_at)}</p>}
                     </div>
                   </div>
                 )
@@ -150,8 +142,8 @@ export default function MatchHistoriePage(){
             </div>
 
             {hasMore&&(
-              <button onClick={()=>setPage(p=>p+1)} style={{display:"block",width:"100%",marginTop:10,padding:"14px",background:C,border:`1px solid ${B}`,borderRadius:12,color:M,fontSize:13,fontWeight:700,cursor:"pointer"}}>
-                mehr laden ({filtered.length-(page+1)*PER_PAGE} weitere)
+              <button onClick={()=>setPage(p=>p+1)} style={{...btnGhost,width:"100%",marginTop:10}}>
+                Mehr laden ({filtered.length-(page+1)*PER_PAGE} weitere)
               </button>
             )}
           </>

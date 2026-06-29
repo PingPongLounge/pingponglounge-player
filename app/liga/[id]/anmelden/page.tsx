@@ -3,9 +3,10 @@ import { useEffect, useState , use} from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-
-const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
-const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
+import {
+  BG, W, MUT, GREEN, DANGER,
+  cardPad, cardActive, btn, h1, body, meta, eyebrow, backLink,
+} from "@/app/theme"
 
 export default function AnmeldenPage({params}:{params:Promise<{id:string}>}){
   const {id:seasonId}=use(params)
@@ -42,43 +43,43 @@ export default function AnmeldenPage({params}:{params:Promise<{id:string}>}){
     setSaving(false)
   }
 
-  if(loading||!season) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>lädt...</p></main>
+  if(loading||!season) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:MUT}}>Lädt …</p></main>
 
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
       <div style={{maxWidth:420,width:"100%"}}>
-        <Link href={`/liga/${seasonId}`} style={{color:M,textDecoration:"none",fontSize:13,display:"block",marginBottom:24}}>← zurück</Link>
+        <Link href={`/liga/${seasonId}`} style={{...backLink,display:"block",marginBottom:24}}>← Zurück</Link>
 
         {registered?(
-          <div style={{background:C,border:`1px solid ${G}40`,borderRadius:16,padding:"32px 24px",textAlign:"center"}}>
+          <div style={{...cardActive,padding:"32px 24px",textAlign:"center"}}>
             <p style={{fontSize:40,marginBottom:12}}>✓</p>
-            <p style={{fontSize:20,fontWeight:900,color:G,textTransform:"uppercase",marginBottom:8}}>angemeldet!</p>
-            <p style={{fontSize:14,color:M,marginBottom:24}}>du bist für <strong style={{color:W}}>{season.name as string}</strong> registriert. du wirst benachrichtigt sobald die saison startet.</p>
-            <Link href={`/liga/${seasonId}`} style={{display:"block",background:"#fff",color:"#0E1014",textDecoration:"none",borderRadius:10,padding:"14px",fontSize:13,fontWeight:700,textTransform:"lowercase",letterSpacing:"0.02em"}}>zur liga →</Link>
+            <h1 style={{...h1,fontSize:22,color:GREEN,marginBottom:8}}>Angemeldet!</h1>
+            <p style={{...body,marginBottom:24}}>Du bist für <strong style={{color:W}}>{season.name as string}</strong> registriert. Du wirst benachrichtigt, sobald die Saison startet.</p>
+            <Link href={`/liga/${seasonId}`} style={{...btn}}>Zur Liga →</Link>
           </div>
         ):(
           <div>
-            <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:8}}>anmeldung</p>
-            <h1 style={{fontSize:28,fontWeight:900,fontFamily:"'League Spartan', system-ui, sans-serif",textTransform:"uppercase",letterSpacing:".1em",marginBottom:4,background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>{season.name as string}</h1>
-            <p style={{fontSize:13,color:M,marginBottom:24}}>{season.city as string} · {count}/{season.max_players as number} spieler</p>
+            <div style={{...eyebrow,letterSpacing:"0.16em",textTransform:"uppercase",fontWeight:700,marginBottom:8}}>Anmeldung</div>
+            <h1 style={{...h1,marginBottom:4}}>{season.name as string}</h1>
+            <p style={{...meta,marginBottom:24}}>{season.city as string} · {count}/{season.max_players as number} Spieler</p>
 
-            <div style={{background:C,border:`1px solid ${B}`,borderRadius:12,padding:"16px",marginBottom:16}}>
-              {[["📅","kostenlos","keine anmeldegebühr"],["🏓","round robin","jeder spielt gegen jeden"],["📊","live-tabelle","punkte & elo in echtzeit"],["⬆️","auf-/abstieg","top 2 steigen auf, bottom 2 ab"]].map(([icon,title,desc])=>(
+            <div style={{...cardPad,marginBottom:16}}>
+              {[["📅","Kostenlos","keine Anmeldegebühr"],["🏓","Round Robin","jeder spielt gegen jeden"],["📊","Live-Tabelle","Punkte & ELO in Echtzeit"],["⬆️","Auf-/Abstieg","Top 2 steigen auf, Bottom 2 ab"]].map(([icon,title,desc])=>(
                 <div key={title} style={{display:"flex",gap:12,alignItems:"flex-start",marginBottom:12}}>
                   <span style={{fontSize:18,flexShrink:0}}>{icon}</span>
                   <div>
                     <p style={{fontSize:14,fontWeight:700,color:W,margin:"0 0 2px"}}>{title}</p>
-                    <p style={{fontSize:12,color:M,margin:0}}>{desc}</p>
+                    <p style={{...body,margin:0}}>{desc}</p>
                   </div>
                 </div>
               ))}
             </div>
 
             {(count as number)>=(season.max_players as number)?(
-              <div style={{background:`#FF444420`,border:"1px solid #FF444440",borderRadius:10,padding:"14px",textAlign:"center",color:"#FF6666",fontWeight:700}}>liga ist voll</div>
+              <div style={{background:`${DANGER}20`,border:`1px solid ${DANGER}40`,borderRadius:10,padding:"14px",textAlign:"center",color:DANGER,fontWeight:700}}>Liga ist voll</div>
             ):(
-              <button onClick={handleRegister} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#0E1014",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
-                {saving?"anmeldung läuft...":"jetzt kostenlos anmelden"}
+              <button onClick={handleRegister} disabled={saving} style={{...btn,width:"100%",opacity:saving?0.6:1,cursor:saving?"not-allowed":"pointer"}}>
+                {saving?"Anmeldung läuft …":"Jetzt kostenlos anmelden"}
               </button>
             )}
           </div>

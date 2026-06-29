@@ -3,44 +3,17 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import PlayerLogo from "../components/PlayerLogo"
+import { BG as DARK, CARD, CELL, W as TEXT, MUT as MUTED, GREEN as G, btn, btnGhost, input as inputBase } from "@/app/theme"
 
-const G = "#39FF14"
-const DARK = "#0E1014"
-const CARD = "#1A1D24"
-const BORDER = "#1A1D24"
-const MUTED = "rgba(255,255,255,0.66)"
-const TEXT = "#FFFFFF"
-
-const outlineBtn = {
-  border: "none",
-  background: "#fff",
-  borderRadius: "10px",
-  padding: "14px 20px",
-  fontSize: "14px",
-  fontWeight: 700,
-  cursor: "pointer",
-  textTransform: "lowercase" as const,
-  letterSpacing: "0.02em",
-  color: "#0E1014",
-  width: "100%",
-  fontFamily: "'League Spartan', system-ui, sans-serif",
-} as React.CSSProperties
+const outlineBtn = { ...btn, width: "100%" } as React.CSSProperties
 
 const ghostBtn = {
-  background: "transparent",
-  border: `1px solid #23272F`,
-  borderRadius: "10px",
-  padding: "12px 20px",
-  fontSize: "13px",
-  fontWeight: 600,
-  cursor: "pointer",
-  color: TEXT,
-  width: "100%",
+  ...btnGhost,
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
   gap: "10px",
-  fontFamily: "'League Spartan', system-ui, sans-serif",
+  width: "100%",
 } as React.CSSProperties
 
 const linkBtn = {
@@ -50,22 +23,10 @@ const linkBtn = {
   color: MUTED,
   fontSize: "12px",
   textDecoration: "underline",
-  fontFamily: "'League Spartan', system-ui, sans-serif",
   padding: 0,
 } as React.CSSProperties
 
-const input = {
-  width: "100%",
-  background: CARD,
-  border: `1px solid ${BORDER}`,
-  borderRadius: "10px",
-  padding: "14px 16px",
-  fontSize: "15px",
-  color: TEXT,
-  outline: "none",
-  boxSizing: "border-box" as const,
-  fontFamily: "'League Spartan', system-ui, sans-serif",
-} as React.CSSProperties
+const input = { ...inputBase, padding: "14px 16px", fontSize: "15px", boxSizing: "border-box" as const } as React.CSSProperties
 
 export default function LoginPage() {
   const [tab, setTab] = useState<"login" | "register" | "magic" | "reset">("login")
@@ -147,28 +108,31 @@ export default function LoginPage() {
             <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
             <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
           </svg>
-          mit google einloggen
+          Mit Google einloggen
         </button>
 
         <div style={{ display: "flex", alignItems: "center", gap: "12px", margin: "16px 0" }}>
-          <div style={{ flex: 1, height: "1px", background: BORDER }} />
+          <div style={{ flex: 1, height: "1px", background: CELL }} />
           <span style={{ fontSize: "12px", color: MUTED }}>oder</span>
-          <div style={{ flex: 1, height: "1px", background: BORDER }} />
+          <div style={{ flex: 1, height: "1px", background: CELL }} />
         </div>
 
         {/* Tabs — ohne Reset Tab (der kommt als Link) */}
         {tab !== "reset" && (
-          <div style={{ display: "flex", background: CARD, borderRadius: "10px", padding: "3px", border: `1px solid ${BORDER}`, marginBottom: "20px", gap: "2px" }}>
+          <div style={{ display: "flex", background: CARD, borderRadius: "10px", padding: "3px", marginBottom: "20px", gap: "2px" }}>
             {(["login","register","magic"] as const).map(t => (
               <button key={t} onClick={() => { setTab(t); setError(""); setSent(false); setMsg("") }} style={{
-                flex: 1, background: tab === t ? "#fff" : "transparent",
-                border: "none", borderRadius: "7px", padding: "9px 4px",
-                fontSize: "11px", fontWeight: 700, cursor: "pointer",
-                color: tab === t ? "#0E1014" : MUTED,
-                textTransform: "lowercase" as const, letterSpacing: "0.02em",
-                fontFamily: "'League Spartan', system-ui, sans-serif",
+                flex: 1,
+                border: tab === t ? "1.5px solid transparent" : "1.5px solid transparent",
+                borderRadius: "7px", padding: "9px 4px",
+                fontSize: "11px", fontWeight: tab === t ? 700 : 500, cursor: "pointer",
+                color: tab === t ? TEXT : MUTED,
+                letterSpacing: "0.02em",
+                background: tab === t
+                  ? `linear-gradient(${CARD},${CARD}) padding-box, ${G} border-box`
+                  : "transparent",
               }}>
-                {t === "login" ? "login" : t === "register" ? "neu" : "link"}
+                {t === "login" ? "Login" : t === "register" ? "Neu" : "Link"}
               </button>
             ))}
           </div>
@@ -177,19 +141,19 @@ export default function LoginPage() {
         {/* Reset Tab Header */}
         {tab === "reset" && (
           <div style={{ marginBottom: "20px", textAlign: "left" }}>
-            <button onClick={() => { setTab("login"); setError(""); setMsg("") }} style={linkBtn}>← zurück</button>
-            <p style={{ fontSize: "16px", fontWeight: 700, color: TEXT, marginTop: "8px" }}>passwort zurücksetzen</p>
+            <button onClick={() => { setTab("login"); setError(""); setMsg("") }} style={linkBtn}>← Zurück</button>
+            <p style={{ fontSize: "16px", fontWeight: 700, color: TEXT, marginTop: "8px" }}>Passwort zurücksetzen</p>
           </div>
         )}
 
         {msg ? (
-          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: "14px", padding: "24px" }}>
+          <div style={{ background: CARD, borderRadius: "14px", padding: "24px" }}>
             <p style={{ fontSize: "13px", color: G }}>{msg}</p>
           </div>
         ) : sent ? (
-          <div style={{ background: CARD, border: `1px solid ${BORDER}`, borderRadius: "14px", padding: "24px" }}>
-            <p style={{ fontSize: "13px", color: TEXT, marginBottom: "8px", fontWeight: 700 }}>check deine emails</p>
-            <p style={{ fontSize: "13px", color: MUTED }}>link geschickt an <span style={{ color: G }}>{email}</span></p>
+          <div style={{ background: CARD, borderRadius: "14px", padding: "24px" }}>
+            <p style={{ fontSize: "13px", color: TEXT, marginBottom: "8px", fontWeight: 700 }}>Check deine E-Mails</p>
+            <p style={{ fontSize: "13px", color: MUTED }}>Link geschickt an <span style={{ color: G }}>{email}</span></p>
           </div>
         ) : (
           <form
@@ -202,21 +166,21 @@ export default function LoginPage() {
               <input type="password" value={password} onChange={e => setPassword(e.target.value)}
                 placeholder="Passwort" required style={input} />
             )}
-            {error && <p style={{ fontSize: "12px", color: "#FF4444", textAlign: "left" }}>{error}</p>}
+            {error && <p style={{ fontSize: "12px", color: "#E5484D", textAlign: "left" }}>{error}</p>}
             <button type="submit" disabled={loading} style={{ ...outlineBtn, opacity: loading ? 0.5 : 1 }}>
-              {loading ? "..." : tab === "login" ? "einloggen" : tab === "register" ? "konto erstellen" : tab === "magic" ? "login-link senden" : "reset-link senden"}
+              {loading ? "..." : tab === "login" ? "Einloggen" : tab === "register" ? "Konto erstellen" : tab === "magic" ? "Login-Link senden" : "Reset-Link senden"}
             </button>
 
             {/* Passwort vergessen Link — nur bei Login Tab */}
             {tab === "login" && (
               <button type="button" onClick={() => { setTab("reset"); setError("") }} style={linkBtn}>
-                passwort vergessen?
+                Passwort vergessen?
               </button>
             )}
           </form>
         )}
 
-        <p style={{ marginTop: "20px", fontSize: "12px", color: MUTED }}>kein konto nötig — wird automatisch erstellt.</p>
+        <p style={{ marginTop: "20px", fontSize: "12px", color: MUTED }}>Kein Konto nötig — wird automatisch erstellt.</p>
       </div>
     </div>
   )

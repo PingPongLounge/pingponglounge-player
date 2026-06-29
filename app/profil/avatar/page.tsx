@@ -2,9 +2,9 @@
 import { useState, useRef, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
+import { BG, CELL, W, MUT, GREEN, card, label, btn, btnGhost, chipBtn, h1 } from "@/app/theme"
 
-const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
-const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
+const C=CELL,M=MUT,G=GREEN
 
 const STYLES = [
   { id:"graffiti", label:"Graffiti",  emoji:"🎨" },
@@ -89,22 +89,17 @@ export default function AvatarPage() {
         {/* Header */}
         <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:24 }}>
           <Link href="/profil" style={{ color:M, fontSize:20, textDecoration:"none" }}>←</Link>
-          <h1 style={{ fontSize:22, fontWeight:900, fontFamily:"'League Spartan', system-ui, sans-serif", textTransform:"uppercase", letterSpacing:".1em", margin:0, background:GRAD, WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text" }}>
-            avatar erstellen
+          <h1 style={{ ...h1, fontSize:22, fontFamily:"'League Spartan', system-ui, sans-serif", letterSpacing:".1em", margin:0 }}>
+            Avatar erstellen
           </h1>
         </div>
 
         {/* Stil-Auswahl */}
-        <p style={{ fontSize:11, fontWeight:700, color:M, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8 }}>stil</p>
+        <p style={{ ...label, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em" }}>Stil</p>
         <div style={{ display:"flex", gap:8, marginBottom:20, flexWrap:"wrap" }}>
           {STYLES.map(s => (
             <button key={s.id} onClick={() => { setStyle(s.id); setResult(null); setSaved(false) }} style={{
-              background: style===s.id ? "#fff" : C,
-              border: `1px solid ${style===s.id ? "#fff" : B}`,
-              borderRadius:999, padding:"8px 14px",
-              fontSize:13, fontWeight:700,
-              color: style===s.id ? "#0E1014" : M,
-              cursor:"pointer", whiteSpace:"nowrap"
+              ...chipBtn(style===s.id), whiteSpace:"nowrap"
             }}>
               {s.emoji} {s.label}
             </button>
@@ -112,14 +107,14 @@ export default function AvatarPage() {
         </div>
 
         {/* Foto Upload */}
-        <p style={{ fontSize:11, fontWeight:700, color:M, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8 }}>dein foto</p>
+        <p style={{ ...label, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em" }}>Dein Foto</p>
         <div
           onClick={() => fileRef.current?.click()}
           onDrop={e => { e.preventDefault(); const f=e.dataTransfer.files[0]; if(f) handleFile(f) }}
           onDragOver={e => e.preventDefault()}
           style={{
             background: photo ? "transparent" : C,
-            border: `2px dashed ${photo ? "transparent" : B}`,
+            border: photo ? "none" : `2px dashed rgba(255,255,255,.12)`,
             borderRadius:14, minHeight:180,
             display:"flex", alignItems:"center", justifyContent:"center",
             cursor:"pointer", marginBottom:16, overflow:"hidden", position:"relative"
@@ -130,8 +125,8 @@ export default function AvatarPage() {
           ) : (
             <div style={{ textAlign:"center", padding:24 }}>
               <div style={{ fontSize:40, marginBottom:8 }}>📸</div>
-              <p style={{ fontSize:14, color:M }}>foto hochladen oder hierher ziehen</p>
-              <p style={{ fontSize:11, color:"rgba(255,255,255,0.45)", marginTop:4 }}>gesicht gut sichtbar → bestes resultat</p>
+              <p style={{ fontSize:14, color:M }}>Foto hochladen oder hierher ziehen</p>
+              <p style={{ fontSize:11, color:"rgba(255,255,255,0.45)", marginTop:4 }}>Gesicht gut sichtbar → bestes Resultat</p>
             </div>
           )}
           <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }}
@@ -140,12 +135,8 @@ export default function AvatarPage() {
 
         {/* Generieren Button */}
         {photo && !loading && (
-          <button onClick={generate} style={{
-            width:"100%", background:"#fff", color:"#0E1014", border:"none",
-            borderRadius:12, padding:"15px", fontSize:15, fontWeight:800,
-            cursor:"pointer", textTransform:"lowercase", marginBottom:16
-          }}>
-            {genCount === 0 ? "🎨 avatar generieren" : "🔄 nochmals generieren"}
+          <button onClick={generate} style={{ ...btn, width:"100%", padding:"15px", marginBottom:16 }}>
+            {genCount === 0 ? "🎨 Avatar generieren" : "🔄 Nochmals generieren"}
           </button>
         )}
 
@@ -153,52 +144,48 @@ export default function AvatarPage() {
         {loading && (
           <div style={{ textAlign:"center", padding:32 }}>
             <div style={{ fontSize:40, marginBottom:12 }}>⚡</div>
-            <p style={{ color:W, fontWeight:700, fontSize:15 }}>generiere deinen avatar...</p>
-            <p style={{ color:M, fontSize:12, marginTop:6 }}>~30–60 sekunden</p>
+            <p style={{ color:W, fontWeight:700, fontSize:15 }}>Generiere deinen Avatar...</p>
+            <p style={{ color:M, fontSize:12, marginTop:6 }}>~30–60 Sekunden</p>
           </div>
         )}
 
         {/* Resultat */}
         {result && !loading && (
           <div style={{ marginBottom:16 }}>
-            <p style={{ fontSize:11, fontWeight:700, color:M, textTransform:"uppercase", letterSpacing:"0.1em", marginBottom:8 }}>dein avatar</p>
+            <p style={{ ...label, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em" }}>Dein Avatar</p>
 
             {/* Vorschau: Ganzkörper + Kopf-Preview */}
             <div style={{ display:"flex", gap:12, marginBottom:14, alignItems:"flex-start" }}>
-              <div style={{ flex:1, borderRadius:14, overflow:"hidden", border:`1px solid ${B}` }}>
+              <div style={{ flex:1, borderRadius:14, overflow:"hidden", ...card }}>
                 <img src={result} alt="Avatar" style={{ width:"100%", display:"block" }} />
               </div>
               <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
                 {/* Kopf-Crop Preview (wie Profilbild klein) */}
-                <div style={{ width:72, height:72, borderRadius:"50%", overflow:"hidden", border:`2px solid #fff` }}>
+                <div style={{ width:72, height:72, borderRadius:"50%", overflow:"hidden", background:C }}>
                   <img src={result} alt="Avatar Kopf" style={{ width:"100%", height:"200%", objectFit:"cover", objectPosition:"top center" }} />
                 </div>
-                <p style={{ fontSize:10, color:M, textAlign:"center", margin:0 }}>profilbild</p>
+                <p style={{ fontSize:10, color:M, textAlign:"center", margin:0 }}>Profilbild</p>
                 {/* Quadrat-Preview */}
-                <div style={{ width:72, height:72, borderRadius:10, overflow:"hidden", border:`2px solid ${B}` }}>
+                <div style={{ width:72, height:72, borderRadius:10, overflow:"hidden", background:C }}>
                   <img src={result} alt="Avatar Square" style={{ width:"100%", height:"200%", objectFit:"cover", objectPosition:"top center" }} />
                 </div>
-                <p style={{ fontSize:10, color:M, textAlign:"center", margin:0 }}>karte</p>
+                <p style={{ fontSize:10, color:M, textAlign:"center", margin:0 }}>Karte</p>
               </div>
             </div>
 
             {saved ? (
-              <div style={{ background:`${G}18`, border:`1px solid ${G}40`, borderRadius:12, padding:"14px 16px", textAlign:"center" }}>
-                <p style={{ fontSize:15, fontWeight:800, color:G, margin:0 }}>✓ avatar gespeichert!</p>
-                <Link href="/profil" style={{ fontSize:13, color:M, display:"block", marginTop:6 }}>← zurück zum profil</Link>
+              <div style={{ ...card, padding:"14px 16px", textAlign:"center" }}>
+                <p style={{ fontSize:15, fontWeight:800, color:G, margin:0 }}>✓ Avatar gespeichert!</p>
+                <Link href="/profil" style={{ fontSize:13, color:M, display:"block", marginTop:6 }}>← Zurück zum Profil</Link>
               </div>
             ) : (
               <div style={{ display:"flex", gap:10 }}>
-                <button onClick={generate} style={{
-                  flex:1, background:"transparent", border:`1px solid #23272F`, borderRadius:10,
-                  padding:"13px", fontSize:13, fontWeight:700, color:W, cursor:"pointer"
-                }}>🔄 nochmals</button>
+                <button onClick={generate} style={{ ...btnGhost, flex:1, padding:"13px", fontSize:13 }}>🔄 Nochmals</button>
                 <button onClick={save} disabled={saving} style={{
-                  flex:2, background:"#fff", color:"#0E1014", border:"none",
-                  borderRadius:10, padding:"13px", fontSize:14, fontWeight:800,
-                  cursor:saving ? "wait" : "pointer"
+                  ...btn, flex:2, padding:"13px", fontSize:14,
+                  cursor:saving ? "wait" : "pointer", opacity:saving ? 0.6 : 1
                 }}>
-                  {saving ? "speichert..." : "✓ als profilbild speichern"}
+                  {saving ? "Speichert..." : "✓ Als Profilbild speichern"}
                 </button>
               </div>
             )}
@@ -208,7 +195,7 @@ export default function AvatarPage() {
         {error && <p style={{ color:"#f87171", fontSize:13, marginTop:12 }}>{error}</p>}
 
         <p style={{ fontSize:11, color:M, marginTop:20, textAlign:"center" }}>
-          3 generierungen pro stunde · ~30–60 sek pro avatar
+          3 Generierungen pro Stunde · ~30–60 Sek. pro Avatar
         </p>
       </div>
     </main>

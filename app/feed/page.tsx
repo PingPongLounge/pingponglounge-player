@@ -3,12 +3,9 @@ import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
+import { BG, CELL, W, MUT, card, h1, meta, body, eyebrow, levelBadge } from "@/app/theme"
 
-const BG="#0E1014", C="#1A1D24", B="#1A1D24", M="rgba(255,255,255,0.66)", G="#39FF14", W="#FFFFFF", PK="#1FD1C4"
-const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
-
-const levelColor = (l: string): string =>
-  ({ Rookie: "#4ADE80", Challenger: "#FACC15", Advanced: "#FB923C", Elite: PK }[l] || G)
+const G="#39FF14"
 
 function timeAgo(d: string): string {
   const diff = Date.now() - new Date(d).getTime()
@@ -105,27 +102,27 @@ export default function FeedPage() {
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
 
         {/* Header */}
-        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: M, textDecoration: "none", fontSize: 13 }}>← dashboard</Link>
+        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: MUT, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
         <div style={{ margin: "20px 0 24px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-            <span style={{ fontSize: 11, fontWeight: 700, color: G, letterSpacing: "0.16em", textTransform: "uppercase" }}>live</span>
+            <span style={{ fontSize: 11, fontWeight: 700, color: G, letterSpacing: "0.16em", textTransform: "uppercase" }}>Live</span>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: G, boxShadow: `0 0 6px ${G}`, display: "inline-block" }} />
           </div>
-          <h1 style={{ fontSize: 32, fontWeight: 900, fontFamily: "'League Spartan', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: ".1em", lineHeight: 1, background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>feed</h1>
-          <p style={{ fontSize: 13, color: M, marginTop: 6 }}>alle matches · alle ligen · alle städte</p>
+          <h1 style={{ ...h1, fontSize: 32, fontFamily: "'League Spartan', system-ui, sans-serif" }}>Feed</h1>
+          <p style={{ ...meta, marginTop: 6 }}>Alle Matches · alle Ligen · alle Städte</p>
         </div>
 
         {/* Content */}
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: M }}>
+          <div style={{ textAlign: "center", padding: "60px 0", color: MUT }}>
             <div style={{ fontSize: 32, marginBottom: 12 }}>🏓</div>
             <p style={{ fontSize: 14 }}>lädt...</p>
           </div>
         ) : matches.length === 0 ? (
-          <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, padding: "40px 20px", textAlign: "center" }}>
+          <div style={{ ...card, padding: "40px 20px", textAlign: "center" }}>
             <p style={{ fontSize: 32, marginBottom: 12 }}>🏓</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>noch keine matches</p>
-            <p style={{ fontSize: 13, color: M }}>sobald ein match bestätigt wird, erscheint es hier.</p>
+            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>Noch keine Matches</p>
+            <p style={{ ...body }}>Sobald ein Match bestätigt wird, erscheint es hier.</p>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -137,16 +134,16 @@ export default function FeedPage() {
               const myFire = hasReacted(m, "🔥")
 
               return (
-                <div key={m.id} style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, overflow: "hidden" }}>
+                <div key={m.id} style={{ ...card }}>
 
                   {/* Liga Badge */}
                   {m.season && (
-                    <div style={{ padding: "8px 16px", borderBottom: `1px solid ${B}`, display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ fontSize: 10, fontWeight: 700, color: levelColor(m.season.skill_class), background: `${levelColor(m.season.skill_class)}18`, border: `1px solid ${levelColor(m.season.skill_class)}30`, borderRadius: 999, padding: "2px 8px" }}>
+                    <div style={{ padding: "8px 16px", borderBottom: "1px solid rgba(255,255,255,.06)", display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={levelBadge(m.season.skill_class)}>
                         {m.season.skill_class}
                       </span>
-                      <span style={{ fontSize: 11, color: M }}>{m.season.city} · {m.season.name}</span>
-                      <span style={{ fontSize: 11, color: M, marginLeft: "auto" }}>{timeAgo(m.confirmed_at)}</span>
+                      <span style={{ ...meta, fontSize: 11 }}>{m.season.city} · {m.season.name}</span>
+                      <span style={{ ...eyebrow, fontSize: 11, marginLeft: "auto" }}>{timeAgo(m.confirmed_at)}</span>
                     </div>
                   )}
 
@@ -160,7 +157,7 @@ export default function FeedPage() {
                           {isWinnerP1 && <span style={{ fontSize: 11, marginRight: 4 }}>👑</span>}
                           {m.p1?.name || "?"}
                         </p>
-                        <p style={{ fontSize: 11, color: M, marginTop: 2 }}>ELO {m.p1?.elo ?? "—"}</p>
+                        <p style={{ ...meta, fontSize: 11, marginTop: 2 }}>ELO {m.p1?.elo ?? "—"}</p>
                       </div>
 
                       {/* Score */}
@@ -169,7 +166,7 @@ export default function FeedPage() {
                           {isWinnerP1 ? "3" : "—"} : {isWinnerP1 ? "—" : "3"}
                         </p>
                         {m.sets && (
-                          <p style={{ fontSize: 10, color: M, marginTop: 2 }}>{setsLabel(m.sets)}</p>
+                          <p style={{ ...meta, fontSize: 10, marginTop: 2 }}>{setsLabel(m.sets)}</p>
                         )}
                       </div>
 
@@ -179,7 +176,7 @@ export default function FeedPage() {
                           {!isWinnerP1 && m.winner_id && <span style={{ fontSize: 11, marginRight: 4 }}>👑</span>}
                           {m.p2?.name || "?"}
                         </p>
-                        <p style={{ fontSize: 11, color: M, marginTop: 2 }}>ELO {m.p2?.elo ?? "—"}</p>
+                        <p style={{ ...meta, fontSize: 11, marginTop: 2 }}>ELO {m.p2?.elo ?? "—"}</p>
                       </div>
 
                     </div>
@@ -196,10 +193,10 @@ export default function FeedPage() {
                           onClick={() => react(m.id, emoji)}
                           style={{
                             display: "flex", alignItems: "center", gap: 5,
-                            background: active ? `${G}18` : B,
-                            border: `1px solid ${active ? G + "40" : B}`,
+                            background: active ? `${G}18` : CELL,
+                            border: `1px solid ${active ? G + "40" : CELL}`,
                             borderRadius: 999, padding: "5px 12px",
-                            fontSize: 13, color: active ? G : M,
+                            fontSize: 13, color: active ? G : MUT,
                             cursor: userId ? "pointer" : "default",
                             transition: "all .15s"
                           }}

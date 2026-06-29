@@ -2,8 +2,11 @@
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
-
-const BG="#0E1014",C="#1A1D24",B="#1A1D24",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
+import {
+  BG, CELL, W, MUT, GREEN, DANGER,
+  cardPad, cardActive, btn, btnGhost, input, label,
+  body, meta, eyebrow, backLink,
+} from "@/app/theme"
 
 type SetScore={p1:string,p2:string}
 type MatchData={id:string,season_id:string,round:number,p1_id:string,p1_name:string,p2_id:string,p2_name:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,status:string}
@@ -37,8 +40,8 @@ export default function MatchPage({params}:{params:{id:string}}){
     if(!match) return
     const scoreStr = match.sets ? match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ") : "—"
     const subject = `Ergebnis anfechten · Liga-Match ${match.id}`
-    const body = `Ich möchte das eingetragene Ergebnis anfechten.\n\nMatch-ID: ${match.id}\nSpieler: ${match.p1_name} vs ${match.p2_name}\nEingetragenes Ergebnis: ${scoreStr}\n\nBegründung:\n`
-    window.location.href = `mailto:info@pingponglounge.ch?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
+    const mailBody = `Ich möchte das eingetragene Ergebnis anfechten.\n\nMatch-ID: ${match.id}\nSpieler: ${match.p1_name} vs ${match.p2_name}\nEingetragenes Ergebnis: ${scoreStr}\n\nBegründung:\n`
+    window.location.href = `mailto:info@pingponglounge.ch?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody)}`
   }
 
   function validateSets():{valid:boolean,winner:string|null,parsedSets:Array<{p1:number,p2:number}>}{
@@ -67,7 +70,7 @@ export default function MatchPage({params}:{params:{id:string}}){
     else{const d=await res.json();setError(d.error||"Fehler");setSaving(false)}
   }
 
-  if(loading||!match) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>lädt...</p></main>
+  if(loading||!match) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:MUT}}>Lädt …</p></main>
 
   const isP1=match.p1_id===userId
   const isP2=match.p2_id===userId
@@ -78,54 +81,54 @@ export default function MatchPage({params}:{params:{id:string}}){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
       <div style={{maxWidth:440,width:"100%"}}>
-        <Link href={`/liga/${match.season_id}`} style={{color:M,textDecoration:"none",fontSize:13,display:"block",marginBottom:24}}>← liga</Link>
+        <Link href={`/liga/${match.season_id}`} style={{...backLink,display:"block",marginBottom:24}}>← Liga</Link>
 
-        <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:8}}>runde {match.round}</p>
+        <div style={{...eyebrow,letterSpacing:"0.16em",textTransform:"uppercase",fontWeight:700,marginBottom:8}}>Runde {match.round}</div>
 
         {/* Players */}
-        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",background:C,border:`1px solid ${B}`,borderRadius:14,padding:"16px",marginBottom:16}}>
-          <span style={{fontSize:18,fontWeight:900,color:match.winner_id===match.p1_id?G:W}}>{match.p1_name}</span>
+        <div style={{...cardPad,display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+          <span style={{fontSize:18,fontWeight:900,color:match.winner_id===match.p1_id?GREEN:W}}>{match.p1_name}</span>
           {match.status==="confirmed"?(
-            <span style={{fontSize:24,fontWeight:900,color:W,background:B,borderRadius:8,padding:"6px 14px"}}>{sw.p1}:{sw.p2}</span>
-          ):<span style={{fontSize:14,color:M}}>vs</span>}
-          <span style={{fontSize:18,fontWeight:900,color:match.winner_id===match.p2_id?G:W}}>{match.p2_name}</span>
+            <span style={{fontSize:24,fontWeight:900,color:W,background:CELL,borderRadius:8,padding:"6px 14px"}}>{sw.p1}:{sw.p2}</span>
+          ):<span style={{...meta}}>vs</span>}
+          <span style={{fontSize:18,fontWeight:900,color:match.winner_id===match.p2_id?GREEN:W}}>{match.p2_name}</span>
         </div>
 
         {/* QR Code — nur wenn Match noch offen */}
         {match.status!=="confirmed"&&!isP1&&!isP2&&(
-          <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,padding:"20px",textAlign:"center",marginBottom:16}}>
-            <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.16em",textTransform:"uppercase",marginBottom:12}}>qr-code für spieler</p>
+          <div style={{...cardPad,textAlign:"center",marginBottom:16}}>
+            <div style={{...eyebrow,letterSpacing:"0.16em",textTransform:"uppercase",fontWeight:700,marginBottom:12}}>QR-Code für Spieler</div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={qrUrl} alt="Match QR" style={{width:160,height:160,borderRadius:10,display:"block",margin:"0 auto 10px"}}/>
-            <p style={{fontSize:12,color:M}}>spieler scannen diesen code um das resultat einzutragen</p>
+            <p style={{...body}}>Spieler scannen diesen Code, um das Resultat einzutragen.</p>
           </div>
         )}
 
         {/* Confirmed state */}
         {match.status==="confirmed"&&(
-          <div style={{background:`${G}15`,border:`1px solid ${G}40`,borderRadius:12,padding:"20px",textAlign:"center"}}>
-            <p style={{fontSize:"16px",fontWeight:700,color:G,marginBottom:8}}>✓ bestätigt</p>
-            {match.sets&&<p style={{fontSize:13,color:M}}>{match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ")}</p>}
+          <div style={{...cardActive,padding:20,textAlign:"center"}}>
+            <p style={{fontSize:16,fontWeight:700,color:GREEN,marginBottom:8}}>✓ Bestätigt</p>
+            {match.sets&&<p style={{...meta}}>{match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ")}</p>}
           </div>
         )}
 
         {/* P1: enter result */}
         {(isP1||isP2)&&match.status==="pending"&&(
           <div>
-            <p style={{fontSize:13,fontWeight:700,color:W,marginBottom:12}}>ergebnis eingeben (sätze)</p>
+            <div style={{...label,marginBottom:12}}>Ergebnis eingeben (Sätze)</div>
             {sets.map((s,i)=>(
               <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-                <span style={{fontSize:12,color:M,width:56,flexShrink:0}}>satz {i+1}</span>
-                <input value={s.p1} onChange={e=>updateSet(i,"p1",e.target.value)} placeholder="11" style={{flex:1,background:C,border:`1px solid ${B}`,borderRadius:8,padding:"10px",fontSize:18,fontWeight:700,color:W,outline:"none",textAlign:"center"}} type="number" min="0" max="20"/>
-                <span style={{color:M,fontSize:16}}>:</span>
-                <input value={s.p2} onChange={e=>updateSet(i,"p2",e.target.value)} placeholder="8" style={{flex:1,background:C,border:`1px solid ${B}`,borderRadius:8,padding:"10px",fontSize:18,fontWeight:700,color:W,outline:"none",textAlign:"center"}} type="number" min="0" max="20"/>
-                {i>=3&&<button onClick={()=>removeSet(i)} style={{background:"none",border:"none",color:M,cursor:"pointer",fontSize:16}}>×</button>}
+                <span style={{...meta,width:56,flexShrink:0}}>Satz {i+1}</span>
+                <input value={s.p1} onChange={e=>updateSet(i,"p1",e.target.value)} placeholder="11" style={{...input,fontSize:18,fontWeight:700,textAlign:"center"}} type="number" min="0" max="20"/>
+                <span style={{color:MUT,fontSize:16}}>:</span>
+                <input value={s.p2} onChange={e=>updateSet(i,"p2",e.target.value)} placeholder="8" style={{...input,fontSize:18,fontWeight:700,textAlign:"center"}} type="number" min="0" max="20"/>
+                {i>=3&&<button onClick={()=>removeSet(i)} style={{background:"none",border:"none",color:MUT,cursor:"pointer",fontSize:16}}>×</button>}
               </div>
             ))}
-            {sets.length<5&&<button onClick={addSet} style={{width:"100%",background:"none",border:`1px dashed ${B}`,borderRadius:8,padding:"10px",color:M,cursor:"pointer",fontSize:13,marginBottom:12}}>+ satz hinzufügen</button>}
-            {error&&<p style={{color:"#FF6666",fontSize:13,marginBottom:8}}>{error}</p>}
-            <button onClick={handleSubmit} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#0E1014",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
-              {saving?"wird gespeichert...":"ergebnis einreichen"}
+            {sets.length<5&&<button onClick={addSet} style={{width:"100%",background:"none",border:`1px dashed ${CELL}`,borderRadius:8,padding:"10px",color:MUT,cursor:"pointer",fontSize:13,marginBottom:12}}>+ Satz hinzufügen</button>}
+            {error&&<p style={{color:DANGER,fontSize:13,marginBottom:8}}>{error}</p>}
+            <button onClick={handleSubmit} disabled={saving} style={{...btn,width:"100%",opacity:saving?0.6:1,cursor:saving?"not-allowed":"pointer"}}>
+              {saving?"Wird gespeichert …":"Ergebnis einreichen"}
             </button>
           </div>
         )}
@@ -133,25 +136,25 @@ export default function MatchPage({params}:{params:{id:string}}){
         {/* P2: confirm */}
         {isP2&&match.status==="p1_entered"&&(
           <div>
-            <div style={{background:C,border:`1px solid #FACC1540`,borderRadius:12,padding:"16px",marginBottom:16}}>
-              <p style={{fontSize:13,color:"#FACC15",fontWeight:700,marginBottom:4}}>⏳ ergebnis eingereicht</p>
-              <p style={{fontSize:13,color:M}}>{match.p1_name} hat folgendes ergebnis eingetragen:</p>
+            <div style={{...cardPad,marginBottom:16}}>
+              <p style={{fontSize:13,color:"#FACC15",fontWeight:700,marginBottom:4}}>⏳ Ergebnis eingereicht</p>
+              <p style={{...meta}}>{match.p1_name} hat folgendes Ergebnis eingetragen:</p>
               {match.sets&&<p style={{fontSize:15,fontWeight:700,color:W,marginTop:8}}>{match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ")}</p>}
             </div>
-            {error&&<p style={{color:"#FF6666",fontSize:13,marginBottom:8}}>{error}</p>}
-            <button onClick={handleConfirm} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#0E1014",border:"none",borderRadius:10,padding:"16px",fontSize:14,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em",marginBottom:8}}>
-              {saving?"...":"✓ ergebnis bestätigen"}
+            {error&&<p style={{color:DANGER,fontSize:13,marginBottom:8}}>{error}</p>}
+            <button onClick={handleConfirm} disabled={saving} style={{...btn,width:"100%",marginBottom:8,opacity:saving?0.6:1,cursor:saving?"not-allowed":"pointer"}}>
+              {saving?"…":"✓ Ergebnis bestätigen"}
             </button>
-            <button onClick={handleDispute} style={{width:"100%",background:"transparent",border:`1px solid #23272F`,color:W,borderRadius:10,padding:"14px",fontSize:13,cursor:"pointer",textTransform:"lowercase"}}>ergebnis anfechten</button>
+            <button onClick={handleDispute} style={{...btnGhost,width:"100%"}}>Ergebnis anfechten</button>
           </div>
         )}
 
         {/* Waiting state for P1 */}
         {isP1&&match.status==="p1_entered"&&(
-          <div style={{background:C,border:`1px solid ${B}`,borderRadius:12,padding:"20px",textAlign:"center"}}>
+          <div style={{...cardPad,textAlign:"center"}}>
             <p style={{fontSize:32,marginBottom:8}}>⏳</p>
-            <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:4}}>warten auf {match.p2_name}</p>
-            <p style={{fontSize:13,color:M}}>automatisch bestätigt nach 24h</p>
+            <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:4}}>Warten auf {match.p2_name}</p>
+            <p style={{...meta}}>Automatisch bestätigt nach 24 h.</p>
           </div>
         )}
       </div>

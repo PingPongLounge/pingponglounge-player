@@ -1,21 +1,19 @@
 "use client"
 import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { BG, CELL, W, SUB, MUT, GREEN, lvColor, btn, cardPad } from "@/app/theme"
 
-const G = "#39FF14"
-const DARK = "#0E1014"
-const SURFACE = "#1A1D24"
-const CARD = "#1A1D24"
-const BORDER = "#1A1D24"
-const TEXT = "#FFFFFF"
-const MUTED = "rgba(255,255,255,0.66)"
+const G = GREEN
+const DARK = BG
+const TEXT = W
+const MUTED = MUT
 
 // Level-Logik analog zum Onboarding (LEVELS-Array dort).
 const LEVELS = [
-  { name: "Rookie",     color: "#4ADE80", elo: 1000 },
-  { name: "Challenger", color: "#FACC15", elo: 1100 },
-  { name: "Advanced",   color: "#FB923C", elo: 1300 },
-  { name: "Elite",      color: "#1FD1C4", elo: 1500 },
+  { name: "Rookie",     elo: 1000 },
+  { name: "Challenger", elo: 1100 },
+  { name: "Advanced",   elo: 1300 },
+  { name: "Elite",      elo: 1500 },
 ]
 
 // Nächstkleineres Level zu einer ELO (gleiche Idee wie calcLevel im Onboarding)
@@ -27,8 +25,8 @@ function levelForElo(elo: number) {
 
 type SetScore = { you: string; opp: string }
 
-const inp: React.CSSProperties = { flex: 1, background: SURFACE, border: "1px solid " + BORDER, borderRadius: "8px", padding: "12px", fontSize: "18px", fontWeight: 700, color: TEXT, outline: "none", textAlign: "center", boxSizing: "border-box", fontFamily: "inherit" }
-const primaryBtn = (disabled = false): React.CSSProperties => ({ width: "100%", background: disabled ? BORDER : "#fff", color: disabled ? MUTED : "#0E1014", border: "none", borderRadius: "10px", padding: "16px", fontSize: "14px", fontWeight: 800, cursor: disabled ? "not-allowed" : "pointer", textTransform: "lowercase", letterSpacing: "0.02em", marginTop: "14px", fontFamily: "inherit" })
+const inp: React.CSSProperties = { flex: 1, background: CELL, border: "none", borderRadius: "12px", padding: "12px", fontSize: "18px", fontWeight: 700, color: TEXT, outline: "none", textAlign: "center", boxSizing: "border-box", fontFamily: "inherit" }
+const primaryBtn = (disabled = false): React.CSSProperties => ({ ...btn, width: "100%", padding: "16px", marginTop: "14px", opacity: disabled ? 0.5 : 1, cursor: disabled ? "not-allowed" : "pointer" })
 
 function SpielenInner() {
   const router = useRouter()
@@ -111,22 +109,22 @@ function SpielenInner() {
   if (screen === "A") return (
     <div style={wrap}><div style={box}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>gerade gespielt?</span>
+        <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>Gerade gespielt?</span>
         <span style={{ fontSize: "11px", color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em" }}>PLAYER</span>
       </div>
-      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "lowercase", marginBottom: "6px" }}>dein resultat</h2>
-      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "24px" }}>
-        {ort ? <>trag dein ergebnis aus <span style={{ color: TEXT, fontWeight: 700 }}>{ort}</span> ein.</> : "trag dein ergebnis satz für satz ein."}
+      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", letterSpacing: ".04em", marginBottom: "6px" }}>Dein Resultat</h2>
+      <p style={{ fontSize: "14px", color: MUTED, fontWeight: 300, marginBottom: "24px" }}>
+        {ort ? <>Trag dein Ergebnis aus <span style={{ color: TEXT, fontWeight: 700 }}>{ort}</span> ein.</> : "Trag dein Ergebnis Satz für Satz ein."}
       </p>
 
       <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", padding: "0 4px" }}>
-        <span style={{ fontSize: "12px", color: G, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>du</span>
-        <span style={{ fontSize: "12px", color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>gegner</span>
+        <span style={{ fontSize: "12px", color: SUB, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>Du</span>
+        <span style={{ fontSize: "12px", color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>Gegner</span>
       </div>
 
       {sets.map((s, i) => (
         <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-          <span style={{ fontSize: "12px", color: MUTED, width: 50, flexShrink: 0 }}>satz {i + 1}</span>
+          <span style={{ fontSize: "12px", color: MUTED, width: 50, flexShrink: 0 }}>Satz {i + 1}</span>
           <input value={s.you} onChange={e => updateSet(i, "you", e.target.value)} placeholder="11" style={inp} type="number" inputMode="numeric" min={0} max={30} />
           <span style={{ color: MUTED, fontSize: "16px" }}>:</span>
           <input value={s.opp} onChange={e => updateSet(i, "opp", e.target.value)} placeholder="8" style={inp} type="number" inputMode="numeric" min={0} max={30} />
@@ -135,16 +133,16 @@ function SpielenInner() {
       ))}
 
       {sets.length < 5 && (
-        <button type="button" onClick={addSet} style={{ width: "100%", background: "none", border: "1px dashed " + BORDER, borderRadius: "8px", padding: "10px", color: MUTED, cursor: "pointer", fontSize: "13px", marginTop: "4px", fontFamily: "inherit" }}>
-          + satz hinzufügen
+        <button type="button" onClick={addSet} style={{ width: "100%", background: "none", border: "1px dashed " + CELL, borderRadius: "12px", padding: "10px", color: MUTED, cursor: "pointer", fontSize: "13px", marginTop: "4px", fontFamily: "inherit" }}>
+          + Satz hinzufügen
         </button>
       )}
 
       {error && <p style={{ fontSize: "13px", color: "#f87171", marginTop: "12px" }}>{error}</p>}
 
-      <button type="button" style={primaryBtn(false)} onClick={goToResult}>resultat ansehen →</button>
+      <button type="button" style={primaryBtn(false)} onClick={goToResult}>Resultat ansehen →</button>
       <button type="button" onClick={() => router.push("/login")} style={{ width: "100%", background: "none", border: "none", color: MUTED, fontSize: "12px", textDecoration: "underline", cursor: "pointer", marginTop: "14px", fontFamily: "inherit" }}>
-        ich will mich nur anmelden
+        Ich will mich nur anmelden
       </button>
     </div></div>
   )
@@ -153,51 +151,51 @@ function SpielenInner() {
   return (
     <div style={wrap}><div style={box}>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>du bist jetzt spieler</span>
+        <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>Du bist jetzt Spieler</span>
         <span style={{ fontSize: "11px", color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em" }}>PLAYER</span>
       </div>
 
       {/* ELO-Ring / Card */}
-      <div style={{ background: CARD, border: "1px solid " + BORDER, borderRadius: "16px", padding: "28px 20px", textAlign: "center", marginBottom: "16px" }}>
+      <div style={{ ...cardPad, padding: "28px 20px", textAlign: "center", marginBottom: "16px" }}>
         <div style={{
           width: 140, height: 140, margin: "0 auto 16px", borderRadius: "50%",
-          border: `4px solid ${level.color}`, display: "flex", flexDirection: "column",
+          border: `4px solid ${lvColor(level.name)}`, display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
-          boxShadow: `0 0 28px ${level.color}33`,
+          boxShadow: `0 0 28px ${lvColor(level.name)}33`,
         }}>
           <span style={{ fontSize: "11px", color: MUTED, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>ELO</span>
           <span style={{ fontSize: "44px", fontWeight: 900, color: TEXT, lineHeight: 1 }}>{provisionalElo}</span>
         </div>
 
-        <p style={{ fontSize: "11px", fontWeight: 700, color: level.color, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "4px" }}>dein level</p>
-        <h2 style={{ fontSize: "32px", fontWeight: 900, color: level.color, textTransform: "uppercase", marginBottom: "16px", letterSpacing: "-0.02em" }}>{level.name}</h2>
+        <p style={{ fontSize: "11px", fontWeight: 700, color: lvColor(level.name), letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "4px" }}>Dein Level</p>
+        <h2 style={{ fontSize: "32px", fontWeight: 900, color: lvColor(level.name), textTransform: "uppercase", marginBottom: "16px", letterSpacing: "-0.02em" }}>{level.name}</h2>
 
         {/* Rang */}
-        <div style={{ borderTop: "1px solid " + BORDER, paddingTop: "16px" }}>
+        <div style={{ borderTop: "1px solid " + CELL, paddingTop: "16px" }}>
           {rankLoading ? (
-            <p style={{ fontSize: "13px", color: MUTED }}>rang wird berechnet…</p>
+            <p style={{ fontSize: "13px", color: MUTED }}>Rang wird berechnet…</p>
           ) : rank !== null ? (
             <p style={{ fontSize: "14px", color: TEXT }}>
-              geschätzter start-rang <span style={{ color: G, fontWeight: 900, fontSize: "22px" }}>#{rank}</span>
+              Geschätzter Start-Rang <span style={{ color: G, fontWeight: 900, fontSize: "22px" }}>#{rank}</span>
             </p>
           ) : (
-            <p style={{ fontSize: "13px", color: MUTED, lineHeight: 1.5 }}>dein rang wird nach dem sichern berechnet.</p>
+            <p style={{ fontSize: "13px", color: MUTED, lineHeight: 1.5 }}>Dein Rang wird nach dem Sichern berechnet.</p>
           )}
         </div>
       </div>
 
       {/* PingPoints Chip */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", background: CARD, border: "1px solid " + BORDER, borderRadius: "10px", padding: "12px", marginBottom: "8px" }}>
-        <span style={{ color: "#FFD700", fontWeight: 900, fontSize: "15px" }}>+15 pingpoints</span>
-        <span style={{ color: MUTED, fontSize: "12px" }}>nach dem sichern</span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", background: CELL, border: "none", borderRadius: "12px", padding: "12px", marginBottom: "8px" }}>
+        <span style={{ color: "#FFD700", fontWeight: 900, fontSize: "15px" }}>+15 PingPoints</span>
+        <span style={{ color: MUTED, fontSize: "12px" }}>nach dem Sichern</span>
       </div>
       <p style={{ fontSize: "12px", color: MUTED, textAlign: "center", marginBottom: "8px", lineHeight: 1.5 }}>
-        {won ? "sieg eingetragen — dein start-elo bekommt einen bonus." : "resultat eingetragen. sicher dir jetzt deinen rang."}
+        {won ? "Sieg eingetragen — dein Start-ELO bekommt einen Bonus." : "Resultat eingetragen. Sicher dir jetzt deinen Rang."}
       </p>
 
-      <button type="button" style={primaryBtn(false)} onClick={saveProfile}>profil sichern →</button>
+      <button type="button" style={primaryBtn(false)} onClick={saveProfile}>Profil sichern →</button>
       <button type="button" onClick={() => router.push("/login")} style={{ width: "100%", background: "none", border: "none", color: MUTED, fontSize: "12px", textDecoration: "underline", cursor: "pointer", marginTop: "14px", fontFamily: "inherit" }}>
-        später
+        Später
       </button>
     </div></div>
   )

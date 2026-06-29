@@ -3,41 +3,16 @@ import { useState, useEffect, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import BottomNav from "@/app/components/BottomNav"
 import Link from "next/link"
+import {
+  BG, CELL, W, SUB, MUT, LINE, DANGER, GREEN,
+  gt, cardPad, cardActive, cellKey,
+  chipBtn, btn, btnGhost, input, label, h1, h2, body, meta, eyebrow,
+} from "@/app/theme"
 
-// ─── DESIGN TOKENS ────────────────────────────────────────────────────────────
-const BG   = "#0E1013"
-const CARD = "#1A1D24"
-const BD   = "#1A1D24"
-const TEXT = "#FFFFFF"
-const SUB  = "rgba(255,255,255,0.35)"
-const LBL  = "rgba(255,255,255,0.5)"
-const GRAD = "linear-gradient(135deg, #39FF14 0%, #00D4AA 50%, #1FD1C4 100%)"
-const G    = "#39FF14"
-
-const btnPrimary: React.CSSProperties = {
-  background: "#fff", color: "#0E1014",
-  border: "none", borderRadius: 10,
-  padding: "14px 24px", fontFamily: "inherit",
-  fontWeight: 800, fontSize: 14,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.06em", cursor: "pointer",
-  width: "100%",
-}
-const btnGhost: React.CSSProperties = {
-  background: "transparent", color: TEXT,
-  border: `1px solid ${BD}`, borderRadius: 8,
-  padding: "10px 16px", fontFamily: "inherit",
-  fontWeight: 700, fontSize: 12,
-  textTransform: "uppercase" as const,
-  letterSpacing: "0.06em", cursor: "pointer",
-}
-const input: React.CSSProperties = {
-  width: "100%", background: CARD, border: `1px solid ${BD}`,
-  borderRadius: 8, padding: "13px 16px",
-  fontSize: 16, color: TEXT, fontFamily: "inherit",
-  fontWeight: 600, outline: "none",
-  boxSizing: "border-box" as const, display: "block",
-}
+// ─── LOKALE STYLE-ALIASE (auf Theme-Tokens gemappt, keine Logik) ───────────────
+const TEXT = W
+const LBL  = MUT
+const G    = GREEN
 
 // ─── TYPEN ────────────────────────────────────────────────────────────────────
 type Slot = { hour: number; start: string; end: string; available: boolean; tablesBooked?: number }
@@ -128,7 +103,7 @@ function StepBar({ current }: { current: Step }) {
               <div style={{
                 width: 18, height: 18, borderRadius: "50%",
                 background: done || active ? TEXT : "transparent",
-                border: done || active ? "none" : `1px solid ${BD}`,
+                border: done || active ? "none" : `1px solid ${CELL}`,
                 display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
                 {done
@@ -142,7 +117,7 @@ function StepBar({ current }: { current: Step }) {
                 color: active ? TEXT : done ? G : "#34373F",
               }}>{STEP_LABELS[s]}</span>
             </div>
-            {i < visible.length - 1 && <div style={{ width: 12, height: 1, background: BD }} />}
+            {i < visible.length - 1 && <div style={{ width: 12, height: 1, background: CELL }} />}
           </div>
         )
       })}
@@ -361,19 +336,13 @@ export default function BuchenPage() {
           {/* Header */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16 }}>
             {back ? (
-              <button onClick={back} style={{ ...btnGhost, padding: "7px 12px", flexShrink: 0 }}>
+              <button onClick={back} style={{ ...btnGhost, display: "inline-flex", width: "auto", padding: "8px 12px", flexShrink: 0 }}>
                 <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" style={{ display: "block" }}>
                   <path d="M19 12H5M12 5l-7 7 7 7"/>
                 </svg>
               </button>
             ) : <div style={{ width: 36 }} />}
-            <h1 style={{
-              fontSize: "clamp(24px, 5vw, 36px)", fontWeight: 900,
-              letterSpacing: ".08em", lineHeight: 0.92,
-              background: GRAD, WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent", backgroundClip: "text",
-              textTransform: "uppercase",
-            }}>Tisch buchen.</h1>
+            <h1 style={{ ...h1, fontSize: "clamp(24px, 5vw, 36px)", lineHeight: 0.92 }}>Tisch buchen</h1>
           </div>
           <StepBar current={step} />
           {children}
@@ -398,29 +367,27 @@ export default function BuchenPage() {
     return wrap("Tisch buchen.", null, (
       <>
         {isSommerpause && (
-          <div style={{ background: "rgba(255,159,46,0.08)", border: "1.5px solid rgba(255,159,46,0.4)", borderRadius: 12, padding: "14px 16px", marginBottom: 16 }}>
-            <p style={{ fontWeight: 900, fontSize: 13, textTransform: "uppercase", color: "#FF9F2E", marginBottom: 4 }}>🌞 Sommerpause — 30. Juni bis 31. August</p>
-            <p style={{ fontSize: 12, color: SUB, lineHeight: 1.5 }}>
+          <div style={{ ...cardPad, padding: "14px 16px", marginBottom: 16 }}>
+            <p style={{ ...eyebrow, color: "#FF9F2E", fontWeight: 800, fontSize: 12, letterSpacing: ".04em", marginBottom: 4 }}>Sommerpause — 30. Juni bis 31. August</p>
+            <p style={{ ...body }}>
               Oerlikon, Langstrasse und Basel sind geschlossen. Buchungen via Glattbrugg (24/7) oder St. Gallen.
             </p>
           </div>
         )}
 
         {/* Standort */}
-        <p style={{ fontSize: 10, color: LBL, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>standort</p>
+        <p style={{ ...label }}>Standort</p>
         {location ? (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: CARD, border: `1px solid ${BD}`, borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}>
+          <div style={{ ...cardPad, display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", marginBottom: 16 }}>
             <div>
-              <div style={{ fontSize: 15, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".06em", background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                {location.name}
-              </div>
-              <div style={{ fontSize: 11, color: SUB, marginTop: 1 }}>{location.city}</div>
+              <div style={{ ...h2, fontSize: 16 }}>{location.name}</div>
+              <div style={{ ...meta, marginTop: 2 }}>{location.city}</div>
             </div>
             <button onClick={() => { setLocation(null); setSelectedSlot(null); setSlots([]) }}
-              style={{ ...btnGhost, fontSize: 10, padding: "5px 10px" }}>Ändern</button>
+              style={{ ...btnGhost, display: "inline-block", width: "auto", fontSize: 12, padding: "7px 14px" }}>Ändern</button>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 16 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16 }}>
             {LOCATIONS.map(loc => {
               const s = getOpenStatus(loc)
               return (
@@ -430,12 +397,12 @@ export default function BuchenPage() {
                     if (loc.eversports) { window.open(loc.eversports, "_blank"); return }
                     setLocation(loc); setSelectedSlot(null); setSlots([])
                   }}
-                  style={{ background: CARD, border: `1.5px solid ${BD}`, borderRadius: 10, padding: "10px 12px", cursor: loc.teamOnly ? "not-allowed" : "pointer", textAlign: "left", opacity: loc.teamOnly ? 0.5 : 1 }}>
-                  <div style={{ fontSize: 9, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em", color: s.open ? G : SUB, marginBottom: 3 }}>
+                  style={{ ...cardPad, padding: "12px 14px", cursor: loc.teamOnly ? "not-allowed" : "pointer", textAlign: "left", opacity: loc.teamOnly ? 0.5 : 1, fontFamily: "inherit" }}>
+                  <div style={{ ...eyebrow, fontWeight: 700, color: s.open ? G : MUT, marginBottom: 4, textTransform: "uppercase", letterSpacing: ".04em" }}>
                     {s.label}
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 900, color: TEXT, textTransform: "uppercase" }}>{loc.name}</div>
-                  <div style={{ fontSize: 11, color: SUB, marginTop: 1 }}>{loc.city}</div>
+                  <div style={{ ...h2, fontSize: 15 }}>{loc.name}</div>
+                  <div style={{ ...meta, marginTop: 2 }}>{loc.city}</div>
                 </button>
               )
             })}
@@ -445,20 +412,20 @@ export default function BuchenPage() {
         {location && (
           <>
             {/* Datum */}
-            <p style={{ fontSize: 10, color: LBL, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>datum</p>
+            <p style={{ ...label }}>Datum</p>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: showCal ? 10 : 16 }}>
               <button onClick={() => {
                 const prev = addDays(selectedDate, -1)
                 const today = new Date(); today.setHours(0,0,0,0)
                 if (prev >= today) { setSelectedDate(prev); setSelectedSlot(null) }
-              }} style={{ ...btnGhost, padding: "8px 14px", fontSize: 16, flexShrink: 0 }}>‹</button>
+              }} style={{ ...btnGhost, display: "inline-flex", alignItems: "center", justifyContent: "center", width: "auto", padding: "9px 16px", fontSize: 16, flexShrink: 0 }}>‹</button>
               <button onClick={() => { setCalMonth(() => { const d = new Date(selectedDate); d.setDate(1); return d }); setShowCal(v => !v) }}
-                style={{ flex: 1, textAlign: "center", fontSize: 15, fontWeight: 900, color: TEXT, letterSpacing: "-.01em", background: "transparent", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                style={{ flex: 1, textAlign: "center", fontSize: 15, fontWeight: 700, color: TEXT, letterSpacing: "-.01em", background: "transparent", border: "none", cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                 {dateLabel}
                 <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke={SUB} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showCal ? "rotate(180deg)" : "none" }}><path d="M6 9l6 6 6-6" /></svg>
               </button>
               <button onClick={() => { setSelectedDate(addDays(selectedDate, 1)); setSelectedSlot(null) }}
-                style={{ ...btnGhost, padding: "8px 14px", fontSize: 16, flexShrink: 0 }}>›</button>
+                style={{ ...btnGhost, display: "inline-flex", alignItems: "center", justifyContent: "center", width: "auto", padding: "9px 16px", fontSize: 16, flexShrink: 0 }}>›</button>
             </div>
 
             {showCal && (() => {
@@ -471,14 +438,14 @@ export default function BuchenPage() {
               for (let d = 1; d <= daysIn; d++) cells.push(new Date(y, m, d))
               const canPrevMonth = new Date(y, m, 1) > new Date(today.getFullYear(), today.getMonth(), 1)
               return (
-                <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 12, padding: 12, marginBottom: 16 }}>
+                <div style={{ ...cardPad, padding: 12, marginBottom: 16 }}>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                    <button onClick={() => canPrevMonth && setCalMonth(new Date(y, m - 1, 1))} style={{ ...btnGhost, padding: "4px 10px", fontSize: 14, opacity: canPrevMonth ? 1 : 0.3 }}>‹</button>
+                    <button onClick={() => canPrevMonth && setCalMonth(new Date(y, m - 1, 1))} style={{ ...btnGhost, display: "inline-flex", width: "auto", padding: "5px 12px", fontSize: 14, opacity: canPrevMonth ? 1 : 0.3 }}>‹</button>
                     <span style={{ fontSize: 13, fontWeight: 700, color: TEXT }}>{calMonth.toLocaleDateString("de-CH", { month: "long", year: "numeric" })}</span>
-                    <button onClick={() => setCalMonth(new Date(y, m + 1, 1))} style={{ ...btnGhost, padding: "4px 10px", fontSize: 14 }}>›</button>
+                    <button onClick={() => setCalMonth(new Date(y, m + 1, 1))} style={{ ...btnGhost, display: "inline-flex", width: "auto", padding: "5px 12px", fontSize: 14 }}>›</button>
                   </div>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3 }}>
-                    {["mo","di","mi","do","fr","sa","so"].map(w => <div key={w} style={{ textAlign: "center", fontSize: 9, color: LBL, padding: "2px 0" }}>{w}</div>)}
+                    {["Mo","Di","Mi","Do","Fr","Sa","So"].map(w => <div key={w} style={{ textAlign: "center", fontSize: 9, color: MUT, padding: "2px 0" }}>{w}</div>)}
                     {cells.map((d, i) => {
                       if (!d) return <div key={i} />
                       const past = d < today
@@ -498,47 +465,41 @@ export default function BuchenPage() {
             })()}
 
             {/* Dauer */}
-            <p style={{ fontSize: 10, color: LBL, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>dauer</p>
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap" as const, marginBottom: 16 }}>
+            <p style={{ ...label }}>Dauer</p>
+            <div style={{ display: "flex", gap: 8, flexWrap: "wrap" as const, marginBottom: 16 }}>
               {DURATIONS.map(d => (
                 <button key={d.val} onClick={() => { setDuration(d.val); setSelectedSlot(null) }}
-                  style={{
-                    padding: "6px 14px", borderRadius: 20, cursor: "pointer",
-                    border: `1px solid ${duration === d.val ? "rgba(255,255,255,0.7)" : BD}`,
-                    background: duration === d.val ? "rgba(255,255,255,0.06)" : "transparent",
-                    fontFamily: "inherit", fontWeight: 500, fontSize: 13,
-                    color: duration === d.val ? TEXT : SUB,
-                  }}>
+                  style={{ ...chipBtn(duration === d.val), fontFamily: "inherit" }}>
                   {d.label}
                 </button>
               ))}
             </div>
 
             {/* Slots */}
-            <p style={{ fontSize: 10, color: LBL, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 8 }}>verfügbare zeiten</p>
+            <p style={{ ...label }}>Verfügbare Zeiten</p>
             {isClosed ? (
-              <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 8, padding: "20px 16px", textAlign: "center", marginBottom: 16 }}>
-                <p style={{ color: SUB, fontSize: 13 }}>Heute geschlossen.</p>
+              <div style={{ ...cardPad, padding: "20px 16px", textAlign: "center", marginBottom: 16 }}>
+                <p style={{ ...body }}>Heute geschlossen.</p>
                 {(() => {
                   const next = location.openHours.map(h => ({ ...h, days: (h.dow - pickerDow + 7) % 7 || 7 })).sort((a, b) => a.days - b.days)[0]
                   const days = ["So","Mo","Di","Mi","Do","Fr","Sa"]
-                  return next ? <p style={{ fontSize: 11, color: LBL, marginTop: 4 }}>Nächstes Öffnen: {days[next.dow]} ab {next.open}</p> : null
+                  return next ? <p style={{ ...meta, marginTop: 4 }}>Nächstes Öffnen: {days[next.dow]} ab {next.open}</p> : null
                 })()}
               </div>
             ) : slotsLoading ? (
               <div style={{ textAlign: "center", padding: "28px 0" }}>
-                <div style={{ width: 24, height: 24, borderRadius: "50%", border: `2.5px solid ${BD}`, borderTopColor: G, margin: "0 auto 10px", animation: "spin 0.8s linear infinite" }} />
-                <p style={{ color: SUB, fontSize: 13 }}>Verfügbarkeit wird geprüft…</p>
+                <div style={{ width: 24, height: 24, borderRadius: "50%", border: `2.5px solid ${CELL}`, borderTopColor: G, margin: "0 auto 10px", animation: "spin 0.8s linear infinite" }} />
+                <p style={{ ...body }}>Verfügbarkeit wird geprüft…</p>
                 <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
               </div>
             ) : slotsError ? (
-              <div style={{ background: "rgba(248,113,113,0.06)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 8, padding: 16, textAlign: "center", marginBottom: 16 }}>
-                <p style={{ color: "#f87171", fontSize: 13 }}>{slotsError}</p>
-                <button onClick={() => loadSlots(selectedDate)} style={{ ...btnGhost, marginTop: 10 }}>Nochmals versuchen</button>
+              <div style={{ ...cardPad, padding: 16, textAlign: "center", marginBottom: 16 }}>
+                <p style={{ ...body, color: DANGER }}>{slotsError}</p>
+                <button onClick={() => loadSlots(selectedDate)} style={{ ...btnGhost, display: "inline-block", width: "auto", marginTop: 10 }}>Nochmals versuchen</button>
               </div>
             ) : visibleSlots.length === 0 ? (
-              <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 8, padding: "20px 16px", textAlign: "center", marginBottom: 16 }}>
-                <p style={{ color: SUB, fontSize: 13 }}>Kein freier Tisch — anderes Datum oder Dauer wählen.</p>
+              <div style={{ ...cardPad, padding: "20px 16px", textAlign: "center", marginBottom: 16 }}>
+                <p style={{ ...body }}>Kein freier Tisch — anderes Datum oder Dauer wählen.</p>
               </div>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 6, marginBottom: 16 }}>
@@ -547,8 +508,11 @@ export default function BuchenPage() {
                   return (
                     <button key={slot.hour}
                       onClick={() => { setSelectedSlot(sel ? null : slot); if (!sel) setTables(1) }}
-                      style={{ background: sel ? TEXT : CARD, border: `1px solid ${sel ? TEXT : BD}`, borderRadius: 8, padding: "10px 4px", cursor: "pointer", textAlign: "center" }}>
-                      <div style={{ fontSize: 13, fontWeight: 500, color: sel ? "#0E1014" : TEXT }}>{pad(slot.hour)}:00</div>
+                      style={{
+                        ...(sel ? cardActive : { background: CELL, border: "1.5px solid transparent" }),
+                        borderRadius: 10, padding: "10px 4px", cursor: "pointer", textAlign: "center", fontFamily: "inherit",
+                      }}>
+                      <div style={{ fontSize: 13, fontWeight: sel ? 700 : 500, color: TEXT }}>{pad(slot.hour)}:00</div>
                     </button>
                   )
                 })}
@@ -560,19 +524,19 @@ export default function BuchenPage() {
               const freeMax = location.tables
               const free = Math.max(0, freeMax - (selectedSlot.tablesBooked || 0))
               return (
-                <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 12, padding: 16, marginBottom: 16 }}>
+                <div style={{ ...cardPad, padding: 16, marginBottom: 16 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
-                    <span style={{ fontSize: 12, color: SUB, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: ".06em" }}>Tische:</span>
+                    <span style={{ ...cellKey, fontSize: 11, marginBottom: 0 }}>Tische</span>
                     <button onClick={() => setTables(t => Math.max(1, t-1))}
-                      style={{ width: 30, height: 30, borderRadius: "50%", border: `1.5px solid ${BD}`, background: "transparent", color: TEXT, cursor: "pointer", fontSize: 16, fontWeight: 700 }}>−</button>
-                    <span style={{ fontSize: 18, fontWeight: 900, minWidth: 20, textAlign: "center" }}>{tables}</span>
+                      style={{ width: 30, height: 30, borderRadius: "50%", border: `1.5px solid ${CELL}`, background: "transparent", color: TEXT, cursor: "pointer", fontSize: 16, fontWeight: 700 }}>−</button>
+                    <span style={{ fontSize: 18, fontWeight: 900, minWidth: 20, textAlign: "center", color: TEXT }}>{tables}</span>
                     <button onClick={() => setTables(t => Math.min(free, t+1))}
-                      style={{ width: 30, height: 30, borderRadius: "50%", border: `1.5px solid ${BD}`, background: "transparent", color: TEXT, cursor: "pointer", fontSize: 16, fontWeight: 700 }}>+</button>
-                    <span style={{ fontSize: 11, color: SUB }}>max. {free}</span>
+                      style={{ width: 30, height: 30, borderRadius: "50%", border: `1.5px solid ${CELL}`, background: "transparent", color: TEXT, cursor: "pointer", fontSize: 16, fontWeight: 700 }}>+</button>
+                    <span style={{ ...meta, fontSize: 11 }}>max. {free}</span>
                     <span style={{ fontSize: 16, fontWeight: 900, color: TEXT, marginLeft: "auto" }}>CHF {priceBase}.—</span>
                   </div>
-                  <button onClick={() => setStep("details")} style={btnPrimary}>
-                    Weiter → Angaben
+                  <button onClick={() => setStep("details")} style={{ ...btn, width: "100%", fontFamily: "inherit" }}>
+                    Weiter zu den Angaben
                   </button>
                 </div>
               )
@@ -581,8 +545,8 @@ export default function BuchenPage() {
         )}
 
         {!location && (
-          <div style={{ textAlign: "center", padding: "24px 0", color: LBL, fontSize: 12, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: ".1em" }}>
-            ↑ Standort wählen
+          <div style={{ ...meta, textAlign: "center", padding: "24px 0", color: MUT }}>
+            Bitte zuerst einen Standort wählen.
           </div>
         )}
       </>
@@ -596,66 +560,66 @@ export default function BuchenPage() {
     return wrap("Tisch buchen.", () => setStep("picker"), (
       <>
         {/* Buchungs-Preview */}
-        <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 12, padding: 16, marginBottom: 20 }}>
-          <p style={{ fontSize: 11, color: SUB, marginBottom: 2 }}>{location?.name}</p>
+        <div style={{ ...cardPad, padding: 16, marginBottom: 20 }}>
+          <p style={{ ...eyebrow, marginBottom: 2 }}>{location?.name}</p>
           <p style={{ fontSize: 16, fontWeight: 900, color: TEXT }}>
             {formatDate(selectedDate)} · {pad(selectedSlot?.hour ?? 0)}:00 · {duration}h
           </p>
-          <p style={{ fontSize: 12, color: SUB, marginTop: 4 }}>
+          <p style={{ ...meta, marginTop: 4 }}>
             {tables} {tables === 1 ? "Tisch" : "Tische"} · CHF {priceBase}.—
           </p>
         </div>
 
         {/* Anzahl Personen */}
-        <p style={{ fontSize: 10, color: LBL, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 8 }}>Anzahl Personen</p>
+        <p style={{ ...label }}>Anzahl Personen</p>
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <button onClick={() => setPersons(p => Math.max(2, p-1))} style={{ width: 36, height: 36, borderRadius: "50%", border: `1.5px solid ${BD}`, background: "transparent", color: TEXT, cursor: "pointer", fontSize: 18, fontWeight: 700 }}>−</button>
-          <span style={{ fontSize: 22, fontWeight: 900, minWidth: 30, textAlign: "center" }}>{persons}</span>
-          <button onClick={() => setPersons(p => Math.min(tables * 4, p+1))} style={{ width: 36, height: 36, borderRadius: "50%", border: `1.5px solid ${BD}`, background: "transparent", color: TEXT, cursor: "pointer", fontSize: 18, fontWeight: 700 }}>+</button>
-          <span style={{ fontSize: 11, color: SUB }}>max. {tables * 4} pro {tables === 1 ? "Tisch" : "Tischen"}</span>
+          <button onClick={() => setPersons(p => Math.max(2, p-1))} style={{ width: 36, height: 36, borderRadius: "50%", border: `1.5px solid ${CELL}`, background: "transparent", color: TEXT, cursor: "pointer", fontSize: 18, fontWeight: 700 }}>−</button>
+          <span style={{ fontSize: 22, fontWeight: 900, minWidth: 30, textAlign: "center", color: TEXT }}>{persons}</span>
+          <button onClick={() => setPersons(p => Math.min(tables * 4, p+1))} style={{ width: 36, height: 36, borderRadius: "50%", border: `1.5px solid ${CELL}`, background: "transparent", color: TEXT, cursor: "pointer", fontSize: 18, fontWeight: 700 }}>+</button>
+          <span style={{ ...meta, fontSize: 11 }}>max. {tables * 4} pro {tables === 1 ? "Tisch" : "Tischen"}</span>
         </div>
 
         {/* Formular */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginBottom: 12 }}>
           <div>
-            <p style={{ fontSize: 10, color: LBL, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }}>Vorname *</p>
+            <label style={label}>Vorname *</label>
             <input style={input} value={form.firstName} autoComplete="given-name"
               onChange={e => setForm(f => ({ ...f, firstName: e.target.value }))} placeholder="Max" />
           </div>
           <div>
-            <p style={{ fontSize: 10, color: LBL, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }}>Nachname *</p>
+            <label style={label}>Nachname *</label>
             <input style={input} value={form.lastName} autoComplete="family-name"
               onChange={e => setForm(f => ({ ...f, lastName: e.target.value }))} placeholder="Muster" />
           </div>
         </div>
         <div style={{ marginBottom: 12 }}>
-          <p style={{ fontSize: 10, color: LBL, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }}>E-Mail *</p>
+          <label style={label}>E-Mail *</label>
           <input style={input} type="email" value={form.email} autoComplete="email"
             onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="max@example.ch" />
         </div>
         <div style={{ marginBottom: 12 }}>
-          <p style={{ fontSize: 10, color: LBL, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }}>Telefon</p>
+          <label style={label}>Telefon</label>
           <input style={input} type="tel" value={form.phone} autoComplete="tel"
             onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} placeholder="+41 79 000 00 00" />
         </div>
         <div style={{ marginBottom: 24 }}>
-          <p style={{ fontSize: 10, color: LBL, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 6 }}>Notiz (optional)</p>
+          <label style={label}>Notiz (optional)</label>
           <textarea style={{ ...input, minHeight: 70, resize: "vertical" as const }} value={form.comments}
             onChange={e => setForm(f => ({ ...f, comments: e.target.value }))} placeholder="z.B. Geburtstag, besondere Wünsche…" />
         </div>
 
         {/* Gruppe ≥ 12 */}
         {persons >= 12 && (
-          <div style={{ background: "rgba(57,255,20,0.06)", border: `1px solid ${G}30`, borderRadius: 10, padding: "12px 16px", marginBottom: 16 }}>
-            <p style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 2 }}>🎉 Ihr seid {persons} Personen — Teamevents-Pakete verfügbar!</p>
-            <p style={{ fontSize: 11, color: SUB }}>Quick Social CHF 49/P. · Team Night CHF 89/P. · All-In CHF 139/P.</p>
-            <Link href="/teamevents" style={{ fontSize: 11, color: G, fontWeight: 700 }}>Pakete ansehen →</Link>
+          <div style={{ ...cardPad, padding: "12px 16px", marginBottom: 16 }}>
+            <p style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 2 }}>Ihr seid {persons} Personen — Teamevent-Pakete verfügbar.</p>
+            <p style={{ ...meta }}>Quick Social CHF 49/P. · Team Night CHF 89/P. · All-In CHF 139/P.</p>
+            <Link href="/teamevents" style={{ fontSize: 12, color: G, fontWeight: 700, textDecoration: "none" }}>Pakete ansehen →</Link>
           </div>
         )}
 
         <button disabled={!formValid} onClick={() => formValid && setStep("confirm")}
-          style={{ ...btnPrimary, opacity: formValid ? 1 : 0.4 }}>
-          Weiter zur Bestätigung →
+          style={{ ...btn, width: "100%", fontFamily: "inherit", opacity: formValid ? 1 : 0.4 }}>
+          Weiter zur Bestätigung
         </button>
       </>
     ))
@@ -666,7 +630,7 @@ export default function BuchenPage() {
     return wrap("Tisch buchen.", () => setStep("details"), (
       <>
         {/* Zusammenfassung */}
-        <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 12, padding: 16, marginBottom: 16, display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ ...cardPad, padding: 16, marginBottom: 16, display: "flex", flexDirection: "column", gap: 12 }}>
           {[
             { label: "Standort", value: location?.name || "" },
             { label: "Datum",    value: formatDate(selectedDate) },
@@ -677,11 +641,11 @@ export default function BuchenPage() {
             ...(form.phone ? [{ label: "Telefon", value: form.phone }] : []),
           ].map(r => (
             <div key={r.label} style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 16 }}>
-              <span style={{ fontSize: 11, color: SUB, fontWeight: 700, textTransform: "uppercase" as const, letterSpacing: ".06em", flexShrink: 0 }}>{r.label}</span>
+              <span style={{ ...cellKey, fontSize: 11, marginBottom: 0, flexShrink: 0 }}>{r.label}</span>
               <span style={{ fontSize: 14, color: TEXT, textAlign: "right" }}>{r.value}</span>
             </div>
           ))}
-          <div style={{ borderTop: `1px solid ${BD}`, paddingTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+          <div style={{ borderTop: `1px solid ${LINE}`, paddingTop: 12, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <span style={{ fontSize: 15, fontWeight: 900, color: TEXT }}>Tischmiete</span>
             <span style={{ fontSize: 15, fontWeight: 900, color: TEXT }}>CHF {priceBase}.—</span>
           </div>
@@ -691,9 +655,9 @@ export default function BuchenPage() {
               <span style={{ fontSize: 13, color: G }}>−CHF {discount}.—</span>
             </div>
           )}
-          <div style={{ display: "flex", justifyContent: "space-between", borderTop: `1px solid ${BD}`, paddingTop: 12 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", borderTop: `1px solid ${LINE}`, paddingTop: 12 }}>
             <span style={{ fontSize: 17, fontWeight: 900, color: TEXT }}>Gesamt</span>
-            <span style={{ fontSize: 17, fontWeight: 900, background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+            <span style={{ fontSize: 22, fontWeight: 900, ...gt }}>
               CHF {grandTotal}.—
             </span>
           </div>
@@ -701,58 +665,58 @@ export default function BuchenPage() {
 
         {/* PingPoints einlösen */}
         {maxRedeem > 0 && (
-          <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 12, padding: 14, marginBottom: 16 }}>
+          <div style={{ ...cardPad, padding: 14, marginBottom: 16 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <div>
-                <p style={{ fontSize: 12, color: TEXT, fontWeight: 900, textTransform: "uppercase" as const, letterSpacing: ".06em", marginBottom: 2 }}>PingPoints einlösen</p>
-                <p style={{ fontSize: 11, color: SUB }}>{pingPoints} Punkte · 1 Punkt = CHF 2 Rabatt</p>
+                <p style={{ fontSize: 13, color: TEXT, fontWeight: 900 }}>PingPoints einlösen</p>
+                <p style={{ ...meta, marginTop: 2 }}>{pingPoints} Punkte · 1 Punkt = CHF 2 Rabatt</p>
               </div>
               <span style={{ fontSize: 14, color: G, fontWeight: 900 }}>{pingPoints}P</span>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <button onClick={() => setRedeemPoints(p => Math.max(0, p-1))} disabled={redeemPoints === 0}
-                style={{ width: 32, height: 32, borderRadius: "50%", border: `1.5px solid ${BD}`, background: "transparent", color: TEXT, cursor: redeemPoints === 0 ? "not-allowed" : "pointer", fontSize: 18, opacity: redeemPoints === 0 ? 0.3 : 1, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
+                style={{ width: 32, height: 32, borderRadius: "50%", border: `1.5px solid ${CELL}`, background: "transparent", color: TEXT, cursor: redeemPoints === 0 ? "not-allowed" : "pointer", fontSize: 18, opacity: redeemPoints === 0 ? 0.3 : 1, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
               <div style={{ flex: 1, textAlign: "center" }}>
                 {redeemPoints === 0
-                  ? <span style={{ fontSize: 12, color: SUB }}>Nicht einlösen</span>
+                  ? <span style={{ ...meta }}>Nicht einlösen</span>
                   : <span style={{ fontSize: 13, color: TEXT, fontWeight: 900 }}>{redeemPoints}P = −CHF {discount}.—</span>
                 }
               </div>
               <button onClick={() => setRedeemPoints(p => Math.min(maxRedeem, p+1))} disabled={redeemPoints >= maxRedeem}
-                style={{ width: 32, height: 32, borderRadius: "50%", border: `1.5px solid ${BD}`, background: "transparent", color: TEXT, cursor: redeemPoints >= maxRedeem ? "not-allowed" : "pointer", fontSize: 18, opacity: redeemPoints >= maxRedeem ? 0.3 : 1, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
+                style={{ width: 32, height: 32, borderRadius: "50%", border: `1.5px solid ${CELL}`, background: "transparent", color: TEXT, cursor: redeemPoints >= maxRedeem ? "not-allowed" : "pointer", fontSize: 18, opacity: redeemPoints >= maxRedeem ? 0.3 : 1, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
             </div>
           </div>
         )}
 
         {/* PingPoints Preview */}
-        <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 10, padding: "10px 14px", marginBottom: 16 }}>
-          <p style={{ fontSize: 11, color: SUB, fontWeight: 700, textTransform: "uppercase" as const }}>
+        <div style={{ ...cardPad, padding: "12px 16px", marginBottom: 16 }}>
+          <p style={{ ...meta }}>
             Nach dieser Buchung: {Math.max(0, (pingPoints - redeemPoints + 1) % 10)}/10 PingPoints
             {pingPoints - redeemPoints + 1 >= 10 ? " · Gratis-Stunde verfügbar!" : ""}
           </p>
-          <div style={{ background: `${BD}`, borderRadius: 3, height: 4, marginTop: 6 }}>
+          <div style={{ background: CELL, borderRadius: 3, height: 4, marginTop: 6 }}>
             <div style={{ background: G, borderRadius: 3, height: 4, width: `${Math.min(100, ((pingPoints - redeemPoints + 1) % 10) * 10)}%`, transition: "width 0.4s" }} />
           </div>
         </div>
 
         {bookingError && (
-          <div style={{ background: "rgba(248,113,113,0.06)", border: "1px solid rgba(248,113,113,0.25)", borderRadius: 8, padding: "14px 18px", marginBottom: 16 }}>
-            <p style={{ color: "#f87171", fontSize: 13 }}>{bookingError}</p>
+          <div style={{ ...cardPad, padding: "14px 18px", marginBottom: 16 }}>
+            <p style={{ ...body, color: DANGER }}>{bookingError}</p>
           </div>
         )}
 
         <button onClick={submitBooking} disabled={submitting}
-          style={{ ...btnPrimary, opacity: submitting ? 0.6 : 1 }}>
+          style={{ ...btn, width: "100%", fontFamily: "inherit", opacity: submitting ? 0.6 : 1 }}>
           {submitting ? "Buchung wird gespeichert…"
             : location?.requiresPayment
-              ? `Jetzt buchen & bezahlen · CHF ${grandTotal}.— →`
+              ? `Jetzt buchen & bezahlen · CHF ${grandTotal}.—`
               : grandTotal === 0
-                ? "Gratis buchen →"
-                : `Verbindlich reservieren · CHF ${grandTotal}.— →`}
+                ? "Gratis buchen"
+                : `Verbindlich reservieren · CHF ${grandTotal}.—`}
         </button>
 
         {!location?.requiresPayment && (
-          <p style={{ fontSize: 11, color: LBL, textAlign: "center", marginTop: 10 }}>Bezahlung direkt vor Ort</p>
+          <p style={{ ...meta, textAlign: "center", marginTop: 10, color: MUT }}>Bezahlung direkt vor Ort</p>
         )}
       </>
     ))
@@ -762,20 +726,20 @@ export default function BuchenPage() {
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
       <div style={{ maxWidth: 480, margin: "0 auto", textAlign: "center", paddingTop: 60 }}>
-        <div style={{ width: 72, height: 72, borderRadius: "50%", background: `${G}18`, border: `2px solid ${G}40`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", fontSize: 32 }}>
+        <div style={{ width: 72, height: 72, borderRadius: "50%", background: `${G}18`, border: `2px solid ${G}40`, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px", fontSize: 32, color: G }}>
           ✓
         </div>
-        <h2 style={{ fontSize: "clamp(24px, 5vw, 36px)", fontWeight: 900, textTransform: "uppercase", background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text", marginBottom: 8 }}>
-          Buchung bestätigt!
+        <h2 style={{ ...h1, fontSize: "clamp(24px, 5vw, 36px)", marginBottom: 8 }}>
+          Buchung bestätigt
         </h2>
-        <p style={{ fontSize: 15, color: SUB, marginBottom: 8 }}>
+        <p style={{ ...body, fontSize: 15, marginBottom: 8 }}>
           Buchungsnummer: <strong style={{ color: TEXT }}>#{bookingRef}</strong>
         </p>
-        <p style={{ fontSize: 14, color: SUB, marginBottom: 28 }}>
+        <p style={{ ...body, marginBottom: 28 }}>
           Bestätigung wurde an <strong style={{ color: TEXT }}>{stripeReturn?.email || form.email}</strong> gesendet.
         </p>
 
-        <div style={{ background: CARD, border: `1px solid ${BD}`, borderRadius: 12, padding: 20, textAlign: "left", marginBottom: 28, display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ ...cardPad, padding: 20, textAlign: "left", marginBottom: 28, display: "flex", flexDirection: "column", gap: 10 }}>
           {[
             { label: "Standort", value: stripeReturn?.locName  || location?.name || "" },
             { label: "Datum",    value: stripeReturn?.dateLabel || formatDate(selectedDate) },
@@ -783,7 +747,7 @@ export default function BuchenPage() {
             { label: "Tische",   value: `${tables} Tisch${tables > 1 ? "e" : ""}` },
           ].map(r => (
             <div key={r.label} style={{ display: "flex", justifyContent: "space-between" }}>
-              <span style={{ fontSize: 11, color: SUB, fontWeight: 700, textTransform: "uppercase" as const }}>{r.label}</span>
+              <span style={{ ...cellKey, fontSize: 11, marginBottom: 0 }}>{r.label}</span>
               <span style={{ fontSize: 14, color: TEXT }}>{r.value}</span>
             </div>
           ))}
@@ -796,11 +760,11 @@ export default function BuchenPage() {
             setBookingRef(""); setBookingError(""); setStripeReturn(null); setRedeemPoints(0)
             const d = new Date(); d.setHours(0,0,0,0); setSelectedDate(d)
             window.history.replaceState({}, "", "/buchen")
-          }} style={{ ...btnGhost, padding: "12px 24px" }}>
+          }} style={{ ...btnGhost, display: "inline-block", width: "auto", padding: "12px 24px" }}>
             Neue Buchung
           </button>
-          <Link href="/entdecken" style={{ ...btnPrimary, display: "inline-block", textAlign: "center", textDecoration: "none", width: "auto", padding: "12px 24px" }}>
-            Zur Übersicht →
+          <Link href="/entdecken" style={{ ...btn, display: "inline-block", width: "auto", padding: "12px 24px" }}>
+            Zur Übersicht
           </Link>
         </div>
       </div>
