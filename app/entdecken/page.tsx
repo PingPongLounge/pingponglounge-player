@@ -7,7 +7,7 @@ import LigaChatHome from '@/app/components/LigaChatHome'
 const BG = '#0E1014', CARD = '#1A1D24', CELL = '#23272F', W = '#FFFFFF'
 const SUB = 'rgba(255,255,255,.82)', MUT = 'rgba(255,255,255,.5)'
 const LINE = 'rgba(255,255,255,.07)'
-const GRAD = 'linear-gradient(135deg,#39FF14,#00E5FF)'
+const GRAD = 'linear-gradient(135deg,#39FF14,#1FD1C4)'
 
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }
 const grp: React.CSSProperties = { fontSize: 11, fontWeight: 700, letterSpacing: '.22em', textTransform: 'uppercase', color: MUT, margin: '22px 18px 9px' }
@@ -28,7 +28,7 @@ function Logo({ small }: { small?: boolean }) {
   const s = small ? 38 : 56
   return (
     <svg width={s} height={s} viewBox="0 0 80 80" fill="none" style={{ display: 'block' }}>
-      <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#39FF14" /><stop offset="100%" stopColor="#00E5FF" /></linearGradient></defs>
+      <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#39FF14" /><stop offset="100%" stopColor="#1FD1C4" /></linearGradient></defs>
       <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="2.5" strokeLinejoin="round" />
       <circle cx="63" cy="58" r="6" fill="url(#lg)" />
     </svg>

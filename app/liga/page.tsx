@@ -5,9 +5,9 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 
 const BG="#0E1013",C="#171A1F",B="#232833",M="rgba(255,255,255,0.85)",W="#FFFFFF"
-const GRAD="linear-gradient(135deg,#39FF14,#00E5FF)"
+const GRAD="linear-gradient(135deg,#39FF14,#1FD1C4)"
 const gt:React.CSSProperties={background:GRAD,WebkitBackgroundClip:"text",backgroundClip:"text",WebkitTextFillColor:"transparent"}
-const lvColor=(l:string):string=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:"#00E5FF"}[l]||"#39FF14")
+const lvColor=(l:string):string=>({Rookie:"#4ADE80",Challenger:"#FACC15",Advanced:"#FB923C",Elite:"#1FD1C4"}[l]||"#39FF14")
 
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number}
 type Row={user_id:string,name:string,elo:number,level:string}
@@ -109,7 +109,7 @@ export default function LigaPage(){
       {/* Topbar */}
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",borderBottom:`1px solid ${B}`,background:"#0B0D10",position:"sticky",top:0,zIndex:10}}>
         <Link href="/entdecken" style={{display:"flex",alignItems:"center",gap:8,textDecoration:"none"}}>
-          <svg width="22" height="22" viewBox="0 0 80 80" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#00E5FF"/></linearGradient></defs><path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="3.4" strokeLinejoin="round"/><circle cx="63" cy="58" r="6.5" fill="url(#lg)"/></svg>
+          <svg width="22" height="22" viewBox="0 0 80 80" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#1FD1C4"/></linearGradient></defs><path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="3.4" strokeLinejoin="round"/><circle cx="63" cy="58" r="6.5" fill="url(#lg)"/></svg>
           <span style={{fontSize:13,fontWeight:800,letterSpacing:".20em",...gt}}>PLAYER <span style={{fontWeight:500,color:"rgba(255,255,255,.85)"}}>LIGA</span></span>
         </Link>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
@@ -151,7 +151,7 @@ export default function LigaPage(){
           <div style={{display:"flex",gap:8,padding:"12px 14px 6px"}}>
             {citySeasons.map(s=>{
               const on=s.id===seasonId
-              const tabStyle:React.CSSProperties=on?{flex:1,borderRadius:12,padding:"10px 8px",textAlign:"center",cursor:"pointer",border:"1.5px solid transparent",background:"linear-gradient(#101319,#101319) padding-box, linear-gradient(135deg,#39FF14,#00E5FF) border-box"}:{flex:1,borderRadius:12,padding:"10px 8px",textAlign:"center",cursor:"pointer",border:`1px solid ${B}`,background:"#14171C"}
+              const tabStyle:React.CSSProperties=on?{flex:1,borderRadius:12,padding:"10px 8px",textAlign:"center",cursor:"pointer",border:"1.5px solid transparent",background:"linear-gradient(#101319,#101319) padding-box, linear-gradient(135deg,#39FF14,#1FD1C4) border-box"}:{flex:1,borderRadius:12,padding:"10px 8px",textAlign:"center",cursor:"pointer",border:`1px solid ${B}`,background:"#14171C"}
               return(
                 <button key={s.id} onClick={()=>setSeasonId(s.id)} style={tabStyle}>
                   <div style={{fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:".03em",color:W}}>{isPro(s)?"pro":"einstieg"}</div>

@@ -26,15 +26,15 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
             <stop offset="0%" stopColor="#39FF14">
               <animate
                 attributeName="stop-color"
-                values="#39FF14;#00E5FF;#39FF14"
+                values="#39FF14;#1FD1C4;#39FF14"
                 dur="8s"
                 repeatCount="indefinite"
               />
             </stop>
-            <stop offset="100%" stopColor="#00E5FF">
+            <stop offset="100%" stopColor="#1FD1C4">
               <animate
                 attributeName="stop-color"
-                values="#00E5FF;#39FF14;#00E5FF"
+                values="#1FD1C4;#39FF14;#1FD1C4"
                 dur="8s"
                 repeatCount="indefinite"
               />
@@ -94,7 +94,7 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
         lineHeight: 1,
         fontFamily: "'League Spartan', system-ui, sans-serif",
         userSelect: "none" as const,
-        background: "linear-gradient(135deg, #39FF14 0%, #00E5FF 100%)",
+        background: "linear-gradient(135deg, #39FF14 0%, #1FD1C4 100%)",
         WebkitBackgroundClip: "text",
         WebkitTextFillColor: "transparent",
         backgroundClip: "text",

@@ -7,7 +7,7 @@ import StartMenu from "./StartMenu"
 const HIDE = ["/", "/login", "/onboarding", "/spielen", "/join", "/auth", "/entdecken", "/staff"]
 
 const BG = "#0E1014"
-const GRAD = "linear-gradient(135deg,#39FF14,#00E5FF)"
+const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
 
 export default function AppHeader() {
@@ -19,7 +19,7 @@ export default function AppHeader() {
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/entdecken" aria-label="Startseite" style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none" }}>
           <svg width="28" height="28" viewBox="0 0 80 80" fill="none">
-            <defs><linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#39FF14" /><stop offset="100%" stopColor="#00E5FF" /></linearGradient></defs>
+            <defs><linearGradient id="hg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#39FF14" /><stop offset="100%" stopColor="#1FD1C4" /></linearGradient></defs>
             <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#hg)" strokeWidth="3" strokeLinejoin="round" />
             <circle cx="63" cy="58" r="6" fill="url(#hg)" />
           </svg>

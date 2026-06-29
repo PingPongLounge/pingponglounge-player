@@ -15,7 +15,7 @@ const input: React.CSSProperties = {
 
 const btn: React.CSSProperties = {
   border: "2px solid transparent",
-  background: "linear-gradient(#111214, #111214) padding-box, linear-gradient(135deg, #39FF14 0%, #00E5FF 100%) border-box",
+  background: "linear-gradient(#111214, #111214) padding-box, linear-gradient(135deg, #39FF14 0%, #1FD1C4 100%) border-box",
   borderRadius: 10, padding: "14px", fontSize: "14px", fontWeight: 700,
   cursor: "pointer", color: G, textTransform: "uppercase" as const,
   letterSpacing: "0.06em", width: "100%",

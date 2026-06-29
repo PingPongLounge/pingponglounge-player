@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react"
 const CARD = "#1A1D24", CELL = "#23272F", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.5)"
 const LINE = "rgba(255,255,255,.07)"
-const GRAD = "linear-gradient(135deg,#39FF14,#00E5FF)"
+const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 
 type Msg = { id: string; user_id: string | null; text: string; created_at: string; kind: string | null; name: string }
 
