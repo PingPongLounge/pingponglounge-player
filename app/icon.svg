@@ -3,5 +3,5 @@
   <rect width="200" height="200" rx="40" fill="#111214"/>
   <path d="M 40 40 L 40 162" stroke="url(#g)" stroke-width="14" stroke-linecap="round"/>
   <path d="M 40 40 Q 40 40 92 40 Q 136 40 136 84 Q 136 128 92 128 L 40 128" stroke="url(#g)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
-  <circle cx="156" cy="150" r="13" fill="none" stroke="url(#g)" stroke-width="9"/>
+  <circle cx="156" cy="150" r="15" fill="url(#g)"/>
 </svg>
