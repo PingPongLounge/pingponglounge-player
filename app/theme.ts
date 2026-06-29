@@ -25,24 +25,36 @@ export const W      = '#FFFFFF'                  // Primärtext
 export const SUB    = 'rgba(255,255,255,.85)'   // Sekundärtext (gut lesbar)
 export const MUT    = 'rgba(255,255,255,.6)'    // Labels / gedämpft (Minimum für Text)
 export const LINE   = 'rgba(255,255,255,.06)'   // ultra-dezente Trennlinie
-export const DANGER = '#F87171'                 // Fehler / Löschen
+export const DANGER = '#E5484D'                 // Fehler / Löschen (klares, ruhiges Rot)
 
 export const GREEN  = '#39FF14'
 export const CYAN   = '#00E5FF'
-export const GRAD   = 'linear-gradient(135deg,#39FF14,#00E5FF)'   // DAS eine Leuchten
+export const GRAD   = 'linear-gradient(135deg,#39FF14,#00E5FF)'   // DAS eine Leuchten (Logo + Rang)
 export const SHADOW = '0 4px 14px rgba(0,0,0,.35)'
 
-/* ---------- Level-Farben (kein Pink, Elite = Cyan) ---------- */
+/* ---------- Level-Farben: gedämpfte Pastell-Metalle (Aufstieg Mint→Bronze→Silber→Gold) ----------
+   Jedes Level = sanfter Verlauf. Dunkle Schrift drauf (TEXT_ON). */
+export const LEVEL_GRADIENTS: Record<string, string> = {
+  Rookie:     'linear-gradient(135deg,#A8E0C8,#6FB89A)',  // Mint
+  Challenger: 'linear-gradient(135deg,#E3A977,#A8662F)',  // Bronze
+  Advanced:   'linear-gradient(135deg,#E6EAF0,#969FAD)',  // Silber
+  Elite:      'linear-gradient(135deg,#F2DB8E,#C49A3A)',  // Gold
+  Pro:        GRAD,                                        // Pro = das Marken-Leuchten
+  alle:       'linear-gradient(135deg,#A8E0C8,#6FB89A)',
+}
+// Repräsentative Einzelfarbe je Level (für Text/Linien, wo kein Verlauf geht)
 export const LEVEL_COLORS: Record<string, string> = {
-  Rookie:     '#8B93A1',  // Grau
-  Challenger: '#39FF14',  // Grün
-  Advanced:   '#FFB020',  // Amber
-  Elite:      '#00E5FF',  // Cyan
-  Pro:        '#00E5FF',
-  alle:       '#8B93A1',
+  Rookie:     '#8FCFB4',
+  Challenger: '#CF9763',
+  Advanced:   '#BFC6D0',
+  Elite:      '#E0C266',
+  Pro:        '#39FF14',
+  alle:       '#8FCFB4',
 }
 export const lvColor = (level?: string | null): string =>
   (level && LEVEL_COLORS[level]) || SUB
+export const lvGrad = (level?: string | null): string =>
+  (level && LEVEL_GRADIENTS[level]) || LEVEL_GRADIENTS.alle
 
 /* ---------- Verlauf-Text (NUR Logo + Rang) ---------- */
 export const gt: CSSProperties = {
@@ -143,10 +155,10 @@ export const label: CSSProperties = { fontSize: 11, fontWeight: 500, color: MUT,
 export const input: CSSProperties = { width: '100%', background: INPUTBG, border: `1px solid ${CELL}`, borderRadius: 10, padding: '12px 14px', fontSize: 14, color: W, outline: 'none', fontFamily: 'inherit' }
 
 /* ---------- Badges ---------- */
-// Status-/Level-Pill mit Outline in Level-Farbe
-export const levelBadge = (level?: string | null): CSSProperties => {
-  const c = lvColor(level)
-  return { fontSize: 10.5, fontWeight: 700, color: c, border: `1px solid ${c}55`, borderRadius: 999, padding: '3px 10px', display: 'inline-block', letterSpacing: '.02em' }
-}
+// Level-Pille: gefüllter Pastell-Metall-Verlauf + dunkle Schrift (Bronze/Silber/Gold lesbar)
+export const levelBadge = (level?: string | null): CSSProperties => ({
+  fontSize: 10.5, fontWeight: 800, color: '#15110A', background: lvGrad(level),
+  border: 'none', borderRadius: 999, padding: '3px 11px', display: 'inline-block', letterSpacing: '.02em',
+})
 // Neutrale Status-Pill (offen/läuft/beendet)
 export const statusPill: CSSProperties = { fontSize: 10, fontWeight: 500, color: SUB, border: `1px solid ${SUB}`, borderRadius: 999, padding: '3px 10px', display: 'inline-block' }
