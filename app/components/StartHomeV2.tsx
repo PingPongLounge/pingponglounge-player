@@ -80,9 +80,9 @@ export default function StartHomeV2(d: StartData) {
               <div style={{ fontSize: 13, color: MUT, fontWeight: 500, marginTop: 1 }}>{d.lvl} · #{d.rank}</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <Link href="/shop" aria-label="Shop" style={{ width: 44, height: 44, borderRadius: 12, border: `1px solid ${CELL}`, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
+              <a href="https://pingponglounge.ch/shop" target="_blank" rel="noopener noreferrer" aria-label="Shop" style={{ width: 44, height: 44, borderRadius: 12, border: `1px solid ${CELL}`, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" /><path d="M2.5 3h2l2.2 12.2a1.5 1.5 0 0 0 1.5 1.3h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6" /></svg>
-              </Link>
+              </a>
               <StartMenu inline avatar={d.initials} name={d.firstName} sub={`${d.lvl} · #${d.rank}`} />
             </div>
           </div>
