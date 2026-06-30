@@ -14,7 +14,7 @@ function Icon({ d, fillBall }: { d: string; fillBall?: string }) {
 
 const row: React.CSSProperties = { display: "flex", alignItems: "center", gap: 4, padding: "13px 15px", borderTop: `1px solid #20242E`, textDecoration: "none" }
 
-export default function StartMenu({ name = "Spieler", sub = "", inline = false }: { name?: string; sub?: string; inline?: boolean }) {
+export default function StartMenu({ name = "Spieler", sub = "", inline = false, avatar }: { name?: string; sub?: string; inline?: boolean; avatar?: string }) {
   const [open, setOpen] = useState(false)
   const router = useRouter()
 
@@ -32,9 +32,15 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false }
 
   return (
     <>
-      <button onClick={() => setOpen(true)} aria-label="Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), background: C, border: `1px solid ${B}`, borderRadius: 11, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#1FD1C4"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-      </button>
+      {avatar ? (
+        <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#39FF14,#1FD1C4)", border: "none", color: "#06210F", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          {avatar}
+        </button>
+      ) : (
+        <button onClick={() => setOpen(true)} aria-label="Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), background: C, border: `1px solid ${B}`, borderRadius: 11, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#1FD1C4"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+        </button>
+      )}
 
       {open && (
         <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 200, display: "flex", justifyContent: "flex-end" }}>

@@ -1,83 +1,97 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useState } from "react"
 
-const ACTIVE = "#FFFFFF"
-const INACTIVE = "rgba(255,255,255,0.28)"
-const BG = "#20242C"
-const BORDER = "#2A2F39"
+const BG = "#1A1E25"
+const SHEETBG = "#2A2F39"
+const CELL = "#353B46"
+const LINE = "rgba(255,255,255,.09)"
+const MUT = "rgba(255,255,255,.55)"
+const W = "#FFFFFF"
+const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 
 const tabs = [
-  {
-    href: "/match",
-    label: "open game",
-    icon: (a: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        <ellipse cx="10" cy="9.8" rx="5.5" ry="4.8" transform="rotate(-42 10 9.8)"/><path d="M13.5 13.3 17.5 17.3" strokeWidth="3"/><circle cx="18.2" cy="6" r="1.4" fill={a ? ACTIVE : INACTIVE} stroke="none"/>
-      </svg>
-    ),
-  },
-  {
-    href: "/liga",
-    label: "liga",
-    icon: (a: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M5 20v-4M12 20v-9M19 20v-13"/>
-      </svg>
-    ),
-  },
-  {
-    href: "/turniere",
-    label: "turnier",
-    icon: (a: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 4h12v5a6 6 0 0 1-12 0z"/><path d="M6 6H4a2 2 0 0 0 2 4M18 6h2a2 2 0 0 1-2 4M9 20h6M12 15v5"/>
-      </svg>
-    ),
-  },
-  {
-    href: "/profil",
-    label: "profil",
-    icon: (a: boolean) => (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={a ? ACTIVE : INACTIVE} strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="8" r="4"/><path d="M6 20v-2a6 6 0 0 1 12 0v2"/>
-      </svg>
-    ),
-  },
+  { href: "/match", label: "open game", icon: "open-game" },
+  { href: "/liga", label: "liga", icon: "liga" },
+  { href: "/turniere", label: "turnier", icon: "turnier" },
+  { href: "/training", label: "training", icon: "paddles" },
+]
+
+const bookOptions = [
+  { href: "/buchen", icon: "tisch", title: "Tisch", sub: "Spontan einen Tisch reservieren" },
+  { href: "/match", icon: "open-game", title: "Open Game", sub: "Offenem Spiel beitreten oder erstellen" },
+  { href: "/training", icon: "paddles", title: "Training", sub: "Coaching, Drills & Kurse" },
 ]
 
 export default function BottomNav() {
-  const path = usePathname()
+  const path = usePathname() || "/"
+  const [open, setOpen] = useState(false)
+
+  const isActive = (href: string) => path === href || path.startsWith(href + "/")
+
   return (
-    <nav style={{
-      position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100,
-      background: BG, borderTop: `1px solid ${BORDER}`,
-      display: "flex", justifyContent: "center",
-      padding: "10px 0 max(12px, env(safe-area-inset-bottom))",
-    }}>
+    <>
+      {/* Buchen-Sheet */}
+      <div
+        onClick={() => setOpen(false)}
+        style={{
+          position: "fixed", inset: 0, zIndex: 190, background: "rgba(0,0,0,.55)",
+          opacity: open ? 1 : 0, pointerEvents: open ? "auto" : "none", transition: "opacity .25s",
+        }}
+      />
       <div style={{
-        width: "100%", maxWidth: 480, margin: "0 auto",
-        display: "flex", justifyContent: "space-around", alignItems: "center",
+        position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 200,
+        transform: open ? "none" : "translateY(110%)", transition: "transform .3s cubic-bezier(.2,.7,.2,1)",
       }}>
-        {tabs.map(tab => {
-          const active = path === tab.href || (tab.href !== "/entdecken" && path.startsWith(tab.href))
-          return (
-            <Link key={tab.href} href={tab.href} style={{
-              display: "flex", flexDirection: "column", alignItems: "center", gap: 4,
-              textDecoration: "none", padding: "2px 14px",
-            }}>
-              {tab.icon(active)}
-              <span style={{
-                fontSize: 9, fontWeight: 500,
-                color: active ? ACTIVE : INACTIVE,
-                letterSpacing: "0.02em",
-              }}>
-                {tab.label}
+        <div style={{ maxWidth: 480, margin: "0 auto", background: SHEETBG, borderRadius: "24px 24px 0 0", padding: "22px 20px calc(26px + env(safe-area-inset-bottom))" }}>
+          <div style={{ fontSize: 13, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", color: MUT, textAlign: "center", marginBottom: 16 }}>Was möchtest du buchen?</div>
+          {bookOptions.map(o => (
+            <Link key={o.title} href={o.href} onClick={() => setOpen(false)} style={{ display: "flex", alignItems: "center", gap: 15, background: CELL, borderRadius: 16, padding: "15px 18px", marginBottom: 11, textDecoration: "none" }}>
+              <img src={`/icons/${o.icon}.svg`} alt="" style={{ width: 30, height: 30, flexShrink: 0 }} />
+              <span style={{ flex: 1 }}>
+                <span style={{ display: "block", fontSize: 17, fontWeight: 800, color: W }}>{o.title}</span>
+                <span style={{ display: "block", fontSize: 12, color: MUT, marginTop: 2 }}>{o.sub}</span>
               </span>
+              <span style={{ color: MUT, fontSize: 20, fontWeight: 700 }}>›</span>
             </Link>
-          )
-        })}
+          ))}
+        </div>
       </div>
-    </nav>
+
+      {/* Nav-Leiste */}
+      <nav style={{
+        position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100,
+        background: BG, borderTop: `1px solid ${LINE}`,
+        paddingBottom: "env(safe-area-inset-bottom)",
+      }}>
+        <div style={{ width: "100%", maxWidth: 480, margin: "0 auto", height: 70, display: "flex", alignItems: "center" }}>
+          {tabs.slice(0, 2).map(t => <Tab key={t.href} t={t} active={isActive(t.href)} />)}
+
+          <div style={{ flex: 1, display: "flex", justifyContent: "center" }}>
+            <button onClick={() => setOpen(true)} aria-label="Buchen" style={{
+              position: "relative", top: -18, width: 62, height: 62, borderRadius: "50%",
+              background: GRAD, border: `4px solid ${"#20242C"}`, color: "#06210F", cursor: "pointer",
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 1,
+              boxShadow: "0 6px 16px rgba(57,255,20,.25)",
+            }}>
+              <span style={{ fontSize: 23, fontWeight: 900, lineHeight: .8 }}>+</span>
+              <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: ".04em", textTransform: "uppercase" }}>Buchen</span>
+            </button>
+          </div>
+
+          {tabs.slice(2).map(t => <Tab key={t.href} t={t} active={isActive(t.href)} />)}
+        </div>
+      </nav>
+    </>
+  )
+}
+
+function Tab({ t, active }: { t: { href: string; label: string; icon: string }; active: boolean }) {
+  return (
+    <Link href={t.href} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, textDecoration: "none" }}>
+      <img src={`/icons/${t.icon}.svg`} alt="" style={{ width: 25, height: 25, opacity: active ? 1 : .45, filter: active ? "none" : "grayscale(.5)" }} />
+      <span style={{ fontSize: 9.5, fontWeight: 700, color: active ? W : MUT, letterSpacing: ".02em" }}>{t.label}</span>
+    </Link>
   )
 }
