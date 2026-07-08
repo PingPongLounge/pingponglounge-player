@@ -5,6 +5,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 import { BG, CARD, W, MUT, GREEN, card, cardPad, cardActive, cell, chip, btn, btnInCard, btnGhost, chipBtn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
+import { SectionHero, SectionIntro } from "@/app/components/SectionUI"
 
 const M=MUT, G=GREEN, C=CARD
 
@@ -74,15 +75,15 @@ export default function MatchPage() {
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
       <div style={{ maxWidth: 560, margin: "0 auto" }}>
-        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", ...backLink }}>← Dashboard</Link>
+        <Link href="/entdecken" style={{ color: M, textDecoration: "none", fontSize: 13, fontWeight: 500 }}>← Start</Link>
 
-        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", margin: "20px 0 20px" }}>
-          <div>
-            <h1 style={h1}>Open Game</h1>
-            <p style={{ ...body, marginTop: 8 }}>{games.length} offen · {filtered.length} angezeigt</p>
-          </div>
+        <SectionHero eyebrow="Player · Open Game" title="Open Game" subtitle="Spiel wann du willst — tritt bei oder erstelle dein eigenes." />
+        <SectionIntro storageKey="intro_match" title="So funktioniert Open Game" steps={[["1", "Finde ein Spiel", "Filter nach Level und Standort — sieh, was heute läuft."], ["2", "Mitspielen oder erstellen", "Tritt einem offenen Spiel bei oder starte dein eigenes."], ["3", "Ergebnis eintragen", "Nach dem Spiel Resultat erfassen — dein Rang & die PingPoints steigen."]]} cta={{ label: "Open Game erstellen", href: "/match/create" }} />
+
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "20px 0 12px" }}>
+          <p style={{ ...body }}>{games.length} offen · {filtered.length} angezeigt</p>
           {!myGame ? (
-            <Link href="/match/create" style={{ ...btnInCard, alignSelf: "center", whiteSpace: "nowrap" }}>+ Spiel</Link>
+            <Link href="/match/create" style={{ ...btnInCard, whiteSpace: "nowrap" }}>+ Spiel</Link>
           ) : (
             <button onClick={() => cancel(myGame)} style={{ ...btnGhost, display: "inline-block", padding: "10px 16px", fontSize: 12, whiteSpace: "nowrap" }}>Mein Spiel löschen</button>
           )}

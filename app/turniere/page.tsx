@@ -3,6 +3,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { BG, CARD, CELL, W, MUT, GREEN, cardPad, chip, btn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
+import { SectionHero, SectionIntro } from "@/app/components/SectionUI"
 
 const M=MUT, C=CARD, B=CELL, G=GREEN
 const statusLabel=(s:string)=>({open:"offen",running:"läuft",finished:"beendet"}[s]||s)
@@ -43,14 +44,12 @@ export default function TurnierePage(){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
-        <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",...backLink}}>← Dashboard</Link>
+        <Link href="/entdecken" style={{color:M,textDecoration:"none",fontSize:13,fontWeight:500}}>← Start</Link>
 
-        <div style={{margin:"20px 0 16px"}}>
-          <h1 style={h1}>Turniere</h1>
-          <p style={{...body,marginTop:8}}>Community-Turniere · KO-Bracket · Elo</p>
-        </div>
+        <SectionHero eyebrow="Player · Turnier" title="Turniere" subtitle="Community-Turniere · KO-Bracket · zählt für deinen Rang." />
+        <SectionIntro storageKey="intro_turniere" title="So funktioniert ein Turnier" steps={[["1","Turnier finden","Sieh dir offene Turniere in deiner Stadt an."],["2","Anmelden","Sichere dir deinen Platz, solang welche frei sind."],["3","KO-Bracket spielen","Gewinne dich nach oben — die Resultate zählen für ELO & Rang."]]} />
 
-        <Link href="/turniere/neu" style={{...btn,marginBottom:20}}>
+        <Link href="/turniere/neu" style={{...btn,margin:"18px 0 20px"}}>
           + Eigenes Turnier erstellen
         </Link>
 

@@ -5,10 +5,12 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import {
   BG, CARD, CELL, W, SUB, MUT, GREEN, LINE,
-  gt, GRAD, card, btn, levelBadge,
+  gt, GRAD, card, levelBadge,
 } from "@/app/theme"
 
 const C=CARD, B=CELL, M=SUB
+const SHADOW="0 1px 4px rgba(0,0,0,.14)"
+const HERO="#14171E"
 
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number}
 type Row={user_id:string,name:string,elo:number,level:string}
@@ -103,7 +105,8 @@ export default function LigaPage(){
   const citySeasons=seasons.filter(s=>s.city===city)
   const sel=seasons.find(s=>s.id===seasonId)
   const isPro=(s:Season)=>/advanced|elite|pro/i.test(s.skill_class)
-  const medal=(i:number)=>i===0?"🥇":i===1?"🥈":i===2?"🥉":`${i+1}`
+  const myIndex=rows.findIndex(r=>r.user_id===userId)
+  const myRow=myIndex>=0?rows[myIndex]:null
 
   return (
     <main style={{minHeight:"100vh",background:BG,paddingBottom:90}}>
@@ -133,13 +136,14 @@ export default function LigaPage(){
       )}
 
       <div style={{maxWidth:480,margin:"0 auto"}}>
-        {/* Foto-Hero */}
-        <div style={{position:"relative",height:130}}>
-          <img src="/liga-hero.jpg" alt="" style={{width:"100%",height:130,objectFit:"cover",display:"block"}}/>
-          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(14,16,19,.25),rgba(14,16,19,.9))"}}/>
-          <div style={{position:"absolute",left:16,bottom:12}}>
-            <div style={{fontSize:28,fontWeight:900,textTransform:"uppercase",letterSpacing:".08em",color:W}}>Liga</div>
-            <div style={{fontSize:11.5,color:SUB,fontWeight:300}}>Steig auf · gewinne Punkte · fordere heraus</div>
+        {/* Foto-Hero (Glattbrugg-Tische, ohne Leute) */}
+        <div style={{position:"relative",height:190,margin:"14px 14px 0",borderRadius:24,overflow:"hidden",boxShadow:SHADOW}}>
+          <img src="/gl-tische.jpg" alt="" style={{width:"100%",height:190,objectFit:"cover",display:"block"}}/>
+          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(20,23,30,.15) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.9) 100%)"}}/>
+          <div style={{position:"absolute",left:22,right:22,bottom:18}}>
+            <div style={{fontSize:11,fontWeight:800,letterSpacing:".22em",textTransform:"uppercase",color:SUB}}>Player · Liga</div>
+            <div style={{fontSize:42,fontWeight:900,lineHeight:.88,textTransform:"uppercase",letterSpacing:"-.02em",color:W,marginTop:5}}>Liga</div>
+            <div style={{fontSize:13,color:SUB,fontWeight:300,marginTop:7}}>Steig auf · gewinne Punkte · fordere heraus</div>
           </div>
         </div>
 
@@ -164,25 +168,62 @@ export default function LigaPage(){
           </div>
           <div style={{fontSize:11,color:SUB,fontWeight:300,padding:"4px 16px 8px"}}>{sel?.city} · {sel?.status==="running"?"Saison läuft":"Anmeldung offen"} · zusammen, klar getrennt</div>
 
-          {/* Standings-Karte */}
-          <div style={{padding:"0 14px"}}>
-            <div style={{...card,borderRadius:16}}>
-              <div style={{height:360,overflowY:"auto",padding:"4px 8px"}}>
+          {/* Neu hier? — Erklärung (nur Nicht-Mitglieder) */}
+          {!myReg&&(
+            <div style={{padding:"4px 14px 0"}}>
+              <div style={{borderRadius:24,padding:22,boxShadow:SHADOW,border:"1.5px solid transparent",background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`}}>
+                <div style={{fontSize:11,fontWeight:800,letterSpacing:".1em",textTransform:"uppercase",...gt}}>Neu hier?</div>
+                <div style={{fontSize:22,fontWeight:900,color:W,margin:"6px 0 16px"}}>So funktioniert die Liga</div>
+                {([
+                  ["1","Beitreten","Wähle Einstieg (Rookie + Challenger) oder Pro (Advanced + Elite)."],
+                  ["2","Spielen & fordern","Fordere andere aus deiner Klasse — jedes Resultat zählt."],
+                  ["3","Aufsteigen","Gewinnst du, steigst du in der Rangliste und sammelst PingPoints."],
+                ] as [string,string,string][]).map(([n,t,d])=>(
+                  <div key={n} style={{display:"flex",gap:13,alignItems:"flex-start",marginBottom:14}}>
+                    <span style={{width:27,height:27,borderRadius:"50%",background:GRAD,color:"#06210F",fontSize:13,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{n}</span>
+                    <div><div style={{fontSize:14.5,fontWeight:800,color:W}}>{t}</div><div style={{fontSize:12.5,color:MUT,marginTop:2,lineHeight:1.4}}>{d}</div></div>
+                  </div>
+                ))}
+                <button onClick={join} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:6,background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":"Liga beitreten"}</button>
+              </div>
+            </div>
+          )}
+
+          {/* Deine Position (nur Mitglieder) */}
+          {myReg&&myRow&&(
+            <div style={{padding:"4px 14px 0"}}>
+              <div style={{background:HERO,borderRadius:22,padding:"20px 22px",boxShadow:SHADOW,display:"flex",alignItems:"center",gap:16}}>
+                <div style={{fontSize:52,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{myIndex+1}</div>
+                <div>
+                  <div style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position</div>
+                  <div style={{fontSize:14,color:SUB,fontWeight:300,marginTop:3}}>{myRow.level||sel?.skill_class} · ELO {myRow.elo}</div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Rangliste */}
+          <div style={{padding:"16px 14px 0"}}>
+            <div style={{...card,borderRadius:24,padding:"20px 16px"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:6}}>
+                <img src="/icons/liga.svg" alt="" style={{width:18,height:18}}/>
+                <span style={{fontSize:12,fontWeight:700,letterSpacing:".24em",textTransform:"uppercase",color:MUT}}>Rangliste · {count} Spieler</span>
+              </div>
+              <div style={{maxHeight:360,overflowY:"auto"}}>
                 {rows.length===0?(
                   <p style={{textAlign:"center",color:M,padding:"40px 0",fontSize:13}}>Noch keine Spieler — sei die/der Erste!</p>
                 ):rows.map((r,i)=>{
                   const me=r.user_id===userId
                   return(
-                    <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:10,padding:"9px 10px",borderBottom:`1px solid ${LINE}`,...(me?{background:"linear-gradient(90deg,rgba(57,255,20,.12),rgba(31,209,196,.05))",borderRadius:12}:{})}}>
-                      <span style={{width:24,textAlign:"center",fontSize:14,fontWeight:700,color:SUB}}>{medal(i)}</span>
-                      <span style={{width:32,height:32,borderRadius:"50%",background:CARD,border:`1px solid ${CELL}`,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,flexShrink:0}}>🏓</span>
+                    <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 8px",borderTop:i===0?"none":`1px solid ${LINE}`,...(me?{background:"rgba(57,255,20,.07)",borderRadius:12}:{})}}>
+                      <span style={{width:26,textAlign:"center",fontSize:15,fontWeight:900,...(i<3?gt:{color:SUB})}}>{i+1}</span>
                       <div style={{flex:1,minWidth:0}}>
-                        <span style={{fontSize:14,fontWeight:500,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 5px",marginLeft:6,color:SUB}}>Du</span>}</span>
+                        <span style={{fontSize:15,fontWeight:700,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 6px",marginLeft:7,color:SUB}}>Du</span>}</span>
                       </div>
                       {r.level&&<span style={levelBadge(r.level)}>{r.level}</span>}
-                      <span style={{fontSize:14,fontWeight:700,...gt}}>{r.elo}</span>
+                      <span style={{fontSize:14,fontWeight:800,...(me?gt:{color:SUB})}}>{r.elo}</span>
                       {!me&&myReg&&(
-                        <button onClick={()=>challenge(r.user_id)} title="Herausfordern" style={{background:CELL,border:"none",borderRadius:8,padding:"5px 8px",fontSize:13,cursor:"pointer"}}>⚔️</button>
+                        <button onClick={()=>challenge(r.user_id)} title="Herausfordern" style={{border:"1.4px solid transparent",borderRadius:10,padding:"7px 11px",fontSize:11,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:"pointer",whiteSpace:"nowrap"}}>Fordern</button>
                       )}
                     </div>
                   )
@@ -190,13 +231,6 @@ export default function LigaPage(){
               </div>
             </div>
           </div>
-
-          {/* Beitreten */}
-          {!myReg&&(
-            <div style={{padding:"12px 14px 0"}}>
-              <button onClick={join} disabled={busy} style={{...btn,width:"100%",opacity:busy?0.6:1,cursor:busy?"not-allowed":"pointer"}}>{busy?"…":"+ Liga beitreten"}</button>
-            </div>
-          )}
         </>)}
       </div>
 

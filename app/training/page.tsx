@@ -2,6 +2,7 @@
 import { useEffect } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
+import { SectionHero, SectionIntro } from "@/app/components/SectionUI"
 
 const BG = "#20242C", CARD = "#2A2F39", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.5)"
@@ -28,11 +29,9 @@ export default function TrainingPage() {
       <div style={{ maxWidth: 480, margin: "0 auto" }}>
         <Link href="/entdecken" style={{ color: MUT, textDecoration: "none", fontSize: 13, fontWeight: 500 }}>← Start</Link>
 
-        <div style={{ margin: "18px 0 18px" }}>
-          <div style={{ fontSize: 11, color: MUT, fontWeight: 700, letterSpacing: ".22em", textTransform: "uppercase" }}>Academy</div>
-          <h1 style={{ fontSize: 30, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".04em", color: W, marginTop: 6 }}>Training</h1>
-          <p style={{ fontSize: 14, color: SUB, fontWeight: 300, marginTop: 8, lineHeight: 1.45 }}>Wöchentliches Tischtennis-Training von Beginner bis Pro · Ping Pong Lounge Glattbrugg.</p>
-        </div>
+        <SectionHero eyebrow="Player · Academy" title="Training" subtitle="Wöchentliches Coaching von Beginner bis Pro · Glattbrugg." />
+        <SectionIntro storageKey="intro_training" title="So funktioniert das Training" steps={[["1", "Kurs wählen", "Von Beginner bis Pro — wöchentlich in der Lounge Glattbrugg."], ["2", "Termin buchen", "Anmeldung & Bezahlung laufen direkt über Eversports."], ["3", "Besser werden", "Regelmässiges Coaching, Drills und Matchpraxis."]]} />
+        <div style={{ height: 18 }} />
 
         {EVERSPORTS_WIDGET_ID ? (
           <div style={{ background: CARD, borderRadius: 18, padding: 8, overflow: "hidden" }}>
