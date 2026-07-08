@@ -48,6 +48,7 @@ export default async function EntdeckenPage() {
             <Logo />
             <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '.26em', marginTop: 8, ...gt }}>PLAYER</div>
             <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '.22em', color: MUT, textTransform: 'uppercase', marginTop: 4 }}>Next Level Table Tennis</div>
+            <div style={{ display: 'inline-block', fontSize: 9, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#06210F', background: GRAD, borderRadius: 999, padding: '3px 9px', marginTop: 10 }}>Beta Version</div>
             <div style={{ marginTop: 26 }}>
               <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 15, padding: 17, fontSize: 18, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.04em', color: '#06210F', background: GRAD, textDecoration: 'none' }}>Login / Registrieren</Link>
               <Link href="/spielen" style={{ display: 'block', textAlign: 'center', marginTop: 12, color: SUB, fontSize: 14, fontWeight: 500, textDecoration: 'none' }}>Schon gespielt? Resultat eintragen →</Link>

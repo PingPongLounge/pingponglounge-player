@@ -76,7 +76,10 @@ export default function StartHomeV2(d: StartData) {
           {/* Kopf */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 13, padding: "0 18px", marginBottom: 18 }}>
             <div>
-              <div style={{ fontSize: 21, fontWeight: 800, color: W }}>Hi, {d.firstName} 👋</div>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ fontSize: 21, fontWeight: 800, color: W }}>Hi, {d.firstName} 👋</div>
+                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "#06210F", background: GRAD, borderRadius: 999, padding: "2px 7px" }}>Beta</span>
+              </div>
               <div style={{ fontSize: 13, color: MUT, fontWeight: 500, marginTop: 1 }}>{d.lvl} · #{d.rank}</div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
