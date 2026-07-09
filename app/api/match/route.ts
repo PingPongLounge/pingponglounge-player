@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 
 type PubProfile = { id: string; name: string; elo: number; level: string }
@@ -71,8 +72,9 @@ export async function POST(req: NextRequest) {
   const duration_minutes = [30, 60, 90, 120].includes(Number(body.duration_minutes)) ? Number(body.duration_minutes) : 60
   const notes = body.notes ? String(body.notes).slice(0, 300) : null
 
+  const admin = createAdminClient()
   // Nur 1 aktives selbst erstelltes Spiel pro Spieler
-  const { data: existing } = await sb
+  const { data: existing } = await admin
     .from("open_games")
     .select("id")
     .eq("created_by", user.id)
@@ -80,7 +82,7 @@ export async function POST(req: NextRequest) {
     .maybeSingle()
   if (existing) return NextResponse.json({ error: "Du hast bereits ein offenes Spiel" }, { status: 409 })
 
-  const { data: game, error } = await sb
+  const { data: game, error } = await admin
     .from("open_games")
     .insert({
       created_by: user.id, location_name, date, start_hour, duration_minutes,
@@ -91,7 +93,7 @@ export async function POST(req: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
   // Ersteller als erster Spieler
-  await sb.from("open_game_players").insert({ game_id: game.id, user_id: user.id, status: "joined" })
+  await admin.from("open_game_players").insert({ game_id: game.id, user_id: user.id, status: "joined" })
 
   return NextResponse.json({ id: game.id })
 }

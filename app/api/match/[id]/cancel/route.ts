@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -7,7 +8,8 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   const { data: { user } } = await sb.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { data: game } = await sb
+  const admin = createAdminClient()
+  const { data: game } = await admin
     .from("open_games")
     .select("created_by,status")
     .eq("id", id)
@@ -16,7 +18,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   if (!game) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 })
   if (game.created_by !== user.id) return NextResponse.json({ error: "Nicht berechtigt" }, { status: 403 })
 
-  // Ersteller darf eigenes Spiel ändern (RLS: auth.uid() = created_by)
-  await sb.from("open_games").update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("id", id)
+  const { error } = await admin.from("open_games").update({ status: "cancelled", updated_at: new Date().toISOString() }).eq("id", id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

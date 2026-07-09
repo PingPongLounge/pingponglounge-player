@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(req: NextRequest) {
@@ -32,12 +33,13 @@ export async function POST(req: NextRequest) {
   const clean = String(text || "").trim().slice(0, 500)
   if (!season_id || !clean) return NextResponse.json({ error: "Leer" }, { status: 400 })
 
+  const admin = createAdminClient()
   // Nur angemeldete Spieler dürfen in den Liga-Chat schreiben
-  const { data: reg } = await sb.from("league_registrations")
+  const { data: reg } = await admin.from("league_registrations")
     .select("id").eq("season_id", season_id).eq("player_id", user.id).maybeSingle()
   if (!reg) return NextResponse.json({ error: "Nur Liga-Mitglieder können schreiben" }, { status: 403 })
 
-  const { error } = await sb.from("league_messages").insert({ season_id, user_id: user.id, text: clean })
+  const { error } = await admin.from("league_messages").insert({ season_id, user_id: user.id, text: clean })
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ ok: true })
 }

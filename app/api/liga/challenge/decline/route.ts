@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
@@ -7,7 +8,8 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await sb.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { data: match } = await sb.from("league_matches")
+  const admin = createAdminClient()
+  const { data: match } = await admin.from("league_matches")
     .select("p1_id, p2_id, status").eq("id", match_id).single()
   if (!match) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 })
   if (match.p1_id !== user.id && match.p2_id !== user.id)
@@ -15,6 +17,7 @@ export async function POST(req: NextRequest) {
   if (match.status !== "challenge_sent")
     return NextResponse.json({ error: "Nicht mehr offen" }, { status: 400 })
 
-  await sb.from("league_matches").update({ status: "cancelled" }).eq("id", match_id)
+  const { error } = await admin.from("league_matches").update({ status: "cancelled" }).eq("id", match_id)
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }

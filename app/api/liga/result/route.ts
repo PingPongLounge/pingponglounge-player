@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
@@ -7,7 +8,8 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await sb.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { data: match } = await sb
+  const admin = createAdminClient()
+  const { data: match } = await admin
     .from("league_matches")
     .select("p1_id,p2_id,status")
     .eq("id", match_id)
@@ -31,13 +33,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ungültige Satzwerte" }, { status: 400 })
   }
 
-  await sb.from("league_matches").update({
+  const { error } = await admin.from("league_matches").update({
     sets,
     winner_id,
     status: "p1_entered",
     played_at: new Date().toISOString(),
-    entered_by: user.id,       // für Confirm-Validierung
+    entered_by: user.id,
   }).eq("id", match_id)
 
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ ok: true })
 }
