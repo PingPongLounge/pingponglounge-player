@@ -41,11 +41,11 @@ export default function TrainingPage() {
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", width: 60, height: 60, borderRadius: 16, background: GRAD, color: "#06210F", flexShrink: 0 }}>
               <span style={{ fontSize: 20, fontWeight: 900, lineHeight: 1 }}>Do</span>
-              <span style={{ fontSize: 12, fontWeight: 800, marginTop: 2 }}>19:00</span>
+              <span style={{ fontSize: 11, fontWeight: 800, marginTop: 2 }}>19:30</span>
             </div>
             <div>
               <div style={{ fontSize: 19, fontWeight: 900, color: W }}>Wöchentliches Training</div>
-              <div style={{ fontSize: 13, color: SUB, fontWeight: 300, marginTop: 3 }}>Glattbrugg · Beginner bis Pro</div>
+              <div style={{ fontSize: 13, color: SUB, fontWeight: 300, marginTop: 3 }}>Do 19:30–21:00 · Glattbrugg · Einsteiger & Medium · 8 Plätze</div>
             </div>
           </div>
           <a href={EVERSPORTS_STUDIO} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", marginTop: 18, background: GRAD, color: "#06210F", borderRadius: 14, padding: 15, fontSize: 15, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }}>Platz sichern</a>
