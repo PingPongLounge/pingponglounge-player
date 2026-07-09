@@ -209,10 +209,17 @@ export default function LigaPage(){
                 <img src="/icons/liga.svg" alt="" style={{width:18,height:18}}/>
                 <span style={{fontSize:12,fontWeight:700,letterSpacing:".24em",textTransform:"uppercase",color:MUT}}>Rangliste · {count} Spieler</span>
               </div>
-              <div style={{maxHeight:360,overflowY:"auto"}}>
-                {rows.length===0?(
-                  <p style={{textAlign:"center",color:M,padding:"40px 0",fontSize:13}}>Noch keine Spieler — sei die/der Erste!</p>
-                ):rows.map((r,i)=>{
+              <div style={{maxHeight:420,overflowY:"auto"}}>
+                {Array.from({length:50}).map((_,i)=>{
+                  const r=rows[i]
+                  if(!r){
+                    return(
+                      <div key={`empty-${i}`} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 8px",borderTop:i===0?"none":`1px solid ${LINE}`,opacity:.38}}>
+                        <span style={{width:26,textAlign:"center",fontSize:15,fontWeight:900,color:MUT}}>{i+1}</span>
+                        <div style={{flex:1,minWidth:0}}><span style={{fontSize:14,fontWeight:500,color:MUT}}>frei</span></div>
+                      </div>
+                    )
+                  }
                   const me=r.user_id===userId
                   return(
                     <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 8px",borderTop:i===0?"none":`1px solid ${LINE}`,...(me?{background:"rgba(57,255,20,.07)",borderRadius:12}:{})}}>
