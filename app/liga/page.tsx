@@ -36,6 +36,13 @@ export default function LigaPage(){
   const [msgs,setMsgs]=useState<Msg[]>([])
   const [msg,setMsg]=useState("")
   const meRef=useRef<HTMLDivElement|null>(null)
+  // Fordern-Popup
+  const [fTarget,setFTarget]=useState<{id:string,name:string}|null>(null)
+  const [fTab,setFTab]=useState<"challenge"|"result">("challenge")
+  const [fDate,setFDate]=useState("")
+  const [fTime,setFTime]=useState("")
+  const [fMy,setFMy]=useState(3)
+  const [fOpp,setFOpp]=useState(1)
 
   const flash=(t:string)=>{setToast(t);setTimeout(()=>setToast(""),2500)}
 
@@ -116,6 +123,37 @@ export default function LigaPage(){
     const j=await r.json().catch(()=>({}))
     if(r.ok){flash("⚔️ Herausforderung gesendet!");loadStandings(seasonId)}
     else flash(j.error||"Fehler")
+  }
+  function openForder(r:Row){ setFTarget({id:r.user_id,name:r.name}); setFTab("challenge"); setFDate(""); setFTime(""); setFMy(3); setFOpp(1) }
+  async function sendChallenge(){
+    if(!fTarget) return
+    setBusy(true)
+    const r=await fetch("/api/liga/challenge",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,challenged_id:fTarget.id})})
+    const j=await r.json().catch(()=>({}))
+    if(r.ok){
+      if(fDate||fTime){
+        const when=[fDate,fTime].filter(Boolean).join(" ")
+        await fetch("/api/liga/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,text:`⚔️ Herausforderung an ${fTarget.name} — Vorschlag: ${when}`})})
+      }
+      flash("⚔️ Herausforderung gesendet!"); setFTarget(null); loadStandings(seasonId)
+    } else flash(j.error||"Fehler")
+    setBusy(false)
+  }
+  async function sendResult(){
+    if(!fTarget||!userId) return
+    if(fMy===fOpp){ flash("Kein Unentschieden möglich"); return }
+    setBusy(true)
+    const dm=await fetch("/api/liga/direct-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,opponent_id:fTarget.id})})
+    const dj=await dm.json().catch(()=>({}))
+    const matchId=dm.ok?dj.id:dj.existing_id
+    if(!matchId){ flash(dj.error||"Fehler beim Anlegen"); setBusy(false); return }
+    const sets=[...Array(fMy)].map(()=>({p1:11,p2:7})).concat([...Array(fOpp)].map(()=>({p1:7,p2:11})))
+    const winner_id=fMy>fOpp?userId:fTarget.id
+    const rr=await fetch("/api/liga/result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId,sets,winner_id})})
+    const rj=await rr.json().catch(()=>({}))
+    if(rr.ok){ flash("✓ Eingetragen — warte auf Bestätigung"); setFTarget(null); loadStandings(seasonId) }
+    else flash(rj.error||"Fehler")
+    setBusy(false)
   }
   async function acceptChallenge(matchId:string){
     const r=await fetch("/api/liga/challenge/accept",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId})})
@@ -265,7 +303,7 @@ export default function LigaPage(){
                       {!me&&myReg&&(()=>{
                         const om=openMatches[r.user_id]
                         const btnBase:React.CSSProperties={border:"1.4px solid transparent",borderRadius:10,padding:"7px 10px",fontSize:10,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:"pointer",whiteSpace:"nowrap",fontFamily:"inherit"}
-                        if(!om) return <button onClick={()=>challenge(r.user_id)} style={btnBase}>Herausforderung senden</button>
+                        if(!om) return <button onClick={()=>openForder(r)} style={btnBase}>Fordern</button>
                         if(om.status==="challenge_sent"&&!om.iAmP1) return <button onClick={()=>acceptChallenge(om.id)} style={{...btnBase,background:GRAD,color:"#06210F"}}>Annehmen ✓</button>
                         if(om.status==="challenge_sent"&&om.iAmP1) return <span style={{fontSize:10,color:MUT,whiteSpace:"nowrap"}}>⏳ Ausstehend</span>
                         if(om.status==="accepted"||om.status==="pending") return <Link href={`/liga/match/${om.id}`} style={{...btnBase,textDecoration:"none",display:"inline-block"}}>Spiel eintragen →</Link>
@@ -280,6 +318,62 @@ export default function LigaPage(){
           </div>
         </>)}
       </div>
+
+      {/* Fordern-Popup */}
+      {fTarget&&(
+        <div onClick={()=>setFTarget(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:60,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:440,background:CARD,borderRadius:"24px 24px 0 0",padding:"22px 20px calc(26px + env(safe-area-inset-bottom))"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+              <div style={{fontSize:20,fontWeight:900,color:W}}>vs {fTarget.name}</div>
+              <button onClick={()=>setFTarget(null)} style={{background:"none",border:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
+            </div>
+
+            <div style={{display:"flex",gap:8,margin:"16px 0 18px"}}>
+              {(["challenge","result"] as const).map(t=>{
+                const on=fTab===t
+                return <button key={t} onClick={()=>setFTab(t)} style={{flex:1,borderRadius:12,padding:"11px 8px",fontSize:12.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",color:W,border:"1.5px solid transparent",background:on?`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`:CELL}}>{t==="challenge"?"Herausfordern":"Ergebnis eintragen"}</button>
+              })}
+            </div>
+
+            {fTab==="challenge"?(
+              <>
+                <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Schlag eine Zeit vor — {fTarget.name} bekommt die Anfrage.</div>
+                <div style={{display:"flex",gap:12}}>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Datum</div>
+                    <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} style={{width:"100%",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                  </div>
+                  <div style={{flex:1}}>
+                    <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Zeit</div>
+                    <input type="time" value={fTime} onChange={e=>setFTime(e.target.value)} style={{width:"100%",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                  </div>
+                </div>
+                <button onClick={sendChallenge} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:22,background:GRAD,color:"#06210F",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":"Anfrage senden"}</button>
+              </>
+            ):(
+              <>
+                <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:18}}>Schon gespielt? Trag die Sätze ein — {fTarget.name} bestätigt, dann zählt&apos;s (ELO + PingPoints).</div>
+                <div style={{display:"flex",alignItems:"flex-end",justifyContent:"center",gap:14}}>
+                  {([["Du",fMy,setFMy],[fTarget.name,fOpp,setFOpp]] as [string,number,(n:number)=>void][]).map(([lab,val,set],idx)=>(
+                    <>
+                      {idx===1&&<span style={{fontSize:30,fontWeight:900,color:MUT,paddingBottom:4}}>:</span>}
+                      <div key={idx} style={{textAlign:"center"}}>
+                        <div style={{fontSize:11,color:MUT,fontWeight:700,textTransform:"uppercase",marginBottom:9,maxWidth:110,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lab}</div>
+                        <div style={{display:"flex",alignItems:"center",gap:9}}>
+                          <button onClick={()=>set(Math.max(0,val-1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,border:"none",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>−</button>
+                          <span style={{fontSize:36,fontWeight:900,width:34,textAlign:"center",...gt}}>{val}</span>
+                          <button onClick={()=>set(Math.min(7,val+1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,border:"none",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>+</button>
+                        </div>
+                      </div>
+                    </>
+                  ))}
+                </div>
+                <button onClick={sendResult} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:24,background:GRAD,color:"#06210F",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":"Ergebnis absenden"}</button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Chat */}
       {chatOpen&&(
