@@ -188,7 +188,7 @@ export default function LigaPage(){
           <span style={{fontSize:13,fontWeight:800,letterSpacing:".20em",...gt}}>PLAYER <span style={{fontWeight:500,color:SUB}}>LIGA</span></span>
         </Link>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={()=>setShowCity(v=>!v)} style={{background:"none",border:"none",color:M,fontSize:12,cursor:"pointer"}}>📍 {city||"Stadt"} ▾</button>
+          <button onClick={()=>setShowCity(v=>!v)} style={{background:CELL,border:"none",color:W,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 11px"}}>{city||"Stadt"} ▾</button>
           <button onClick={()=>setChatOpen(true)} aria-label="Chat" style={{width:36,height:36,borderRadius:10,background:C,border:"none",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#39FF14" strokeWidth="1.8"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
           </button>
@@ -266,7 +266,7 @@ export default function LigaPage(){
               <div style={{background:HERO,borderRadius:22,padding:"20px 22px",boxShadow:SHADOW,display:"flex",alignItems:"center",gap:16}}>
                 <div style={{fontSize:52,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{myIndex+1}</div>
                 <div>
-                  <div style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position</div>
+                  <div style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position{sel?.city?` · ${sel.city}`:""}</div>
                   <div style={{fontSize:14,color:SUB,fontWeight:300,marginTop:3}}>{myRow.level?`Level ${myRow.level}`:(sel?.skill_class?`Level ${sel.skill_class}`:'')} · ELO {myRow.elo}</div>
                 </div>
               </div>
@@ -278,7 +278,7 @@ export default function LigaPage(){
             <div style={{...card,borderRadius:24,padding:"20px 16px"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:6}}>
                 <img src="/icons/liga.svg" alt="" style={{width:18,height:18}}/>
-                <span style={{fontSize:12,fontWeight:700,letterSpacing:".24em",textTransform:"uppercase",color:MUT}}>Rangliste · {count} Spieler</span>
+                <span style={{fontSize:12,fontWeight:700,letterSpacing:".24em",textTransform:"uppercase",color:MUT}}>Rangliste{sel?.city?` · ${sel.city}`:""} · {count} Spieler</span>
               </div>
               <div style={{maxHeight:420,overflowY:"auto"}}>
                 {Array.from({length:50}).map((_,i)=>{
