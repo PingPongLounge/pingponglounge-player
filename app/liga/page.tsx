@@ -59,7 +59,7 @@ export default function LigaPage(){
     setSeasons(ss)
     let lvl:string|null=null
     if(user){ const {data:pf}=await sb.from("profiles").select("level").eq("id",user.id).maybeSingle(); lvl=pf?.level||null; setMyLevel(lvl) }
-    const proLvl=(parseInt(lvl||"0")||0)>=5
+    const proLvl=(parseInt(lvl||"0")||0)>=4
     let defCity=ss[0]?.city||""
     let defSeason=(ss.find(s=>s.city===defCity&&/5|6|7|pro/i.test(s.skill_class)===proLvl)||ss[0])?.id||""
     if(user){
@@ -204,7 +204,7 @@ export default function LigaPage(){
         <div onClick={()=>setShowCity(false)} style={{position:"fixed",inset:0,zIndex:20}}>
           <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:54,right:14,background:"#14171C",border:`1px solid ${B}`,borderRadius:14,padding:6,minWidth:160}}>
             {cities.map(ci=>(
-              <div key={ci} onClick={()=>{const proLvl=(parseInt(myLevel||"0")||0)>=5;const fs=seasons.find(s=>s.city===ci&&isPro(s)===proLvl)||seasons.find(s=>s.city===ci);setCity(ci);if(fs)setSeasonId(fs.id);setShowCity(false)}} style={{padding:"11px 12px",borderRadius:9,fontSize:14,fontWeight:ci===city?600:400,color:ci===city?GREEN:W,cursor:"pointer"}}>{ci}</div>
+              <div key={ci} onClick={()=>{const proLvl=(parseInt(myLevel||"0")||0)>=4;const fs=seasons.find(s=>s.city===ci&&isPro(s)===proLvl)||seasons.find(s=>s.city===ci);setCity(ci);if(fs)setSeasonId(fs.id);setShowCity(false)}} style={{padding:"11px 12px",borderRadius:9,fontSize:14,fontWeight:ci===city?600:400,color:ci===city?GREEN:W,cursor:"pointer"}}>{ci}</div>
             ))}
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function LigaPage(){
                 <div style={{fontSize:11,fontWeight:800,letterSpacing:".1em",textTransform:"uppercase",...gt}}>Neu hier?</div>
                 <div style={{fontSize:22,fontWeight:900,color:W,margin:"6px 0 16px"}}>So funktioniert die Liga</div>
                 {([
-                  ["1","Beitreten","Wähle Einstieg (Level 1–4) oder Pro (Level 5–7) — passend zu deinem Niveau."],
+                  ["1","Beitreten","Wähle Einstieg (Level 1–3) oder Pro (Level 4–7) — passend zu deinem Niveau."],
                   ["2","Spielen & fordern","Fordere andere aus deiner Klasse — jedes Resultat zählt."],
                   ["3","Aufsteigen","Gewinnst du, steigst du in der Rangliste und sammelst PingPoints."],
                 ] as [string,string,string][]).map(([n,t,d])=>(
