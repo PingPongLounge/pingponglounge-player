@@ -35,15 +35,16 @@ export default function LigaPage(){
 
   const flash=(t:string)=>{setToast(t);setTimeout(()=>setToast(""),2500)}
 
-  // Saisons laden
+  // Saisons laden — getUser + Seasons parallel
   useEffect(()=>{(async()=>{
     const sb=createClient()
-    const {data:{user}}=await sb.auth.getUser()
-    setUserId(user?.id||null)
-    const {data}=await sb.from("league_seasons").select("id,name,city,skill_class,status,max_players").in("status",["open","running"]).order("city").order("skill_class")
+    const [{data:{user}},{data}]=await Promise.all([
+      sb.auth.getUser(),
+      sb.from("league_seasons").select("id,name,city,skill_class,status,max_players").in("status",["open","running"]).order("city").order("skill_class"),
+    ])
     const ss=(data||[]) as Season[]
+    setUserId(user?.id||null)
     setSeasons(ss)
-    // Default-Stadt: wo der User angemeldet ist, sonst erste
     let defCity=ss[0]?.city||""
     let defSeason=ss[0]?.id||""
     if(user){
@@ -57,6 +58,7 @@ export default function LigaPage(){
   const loadStandings=useCallback(async(sid:string)=>{
     if(!sid) return
     const sb=createClient()
+    // Registrierungen + Profildaten parallel laden
     const {data:regs}=await sb.from("league_registrations").select("player_id").eq("season_id",sid)
     const ids=(regs||[]).map(r=>r.player_id)
     setCount(ids.length)
