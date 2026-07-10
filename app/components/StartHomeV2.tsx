@@ -73,6 +73,16 @@ export default function StartHomeV2(d: StartData) {
       <main style={{ minHeight: "100vh", background: BG, paddingBottom: 110 }}>
         <div ref={root} style={{ maxWidth: 480, margin: "0 auto", padding: "18px 0 90px" }}>
 
+          {/* Logo oben mittig */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, padding: "6px 18px 20px", textDecoration: "none" }}>
+            <svg width="44" height="44" viewBox="0 0 80 80" fill="none">
+              <defs><linearGradient id="lhg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#39FF14" /><stop offset="100%" stopColor="#1FD1C4" /></linearGradient></defs>
+              <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lhg)" strokeWidth="3" strokeLinejoin="round" />
+              <circle cx="63" cy="58" r="6" fill="url(#lhg)" />
+            </svg>
+            <span style={{ fontSize: 16, fontWeight: 800, letterSpacing: ".28em", background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}>PLAYER</span>
+          </div>
+
           {/* Kopf */}
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 13, padding: "0 18px", marginBottom: 18 }}>
             <div>

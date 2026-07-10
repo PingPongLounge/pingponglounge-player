@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import "./globals.css"
 import AppHeader from "./components/AppHeader"
+import SplashScreen from "./components/SplashScreen"
 
 export const metadata: Metadata = {
   title: "Next Level Table Tennis",
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="de">
       <body style={{ margin: 0, background: "#20242C", color: "#E8E6E1", fontFamily: "system-ui, sans-serif", minHeight: "100vh" }}>
+        <SplashScreen />
         <AppHeader />
         {children}
       </body>
