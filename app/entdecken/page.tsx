@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import BottomNav from '@/app/components/BottomNav'
 import StartHomeV2, { Game } from '@/app/components/StartHomeV2'
@@ -74,6 +75,8 @@ export default async function EntdeckenPage() {
   }
 
   const { data: profile } = await sb.from('profiles').select('id,name,level,elo,matches_played,matches_won').eq('id', user.id).maybeSingle()
+  // Level-Gate: Wer noch keine Einstufung hat, wird zuerst zum Onboarding (Level-Abfrage) geschickt.
+  if (!profile || !profile.level) redirect('/onboarding')
   const elo = profile?.elo ?? 1000
   const lvl = profile?.level || 'Rookie'
   const firstName = profile?.name?.split(' ')[0] || 'Spieler'
