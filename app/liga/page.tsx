@@ -212,8 +212,7 @@ export default function LigaPage(){
           <img src="/gl-tische.jpg" alt="" style={{width:"100%",height:190,objectFit:"cover",display:"block"}}/>
           <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(20,23,30,.15) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.9) 100%)"}}/>
           <div style={{position:"absolute",left:22,right:22,bottom:18}}>
-            <div style={{fontSize:11,fontWeight:800,letterSpacing:".22em",textTransform:"uppercase",color:SUB}}>Player · Liga</div>
-            <div style={{fontSize:42,fontWeight:900,lineHeight:.88,textTransform:"uppercase",letterSpacing:"-.02em",color:W,marginTop:5}}>Liga</div>
+            <div style={{fontSize:42,fontWeight:900,lineHeight:.88,textTransform:"uppercase",letterSpacing:"-.02em",color:W}}>Liga</div>
             <div style={{fontSize:13,color:SUB,fontWeight:300,marginTop:7}}>Steig auf · gewinne Punkte · fordere heraus</div>
           </div>
         </div>
@@ -237,7 +236,7 @@ export default function LigaPage(){
               )
             })}
           </div>
-          <div style={{fontSize:11,color:SUB,fontWeight:300,padding:"4px 16px 8px"}}>{sel?.city} · {sel?.status==="running"?"Saison läuft":"Anmeldung offen"} · zusammen, klar getrennt</div>
+          <div style={{fontSize:11,color:MUT,fontWeight:300,padding:"4px 16px 6px",textAlign:"center"}}>{sel?.status==="running"?"Saison läuft":"Anmeldung offen"}</div>
 
           {/* Neu hier? — Erklärung (nur Nicht-Mitglieder) */}
           {!myReg&&(
@@ -266,7 +265,7 @@ export default function LigaPage(){
               <div style={{background:HERO,borderRadius:22,padding:"20px 22px",boxShadow:SHADOW,display:"flex",alignItems:"center",gap:16}}>
                 <div style={{fontSize:52,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{myIndex+1}</div>
                 <div>
-                  <div style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position{sel?.city?` · ${sel.city}`:""}</div>
+                  <div style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position</div>
                   <div style={{fontSize:14,color:SUB,fontWeight:300,marginTop:3}}>{myRow.level?`Level ${myRow.level}`:(sel?.skill_class?`Level ${sel.skill_class}`:'')} · ELO {myRow.elo}</div>
                 </div>
               </div>
@@ -278,7 +277,7 @@ export default function LigaPage(){
             <div style={{...card,borderRadius:24,padding:"20px 16px"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:6}}>
                 <img src="/icons/liga.svg" alt="" style={{width:18,height:18}}/>
-                <span style={{fontSize:12,fontWeight:700,letterSpacing:".24em",textTransform:"uppercase",color:MUT}}>Rangliste{sel?.city?` · ${sel.city}`:""} · {count} Spieler</span>
+                <span style={{fontSize:12,fontWeight:700,letterSpacing:".24em",textTransform:"uppercase",color:MUT}}>Rangliste · {count} Spieler</span>
               </div>
               <div style={{maxHeight:420,overflowY:"auto"}}>
                 {Array.from({length:50}).map((_,i)=>{
