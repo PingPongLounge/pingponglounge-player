@@ -4,7 +4,8 @@ import { usePathname } from "next/navigation"
 import StartMenu from "./StartMenu"
 
 // Nur bei Auth/Onboarding-Flows verstecken
-const HIDE = ["/", "/login", "/onboarding", "/spielen", "/join", "/auth"]
+// Sektionsseiten haben ihren eigenen grünen "PLAYER LIGA/TURNIER/…"-Header → globalen ausblenden
+const HIDE = ["/", "/login", "/onboarding", "/spielen", "/join", "/auth", "/liga", "/match", "/turniere", "/training", "/shop"]
 
 const BG = "#20242C"
 const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"

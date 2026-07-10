@@ -13,7 +13,7 @@ const SHADOW="0 1px 4px rgba(0,0,0,.14)"
 const HERO="#14171E"
 
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number}
-type Row={user_id:string,name:string,elo:number,level:string}
+type Row={user_id:string,name:string,elo:number,level:string,real?:string|null}
 type OpenMatch={id:string,status:string,iAmP1:boolean}
 type Reactions={heart:number,fire:number,laugh:number,myReacts:string[]}
 type Msg={id:string,user_id:string|null,name:string,text:string,kind?:string,match_id?:string,reactions:Reactions}
@@ -79,8 +79,8 @@ export default function LigaPage(){
     const isReg=!!userId&&ids.includes(userId)
     setMyReg(isReg)
     if(ids.length===0){setRows([]);return}
-    const {data:profs}=await sb.from("public_profiles").select("id,name,elo,level").in("id",ids)
-    const list=(profs||[]).map(p=>({user_id:p.id,name:p.name,elo:p.elo??1000,level:p.level||""})).sort((a,b)=>b.elo-a.elo)
+    const {data:profs}=await sb.from("public_profiles").select("id,name,elo,level,real_short").in("id",ids)
+    const list=(profs||[]).map(p=>({user_id:p.id,name:p.name,elo:p.elo??1000,level:p.level||"",real:(p as {real_short?:string|null}).real_short})).sort((a,b)=>b.elo-a.elo)
     setRows(list)
     // Offene Matches des eingeloggten Spielers laden
     if(userId&&isReg){
@@ -284,7 +284,8 @@ export default function LigaPage(){
                     <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 8px",borderTop:i===0?"none":`1px solid ${LINE}`,...(me?{background:"rgba(57,255,20,.07)",borderRadius:12}:{})}}>
                       <span style={{width:26,textAlign:"center",fontSize:15,fontWeight:900,...(i<3?gt:{color:SUB})}}>{i+1}</span>
                       <div style={{flex:1,minWidth:0}}>
-                        <span style={{fontSize:15,fontWeight:700,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 6px",marginLeft:7,color:SUB}}>Du</span>}</span>
+                        <span style={{fontSize:15,fontWeight:800,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 6px",marginLeft:7,color:SUB}}>Du</span>}</span>
+                        {r.real&&<div style={{fontSize:11,color:MUT,fontWeight:500,marginTop:1}}>{r.real}</div>}
                       </div>
                       {r.level&&<span style={levelBadge(r.level)}>L{r.level}</span>}
                       <span style={{fontSize:14,fontWeight:800,...(me?gt:{color:SUB})}}>{r.elo}</span>
