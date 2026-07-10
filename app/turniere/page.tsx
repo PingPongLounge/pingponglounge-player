@@ -80,7 +80,7 @@ export default function TurnierePage(){
                       <span style={{...statusPill,flexShrink:0}}>{statusLabel(t.status)}</span>
                     </div>
                     <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-                      <span style={levelBadge(t.skill_class)}>{t.skill_class}</span>
+                      <span style={levelBadge(t.skill_class)}>{t.skill_class==="alle"?"Alle Level":`Level ${t.skill_class}`}</span>
                       <span style={chip}>⚔️ {t.format==="ko"?"KO-Bracket":"Gruppen"}</span>
                       <span style={chip}>{regCount}/{t.max_players} Spieler</span>
                     </div>

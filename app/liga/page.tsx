@@ -106,7 +106,7 @@ export default function LigaPage(){
   const cities=[...new Set(seasons.map(s=>s.city))]
   const citySeasons=seasons.filter(s=>s.city===city)
   const sel=seasons.find(s=>s.id===seasonId)
-  const isPro=(s:Season)=>/advanced|elite|pro/i.test(s.skill_class)
+  const isPro=(s:Season)=>/5|6|7|pro/i.test(s.skill_class)
   const myIndex=rows.findIndex(r=>r.user_id===userId)
   const myRow=myIndex>=0?rows[myIndex]:null
 
@@ -162,7 +162,7 @@ export default function LigaPage(){
               return(
                 <button key={s.id} onClick={()=>setSeasonId(s.id)} style={tabStyle}>
                   <div style={{fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:".03em",color:W}}>{isPro(s)?"Pro":"Einstieg"}</div>
-                  <div style={{fontSize:9.5,color:MUT,marginTop:2}}>{s.skill_class.replace("+"," · ")}</div>
+                  <div style={{fontSize:9.5,color:MUT,marginTop:2}}>Level {s.skill_class}</div>
                   <div style={{fontSize:9,fontWeight:600,marginTop:4,color:MUT}}>{isPro(s)?`${count}/${s.max_players}`:"offen"}</div>
                 </button>
               )
@@ -177,7 +177,7 @@ export default function LigaPage(){
                 <div style={{fontSize:11,fontWeight:800,letterSpacing:".1em",textTransform:"uppercase",...gt}}>Neu hier?</div>
                 <div style={{fontSize:22,fontWeight:900,color:W,margin:"6px 0 16px"}}>So funktioniert die Liga</div>
                 {([
-                  ["1","Beitreten","Wähle Einstieg (Rookie + Challenger) oder Pro (Advanced + Elite)."],
+                  ["1","Beitreten","Wähle Einstieg (Level 1–4) oder Pro (Level 5–7) — passend zu deinem Niveau."],
                   ["2","Spielen & fordern","Fordere andere aus deiner Klasse — jedes Resultat zählt."],
                   ["3","Aufsteigen","Gewinnst du, steigst du in der Rangliste und sammelst PingPoints."],
                 ] as [string,string,string][]).map(([n,t,d])=>(
@@ -198,7 +198,7 @@ export default function LigaPage(){
                 <div style={{fontSize:52,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{myIndex+1}</div>
                 <div>
                   <div style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position</div>
-                  <div style={{fontSize:14,color:SUB,fontWeight:300,marginTop:3}}>{myRow.level||sel?.skill_class} · ELO {myRow.elo}</div>
+                  <div style={{fontSize:14,color:SUB,fontWeight:300,marginTop:3}}>{myRow.level?`Level ${myRow.level}`:(sel?.skill_class?`Level ${sel.skill_class}`:'')} · ELO {myRow.elo}</div>
                 </div>
               </div>
             </div>
@@ -229,7 +229,7 @@ export default function LigaPage(){
                       <div style={{flex:1,minWidth:0}}>
                         <span style={{fontSize:15,fontWeight:700,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 6px",marginLeft:7,color:SUB}}>Du</span>}</span>
                       </div>
-                      {r.level&&<span style={levelBadge(r.level)}>{r.level}</span>}
+                      {r.level&&<span style={levelBadge(r.level)}>L{r.level}</span>}
                       <span style={{fontSize:14,fontWeight:800,...(me?gt:{color:SUB})}}>{r.elo}</span>
                       {!me&&myReg&&(
                         <button onClick={()=>challenge(r.user_id)} title="Herausfordern" style={{border:"1.4px solid transparent",borderRadius:10,padding:"7px 11px",fontSize:11,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:"pointer",whiteSpace:"nowrap"}}>Fordern</button>

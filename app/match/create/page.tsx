@@ -6,7 +6,8 @@ import { BG, CARD, CELL, W, MUT, DANGER, btn, chipBtn, h1, body, label as themeL
 
 const M=MUT, C=CARD, B=CELL
 
-const LEVELS = ["Rookie", "Challenger", "Advanced", "Elite"]
+const LEVELS = ["1", "2", "3", "4", "5", "6", "7"]
+const LEVEL_LABEL = (l: string) => `Level ${l}`
 const CITIES = ["Glattbrugg", "Oerlikon", "Zürich", "Winterthur", "Baden", "Andere"]
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 7) // 7-22 Uhr
 
@@ -58,7 +59,7 @@ export default function CreateMatchPage() {
         <div style={{ marginBottom: 20 }}>
           <label style={label}>Level</label>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
-            {LEVELS.map(l => <button key={l} onClick={() => setLevel(l)} style={chip(level === l)}>{l}</button>)}
+            {LEVELS.map(l => <button key={l} onClick={() => setLevel(l)} style={chip(level === l)}>{LEVEL_LABEL(l)}</button>)}
           </div>
         </div>
 

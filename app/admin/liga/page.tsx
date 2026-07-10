@@ -7,12 +7,12 @@ import { STAFF_EMAILS } from "@/lib/staff"
 const BG="#20242C",C="#2A2F39",B="#2A2F39",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
 const GRAD="linear-gradient(135deg,#39FF14 0%,#00D4AA 50%,#1FD1C4 100%)"
 const CITIES=["Oerlikon","Langstrasse","Glattbrugg","Basel","Luzern","St. Gallen","Bern","Zürich"]
-const LEVELS=["Rookie","Challenger","Advanced","Elite"]
+const LEVELS=[{v:"1-4",l:"Level 1–4 (Einstieg)"},{v:"5-7",l:"Level 5–7 (Pro)"}]
 
 
 export default function AdminLigaPage(){
   const [seasons,setSeasons]=useState<Record<string,unknown>[]>([])
-  const [form,setForm]=useState({name:"",city:"Zürich",skill_class:"Challenger",max_players:10,start_date:"",description:""})
+  const [form,setForm]=useState({name:"",city:"Zürich",skill_class:"1-4",max_players:10,start_date:"",description:""})
   const [saving,setSaving]=useState(false)
   const [generating,setGenerating]=useState<string|null>(null)
   const [msg,setMsg]=useState("")
@@ -77,7 +77,7 @@ export default function AdminLigaPage(){
               {CITIES.map(c=><option key={c} value={c}>{c}</option>)}
             </select>
             <select value={form.skill_class} onChange={e=>setForm(f=>({...f,skill_class:e.target.value}))} style={{background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none"}}>
-              {LEVELS.map(l=><option key={l} value={l}>{l}</option>)}
+              {LEVELS.map(l=><option key={l.v} value={l.v}>{l.l}</option>)}
             </select>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>

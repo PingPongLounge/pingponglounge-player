@@ -7,7 +7,8 @@ import { BG, CARD, CELL, W, MUT, GREEN, DANGER, cardPad, btn, chipBtn, h1, body,
 
 const M=MUT, C=CARD, B=CELL, G=GREEN
 const CITIES=["Glattbrugg","Oerlikon","Zürich","Winterthur","Baden","Tessin"]
-const LEVELS=["alle","Rookie","Challenger","Advanced","Elite"]
+const LEVELS=["alle","1","2","3","4","5","6","7"]
+const LEVEL_LABEL=(l:string)=>l==="alle"?"Alle Level":`Level ${l}`
 
 const inputStyle=themeInput
 
@@ -84,7 +85,7 @@ export default function NeuesTurnierPage(){
           </div>
           <Label>Level</Label>
           <div style={{display:"flex",gap:8,flexWrap:"wrap"}}>
-            {LEVELS.map(l=><Chip key={l} active={skill===l} onClick={()=>setSkill(l)}>{l}</Chip>)}
+            {LEVELS.map(l=><Chip key={l} active={skill===l} onClick={()=>setSkill(l)}>{LEVEL_LABEL(l)}</Chip>)}
           </div>
         </Section>
 

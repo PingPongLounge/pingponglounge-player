@@ -32,29 +32,64 @@ export const CYAN   = '#1FD1C4'
 export const GRAD   = 'linear-gradient(135deg,#39FF14,#1FD1C4)'   // DAS eine Leuchten (Logo + Rang)
 export const SHADOW = '0 4px 14px rgba(0,0,0,.35)'
 
-/* ---------- Level-Farben: gedämpfte Pastell-Metalle (Aufstieg Mint→Bronze→Silber→Gold) ----------
-   Jedes Level = sanfter Verlauf. Dunkle Schrift drauf (TEXT_ON). */
-export const LEVEL_GRADIENTS: Record<string, string> = {
-  Rookie:     'linear-gradient(135deg,#A8E0C8,#6FB89A)',  // Mint
-  Challenger: 'linear-gradient(135deg,#E3A977,#A8662F)',  // Bronze
-  Advanced:   'linear-gradient(135deg,#E6EAF0,#969FAD)',  // Silber
-  Elite:      'linear-gradient(135deg,#F2DB8E,#C49A3A)',  // Gold
-  Pro:        GRAD,                                        // Pro = das Marken-Leuchten
-  alle:       'linear-gradient(135deg,#A8E0C8,#6FB89A)',
+/* ---------- Level-System: 1–7 (Mint → Teal → Bronze → Amber → Silber → Platin → Gold) ----------
+   Aufsteigend — dunkle Schrift drauf (TEXT_ON = #15110A). */
+
+// Beschreibungen: Single Source of Truth für Onboarding + Profil + Turniere
+export const LEVEL_DESCS: Record<string, string> = {
+  '1': 'Einsteiger, spiele zum Spass',
+  '2': 'Grundschläge sicher, erste eigene Rallyes',
+  '3': 'Regelmässiger Freizeitspieler',
+  '4': 'Solide Technik, spiele auch Turniere',
+  '5': 'Vereinserfahrung & gute Taktik',
+  '6': 'Turnierspieler, konstante Top-Leistung',
+  '7': 'Wettkampf-Niveau, Spitzenklasse',
 }
-// Repräsentative Einzelfarbe je Level (für Text/Linien, wo kein Verlauf geht)
+
+// Mindest-ELO je Level
+export const LEVEL_ELO: Record<string, number> = {
+  '1': 0, '2': 1050, '3': 1150, '4': 1250, '5': 1350, '6': 1450, '7': 1600,
+}
+
+export const LEVEL_GRADIENTS: Record<string, string> = {
+  '1': 'linear-gradient(135deg,#A8E0C8,#6FB89A)',  // Mint
+  '2': 'linear-gradient(135deg,#90D4CC,#4EA8A0)',  // Teal
+  '3': 'linear-gradient(135deg,#E3A977,#A8662F)',  // Bronze
+  '4': 'linear-gradient(135deg,#E8C85A,#C09930)',  // Amber
+  '5': 'linear-gradient(135deg,#E6EAF0,#969FAD)',  // Silber
+  '6': 'linear-gradient(135deg,#C8D8F0,#8098C8)',  // Platin
+  '7': 'linear-gradient(135deg,#F2DB8E,#C49A3A)',  // Gold
+  alle: 'linear-gradient(135deg,#A8E0C8,#6FB89A)',
+}
 export const LEVEL_COLORS: Record<string, string> = {
-  Rookie:     '#8FCFB4',
-  Challenger: '#CF9763',
-  Advanced:   '#BFC6D0',
-  Elite:      '#E0C266',
-  Pro:        '#39FF14',
-  alle:       '#8FCFB4',
+  '1': '#8FCFB4',
+  '2': '#5BBFB7',
+  '3': '#CF9763',
+  '4': '#D4B040',
+  '5': '#BFC6D0',
+  '6': '#8898CC',
+  '7': '#E0C266',
+  alle: '#8FCFB4',
 }
 export const lvColor = (level?: string | null): string =>
   (level && LEVEL_COLORS[level]) || SUB
 export const lvGrad = (level?: string | null): string =>
   (level && LEVEL_GRADIENTS[level]) || LEVEL_GRADIENTS.alle
+
+/** Gibt "Level 3" zurück, oder "" wenn leer */
+export const lvLabel = (level?: string | null): string =>
+  level && level !== 'alle' ? `Level ${level}` : ''
+
+/** ELO → Level-String '1'–'7' */
+export function eloToLevel(elo: number): string {
+  if (elo >= 1600) return '7'
+  if (elo >= 1450) return '6'
+  if (elo >= 1350) return '5'
+  if (elo >= 1250) return '4'
+  if (elo >= 1150) return '3'
+  if (elo >= 1050) return '2'
+  return '1'
+}
 
 /* ---------- Verlauf-Text (NUR Logo + Rang) ---------- */
 export const gt: CSSProperties = {

@@ -8,7 +8,10 @@ const SUB = 'rgba(255,255,255,.9)', MUT = 'rgba(255,255,255,.72)'
 const GRAD = 'linear-gradient(135deg,#39FF14,#1FD1C4)'
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }
 
-const LV = [{ n: 'Rookie', min: 0 }, { n: 'Challenger', min: 1100 }, { n: 'Advanced', min: 1300 }, { n: 'Elite', min: 1500 }]
+const LV = [
+  { n: 'Level 1', min: 0 }, { n: 'Level 2', min: 1050 }, { n: 'Level 3', min: 1150 },
+  { n: 'Level 4', min: 1250 }, { n: 'Level 5', min: 1350 }, { n: 'Level 6', min: 1450 }, { n: 'Level 7', min: 1600 },
+]
 
 function Logo() {
   return (

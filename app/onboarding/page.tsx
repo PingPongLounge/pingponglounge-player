@@ -2,13 +2,16 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { BG as DARK, CARD, CELL, W as TEXT, MUT as MUTED, GREEN as G, GRAD, lvColor, btn, input as inputBase } from "@/app/theme"
+import { BG as DARK, CARD, CELL, W as TEXT, MUT as MUTED, GREEN as G, GRAD, lvColor, lvGrad, LEVEL_DESCS, LEVEL_ELO, eloToLevel, btn, input as inputBase } from "@/app/theme"
 
 const LEVELS = [
-  { name: "Rookie",     color: lvColor("Rookie"),     desc: "Einsteiger, spiele zum Spass",  elo: 1000 },
-  { name: "Challenger", color: lvColor("Challenger"), desc: "Regelmässiger Freizeitspieler", elo: 1100 },
-  { name: "Advanced",   color: lvColor("Advanced"),   desc: "Vereinserfahrung & Taktik",     elo: 1300 },
-  { name: "Elite",      color: lvColor("Elite"),      desc: "Turnierspieler & Wettkampf",    elo: 1500 },
+  { name: "1", color: lvColor("1"), grad: lvGrad("1"), desc: LEVEL_DESCS["1"], elo: LEVEL_ELO["1"] },
+  { name: "2", color: lvColor("2"), grad: lvGrad("2"), desc: LEVEL_DESCS["2"], elo: LEVEL_ELO["2"] },
+  { name: "3", color: lvColor("3"), grad: lvGrad("3"), desc: LEVEL_DESCS["3"], elo: LEVEL_ELO["3"] },
+  { name: "4", color: lvColor("4"), grad: lvGrad("4"), desc: LEVEL_DESCS["4"], elo: LEVEL_ELO["4"] },
+  { name: "5", color: lvColor("5"), grad: lvGrad("5"), desc: LEVEL_DESCS["5"], elo: LEVEL_ELO["5"] },
+  { name: "6", color: lvColor("6"), grad: lvGrad("6"), desc: LEVEL_DESCS["6"], elo: LEVEL_ELO["6"] },
+  { name: "7", color: lvColor("7"), grad: lvGrad("7"), desc: LEVEL_DESCS["7"], elo: LEVEL_ELO["7"] },
 ]
 
 const CANTON_MAP: Record<string, string> = {
@@ -54,17 +57,19 @@ const ALL_NICKS = [
 ]
 
 function calcLevel(score: number) {
-  if (score >= 12) return LEVELS[3]
-  if (score >= 8)  return LEVELS[2]
-  if (score >= 4)  return LEVELS[1]
+  if (score >= 14) return LEVELS[6]
+  if (score >= 11) return LEVELS[5]
+  if (score >= 9)  return LEVELS[4]
+  if (score >= 7)  return LEVELS[3]
+  if (score >= 5)  return LEVELS[2]
+  if (score >= 3)  return LEVELS[1]
   return LEVELS[0]
 }
 
 // Nächstkleineres Level zu einer ELO (für den /spielen Hook-Flow).
 function levelForElo(elo: number) {
-  let chosen = LEVELS[0]
-  for (const l of LEVELS) if (elo >= l.elo) chosen = l
-  return chosen
+  const key = eloToLevel(elo)
+  return LEVELS.find(l => l.name === key) ?? LEVELS[0]
 }
 
 type PendingResult = { elo: number; won?: boolean; sets?: unknown; ort?: string; ts?: number }
@@ -201,7 +206,7 @@ export default function OnboardingPage() {
         <div style={{ marginTop: "16px" }}>
           {LEVELS.map(l => (
             <button key={l.name} style={optBtn(manualLevel === l.name)} onClick={() => setManualLevel(l.name)}>
-              <span style={{ color: l.color, fontWeight: 800 }}>{l.name}</span>
+              <span style={{ color: l.color, fontWeight: 800 }}>Level {l.name}</span>
               <span style={{ fontSize: "12px", color: MUTED, marginLeft: "8px" }}>{l.desc}</span>
             </button>
           ))}
@@ -235,7 +240,7 @@ export default function OnboardingPage() {
     <div style={wrap}><div style={box}>
       <Header step={pending ? 2 : 3} total={pending ? 2 : 3} />
       <p style={{ fontSize: "11px", fontWeight: 700, color: chosenLevel.color, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>{pending ? "Dein Start-Rang" : mode === "quiz" ? "Dein Ergebnis" : "Bestätigung"}</p>
-      <h2 style={{ fontSize: "40px", fontWeight: 900, color: chosenLevel.color, textTransform: "uppercase", marginBottom: "4px", letterSpacing: "-0.02em" }}>{chosenLevel.name}</h2>
+      <h2 style={{ fontSize: "40px", fontWeight: 900, color: chosenLevel.color, textTransform: "uppercase", marginBottom: "4px", letterSpacing: "-0.02em" }}>Level {chosenLevel.name}</h2>
       <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{chosenLevel.desc}</p>
       <div style={{ background: CARD, borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
         {[{ label: "Name", value: name }, { label: "Kanton", value: canton }, { label: "Level", value: chosenLevel.name }, { label: "Start-ELO", value: String(chosenLevel.elo) }].map(row => (
