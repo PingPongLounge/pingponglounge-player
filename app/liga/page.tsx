@@ -20,6 +20,7 @@ type Msg={id:string,user_id:string|null,name:string,text:string,kind?:string,mat
 
 export default function LigaPage(){
   const [userId,setUserId]=useState<string|null>(null)
+  const [myLevel,setMyLevel]=useState<string|null>(null)
   const [seasons,setSeasons]=useState<Season[]>([])
   const [city,setCity]=useState<string>("")
   const [seasonId,setSeasonId]=useState<string>("")
@@ -56,8 +57,11 @@ export default function LigaPage(){
     const ss=(data||[]) as Season[]
     setUserId(user?.id||null)
     setSeasons(ss)
+    let lvl:string|null=null
+    if(user){ const {data:pf}=await sb.from("profiles").select("level").eq("id",user.id).maybeSingle(); lvl=pf?.level||null; setMyLevel(lvl) }
+    const proLvl=(parseInt(lvl||"0")||0)>=5
     let defCity=ss[0]?.city||""
-    let defSeason=ss[0]?.id||""
+    let defSeason=(ss.find(s=>s.city===defCity&&/5|6|7|pro/i.test(s.skill_class)===proLvl)||ss[0])?.id||""
     if(user){
       const {data:myRegs}=await sb.from("league_registrations").select("season_id").eq("player_id",user.id)
       const mySeason=ss.find(s=>(myRegs||[]).some(r=>r.season_id===s.id))
@@ -182,15 +186,15 @@ export default function LigaPage(){
   return (
     <main style={{minHeight:"100vh",background:BG,paddingBottom:90}}>
       {/* Topbar */}
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",borderBottom:`1px solid ${B}`,background:"#0B0D10",position:"sticky",top:0,zIndex:10}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",background:GRAD,position:"sticky",top:0,zIndex:10}}>
         <Link href="/entdecken" style={{display:"flex",alignItems:"center",gap:8,textDecoration:"none"}}>
-          <svg width="22" height="22" viewBox="0 0 80 80" fill="none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#1FD1C4"/></linearGradient></defs><path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="3.4" strokeLinejoin="round"/><circle cx="63" cy="58" r="6.5" fill="url(#lg)"/></svg>
-          <span style={{fontSize:13,fontWeight:800,letterSpacing:".20em",...gt}}>PLAYER <span style={{fontWeight:500,color:SUB}}>LIGA</span></span>
+          <svg width="22" height="22" viewBox="0 0 80 80" fill="none"><path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="#06210F" strokeWidth="3.6" strokeLinejoin="round"/><circle cx="63" cy="58" r="6.5" fill="#06210F"/></svg>
+          <span style={{fontSize:13,fontWeight:900,letterSpacing:".20em",color:"#06210F"}}>PLAYER <span style={{fontWeight:600,color:"rgba(6,33,15,.72)"}}>LIGA</span></span>
         </Link>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={()=>setShowCity(v=>!v)} style={{background:CELL,border:"none",color:W,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 11px"}}>{city||"Stadt"} ▾</button>
-          <button onClick={()=>setChatOpen(true)} aria-label="Chat" style={{width:36,height:36,borderRadius:10,background:C,border:"none",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#39FF14" strokeWidth="1.8"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
+          <button onClick={()=>setShowCity(v=>!v)} style={{background:"rgba(6,33,15,.15)",border:"none",color:"#06210F",fontSize:12,fontWeight:800,cursor:"pointer",borderRadius:10,padding:"7px 11px"}}>{city||"Stadt"} ▾</button>
+          <button onClick={()=>setChatOpen(true)} aria-label="Chat" style={{width:36,height:36,borderRadius:10,background:"rgba(6,33,15,.15)",border:"none",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06210F" strokeWidth="2"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
           </button>
         </div>
       </div>
@@ -200,7 +204,7 @@ export default function LigaPage(){
         <div onClick={()=>setShowCity(false)} style={{position:"fixed",inset:0,zIndex:20}}>
           <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:54,right:14,background:"#14171C",border:`1px solid ${B}`,borderRadius:14,padding:6,minWidth:160}}>
             {cities.map(ci=>(
-              <div key={ci} onClick={()=>{const fs=seasons.find(s=>s.city===ci);setCity(ci);if(fs)setSeasonId(fs.id);setShowCity(false)}} style={{padding:"11px 12px",borderRadius:9,fontSize:14,fontWeight:ci===city?600:400,color:ci===city?GREEN:W,cursor:"pointer"}}>{ci}</div>
+              <div key={ci} onClick={()=>{const proLvl=(parseInt(myLevel||"0")||0)>=5;const fs=seasons.find(s=>s.city===ci&&isPro(s)===proLvl)||seasons.find(s=>s.city===ci);setCity(ci);if(fs)setSeasonId(fs.id);setShowCity(false)}} style={{padding:"11px 12px",borderRadius:9,fontSize:14,fontWeight:ci===city?600:400,color:ci===city?GREEN:W,cursor:"pointer"}}>{ci}</div>
             ))}
           </div>
         </div>
@@ -222,21 +226,6 @@ export default function LigaPage(){
         ):seasons.length===0?(
           <p style={{textAlign:"center",color:M,padding:"40px 16px"}}>Noch keine Liga aktiv.</p>
         ):(<>
-          {/* Liga-Tabs */}
-          <div style={{display:"flex",gap:8,padding:"12px 14px 6px"}}>
-            {citySeasons.map(s=>{
-              const on=s.id===seasonId
-              const tabStyle:React.CSSProperties=on?{flex:1,borderRadius:12,padding:"10px 8px",textAlign:"center",cursor:"pointer",border:"1.5px solid transparent",background:`linear-gradient(${BG},${BG}) padding-box, ${GRAD} border-box`}:{flex:1,borderRadius:12,padding:"10px 8px",textAlign:"center",cursor:"pointer",border:"none",background:C}
-              return(
-                <button key={s.id} onClick={()=>setSeasonId(s.id)} style={tabStyle}>
-                  <div style={{fontSize:13,fontWeight:700,textTransform:"uppercase",letterSpacing:".03em",color:W}}>{isPro(s)?"Pro":"Einstieg"}</div>
-                  <div style={{fontSize:9.5,color:MUT,marginTop:2}}>Level {s.skill_class}</div>
-                  <div style={{fontSize:9,fontWeight:600,marginTop:4,color:MUT}}>{isPro(s)?`${count}/${s.max_players}`:"offen"}</div>
-                </button>
-              )
-            })}
-          </div>
-          <div style={{fontSize:11,color:MUT,fontWeight:300,padding:"4px 16px 6px",textAlign:"center"}}>{sel?.status==="running"?"Saison läuft":"Anmeldung offen"}</div>
 
           {/* Neu hier? — Erklärung (nur Nicht-Mitglieder) */}
           {!myReg&&(
@@ -265,7 +254,7 @@ export default function LigaPage(){
               <div style={{background:HERO,borderRadius:22,padding:"20px 22px",boxShadow:SHADOW,display:"flex",alignItems:"center",gap:16}}>
                 <div style={{fontSize:52,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{myIndex+1}</div>
                 <div>
-                  <div style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position</div>
+                  <div style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position · {sel?isPro(sel)?"Pro":"Einstieg":""}</div>
                   <div style={{fontSize:14,color:SUB,fontWeight:300,marginTop:3}}>{myRow.level?`Level ${myRow.level}`:(sel?.skill_class?`Level ${sel.skill_class}`:'')} · ELO {myRow.elo}</div>
                 </div>
               </div>
@@ -276,8 +265,8 @@ export default function LigaPage(){
           <div style={{padding:"16px 14px 0"}}>
             <div style={{...card,borderRadius:24,padding:"20px 16px"}}>
               <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:6}}>
-                <img src="/icons/liga.svg" alt="" style={{width:18,height:18}}/>
-                <span style={{fontSize:12,fontWeight:700,letterSpacing:".24em",textTransform:"uppercase",color:MUT}}>Rangliste · {count} Spieler</span>
+                <img src="/icons/liga.svg" alt="" style={{width:30,height:30}}/>
+                <span style={{fontSize:19,fontWeight:800,letterSpacing:".01em",color:W}}>Rangliste · {count} Spieler</span>
               </div>
               <div style={{maxHeight:420,overflowY:"auto"}}>
                 {Array.from({length:50}).map((_,i)=>{

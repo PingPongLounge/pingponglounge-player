@@ -24,13 +24,13 @@ export default function BottomNav() {
       background: BG, borderTop: `1px solid ${LINE}`,
       paddingBottom: "env(safe-area-inset-bottom)",
     }}>
-      <div style={{ width: "100%", maxWidth: 480, margin: "0 auto", height: 66, display: "flex", alignItems: "center" }}>
+      <div style={{ width: "100%", maxWidth: 480, margin: "0 auto", height: 76, display: "flex", alignItems: "center" }}>
         {tabs.map(t => {
           const active = isActive(t.href)
           return (
-            <Link key={t.href} href={t.href} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4, textDecoration: "none" }}>
-              <img src={`/icons/${t.icon}.svg`} alt="" style={{ width: 25, height: 25, opacity: active ? 1 : .45, filter: active ? "none" : "grayscale(.5)" }} />
-              <span style={{ fontSize: 9.5, fontWeight: 700, color: active ? W : MUT, letterSpacing: ".02em" }}>{t.label}</span>
+            <Link key={t.href} href={t.href} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, textDecoration: "none" }}>
+              <img src={`/icons/${t.icon}.svg`} alt="" style={{ width: 31, height: 31, opacity: active ? 1 : .5, filter: active ? "none" : "grayscale(.4)" }} />
+              <span style={{ fontSize: 10.5, fontWeight: 800, color: active ? W : MUT, letterSpacing: ".05em", textTransform: "uppercase" }}>{t.label}</span>
             </Link>
           )
         })}
