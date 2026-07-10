@@ -310,8 +310,8 @@ export default function LigaPage(){
 
       {/* Fordern-Popup */}
       {fTarget&&(
-        <div onClick={()=>setFTarget(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:60,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:440,background:CARD,borderRadius:"24px 24px 0 0",padding:"22px 20px calc(26px + env(safe-area-inset-bottom))",maxHeight:"85vh",overflowY:"auto"}}>
+        <div onClick={()=>setFTarget(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:60,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <div style={{fontSize:20,fontWeight:900,color:W}}>vs {fTarget.name}</div>
               <button onClick={()=>setFTarget(null)} style={{background:"none",border:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
