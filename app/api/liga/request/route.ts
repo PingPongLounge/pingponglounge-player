@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { rateLimited, clientIp } from "@/lib/ratelimit"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -12,8 +12,8 @@ export async function POST(req: NextRequest) {
   if (!name || !email || !firma) return NextResponse.json({ error: "Name, Email und Firma sind Pflicht" }, { status: 400 })
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(email))) return NextResponse.json({ error: "Ungültige E-Mail-Adresse" }, { status: 400 })
 
-  const sb = await createClient()
-  const { error } = await sb.from("liga_requests").insert({
+  const admin = createAdminClient()
+  const { error } = await admin.from("liga_requests").insert({
     name, email, firma, standort, liga_art, start_datum, end_datum,
   })
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

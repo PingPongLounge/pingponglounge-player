@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 import { STAFF_EMAILS } from "@/lib/staff"
 
@@ -22,15 +23,16 @@ export async function POST(req: NextRequest) {
   const sb = await createClient()
   const { data: { user } } = await sb.auth.getUser()
   if (!user || !STAFF_EMAILS.includes(user.email||"")) return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 })
-  const { data: regs } = await sb.from("league_registrations").select("player_id").eq("season_id", season_id)
+  const admin = createAdminClient()
+  const { data: regs } = await admin.from("league_registrations").select("player_id").eq("season_id", season_id)
   if (!regs || regs.length < 2) return NextResponse.json({ error: "Zu wenige Spieler" }, { status: 400 })
   const players = regs.map(r => r.player_id)
   const matches = roundRobin(players)
   const deadline = new Date(); deadline.setDate(deadline.getDate() + 14)
   const inserts = matches.map(m => ({ season_id, round: m.round, p1_id: m.p1, p2_id: m.p2, deadline: deadline.toISOString() }))
-  await sb.from("league_matches").delete().eq("season_id", season_id)
-  const { error } = await sb.from("league_matches").insert(inserts)
+  await admin.from("league_matches").delete().eq("season_id", season_id)
+  const { error } = await admin.from("league_matches").insert(inserts)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  await sb.from("league_seasons").update({ status: "running" }).eq("id", season_id)
+  await admin.from("league_seasons").update({ status: "running" }).eq("id", season_id)
   return NextResponse.json({ ok: true, count: inserts.length })
 }
