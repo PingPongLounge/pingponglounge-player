@@ -14,6 +14,9 @@ const HERO="#14171E"
 
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number}
 type Row={user_id:string,name:string,elo:number,level:string}
+type OpenMatch={id:string,status:string,iAmP1:boolean}
+type Reactions={heart:number,fire:number,laugh:number,myReacts:string[]}
+type Msg={id:string,user_id:string|null,name:string,text:string,kind?:string,match_id?:string,reactions:Reactions}
 
 export default function LigaPage(){
   const [userId,setUserId]=useState<string|null>(null)
@@ -27,9 +30,10 @@ export default function LigaPage(){
   const [busy,setBusy]=useState(false)
   const [toast,setToast]=useState("")
   const [showCity,setShowCity]=useState(false)
+  const [openMatches,setOpenMatches]=useState<Record<string,OpenMatch>>({})
   // chat
   const [chatOpen,setChatOpen]=useState(false)
-  const [msgs,setMsgs]=useState<{id:string,user_id:string|null,name:string,text:string,kind?:string}[]>([])
+  const [msgs,setMsgs]=useState<Msg[]>([])
   const [msg,setMsg]=useState("")
   const meRef=useRef<HTMLDivElement|null>(null)
 
@@ -58,15 +62,31 @@ export default function LigaPage(){
   const loadStandings=useCallback(async(sid:string)=>{
     if(!sid) return
     const sb=createClient()
-    // Registrierungen + Profildaten parallel laden
     const {data:regs}=await sb.from("league_registrations").select("player_id").eq("season_id",sid)
     const ids=(regs||[]).map(r=>r.player_id)
     setCount(ids.length)
-    setMyReg(!!userId&&ids.includes(userId))
+    const isReg=!!userId&&ids.includes(userId)
+    setMyReg(isReg)
     if(ids.length===0){setRows([]);return}
     const {data:profs}=await sb.from("public_profiles").select("id,name,elo,level").in("id",ids)
     const list=(profs||[]).map(p=>({user_id:p.id,name:p.name,elo:p.elo??1000,level:p.level||""})).sort((a,b)=>b.elo-a.elo)
     setRows(list)
+    // Offene Matches des eingeloggten Spielers laden
+    if(userId&&isReg){
+      const {data:myMs}=await sb.from("league_matches")
+        .select("id,p1_id,p2_id,status")
+        .eq("season_id",sid)
+        .in("status",["challenge_sent","accepted","pending","p1_entered"])
+        .or(`p1_id.eq.${userId},p2_id.eq.${userId}`)
+      const map:Record<string,OpenMatch>={}
+      for(const m of myMs||[]){
+        const oppId=m.p1_id===userId?m.p2_id:m.p1_id
+        map[oppId]={id:m.id,status:m.status,iAmP1:m.p1_id===userId}
+      }
+      setOpenMatches(map)
+    } else {
+      setOpenMatches({})
+    }
   },[userId])
 
   useEffect(()=>{ if(seasonId) loadStandings(seasonId) },[seasonId,loadStandings])
@@ -94,7 +114,18 @@ export default function LigaPage(){
   async function challenge(pid:string){
     const r=await fetch("/api/liga/challenge",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,challenged_id:pid})})
     const j=await r.json().catch(()=>({}))
-    flash(r.ok?"⚔️ Herausforderung gesendet!":(j.error||"Fehler"))
+    if(r.ok){flash("⚔️ Herausforderung gesendet!");loadStandings(seasonId)}
+    else flash(j.error||"Fehler")
+  }
+  async function acceptChallenge(matchId:string){
+    const r=await fetch("/api/liga/challenge/accept",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId})})
+    const j=await r.json().catch(()=>({}))
+    if(r.ok){flash("✓ Angenommen — jetzt Spiel eintragen");loadStandings(seasonId)}
+    else flash(j.error||"Fehler")
+  }
+  async function react(messageId:string,type:string){
+    await fetch("/api/liga/message-react",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message_id:messageId,type})})
+    loadChat(seasonId)
   }
   async function send(){
     const t=msg.trim(); if(!t) return
@@ -231,9 +262,16 @@ export default function LigaPage(){
                       </div>
                       {r.level&&<span style={levelBadge(r.level)}>L{r.level}</span>}
                       <span style={{fontSize:14,fontWeight:800,...(me?gt:{color:SUB})}}>{r.elo}</span>
-                      {!me&&myReg&&(
-                        <button onClick={()=>challenge(r.user_id)} title="Herausfordern" style={{border:"1.4px solid transparent",borderRadius:10,padding:"7px 11px",fontSize:11,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:"pointer",whiteSpace:"nowrap"}}>Fordern</button>
-                      )}
+                      {!me&&myReg&&(()=>{
+                        const om=openMatches[r.user_id]
+                        const btnBase:React.CSSProperties={border:"1.4px solid transparent",borderRadius:10,padding:"7px 10px",fontSize:10,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:"pointer",whiteSpace:"nowrap",fontFamily:"inherit"}
+                        if(!om) return <button onClick={()=>challenge(r.user_id)} style={btnBase}>Herausforderung senden</button>
+                        if(om.status==="challenge_sent"&&!om.iAmP1) return <button onClick={()=>acceptChallenge(om.id)} style={{...btnBase,background:GRAD,color:"#06210F"}}>Annehmen ✓</button>
+                        if(om.status==="challenge_sent"&&om.iAmP1) return <span style={{fontSize:10,color:MUT,whiteSpace:"nowrap"}}>⏳ Ausstehend</span>
+                        if(om.status==="accepted"||om.status==="pending") return <Link href={`/liga/match/${om.id}`} style={{...btnBase,textDecoration:"none",display:"inline-block"}}>Spiel eintragen →</Link>
+                        if(om.status==="p1_entered"&&!om.iAmP1) return <Link href={`/liga/match/${om.id}`} style={{...btnBase,background:GRAD,color:"#06210F",textDecoration:"none",display:"inline-block"}}>Bestätigen ✓</Link>
+                        return <span style={{fontSize:10,color:MUT,whiteSpace:"nowrap"}}>⏳ Warte</span>
+                      })()}
                     </div>
                   )
                 })}
@@ -252,10 +290,36 @@ export default function LigaPage(){
               <button onClick={()=>setChatOpen(false)} style={{background:"none",border:"none",color:M,fontSize:18,cursor:"pointer"}}>✕</button>
             </div>
             <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:10}}>
-              {msgs.length===0?<p style={{textAlign:"center",color:M,fontSize:13,marginTop:20}}>Noch keine Nachrichten — schreib die erste 👋</p>:msgs.map(m=>{
-                if(m.kind==="feed") return(
-                  <div key={m.id} style={{alignSelf:"center",fontSize:11,color:SUB,background:CELL,border:"none",borderRadius:999,padding:"5px 12px",textAlign:"center"}}>{m.text}</div>
-                )
+              {msgs.length===0?<p style={{textAlign:"center",color:MUT,fontSize:13,marginTop:20}}>Noch keine Nachrichten — schreib die erste 👋</p>:msgs.map(m=>{
+                if(m.kind==="match"){
+                  let d:{winner:string,loser:string,wSets:number,lSets:number,detail:string}|null=null
+                  try{d=JSON.parse(m.text)}catch{/**/}
+                  const r=m.reactions
+                  return(
+                    <div key={m.id} style={{alignSelf:"stretch"}}>
+                      <div style={{background:"linear-gradient(135deg,rgba(57,255,20,.10),rgba(31,209,196,.07))",border:"1px solid rgba(57,255,20,.18)",borderRadius:14,padding:"11px 14px"}}>
+                        <div style={{fontSize:10,fontWeight:700,color:"rgba(57,255,20,.7)",letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>🏓 Match bestätigt</div>
+                        {d&&<>
+                          <div style={{fontSize:14,fontWeight:800,color:W,marginBottom:2}}>{d.winner} <span style={{color:"rgba(57,255,20,.9)"}}>schlägt</span> {d.loser}</div>
+                          <div style={{fontSize:12,color:MUT,marginBottom:8}}>{d.wSets}:{d.lSets} Sätze{d.detail?` · ${d.detail}`:""}</div>
+                        </>}
+                        <div style={{display:"flex",gap:6}}>
+                          {(["heart","fire","laugh"] as const).map(type=>{
+                            const emoji=type==="heart"?"❤️":type==="fire"?"🔥":"😄"
+                            const cnt=r[type]
+                            const active=r.myReacts.includes(type)
+                            return(
+                              <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:active?"rgba(57,255,20,.15)":"rgba(255,255,255,.06)",border:active?"1px solid rgba(57,255,20,.4)":"1px solid rgba(255,255,255,.08)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:W,fontFamily:"inherit"}}>
+                                <span>{emoji}</span>
+                                {cnt>0&&<span style={{fontSize:11,fontWeight:700,color:active?"#39FF14":MUT}}>{cnt}</span>}
+                              </button>
+                            )
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )
+                }
                 const mine=m.user_id===userId
                 return(
                   <div key={m.id} style={{maxWidth:"80%",alignSelf:mine?"flex-end":"flex-start"}}>

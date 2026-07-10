@@ -18,6 +18,8 @@ export default function MatchPage({params}:{params:{id:string}}){
   const [saving,setSaving]=useState(false)
   const [error,setError]=useState("")
   const [loading,setLoading]=useState(true)
+  const [submitted,setSubmitted]=useState(false)
+  const [nextMatchId,setNextMatchId]=useState<string|null>(null)
 
   useEffect(()=>{
     async function load(){
@@ -59,8 +61,18 @@ export default function MatchPage({params}:{params:{id:string}}){
     if(!valid){setError("Ungültiges Ergebnis — mindestens 3 Sätze, einer muss 3 Sätze gewonnen haben");return}
     setSaving(true);setError("")
     const res=await fetch("/api/liga/result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:params.id,sets:parsedSets,winner_id:winner})})
-    if(res.ok){window.location.href=`/liga/${match?.season_id}`}
+    if(res.ok){setSubmitted(true);setSaving(false)}
     else{const d=await res.json();setError(d.error||"Fehler");setSaving(false)}
+  }
+
+  async function handleNextMatch(){
+    if(!match) return
+    setSaving(true)
+    const oppId=match.p1_id===userId?match.p2_id:match.p1_id
+    const res=await fetch("/api/liga/direct-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:match.season_id,opponent_id:oppId})})
+    const d=await res.json().catch(()=>({}))
+    if(res.ok&&d.id){setNextMatchId(d.id);window.location.href=`/liga/match/${d.id}`}
+    else{setError(d.error||"Fehler");setSaving(false)}
   }
 
   async function handleConfirm(){
@@ -112,8 +124,24 @@ export default function MatchPage({params}:{params:{id:string}}){
           </div>
         )}
 
+        {/* Submitted success state */}
+        {(isP1||isP2)&&submitted&&(
+          <div style={{...cardActive,padding:24,textAlign:"center",marginTop:8}}>
+            <p style={{fontSize:32,marginBottom:8}}>✅</p>
+            <p style={{fontSize:16,fontWeight:700,color:GREEN,marginBottom:4}}>Ergebnis eingereicht!</p>
+            <p style={{...meta,marginBottom:20}}>
+              Warte auf Bestätigung von {isP1?match.p2_name:match.p1_name}.
+            </p>
+            <button onClick={handleNextMatch} disabled={saving} style={{...btn,marginBottom:10,opacity:saving?0.6:1,cursor:saving?"not-allowed":"pointer"}}>
+              {saving?"Erstelle Match …":"Weiteres Spiel eintragen"}
+            </button>
+            {error&&<p style={{color:DANGER,fontSize:13,marginBottom:8}}>{error}</p>}
+            <Link href={`/liga/${match.season_id}`} style={{...btnGhost,display:"block",textAlign:"center",textDecoration:"none"}}>Zurück zur Liga</Link>
+          </div>
+        )}
+
         {/* P1: enter result */}
-        {(isP1||isP2)&&match.status==="pending"&&(
+        {(isP1||isP2)&&match.status==="pending"&&!submitted&&(
           <div>
             <div style={{...label,marginBottom:12}}>Ergebnis eingeben (Sätze)</div>
             {sets.map((s,i)=>(

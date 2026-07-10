@@ -48,17 +48,21 @@ export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string)
     }
   }
 
-  // Chat-Feed: jedes gespielte Liga-Match wird gepostet
+  // Chat-Feed: Match-Ergebnis automatisch als strukturierter Post
   const sets = (m.sets as Array<{ p1: number; p2: number }> | null) || []
   const p1w = sets.filter(s => s.p1 > s.p2).length
   const p2w = sets.filter(s => s.p2 > s.p1).length
   const wSets = m.winner_id === m.p1_id ? p1w : p2w
   const lSets = m.winner_id === m.p1_id ? p2w : p1w
+  const detail = sets.map(s => `${s.p1}:${s.p2}`).join(" · ")
   const { data: names } = await admin.from("public_profiles").select("id,name").in("id", [m.winner_id, loserId])
   const nameOf = (id: string) => (names || []).find(n => n.id === id)?.name || "Spieler"
   await admin.from("league_messages").insert({
-    season_id: m.season_id, user_id: null, kind: "feed",
-    text: `🏓 ${nameOf(m.winner_id)} schlägt ${nameOf(loserId)} ${wSets}:${lSets}`,
+    season_id: m.season_id,
+    user_id: null,
+    kind: "match",
+    match_id: matchId,
+    text: JSON.stringify({ winner: nameOf(m.winner_id), loser: nameOf(loserId), wSets, lSets, detail }),
   })
 
   return { ok: true }
