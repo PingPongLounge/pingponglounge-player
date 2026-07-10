@@ -15,12 +15,35 @@ export default function SplashScreen() {
 
   useEffect(() => {
     // Tagline nach 2s einblenden
-    const t0 = setTimeout(() => setShowTagline(true), 2000)
-    // Nach 3.2s ausblenden
-    const t1 = setTimeout(() => setPhase("fade"), 3200)
-    // Nach weiteren 500ms entfernen
-    const t2 = setTimeout(() => setPhase("done"), 3700)
-    return () => { clearTimeout(t0); clearTimeout(t1); clearTimeout(t2) }
+    const taglineTimer = setTimeout(() => setShowTagline(true), 2000)
+
+    const dismiss = () => {
+      setTimeout(() => setPhase("fade"), 100)
+      setTimeout(() => setPhase("done"), 650)
+    }
+
+    // Seite bereits geladen → sofort (nach Mindestzeit 900ms) ausblenden
+    if (document.readyState === "complete") {
+      const minTimer = setTimeout(dismiss, 900)
+      return () => { clearTimeout(taglineTimer); clearTimeout(minTimer) }
+    }
+
+    // Sonst warten bis window.load — aber mindestens 900ms zeigen
+    let loaded = false
+    let minDone = false
+
+    const tryDismiss = () => { if (loaded && minDone) dismiss() }
+
+    const onLoad = () => { loaded = true; tryDismiss() }
+    window.addEventListener("load", onLoad)
+
+    const minTimer = setTimeout(() => { minDone = true; tryDismiss() }, 900)
+
+    return () => {
+      clearTimeout(taglineTimer)
+      clearTimeout(minTimer)
+      window.removeEventListener("load", onLoad)
+    }
   }, [])
 
   if (phase === "done") return null
@@ -31,7 +54,7 @@ export default function SplashScreen() {
         position: "fixed",
         inset: 0,
         zIndex: 9999,
-        background: "#20242C",
+        background: "#0D1017",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -42,7 +65,6 @@ export default function SplashScreen() {
         pointerEvents: "none",
       }}
     >
-      {/* P-Paddle Logo */}
       <div style={{ animation: "splashPulse 1.8s ease-in-out infinite" }}>
         <svg width="120" height="120" viewBox="0 0 80 80" fill="none">
           <defs>
@@ -62,20 +84,10 @@ export default function SplashScreen() {
         </svg>
       </div>
 
-      {/* PLAYER Text */}
-      <span
-        style={{
-          fontSize: 18,
-          fontWeight: 800,
-          letterSpacing: ".3em",
-          fontFamily: "system-ui, sans-serif",
-          ...gt,
-        }}
-      >
+      <span style={{ fontSize: 18, fontWeight: 800, letterSpacing: ".3em", fontFamily: "system-ui, sans-serif", ...gt }}>
         PLAYER
       </span>
 
-      {/* Tagline — erscheint nach 2s */}
       <span
         style={{
           fontSize: 11,
