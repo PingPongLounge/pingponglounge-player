@@ -87,6 +87,7 @@ export default function OnboardingPage() {
   const [manualLevel, setManualLevel] = useState("")
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizScores, setQuizScores] = useState<number[]>([])
+  const [realName, setRealName] = useState("")
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState("")
   const [nicks, setNicks] = useState<string[]>([])
@@ -132,6 +133,7 @@ export default function OnboardingPage() {
     if (!user) { setSaving(false); setSaveError("Nicht eingeloggt"); return }
     const { error } = await supabase.from("profiles").upsert({
       id: user.id, name: name.trim(), email: user.email,
+      real_name: realName.trim() || null,
       canton: CANTON_MAP[canton] ?? canton,
       level: chosenLevel.name, elo: chosenLevel.elo,
     })
@@ -174,7 +176,9 @@ export default function OnboardingPage() {
       )}
       <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "6px" }}>Dein Profil</h2>
       <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{pending ? "Nur noch Name + Kanton — dann ist dein Rang fix." : "Kurz einrichten — dann geht es los."}</p>
-      <input style={inp} placeholder="Dein Name oder Spitzname" value={name} onChange={e => setName(e.target.value)} />
+      <input style={inp} placeholder="Vor- und Nachname" value={realName} onChange={e => setRealName(e.target.value)} />
+      <p style={{ fontSize: "11px", color: MUTED, margin: "-8px 0 14px 2px" }}>Erscheint nur als „Vorname N." — voll nur in deinem Profil.</p>
+      <input style={inp} placeholder="Spielername (Nickname)" value={name} onChange={e => setName(e.target.value)} />
       <button type="button" onClick={genNicknames} style={{ background: "none", border: "1px solid " + CELL, borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: MUTED, cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em", fontFamily: "inherit" }}>
         {loadingNicks ? "..." : "Vorschläge generieren"}
       </button>
@@ -191,7 +195,7 @@ export default function OnboardingPage() {
         <option value="">Kanton wählen...</option>
         {CANTONS.map(c => <option key={c} value={c}>{c}</option>)}
       </select>
-      <button style={primaryBtn(!name.trim() || !canton)} disabled={!name.trim() || !canton} onClick={() => setStep(pending ? 3 : 1)}>Weiter</button>
+      <button style={primaryBtn(!name.trim() || !realName.trim())} disabled={!name.trim() || !realName.trim()} onClick={() => setStep(pending ? 3 : 1)}>Weiter</button>
     </div></div>
   )
 

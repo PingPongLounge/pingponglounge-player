@@ -42,8 +42,8 @@ export default function LigaPage(){
   const [fTab,setFTab]=useState<"challenge"|"result">("challenge")
   const [fDate,setFDate]=useState("")
   const [fTime,setFTime]=useState("")
-  const [fMy,setFMy]=useState(3)
-  const [fOpp,setFOpp]=useState(1)
+  const [fMy,setFMy]=useState(0)
+  const [fOpp,setFOpp]=useState(0)
 
   const flash=(t:string)=>{setToast(t);setTimeout(()=>setToast(""),2500)}
 
@@ -128,7 +128,7 @@ export default function LigaPage(){
     if(r.ok){flash("⚔️ Herausforderung gesendet!");loadStandings(seasonId)}
     else flash(j.error||"Fehler")
   }
-  function openForder(r:Row){ setFTarget({id:r.user_id,name:r.name}); setFTab("challenge"); setFDate(""); setFTime(""); setFMy(3); setFOpp(1) }
+  function openForder(r:Row){ setFTarget({id:r.user_id,name:r.name}); setFTab("challenge"); setFDate(""); setFTime(""); setFMy(0); setFOpp(0) }
   async function sendChallenge(){
     if(!fTarget) return
     setBusy(true)
@@ -311,7 +311,7 @@ export default function LigaPage(){
       {/* Fordern-Popup */}
       {fTarget&&(
         <div onClick={()=>setFTarget(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.55)",zIndex:60,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:440,background:CARD,borderRadius:"24px 24px 0 0",padding:"22px 20px calc(26px + env(safe-area-inset-bottom))"}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:440,background:CARD,borderRadius:"24px 24px 0 0",padding:"22px 20px calc(26px + env(safe-area-inset-bottom))",maxHeight:"85vh",overflowY:"auto"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <div style={{fontSize:20,fontWeight:900,color:W}}>vs {fTarget.name}</div>
               <button onClick={()=>setFTarget(null)} style={{background:"none",border:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
