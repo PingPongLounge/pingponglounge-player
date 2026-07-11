@@ -14,31 +14,23 @@ const LEVELS = [
   { name: "7", color: lvColor("7"), grad: lvGrad("7"), desc: LEVEL_DESCS["7"], elo: LEVEL_ELO["7"] },
 ]
 
-const CANTON_MAP: Record<string, string> = {
-  "Aargau":"AG","Appenzell Ausserrhoden":"AR","Appenzell Innerrhoden":"AI",
-  "Basel-Landschaft":"BL","Basel-Stadt":"BS","Bern":"BE","Freiburg":"FR",
-  "Genf":"GE","Glarus":"GL","Graubünden":"GR","Jura":"JU","Luzern":"LU",
-  "Neuenburg":"NE","Nidwalden":"NW","Obwalden":"OW","Schaffhausen":"SH",
-  "Schwyz":"SZ","Solothurn":"SO","St. Gallen":"SG","Tessin":"TI",
-  "Thurgau":"TG","Uri":"UR","Waadt":"VD","Wallis":"VS","Zug":"ZG","Zürich":"ZH",
-}
-const CANTONS = Object.keys(CANTON_MAP)
-
+// Nur drei Fragen — die vier gestrichenen (Rückhand, Backspin, Aufschlag-Effet,
+// Spin erkennen) korrelieren so stark mit diesen, dass sie kaum Information
+// bringen und nur Zeit kosten. ELO korrigiert die Einstufung ohnehin nach wenigen Spielen.
 const QUIZ = [
   { q: "Wie lange spielst du schon Tischtennis?",
-    opts: [{ l: "Unter 6 Monate", p: 0 },{ l: "6 Monate – 2 Jahre", p: 1 },{ l: "2 – 5 Jahre", p: 2 },{ l: "Mehr als 5 Jahre", p: 3 }] },
+    opts: [{ l: "Unter 6 Monate", p: 0 },{ l: "6 Monate – 2 Jahre", p: 2 },{ l: "2 – 5 Jahre", p: 4 },{ l: "Mehr als 5 Jahre", p: 6 }] },
   { q: "Kannst du Topspin Vorhand spielen?",
-    opts: [{ l: "Ja, sicher", p: 2 },{ l: "Manchmal", p: 1 },{ l: "Nein", p: 0 }] },
-  { q: "Kannst du Topspin Rückhand spielen?",
-    opts: [{ l: "Ja, sicher", p: 2 },{ l: "Manchmal", p: 1 },{ l: "Nein", p: 0 }] },
-  { q: "Kannst du Backspin (Unterschnitt) spielen?",
-    opts: [{ l: "Ja, gezielt", p: 2 },{ l: "Manchmal", p: 1 },{ l: "Nein", p: 0 }] },
-  { q: "Kannst du Aufschläge mit Effet spielen?",
-    opts: [{ l: "Ja, verschiedene", p: 2 },{ l: "Einfache Varianten", p: 1 },{ l: "Nein", p: 0 }] },
-  { q: "Erkennst du den Spin deines Gegners?",
-    opts: [{ l: "Ja, meistens", p: 2 },{ l: "Manchmal", p: 1 },{ l: "Nein", p: 0 }] },
+    opts: [{ l: "Ja, sicher", p: 4 },{ l: "Manchmal", p: 2 },{ l: "Nein", p: 0 }] },
   { q: "Spielst du in einem Verein oder an Turnieren?",
-    opts: [{ l: "Ja, an Turnieren", p: 3 },{ l: "Ja, im Verein", p: 2 },{ l: "Nein", p: 0 }] },
+    opts: [{ l: "Ja, an Turnieren", p: 5 },{ l: "Ja, im Verein", p: 3 },{ l: "Nein", p: 0 }] },
+]
+
+// Die drei grossen Karten auf dem ersten Screen — ein Tap und man ist eingestuft.
+const QUICK = [
+  { key: "2", title: "Anfänger",        desc: "Du spielst gelegentlich, zum Spass." },
+  { key: "4", title: "Fortgeschritten", desc: "Du beherrschst Topspin und spielst regelmässig." },
+  { key: "6", title: "Profi",           desc: "Verein, Turniere, sicheres Spiel mit Spin." },
 ]
 
 const ALL_NICKS = [
@@ -56,9 +48,10 @@ const ALL_NICKS = [
   "TableSamurai","PaddleKnight","SpinSensei","LoopShogun","SmashNinja"
 ]
 
+// Max. Punktzahl im gekürzten Quiz: 6 + 4 + 5 = 15
 function calcLevel(score: number) {
   if (score >= 14) return LEVELS[6]
-  if (score >= 11) return LEVELS[5]
+  if (score >= 12) return LEVELS[5]
   if (score >= 9)  return LEVELS[4]
   if (score >= 7)  return LEVELS[3]
   if (score >= 5)  return LEVELS[2]
@@ -80,14 +73,14 @@ const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", borderRa
 
 export default function OnboardingPage() {
   const router = useRouter()
+  // Schritte: 0 = Level (drei Karten) · 1 = Quiz (optional) · 2 = Spielername
   const [step, setStep] = useState(0)
   const [name, setName] = useState("")
-  const [canton, setCanton] = useState("")
   const [mode, setMode] = useState<"" | "know" | "quiz">("")
   const [manualLevel, setManualLevel] = useState("")
+  const [showAllLevels, setShowAllLevels] = useState(false)
   const [quizIdx, setQuizIdx] = useState(0)
   const [quizScores, setQuizScores] = useState<number[]>([])
-  const [realName, setRealName] = useState("")
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState("")
   const [nicks, setNicks] = useState<string[]>([])
@@ -95,6 +88,8 @@ export default function OnboardingPage() {
   const [pending, setPending] = useState<PendingResult | null>(null)
 
   // Pending-Resultat aus dem /spielen Hook-Flow lesen (best-effort).
+  // Wer über den QR-Code kommt, hat sein Level schon durchs Spielergebnis —
+  // die Level-Frage entfällt, er landet direkt beim Spielernamen.
   useEffect(() => {
     try {
       const raw = localStorage.getItem("ppl_pending_result")
@@ -102,6 +97,7 @@ export default function OnboardingPage() {
       const parsed = JSON.parse(raw) as PendingResult
       if (parsed && typeof parsed.elo === "number" && Number.isFinite(parsed.elo)) {
         setPending(parsed)
+        setStep(2)
       }
     } catch { /* ungültiges JSON o.ä. → normaler Flow */ }
   }, [])
@@ -134,10 +130,10 @@ export default function OnboardingPage() {
     const supabase = createClient()
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) { setSaving(false); setSaveError("Nicht eingeloggt"); return }
+    // Echter Name und Kanton sind bewusst NICHT mehr Teil des Onboardings —
+    // sie werden im Profil nachgetragen. Nur Spielername + Level sind nötig.
     const { error } = await supabase.from("profiles").upsert({
       id: user.id, name: name.trim(), email: user.email,
-      real_name: realName.trim() || null,
-      canton: CANTON_MAP[canton] ?? canton,
       level: chosenLevel.name, elo: chosenLevel.elo,
     })
     if (error) { setSaveError("Fehler: " + error.message); setSaving(false); return }
@@ -151,7 +147,7 @@ export default function OnboardingPage() {
     const next = [...quizScores, points]
     setQuizScores(next)
     if (quizIdx + 1 < QUIZ.length) setQuizIdx(quizIdx + 1)
-    else setStep(3)
+    else setStep(2) // nach der letzten Frage direkt zum Spielernamen
   }
 
   const wrap: React.CSSProperties = { minHeight: "100vh", background: DARK, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }
@@ -169,78 +165,62 @@ export default function OnboardingPage() {
     </div>
   )
 
-  if (step === 0) return (
+  // ── Schritt 0: Level. Ein Tap und man ist eingestuft. ────────────────────────
+  if (step === 0 && !pending) return (
     <div style={wrap}><div style={box}>
-      <Header step={1} total={pending ? 2 : 3} />
-      {pending && (
-        <div style={{ background: "rgba(57,255,20,0.08)", borderRadius: "10px", padding: "12px 14px", marginBottom: "20px" }}>
-          <p style={{ fontSize: "13px", color: G, fontWeight: 700, lineHeight: 1.4 }}>Dein Resultat ist gespeichert — sichere jetzt deinen Rang.</p>
-        </div>
-      )}
-      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "6px" }}>Dein Profil</h2>
-      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{pending ? "Nur noch Name + Kanton — dann ist dein Rang fix." : "Kurz einrichten — dann geht es los."}</p>
-      <input style={inp} placeholder="Vor- und Nachname" value={realName} onChange={e => setRealName(e.target.value)} />
-      <p style={{ fontSize: "11px", color: MUTED, margin: "-8px 0 14px 2px" }}>Erscheint nur als „Vorname N." — voll nur in deinem Profil.</p>
-      <input style={inp} placeholder="Spielername (Nickname)" value={name} onChange={e => setName(e.target.value)} />
-      <button type="button" onClick={genNicknames} style={{ background: "none", border: "1px solid " + CELL, borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: MUTED, cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em", fontFamily: "inherit" }}>
-        {loadingNicks ? "..." : "Vorschläge generieren"}
-      </button>
-      {nicks.length > 0 && (
-        <div style={{ display: "flex", gap: "8px", marginBottom: "16px", flexWrap: "wrap" }}>
-          {nicks.map(n => (
-            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` : CELL, border: "1.5px solid transparent", borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: TEXT, cursor: "pointer", fontWeight: name === n ? 700 : 400, fontFamily: "inherit" }}>
-              {n}
-            </button>
-          ))}
-        </div>
-      )}
-      <select style={{ ...inp, marginTop: "4px" }} value={canton} onChange={e => setCanton(e.target.value)}>
-        <option value="">Kanton wählen...</option>
-        {CANTONS.map(c => <option key={c} value={c}>{c}</option>)}
-      </select>
-      <button style={primaryBtn(!name.trim() || !realName.trim())} disabled={!name.trim() || !realName.trim()} onClick={() => setStep(pending ? 3 : 1)}>Weiter</button>
-      {/* Der Button war bisher ohne jede Erklärung ausgegraut — genau hier sind Leute abgesprungen. */}
-      {(!realName.trim() || !name.trim()) && (
-        <p style={{ fontSize: "12px", color: MUTED, textAlign: "center", marginTop: "10px", lineHeight: 1.5 }}>
-          {!realName.trim() && !name.trim() ? "Noch nötig: Vor- und Nachname sowie ein Spielername."
-            : !realName.trim() ? "Es fehlt noch dein Vor- und Nachname."
-            : "Es fehlt noch dein Spielername — nimm einen Vorschlag oder erfinde einen."}
-        </p>
-      )}
-    </div></div>
-  )
+      <Header step={1} total={2} />
+      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "6px" }}>Wie gut spielst du?</h2>
+      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "24px" }}>Grob reicht — dein Level passt sich automatisch an, sobald du spielst.</p>
 
-  if (step === 1) return (
-    <div style={wrap}><div style={box}>
-      <Header step={2} total={3} />
-      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "6px" }}>Dein Level</h2>
-      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>Kennst du dein Spielniveau?</p>
-      <button style={optBtn(mode === "know")} onClick={() => setMode("know")}>Ja, ich kenne mein Level</button>
-      <button style={optBtn(mode === "quiz")} onClick={() => setMode("quiz")}>Nein — hilf mir es herauszufinden</button>
-      {mode === "know" && (
-        <div style={{ marginTop: "16px" }}>
+      {!showAllLevels && QUICK.map(q => {
+        const l = LEVELS.find(x => x.name === q.key)!
+        const sel = mode === "know" && manualLevel === q.key
+        return (
+          <button key={q.key} onClick={() => { setMode("know"); setManualLevel(q.key); setStep(2) }}
+            style={{ ...optBtn(sel), padding: "18px 18px", marginBottom: "10px" }}>
+            <span style={{ display: "block", fontSize: "17px", fontWeight: 900, color: l.color, marginBottom: "3px" }}>{q.title}</span>
+            <span style={{ display: "block", fontSize: "13px", color: MUTED, lineHeight: 1.4 }}>{q.desc}</span>
+          </button>
+        )
+      })}
+
+      {showAllLevels && (
+        <div style={{ marginBottom: "6px" }}>
           {LEVELS.map(l => (
-            <button key={l.name} style={optBtn(manualLevel === l.name)} onClick={() => setManualLevel(l.name)}>
+            <button key={l.name} onClick={() => { setMode("know"); setManualLevel(l.name); setStep(2) }} style={optBtn(manualLevel === l.name)}>
               <span style={{ color: l.color, fontWeight: 800 }}>Level {l.name}</span>
               <span style={{ fontSize: "12px", color: MUTED, marginLeft: "8px" }}>{l.desc}</span>
             </button>
           ))}
         </div>
       )}
-      <button style={primaryBtn(!mode || (mode === "know" && !manualLevel))} disabled={!mode || (mode === "know" && !manualLevel)} onClick={() => mode === "quiz" ? setStep(2) : setStep(3)}>Weiter</button>
+
+      {/* Beide Wege bleiben freiwillig — niemand muss das Quiz machen */}
+      <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
+        <button type="button" onClick={() => setShowAllLevels(v => !v)}
+          style={{ flex: 1, background: "none", border: "1px solid " + CELL, borderRadius: "10px", padding: "12px", fontSize: "12.5px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>
+          {showAllLevels ? "Weniger anzeigen" : "Genauer einstufen"}
+        </button>
+        <button type="button" onClick={() => { setMode("quiz"); setQuizIdx(0); setQuizScores([]); setStep(1) }}
+          style={{ flex: 1, background: "none", border: "1px solid " + CELL, borderRadius: "10px", padding: "12px", fontSize: "12.5px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>
+          Nicht sicher? 3 Fragen
+        </button>
+      </div>
     </div></div>
   )
 
-  if (step === 2) {
+  // ── Schritt 1: Quiz (freiwillig, 3 Fragen) ──────────────────────────────────
+  if (step === 1) {
     const q = QUIZ[quizIdx]
     return (
       <div style={wrap}><div style={box}>
         <div style={{ marginBottom: "28px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
             <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>frage {quizIdx + 1} / {QUIZ.length}</span>
+            <button type="button" onClick={() => setStep(0)} style={{ background: "none", border: "none", fontSize: "11px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Zurück</button>
           </div>
           <div style={{ background: CELL, borderRadius: "4px", height: "3px" }}>
-            <div style={{ background: GRAD, height: "3px", borderRadius: "4px", width: `${((quizIdx) / QUIZ.length) * 100}%`, transition: "width 0.3s" }} />
+            <div style={{ background: GRAD, height: "3px", borderRadius: "4px", width: `${(quizIdx / QUIZ.length) * 100}%`, transition: "width 0.3s" }} />
           </div>
         </div>
         <h2 style={{ fontSize: "22px", fontWeight: 800, color: TEXT, marginBottom: "24px", lineHeight: 1.3 }}>{q.q}</h2>
@@ -251,25 +231,57 @@ export default function OnboardingPage() {
     )
   }
 
-  if (step === 3 && chosenLevel) return (
+  // ── Schritt 2: Spielername — das einzige Feld, das man tippen muss ──────────
+  if (step === 2 && chosenLevel) return (
     <div style={wrap}><div style={box}>
-      <Header step={pending ? 2 : 3} total={pending ? 2 : 3} />
-      <p style={{ fontSize: "11px", fontWeight: 700, color: chosenLevel.color, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "8px" }}>{pending ? "Dein Start-Rang" : mode === "quiz" ? "Dein Ergebnis" : "Bestätigung"}</p>
-      <h2 style={{ fontSize: "40px", fontWeight: 900, color: chosenLevel.color, textTransform: "uppercase", marginBottom: "4px", letterSpacing: "-0.02em" }}>Level {chosenLevel.name}</h2>
-      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "28px" }}>{chosenLevel.desc}</p>
-      <div style={{ background: CARD, borderRadius: "12px", padding: "20px", marginBottom: "24px" }}>
-        {[{ label: "Name", value: name }, { label: "Kanton", value: canton }, { label: "Level", value: chosenLevel.name }, { label: "Start-ELO", value: String(chosenLevel.elo) }].map(row => (
-          <div key={row.label} style={{ display: "flex", justifyContent: "space-between", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,.06)" }}>
-            <span style={{ fontSize: "13px", color: MUTED }}>{row.label}</span>
-            <span style={{ fontSize: "13px", color: TEXT, fontWeight: 700 }}>{row.value}</span>
-          </div>
-        ))}
+      <Header step={2} total={2} />
+
+      {pending && (
+        <div style={{ background: "rgba(57,255,20,0.08)", borderRadius: "10px", padding: "12px 14px", marginBottom: "18px" }}>
+          <p style={{ fontSize: "13px", color: G, fontWeight: 700, lineHeight: 1.4 }}>Dein Resultat ist gespeichert — sichere jetzt deinen Rang.</p>
+        </div>
+      )}
+
+      {/* Einstufung als Ergebnis zeigen, nicht als weiteren Bestätigungsschritt */}
+      <div style={{ background: CARD, borderRadius: "12px", padding: "14px 16px", marginBottom: "22px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div>
+          <div style={{ fontSize: "10.5px", fontWeight: 700, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "3px" }}>Deine Einstufung</div>
+          <div style={{ fontSize: "17px", fontWeight: 900, color: chosenLevel.color }}>Level {chosenLevel.name}</div>
+          <div style={{ fontSize: "11.5px", color: MUTED, marginTop: "1px" }}>Start-ELO {chosenLevel.elo}</div>
+        </div>
+        {!pending && (
+          <button type="button" onClick={() => { setStep(0); setShowAllLevels(false) }}
+            style={{ background: "none", border: "1px solid " + CELL, borderRadius: "8px", padding: "8px 12px", fontSize: "11.5px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Ändern</button>
+        )}
       </div>
-      <p style={{ fontSize: "12px", color: MUTED, marginBottom: "16px", lineHeight: 1.6 }}>Dein Level passt sich automatisch an, je mehr du spielst — ELO startet bei {chosenLevel.elo}.</p>
-      {saveError && <p style={{ fontSize: "13px", color: "#E5484D", marginBottom: "10px" }}>{saveError}</p>}
-      <button style={primaryBtn(saving)} disabled={saving} onClick={handleSave}>
-        {saving ? "Wird gespeichert…" : "Profil erstellen"}
+
+      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "6px" }}>Dein Spielername</h2>
+      <p style={{ fontSize: "14px", color: MUTED, marginBottom: "20px" }}>So sehen dich die anderen in der Rangliste.</p>
+
+      <input style={inp} placeholder="Spielername" value={name} onChange={e => setName(e.target.value)} autoFocus />
+      <button type="button" onClick={genNicknames} style={{ background: "none", border: "1px solid " + CELL, borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: MUTED, cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em", fontFamily: "inherit" }}>
+        {loadingNicks ? "..." : "Vorschläge generieren"}
       </button>
+      {nicks.length > 0 && (
+        <div style={{ display: "flex", gap: "8px", marginBottom: "8px", flexWrap: "wrap" }}>
+          {nicks.map(n => (
+            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` : CELL, border: "1.5px solid transparent", borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: TEXT, cursor: "pointer", fontWeight: name === n ? 700 : 400, fontFamily: "inherit" }}>
+              {n}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {saveError && <p style={{ fontSize: "13px", color: "#E5484D", margin: "10px 0 0" }}>{saveError}</p>}
+
+      <button style={primaryBtn(saving || !name.trim())} disabled={saving || !name.trim()} onClick={handleSave}>
+        {saving ? "Wird gespeichert…" : "Los geht's"}
+      </button>
+      {!name.trim() && <p style={{ fontSize: "12px", color: MUTED, textAlign: "center", marginTop: "10px" }}>Wähl einen Spielernamen — oder nimm einen Vorschlag.</p>}
+
+      <p style={{ fontSize: "11.5px", color: MUTED, textAlign: "center", marginTop: "16px", lineHeight: 1.5 }}>
+        Echten Namen und Kanton kannst du später im Profil ergänzen.
+      </p>
     </div></div>
   )
 

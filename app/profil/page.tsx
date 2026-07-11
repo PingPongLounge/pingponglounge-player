@@ -3,7 +3,8 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import LogoutButton from "@/app/components/LogoutButton"
-import { BG, CELL, W, SUB, MUT, GREEN, gt, card, cardPad, cell, levelBadge, btn, h1 } from "@/app/theme"
+import { BG, CARD, CELL, W, SUB, MUT, GREEN, GRAD, gt, card, cardPad, cell, levelBadge, btn, h1 } from "@/app/theme"
+import { createClient } from "@/lib/supabase/client"
 
 const M=MUT,G=GREEN
 
@@ -52,7 +53,16 @@ function EloChart({history,current}:{history:{elo:number,delta:number,created_at
 
 type EloPoint={elo:number,delta:number,created_at:string}
 type RecentMatch={id:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,confirmed_at:string,p1_id:string,p2_id:string,p1:{name:string}|null,p2:{name:string}|null,season:{name:string,city:string}|null}
-type Profile={id:string,name:string,elo:number,level:string,matches_played:number,matches_won:number,canton:string|null,created_at:string,avatar_url?:string|null}
+type Profile={id:string,name:string,real_name?:string|null,elo:number,level:string,matches_played:number,matches_won:number,canton:string|null,created_at:string,avatar_url?:string|null}
+
+const CANTON_MAP: Record<string,string> = {
+  "Aargau":"AG","Appenzell Ausserrhoden":"AR","Appenzell Innerrhoden":"AI","Basel-Landschaft":"BL",
+  "Basel-Stadt":"BS","Bern":"BE","Freiburg":"FR","Genf":"GE","Glarus":"GL","Graubünden":"GR",
+  "Jura":"JU","Luzern":"LU","Neuenburg":"NE","Nidwalden":"NW","Obwalden":"OW","Schaffhausen":"SH",
+  "Schwyz":"SZ","Solothurn":"SO","St. Gallen":"SG","Tessin":"TI","Thurgau":"TG","Uri":"UR",
+  "Waadt":"VD","Wallis":"VS","Zug":"ZG","Zürich":"ZH",
+}
+const CANTONS = Object.keys(CANTON_MAP)
 
 export default function ProfilPage(){
   const [profile,setProfile]=useState<Profile|null>(null)
@@ -63,6 +73,24 @@ export default function ProfilPage(){
   const [badges,setBadges]=useState<{icon:string,title:string,earned:boolean,tier:string}[]>([])
   const [earnedCount,setEarnedCount]=useState(0)
   const [error,setError]=useState("")
+  // Profil vervollständigen (Name + Kanton, aus dem Onboarding hierher verschoben)
+  const [cName,setCName]=useState("")
+  const [cCanton,setCCanton]=useState("")
+  const [completing,setCompleting]=useState(false)
+  const [completeDone,setCompleteDone]=useState(false)
+
+  async function saveComplete(){
+    setCompleting(true)
+    const sb=createClient()
+    const {data:{user}}=await sb.auth.getUser()
+    if(!user){ setCompleting(false); return }
+    const patch: Record<string,string> = {}
+    if(cName.trim()) patch.real_name=cName.trim()
+    if(cCanton) patch.canton=CANTON_MAP[cCanton] ?? cCanton
+    const {error}=await sb.from("profiles").update(patch).eq("id",user.id)
+    setCompleting(false)
+    if(!error){ setCompleteDone(true); load() }
+  }
 
   async function load(){
     setError("")
@@ -145,6 +173,32 @@ export default function ProfilPage(){
             {profile.canton&&<span style={{fontSize:11,color:SUB,background:CELL,borderRadius:999,padding:"3px 11px"}}>{profile.canton}</span>}
           </div>
         </div>
+
+        {/* Profil vervollständigen — echter Name + Kanton werden hier nachgetragen,
+            nicht mehr im Onboarding (das hat zu viele Leute vertrieben). */}
+        {(!profile.real_name || !profile.canton) && !completeDone && (
+          <div style={{...cardPad,padding:"18px 18px",marginBottom:10,border:"1.5px solid transparent",background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`}}>
+            <p style={{fontSize:14,fontWeight:800,color:W,marginBottom:4}}>Profil vervollständigen</p>
+            <p style={{fontSize:12.5,color:M,lineHeight:1.5,marginBottom:14}}>
+              Dein Name erscheint für andere nur als „Vorname N." unter deinem Spielernamen. Der Kanton hilft, dich der richtigen Liga zuzuordnen.
+            </p>
+            {!profile.real_name&&(
+              <input value={cName} onChange={e=>setCName(e.target.value)} placeholder="Vor- und Nachname"
+                style={{width:"100%",boxSizing:"border-box",background:BG,border:`1px solid ${CELL}`,borderRadius:10,padding:"12px 14px",color:W,fontSize:14,marginBottom:10,fontFamily:"inherit",outline:"none"}}/>
+            )}
+            {!profile.canton&&(
+              <select value={cCanton} onChange={e=>setCCanton(e.target.value)}
+                style={{width:"100%",boxSizing:"border-box",background:BG,border:`1px solid ${CELL}`,borderRadius:10,padding:"12px 14px",color:W,fontSize:14,marginBottom:10,fontFamily:"inherit",outline:"none"}}>
+                <option value="">Kanton wählen…</option>
+                {CANTONS.map(c=><option key={c} value={c}>{c}</option>)}
+              </select>
+            )}
+            <button onClick={saveComplete} disabled={completing||(!cName.trim()&&!cCanton)}
+              style={{...btn,width:"100%",marginTop:2,fontSize:14,opacity:(completing||(!cName.trim()&&!cCanton))?.5:1,cursor:(completing||(!cName.trim()&&!cCanton))?"not-allowed":"pointer"}}>
+              {completing?"Wird gespeichert…":"Speichern"}
+            </button>
+          </div>
+        )}
 
         {/* ELO Hero */}
         <div style={{...cardPad,padding:"20px 20px 14px",marginBottom:10,textAlign:"center"}}>
