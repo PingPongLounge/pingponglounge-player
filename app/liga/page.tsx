@@ -103,6 +103,19 @@ export default function LigaPage(){
   },[userId])
 
   useEffect(()=>{ if(seasonId) loadStandings(seasonId) },[seasonId,loadStandings])
+
+  // Überfällige Ergebnisse (24h ohne Reaktion) bestätigen — der Hobby-Plan erlaubt
+  // nur EINEN täglichen Cron, deshalb prüfen wir zusätzlich beim Öffnen der Liga.
+  useEffect(()=>{
+    if(!seasonId) return
+    ;(async()=>{
+      try{
+        const r=await fetch("/api/liga/tick",{method:"POST"})
+        const j=await r.json().catch(()=>({}))
+        if(j?.confirmed>0) loadStandings(seasonId)
+      }catch{ /* egal — nur eine Aufräum-Aktion */ }
+    })()
+  },[seasonId,loadStandings])
   // zu meinem Rang scrollen
   useEffect(()=>{ if(rows.length&&meRef.current){ meRef.current.scrollIntoView({block:"center",behavior:"smooth"}) } },[rows])
 
