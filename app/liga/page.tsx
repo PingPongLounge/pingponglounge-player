@@ -44,6 +44,8 @@ export default function LigaPage(){
   const [fTime,setFTime]=useState("")
   const [fMy,setFMy]=useState(0)
   const [fOpp,setFOpp]=useState(0)
+  const [fRDate,setFRDate]=useState("")        // Wann wurde gespielt?
+  const [fDone,setFDone]=useState<string[]>([]) // in dieser Session eingetragene Ergebnisse
 
   const flash=(t:string)=>{setToast(t);setTimeout(()=>setToast(""),2500)}
 
@@ -128,7 +130,8 @@ export default function LigaPage(){
     if(r.ok){flash("⚔️ Herausforderung gesendet!");loadStandings(seasonId)}
     else flash(j.error||"Fehler")
   }
-  function openForder(r:Row){ setFTarget({id:r.user_id,name:r.name}); setFTab("challenge"); setFDate(""); setFTime(""); setFMy(0); setFOpp(0) }
+  function today(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` }
+  function openForder(r:Row){ setFTarget({id:r.user_id,name:r.name}); setFTab("challenge"); setFDate(""); setFTime(""); setFMy(0); setFOpp(0); setFRDate(today()); setFDone([]) }
   async function sendChallenge(){
     if(!fTarget) return
     setBusy(true)
@@ -153,9 +156,16 @@ export default function LigaPage(){
     if(!matchId){ flash(dj.error||"Fehler beim Anlegen"); setBusy(false); return }
     const sets=[...Array(fMy)].map(()=>({p1:11,p2:7})).concat([...Array(fOpp)].map(()=>({p1:7,p2:11})))
     const winner_id=fMy>fOpp?userId:fTarget.id
-    const rr=await fetch("/api/liga/result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId,sets,winner_id})})
+    const played_at=fRDate?new Date(`${fRDate}T20:00:00`).toISOString():undefined
+    const rr=await fetch("/api/liga/result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId,sets,winner_id,played_at})})
     const rj=await rr.json().catch(()=>({}))
-    if(rr.ok){ flash("✓ Eingetragen — warte auf Bestätigung"); setFTarget(null); loadStandings(seasonId) }
+    if(rr.ok){
+      // Popup bleibt offen → direkt das nächste Ergebnis eintragen
+      setFDone(d=>[...d,`${fMy}:${fOpp}`])
+      setFMy(0); setFOpp(0)
+      flash("✓ Eingetragen — warte auf Bestätigung")
+      loadStandings(seasonId)
+    }
     else flash(rj.error||"Fehler")
     setBusy(false)
   }
@@ -342,7 +352,13 @@ export default function LigaPage(){
               </>
             ):(
               <>
-                <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:18}}>Schon gespielt? Trag die Sätze ein — {fTarget.name} bestätigt, dann zählt&apos;s (ELO + PingPoints).</div>
+                <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Schon gespielt? Trag die Sätze ein — {fTarget.name} bestätigt, dann zählt&apos;s (ELO + PingPoints).</div>
+
+                <div style={{marginBottom:18}}>
+                  <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Wann gespielt?</div>
+                  <input type="date" max={today()} value={fRDate} onChange={e=>setFRDate(e.target.value)} style={{width:"100%",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                </div>
+
                 <div style={{display:"flex",alignItems:"flex-end",justifyContent:"center",gap:14}}>
                   {([["Du",fMy,setFMy],[fTarget.name,fOpp,setFOpp]] as [string,number,(n:number)=>void][]).map(([lab,val,set],idx)=>(
                     <>
@@ -358,7 +374,20 @@ export default function LigaPage(){
                     </>
                   ))}
                 </div>
-                <button onClick={sendResult} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:24,background:GRAD,color:"#06210F",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":"Ergebnis absenden"}</button>
+                <button onClick={sendResult} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:24,background:GRAD,color:"#06210F",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":fDone.length?"Weiteres Ergebnis absenden":"Ergebnis absenden"}</button>
+
+                {fDone.length>0&&(
+                  <div style={{marginTop:16,background:CELL,borderRadius:14,padding:"13px 14px"}}>
+                    <div style={{fontSize:11,fontWeight:700,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:8}}>Eingetragen ({fDone.length})</div>
+                    <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
+                      {fDone.map((s,i)=>(
+                        <span key={i} style={{fontSize:13,fontWeight:800,color:W,background:"#20242C",borderRadius:8,padding:"5px 10px"}}>{s}</span>
+                      ))}
+                    </div>
+                    <div style={{fontSize:11.5,color:SUB,fontWeight:300,marginTop:9}}>Wartet auf {fTarget.name}. Du kannst gleich den nächsten Match eintragen.</div>
+                    <button onClick={()=>setFTarget(null)} style={{display:"block",width:"100%",textAlign:"center",marginTop:11,background:"none",border:`1px solid ${MUT}`,borderRadius:12,padding:11,fontSize:13,fontWeight:800,color:W,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit"}}>Fertig</button>
+                  </div>
+                )}
               </>
             )}
           </div>

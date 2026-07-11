@@ -8,6 +8,24 @@ const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 const SHADOW = "0 1px 4px rgba(0,0,0,.14)"
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
 
+// Grüner Sektions-Balken: "PLAYER LIGA / TURNIER / OPEN GAME / TRAINING"
+// Logo + Wortmarke sind IMMER ein Link zurück auf die Startseite.
+export function SectionTopBar({ section }: { section: string }) {
+  return (
+    <div style={{ position: "sticky", top: 0, zIndex: 50, background: GRAD }}>
+      <div style={{ maxWidth: 480, margin: "0 auto", padding: "11px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <Link href="/entdecken" aria-label="Zur Startseite" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
+          <svg width="22" height="22" viewBox="0 0 80 80" fill="none" aria-hidden>
+            <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="#06210F" strokeWidth="3.6" strokeLinejoin="round" />
+            <circle cx="63" cy="58" r="6.5" fill="#06210F" />
+          </svg>
+          <span style={{ fontSize: 13, fontWeight: 900, letterSpacing: ".20em", color: "#06210F" }}>PLAYER <span style={{ fontWeight: 600, color: "rgba(6,33,15,.72)" }}>{section.toUpperCase()}</span></span>
+        </Link>
+      </div>
+    </div>
+  )
+}
+
 export function SectionHero({ eyebrow, title, subtitle, img = "/gl-tische.jpg" }: { eyebrow: string; title: string; subtitle: string; img?: string }) {
   return (
     <div style={{ position: "relative", height: 190, margin: "14px 0 0", borderRadius: 24, overflow: "hidden", boxShadow: SHADOW }}>

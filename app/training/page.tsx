@@ -2,7 +2,7 @@
 import { useEffect } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import { SectionHero, SectionIntro } from "@/app/components/SectionUI"
+import { SectionHero, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
 
 const BG = "#20242C", CARD = "#2A2F39", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.5)"
@@ -25,10 +25,9 @@ export default function TrainingPage() {
   }, [])
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
-      <div style={{ maxWidth: 480, margin: "0 auto" }}>
-        <Link href="/entdecken" style={{ color: MUT, textDecoration: "none", fontSize: 13, fontWeight: 500 }}>← Start</Link>
-
+    <main style={{ minHeight: "100vh", background: BG, padding: "0 0 100px" }}>
+      <SectionTopBar section="Training" />
+      <div style={{ maxWidth: 480, margin: "0 auto", padding: "6px 16px 0" }}>
         <SectionHero eyebrow="Player · Academy" title="Training" subtitle="Wöchentliches Coaching von Beginner bis Pro · Glattbrugg." />
         <SectionIntro storageKey="intro_training" title="So funktioniert das Training" steps={[["1", "Kurs wählen", "Von Beginner bis Pro — wöchentlich in der Lounge Glattbrugg."], ["2", "Termin sichern", "Anmeldung & Bezahlung laufen direkt über Eversports."], ["3", "Besser werden", "Regelmässiges Coaching, Drills und Matchpraxis."]]} />
 

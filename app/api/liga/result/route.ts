@@ -3,7 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
-  const { match_id, sets, winner_id } = await req.json()
+  const { match_id, sets, winner_id, played_at } = await req.json()
   const sb = await createClient()
   const { data: { user } } = await sb.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -33,11 +33,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Ungültige Satzwerte" }, { status: 400 })
   }
 
+  // Spieldatum: optional vom Spieler gesetzt. Nicht in der Zukunft, max. 60 Tage zurück.
+  let when = new Date()
+  if (played_at) {
+    const d = new Date(played_at)
+    const now = Date.now()
+    if (isNaN(d.getTime())) return NextResponse.json({ error: "Ungültiges Datum" }, { status: 400 })
+    if (d.getTime() > now + 60 * 60 * 1000) return NextResponse.json({ error: "Datum liegt in der Zukunft" }, { status: 400 })
+    if (d.getTime() < now - 60 * 24 * 60 * 60 * 1000) return NextResponse.json({ error: "Datum liegt zu weit zurück" }, { status: 400 })
+    when = d
+  }
+
   const { error } = await admin.from("league_matches").update({
     sets,
     winner_id,
     status: "p1_entered",
-    played_at: new Date().toISOString(),
+    played_at: when.toISOString(),
     entered_by: user.id,
   }).eq("id", match_id)
 

@@ -140,13 +140,6 @@ export default function StartHomeV2(d: StartData) {
             <Link href="/match" style={ghost}>Alle Open Games</Link>
           </div>
 
-          {/* TRAINING */}
-          <div className="rev" style={card}>
-            <div style={thead}><img src="/icons/paddles.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Training</span></div>
-            <div style={csub}>Coaching, Drills & Kurse — buch dich direkt in ein Training ein.</div>
-            <Link href="/training" style={cta}>Trainings ansehen</Link>
-          </div>
-
           {/* LIGA */}
           <div className="rev" style={card}>
             <div style={thead}><img src="/icons/liga.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Liga</span></div>
@@ -176,6 +169,13 @@ export default function StartHomeV2(d: StartData) {
               </div>
             )}
             <Link href="/turniere" style={cta}>{d.tour ? "Anmelden" : "Turniere ansehen"}</Link>
+          </div>
+
+          {/* TRAINING */}
+          <div className="rev" style={card}>
+            <div style={thead}><img src="/icons/paddles.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Training</span></div>
+            <div style={csub}>Coaching, Drills & Kurse — buch dich direkt in ein Training ein.</div>
+            <Link href="/training" style={cta}>Trainings ansehen</Link>
           </div>
 
         </div>

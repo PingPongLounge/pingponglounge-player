@@ -5,7 +5,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 import { BG, CARD, W, MUT, GREEN, card, cardPad, cardActive, cell, chip, btn, btnInCard, btnGhost, chipBtn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
-import { SectionHero, SectionIntro } from "@/app/components/SectionUI"
+import { SectionHero, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
 
 const M=MUT, G=GREEN, C=CARD
 
@@ -73,10 +73,9 @@ export default function MatchPage() {
   )
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
-      <div style={{ maxWidth: 560, margin: "0 auto" }}>
-        <Link href="/entdecken" style={{ color: M, textDecoration: "none", fontSize: 13, fontWeight: 500 }}>← Start</Link>
-
+    <main style={{ minHeight: "100vh", background: BG, padding: "0 0 100px" }}>
+      <SectionTopBar section="Open Game" />
+      <div style={{ maxWidth: 560, margin: "0 auto", padding: "6px 16px 0" }}>
         <SectionHero eyebrow="Player · Open Game" title="Open Game" subtitle="Spiel wann du willst — tritt bei oder erstelle dein eigenes." />
         <SectionIntro storageKey="intro_match" title="So funktioniert Open Game" steps={[["1", "Finde ein Spiel", "Filter nach Level und Standort — sieh, was heute läuft."], ["2", "Mitspielen oder erstellen", "Tritt einem offenen Spiel bei oder starte dein eigenes."], ["3", "Ergebnis eintragen", "Nach dem Spiel Resultat erfassen — dein Rang & die PingPoints steigen."]]} cta={{ label: "Open Game erstellen", href: "/match/create" }} />
 
