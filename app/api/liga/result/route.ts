@@ -2,6 +2,9 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 import { sendResultConfirmRequest } from "@/lib/email"
+import { signAction } from "@/lib/token"
+
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://pingponglounge-player.vercel.app"
 
 export async function POST(req: NextRequest) {
   const { match_id, sets, winner_id, played_at } = await req.json()
@@ -60,19 +63,46 @@ export async function POST(req: NextRequest) {
   // Fehler beim Mailversand dürfen das Eintragen nie scheitern lassen.
   try {
     const opponentId = match.p1_id === user.id ? match.p2_id : match.p1_id
-    const { data: people } = await admin.from("profiles").select("id,name,email").in("id", [user.id, opponentId])
+    const { data: people } = await admin.from("profiles").select("id,name,email,elo").in("id", [user.id, opponentId])
     const me = (people || []).find(p => p.id === user.id)
     const opp = (people || []).find(p => p.id === opponentId)
+
     if (opp?.email) {
       const mySets = (sets as Array<{ p1: number; p2: number }>).filter(s => s.p1 > s.p2).length
       const oppSets = (sets as Array<{ p1: number; p2: number }>).filter(s => s.p2 > s.p1).length
+      const oppWon = winner_id === opponentId
+
+      // ELO-Vorschau: exakt dieselbe Formel wie applyLeagueConfirm (K=32)
+      const myElo = me?.elo ?? 1000
+      const oppElo = opp.elo ?? 1000
+      const wElo = oppWon ? oppElo : myElo
+      const lElo = oppWon ? myElo : oppElo
+      const ea = 1 / (1 + Math.pow(10, (lElo - wElo) / 400))
+      const gain = Math.round(32 * (1 - ea))
+      const oppAfter = oppWon ? Math.max(100, wElo + gain) : Math.max(100, lElo - gain)
+
+      // Aktueller Rang des Gegners (nach ELO, über alle Spieler)
+      const { count } = await admin
+        .from("profiles")
+        .select("id", { count: "exact", head: true })
+        .gt("elo", oppElo)
+      const rankNow = typeof count === "number" ? count + 1 : null
+
+      const t = signAction("confirm", match_id, opponentId)
+      const confirmUrl = `${BASE_URL}/api/liga/confirm-email?m=${match_id}&p=${opponentId}&t=${t}`
+
       await sendResultConfirmRequest({
         to: opp.email,
         opponentName: me?.name || "Dein Gegner",
         recipientName: opp.name || "Spieler",
-        scoreLine: `${mySets}:${oppSets}`,
+        scoreLine: `${oppSets}:${mySets}`, // aus Sicht des Empfängers
+        won: oppWon,
         playedLabel: when.toLocaleDateString("de-CH", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" }),
         matchId: match_id,
+        eloNow: oppElo,
+        eloAfter: oppAfter,
+        rankNow,
+        confirmUrl,
       })
     }
   } catch (e) {

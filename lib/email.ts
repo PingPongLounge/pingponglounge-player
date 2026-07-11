@@ -35,32 +35,64 @@ function shell(inner: string): string {
 }
 
 // Gegner bittet um Bestätigung eines eingetragenen Liga-Ergebnisses.
+// Enthält einen signierten Ein-Klick-Link (kein Login nötig) und zeigt,
+// was die Bestätigung mit ELO und Rang macht.
 export async function sendResultConfirmRequest(opts: {
   to: string
   opponentName: string   // wer das Ergebnis eingetragen hat
   recipientName: string  // wer bestätigen soll
-  scoreLine: string      // z.B. "3:1"
-  playedLabel: string    // z.B. "Fr, 10.07.2026"
+  scoreLine: string      // Ergebnis aus Sicht des Empfängers, z.B. "1:3"
+  won: boolean           // hat der Empfänger gewonnen?
+  playedLabel: string
   matchId: string
+  eloNow: number
+  eloAfter: number
+  rankNow: number | null
+  confirmUrl: string     // signierter Ein-Klick-Link
 }) {
-  const url = `${BASE_URL}/liga/match/${opts.matchId}`
+  const delta = opts.eloAfter - opts.eloNow
+  const deltaColor = delta >= 0 ? G : "#FF5C5C"
+  const deltaLabel = `${delta >= 0 ? "+" : ""}${delta}`
+  const appUrl = `${BASE_URL}/liga/match/${opts.matchId}`
+
   return sendEmail({
     to: opts.to,
-    subject: `${opts.opponentName} hat euer Ergebnis eingetragen — bitte bestätigen`,
+    subject: `${opts.opponentName} hat euer Ergebnis eingetragen (${opts.scoreLine}) — bitte bestätigen`,
     html: shell(`
       <h1 style="font-size:22px;font-weight:900;margin:0 0 10px;color:#fff">Ergebnis bestätigen</h1>
       <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.55;margin:0 0 18px">
         Hallo ${opts.recipientName},<br>
         <strong style="color:#fff">${opts.opponentName}</strong> hat euer Liga-Match vom ${opts.playedLabel} eingetragen.
       </p>
-      <div style="background:#2A2F39;border-radius:14px;padding:18px;text-align:center;margin-bottom:18px">
-        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Ergebnis aus Sicht von ${opts.opponentName}</div>
-        <div style="font-size:34px;font-weight:900;color:${G}">${opts.scoreLine}</div>
+
+      <div style="background:#2A2F39;border-radius:14px;padding:18px;text-align:center;margin-bottom:12px">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Dein Ergebnis · ${opts.won ? "Sieg" : "Niederlage"}</div>
+        <div style="font-size:36px;font-weight:900;color:#fff">${opts.scoreLine}</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px">du : ${opts.opponentName}</div>
       </div>
-      <a href="${url}" style="display:block;text-align:center;background:${G};color:#06210F;border-radius:12px;padding:15px;font-size:15px;font-weight:800;text-decoration:none;text-transform:uppercase;letter-spacing:.03em">Jetzt prüfen &amp; bestätigen</a>
+
+      <div style="background:#2A2F39;border-radius:14px;padding:16px 18px;margin-bottom:18px">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Wenn du bestätigst</div>
+        <table style="width:100%;border-collapse:collapse">
+          <tr>
+            <td style="padding:4px 0;color:rgba(255,255,255,.7);font-size:13px">ELO</td>
+            <td style="padding:4px 0;text-align:right;font-size:14px;color:#fff;font-weight:800">
+              ${opts.eloNow} → ${opts.eloAfter}
+              <span style="color:${deltaColor};font-weight:900;margin-left:6px">${deltaLabel}</span>
+            </td>
+          </tr>
+          ${opts.rankNow ? `<tr>
+            <td style="padding:4px 0;color:rgba(255,255,255,.7);font-size:13px">Dein Rang aktuell</td>
+            <td style="padding:4px 0;text-align:right;font-size:14px;color:#fff;font-weight:800">#${opts.rankNow}</td>
+          </tr>` : ""}
+        </table>
+      </div>
+
+      <a href="${opts.confirmUrl}" style="display:block;text-align:center;background:${G};color:#06210F;border-radius:12px;padding:15px;font-size:15px;font-weight:800;text-decoration:none;text-transform:uppercase;letter-spacing:.03em">Ergebnis bestätigen</a>
+      <a href="${appUrl}" style="display:block;text-align:center;margin-top:9px;color:rgba(255,255,255,.65);font-size:13px;text-decoration:none;padding:11px;border:1px solid rgba(255,255,255,.18);border-radius:12px">Stimmt nicht — in der App widersprechen</a>
+
       <p style="color:rgba(255,255,255,.5);font-size:12.5px;line-height:1.5;margin:16px 0 0">
         Du hast <strong style="color:#fff">24 Stunden</strong> Zeit. Reagierst du nicht, wird das Ergebnis automatisch bestätigt und für ELO &amp; Rangliste gewertet.
-        Stimmt etwas nicht, widersprich in der App.
       </p>
     `),
   })
