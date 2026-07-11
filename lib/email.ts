@@ -31,7 +31,7 @@ const CARD = "#2A2F39"
 function shell(inner: string): string {
   return `
   <div style="font-family:system-ui,-apple-system,sans-serif;max-width:520px;margin:0 auto;padding:28px 24px;background:#20242C;border-radius:20px;color:#fff">
-    <img src="${BASE_URL}/logo-mail.png" alt="Player — Table Tennis Next Level" width="190" style="display:block;width:190px;max-width:190px;height:auto;margin-bottom:24px;border:0">
+    <img src="${BASE_URL}/logo-mail.png" alt="Player — Table Tennis Next Level" width="180" style="display:block;width:180px;max-width:180px;height:auto;margin:0 auto 26px;border:0">
     ${inner}
     <p style="color:rgba(255,255,255,.45);font-size:11px;margin-top:26px;border-top:1px solid rgba(255,255,255,.1);padding-top:14px">Player · playerapp.ch</p>
   </div>`
