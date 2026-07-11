@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
+import { MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
 import {
   BG, CARD, CELL, W, SUB, MUT, GREEN, LINE,
   gt, GRAD, card, levelBadge,
@@ -46,6 +47,8 @@ export default function LigaPage(){
   const [fOpp,setFOpp]=useState(0)
   const [fRDate,setFRDate]=useState("")        // Wann wurde gespielt?
   const [fDone,setFDone]=useState<string[]>([]) // in dieser Session eingetragene Ergebnisse
+  const [fFriendly,setFFriendly]=useState(false) // Freundschaftsspiel: ohne Liga-Punkte
+  const [fNoteRanked,setFNoteRanked]=useState<string|null>(null) // Hinweis, wenn das Gegner-Limit greift
 
   const flash=(t:string)=>{setToast(t);setTimeout(()=>setToast(""),2500)}
 
@@ -144,7 +147,7 @@ export default function LigaPage(){
     else flash(j.error||"Fehler")
   }
   function today(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` }
-  function openForder(r:Row){ setFTarget({id:r.user_id,name:r.name}); setFTab("challenge"); setFDate(""); setFTime(""); setFMy(0); setFOpp(0); setFRDate(today()); setFDone([]) }
+  function openForder(r:Row){ setFTarget({id:r.user_id,name:r.name}); setFTab("challenge"); setFDate(""); setFTime(""); setFMy(0); setFOpp(0); setFRDate(today()); setFDone([]); setFFriendly(false); setFNoteRanked(null) }
   async function sendChallenge(){
     if(!fTarget) return
     setBusy(true)
@@ -163,10 +166,12 @@ export default function LigaPage(){
     if(!fTarget||!userId) return
     if(fMy===fOpp){ flash("Kein Unentschieden möglich"); return }
     setBusy(true)
-    const dm=await fetch("/api/liga/direct-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,opponent_id:fTarget.id})})
+    const dm=await fetch("/api/liga/direct-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,opponent_id:fTarget.id,friendly:fFriendly})})
     const dj=await dm.json().catch(()=>({}))
     const matchId=dm.ok?dj.id:dj.existing_id
     if(!matchId){ flash(dj.error||"Fehler beim Anlegen"); setBusy(false); return }
+    // Limit von 7 gewerteten Spielen gegen denselben Gegner erreicht → zählt nicht mehr
+    if(dm.ok&&dj.limitReached&&!fFriendly) setFNoteRanked(`Ihr habt schon ${MAX_RANKED_PER_OPPONENT} gewertete Spiele diese Saison — dieses zählt nicht für ELO und Rang.`)
     const sets=[...Array(fMy)].map(()=>({p1:11,p2:7})).concat([...Array(fOpp)].map(()=>({p1:7,p2:11})))
     const winner_id=fMy>fOpp?userId:fTarget.id
     const played_at=fRDate?new Date(`${fRDate}T20:00:00`).toISOString():undefined
@@ -387,7 +392,20 @@ export default function LigaPage(){
                     </>
                   ))}
                 </div>
-                <button onClick={sendResult} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:24,background:GRAD,color:"#06210F",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":fDone.length?"Weiteres Ergebnis absenden":"Ergebnis absenden"}</button>
+                {/* Freundschaftsspiel: Ergebnis wird gespeichert und im Chat gezeigt, zählt aber nicht */}
+                <button onClick={()=>setFFriendly(v=>!v)} style={{display:"flex",alignItems:"center",gap:11,width:"100%",marginTop:20,background:CELL,border:"none",borderRadius:14,padding:"13px 14px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
+                  <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:fFriendly?GRAD:"transparent",border:fFriendly?"none":`1.5px solid ${MUT}`,color:"#06210F",fontSize:13,fontWeight:900}}>{fFriendly?"✓":""}</span>
+                  <span style={{flex:1}}>
+                    <span style={{display:"block",fontSize:13.5,fontWeight:700,color:W}}>Freundschaftsspiel</span>
+                    <span style={{display:"block",fontSize:11.5,color:MUT,marginTop:1}}>Zählt nicht für ELO und Rang — erscheint nur im Verlauf.</span>
+                  </span>
+                </button>
+
+                {fNoteRanked&&(
+                  <div style={{marginTop:12,background:CELL,borderRadius:12,padding:"11px 13px",fontSize:12,color:SUB,lineHeight:1.5}}>{fNoteRanked}</div>
+                )}
+
+                <button onClick={sendResult} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:GRAD,color:"#06210F",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":fDone.length?"Weiteres Ergebnis absenden":"Ergebnis absenden"}</button>
 
                 {fDone.length>0&&(
                   <div style={{marginTop:16,background:CELL,borderRadius:14,padding:"13px 14px"}}>
@@ -418,16 +436,16 @@ export default function LigaPage(){
             <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:10}}>
               {msgs.length===0?<p style={{textAlign:"center",color:MUT,fontSize:13,marginTop:20}}>Noch keine Nachrichten — schreib die erste 👋</p>:msgs.map(m=>{
                 if(m.kind==="match"){
-                  let d:{winner:string,loser:string,wSets:number,lSets:number,detail:string}|null=null
+                  let d:{winner:string,loser:string,wSets:number,lSets:number,detail:string,ranked?:boolean}|null=null
                   try{d=JSON.parse(m.text)}catch{/**/}
                   const r=m.reactions
                   return(
                     <div key={m.id} style={{alignSelf:"stretch"}}>
                       <div style={{background:"linear-gradient(135deg,rgba(57,255,20,.10),rgba(31,209,196,.07))",border:"1px solid rgba(57,255,20,.18)",borderRadius:14,padding:"11px 14px"}}>
-                        <div style={{fontSize:10,fontWeight:700,color:"rgba(57,255,20,.7)",letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>🏓 Match bestätigt</div>
+                        <div style={{fontSize:10,fontWeight:700,color:d?.ranked===false?MUT:"rgba(57,255,20,.7)",letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>{d?.ranked===false?"Match · zählt nicht":"Match bestätigt"}</div>
                         {d&&<>
-                          <div style={{fontSize:14,fontWeight:800,color:W,marginBottom:2}}>{d.winner} <span style={{color:"rgba(57,255,20,.9)"}}>schlägt</span> {d.loser}</div>
-                          <div style={{fontSize:12,color:MUT,marginBottom:8}}>{d.wSets}:{d.lSets} Sätze{d.detail?` · ${d.detail}`:""}</div>
+                          <div style={{fontSize:14,fontWeight:800,color:W,marginBottom:2}}>{d.winner} <span style={{color:d.ranked===false?MUT:"rgba(57,255,20,.9)"}}>schlägt</span> {d.loser}</div>
+                          <div style={{fontSize:12,color:MUT,marginBottom:8}}>{d.wSets}:{d.lSets} Sätze{d.detail?` · ${d.detail}`:""}{d.ranked===false?" · ohne Liga-Punkte":""}</div>
                         </>}
                         <div style={{display:"flex",gap:6}}>
                           {(["heart","fire","laugh"] as const).map(type=>{

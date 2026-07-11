@@ -28,6 +28,12 @@ export const PP_REWARDS: Reward[] = [
   { threshold: 500, type: "product",                       label: "Gratis Schlägerhülle", description: "PPL Branded Schlägerhülle — abholbar in deiner Lounge" },
 ]
 
+// Wie oft darf ein Spiel gegen DENSELBEN Gegner pro Saison für ELO/Rang zählen?
+// Darüber hinaus kann weitergespielt und eingetragen werden — das Ergebnis
+// erscheint in Historie und Chat, zählt aber nicht mehr. Schützt die Rangliste
+// davor, dass jemand von einem Kumpel nach oben geschoben wird.
+export const MAX_RANKED_PER_OPPONENT = 7
+
 export const LIGA_CONFIG = {
   minMatchesForRanking: 6,
   inactivityDays: 30,

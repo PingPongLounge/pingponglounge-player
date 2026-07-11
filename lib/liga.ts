@@ -7,7 +7,7 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string): Promise<{ ok: boolean; reason?: string }> {
   const { data: m } = await admin
     .from("league_matches")
-    .select("id,season_id,p1_id,p2_id,winner_id,sets,status")
+    .select("id,season_id,p1_id,p2_id,winner_id,sets,status,ranked")
     .eq("id", matchId)
     .single()
   if (!m || m.status !== "p1_entered" || !m.winner_id) return { ok: false, reason: "not_pending" }
@@ -24,9 +24,13 @@ export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string)
 
   const loserId = m.winner_id === m.p1_id ? m.p2_id : m.p1_id
 
-  const { data: w } = await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", m.winner_id).single()
-  const { data: l } = await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", loserId).single()
-  if (w && l) {
+  // Spiel ohne Liga-Punkte (Freundschaftsspiel oder Gegner-Limit erreicht):
+  // Ergebnis wird gespeichert und im Chat gezeigt, aber ELO/Statistik bleiben unberührt.
+  const ranked = m.ranked !== false
+
+  const { data: w } = ranked ? await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", m.winner_id).single() : { data: null }
+  const { data: l } = ranked ? await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", loserId).single() : { data: null }
+  if (ranked && w && l) {
     const K = 32
     const wElo = w.elo ?? 1000, lElo = l.elo ?? 1000
     const ea = 1 / (1 + Math.pow(10, (lElo - wElo) / 400))
@@ -56,7 +60,7 @@ export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string)
     user_id: null,
     kind: "match",
     match_id: matchId,
-    text: JSON.stringify({ winner: nameOf(m.winner_id), loser: nameOf(loserId), wSets, lSets, detail }),
+    text: JSON.stringify({ winner: nameOf(m.winner_id), loser: nameOf(loserId), wSets, lSets, detail, ranked }),
   })
 
   return { ok: true }
