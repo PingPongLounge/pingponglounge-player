@@ -1,7 +1,9 @@
 // Transaktionale E-Mails via Resend (REST, ohne SDK). Ohne RESEND_API_KEY
 // passiert nichts — die App läuft normal weiter, es wird nur nicht gemailt.
 const RESEND_URL = "https://api.resend.com/emails"
-const FROM = "Ping Pong Lounge Player <player@pingponglounge.ch>"
+// Absender frei konfigurierbar via Vercel-Env RESEND_FROM.
+// Die Domain muss in Resend verifiziert sein, sonst lehnt Resend den Versand ab.
+const FROM = process.env.RESEND_FROM || "Player <points@player.ch>"
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://pingponglounge-player.vercel.app"
 
 const G = "#39FF14"
