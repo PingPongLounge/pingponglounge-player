@@ -67,7 +67,11 @@ export async function POST(req: NextRequest) {
     const me = (people || []).find(p => p.id === user.id)
     const opp = (people || []).find(p => p.id === opponentId)
 
-    if (opp?.email) {
+    // Die Login-Adresse aus auth.users ist die Wahrheit — profiles.email kann veraltet sein.
+    const { data: authOpp } = await admin.auth.admin.getUserById(opponentId)
+    const oppEmail = authOpp?.user?.email || opp?.email || null
+
+    if (opp && oppEmail) {
       const mySets = (sets as Array<{ p1: number; p2: number }>).filter(s => s.p1 > s.p2).length
       const oppSets = (sets as Array<{ p1: number; p2: number }>).filter(s => s.p2 > s.p1).length
       const oppWon = winner_id === opponentId
@@ -92,7 +96,7 @@ export async function POST(req: NextRequest) {
       const confirmUrl = `${BASE_URL}/api/liga/confirm-email?m=${match_id}&p=${opponentId}&t=${t}`
 
       await sendResultConfirmRequest({
-        to: opp.email,
+        to: oppEmail,
         opponentName: me?.name || "Dein Gegner",
         recipientName: opp.name || "Spieler",
         scoreLine: `${oppSets}:${mySets}`, // aus Sicht des Empfängers
