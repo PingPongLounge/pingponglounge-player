@@ -2,20 +2,25 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { applyLeagueConfirm } from "@/lib/liga"
 import { NextRequest, NextResponse } from "next/server"
 
-// Cron: bestätigt Liga-Matches automatisch, wenn der Gegner 48h nicht reagiert.
+// Cron: bestätigt Liga-Matches automatisch, wenn der Gegner 24h nicht reagiert.
+// Gerechnet wird ab entered_at (Eintragung), NICHT ab played_at — played_at ist
+// das frei wählbare Spieldatum und könnte Wochen zurückliegen.
 // Vercel-Cron ruft per GET mit "Authorization: Bearer <CRON_SECRET>".
+const CONFIRM_WINDOW_HOURS = 24
+
 async function run(req: NextRequest) {
   const secret = req.headers.get("authorization")?.replace("Bearer ", "")
   if (secret !== process.env.CRON_SECRET) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const admin = createAdminClient()
-  const cutoff = new Date(Date.now() - 48 * 3600 * 1000).toISOString()
+  const cutoff = new Date(Date.now() - CONFIRM_WINDOW_HOURS * 3600 * 1000).toISOString()
   const { data: overdue } = await admin
     .from("league_matches")
     .select("id")
     .eq("status", "p1_entered")
     .not("winner_id", "is", null)
-    .lt("played_at", cutoff)
+    .not("entered_at", "is", null)
+    .lt("entered_at", cutoff)
     .limit(200)
 
   let confirmed = 0

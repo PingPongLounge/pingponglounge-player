@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
+import { sendResultConfirmRequest } from "@/lib/email"
 
 export async function POST(req: NextRequest) {
   const { match_id, sets, winner_id, played_at } = await req.json()
@@ -49,9 +50,34 @@ export async function POST(req: NextRequest) {
     winner_id,
     status: "p1_entered",
     played_at: when.toISOString(),
+    entered_at: new Date().toISOString(), // Start der 24h-Frist
     entered_by: user.id,
   }).eq("id", match_id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Gegner per E-Mail zur Bestätigung auffordern (24h, danach automatisch bestätigt).
+  // Fehler beim Mailversand dürfen das Eintragen nie scheitern lassen.
+  try {
+    const opponentId = match.p1_id === user.id ? match.p2_id : match.p1_id
+    const { data: people } = await admin.from("profiles").select("id,name,email").in("id", [user.id, opponentId])
+    const me = (people || []).find(p => p.id === user.id)
+    const opp = (people || []).find(p => p.id === opponentId)
+    if (opp?.email) {
+      const mySets = (sets as Array<{ p1: number; p2: number }>).filter(s => s.p1 > s.p2).length
+      const oppSets = (sets as Array<{ p1: number; p2: number }>).filter(s => s.p2 > s.p1).length
+      await sendResultConfirmRequest({
+        to: opp.email,
+        opponentName: me?.name || "Dein Gegner",
+        recipientName: opp.name || "Spieler",
+        scoreLine: `${mySets}:${oppSets}`,
+        playedLabel: when.toLocaleDateString("de-CH", { weekday: "short", day: "2-digit", month: "2-digit", year: "numeric" }),
+        matchId: match_id,
+      })
+    }
+  } catch (e) {
+    console.error("Bestätigungs-Mail fehlgeschlagen:", e)
+  }
+
   return NextResponse.json({ ok: true })
 }

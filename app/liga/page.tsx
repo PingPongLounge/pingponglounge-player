@@ -384,7 +384,7 @@ export default function LigaPage(){
                         <span key={i} style={{fontSize:13,fontWeight:800,color:W,background:"#20242C",borderRadius:8,padding:"5px 10px"}}>{s}</span>
                       ))}
                     </div>
-                    <div style={{fontSize:11.5,color:SUB,fontWeight:300,marginTop:9}}>Wartet auf {fTarget.name}. Du kannst gleich den nächsten Match eintragen.</div>
+                    <div style={{fontSize:11.5,color:SUB,fontWeight:300,marginTop:9,lineHeight:1.5}}>{fTarget.name} bekommt eine E-Mail und hat 24 Std. Zeit zu bestätigen — danach zählt das Ergebnis automatisch. Du kannst gleich den nächsten Match eintragen.</div>
                     <button onClick={()=>setFTarget(null)} style={{display:"block",width:"100%",textAlign:"center",marginTop:11,background:"none",border:`1px solid ${MUT}`,borderRadius:12,padding:11,fontSize:13,fontWeight:800,color:W,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit"}}>Fertig</button>
                   </div>
                 )}
