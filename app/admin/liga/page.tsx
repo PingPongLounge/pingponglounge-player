@@ -18,6 +18,19 @@ export default function AdminLigaPage(){
   const [msg,setMsg]=useState("")
   const [authed,setAuthed]=useState(false)
   const [loading,setLoading]=useState(true)
+  const [reminding,setReminding]=useState(false)
+  const [reminderMsg,setReminderMsg]=useState("")
+
+  async function sendReminders(){
+    setReminding(true);setReminderMsg("")
+    try{
+      const r=await fetch("/api/admin/onboarding-reminder",{method:"POST"})
+      const j=await r.json().catch(()=>({}))
+      if(r.ok) setReminderMsg(j.sent>0?`${j.sent} Erinnerung(en) verschickt.`:"Niemand offen — es hängt gerade keiner im Onboarding.")
+      else setReminderMsg(j.error||"Fehler beim Senden")
+    }catch{ setReminderMsg("Fehler beim Senden") }
+    setReminding(false)
+  }
 
   useEffect(()=>{
     async function load(){
@@ -113,6 +126,20 @@ export default function AdminLigaPage(){
             </div>
           )
         })}
+      </div>
+
+      {/* Onboarding-Erinnerungen */}
+      <div style={{marginTop:28,background:C,borderRadius:14,padding:16}}>
+        <p style={{fontSize:14,fontWeight:700,color:W,margin:"0 0 4px"}}>Onboarding-Erinnerungen</p>
+        <p style={{fontSize:12,color:M,margin:"0 0 12px",lineHeight:1.5}}>
+          Schickt allen eine Mail, die sich registriert, aber ihr Profil nie fertig eingerichtet haben
+          (kein Level). Jeder bekommt sie nur einmal.
+        </p>
+        <button onClick={sendReminders} disabled={reminding}
+          style={{fontSize:12,color:"#20242C",background:G,border:"none",borderRadius:8,padding:"9px 14px",cursor:reminding?"wait":"pointer",fontWeight:800,opacity:reminding?.6:1}}>
+          {reminding?"Wird gesendet…":"Erinnerungen jetzt senden"}
+        </button>
+        {reminderMsg&&<p style={{fontSize:12,color:M,marginTop:10}}>{reminderMsg}</p>}
       </div>
     </main>
   )
