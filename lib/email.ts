@@ -15,7 +15,13 @@ export async function sendEmail(opts: { to: string; subject: string; html: strin
     const res = await fetch(RESEND_URL, {
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ from: FROM, to: opts.to, subject: opts.subject, html: opts.html }),
+      body: JSON.stringify({
+        from: FROM,
+        to: opts.to,
+        subject: opts.subject,
+        // Dark-Mode-Hinweis + voll deckender Hintergrund, damit kein weisser Rand bleibt
+        html: `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><meta name="supported-color-schemes" content="dark light"></head><body style="margin:0;padding:0;background-color:#20242C;">${opts.html}</body></html>`,
+      }),
       signal: AbortSignal.timeout(10000),
     })
     if (!res.ok) return { ok: false, error: `Resend ${res.status}` }
@@ -28,13 +34,26 @@ export async function sendEmail(opts: { to: string; subject: string; html: strin
 const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 const CARD = "#2A2F39"
 
+// Voll deckender dunkler Hintergrund über die ganze Breite — sonst bleibt auf dem
+// Smartphone ein weisser Rand um die Karte stehen (Mail-Clients haben weissen BG).
+// Tabellen statt divs, weil Outlook/Gmail damit zuverlässig umgehen.
 function shell(inner: string): string {
   return `
-  <div style="font-family:system-ui,-apple-system,sans-serif;max-width:520px;margin:0 auto;padding:28px 24px;background:#20242C;border-radius:20px;color:#fff">
-    <img src="${BASE_URL}/logo-mail.png" alt="Player — Next Level Table Tennis" width="180" style="display:block;width:180px;max-width:180px;height:auto;margin:0 auto 26px;border:0">
-    ${inner}
-    <p style="color:rgba(255,255,255,.45);font-size:11px;margin-top:26px;border-top:1px solid rgba(255,255,255,.1);padding-top:14px">Player · playerapp.ch</p>
-  </div>`
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background-color:#20242C;margin:0;padding:0">
+    <tr>
+      <td align="center" style="background-color:#20242C;padding:30px 16px 34px">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:520px;margin:0 auto">
+          <tr>
+            <td style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#ffffff">
+              <img src="${BASE_URL}/logo-mail.png" alt="Player — Next Level Table Tennis" width="180" style="display:block;width:180px;max-width:180px;height:auto;margin:0 auto 28px;border:0">
+              ${inner}
+              <p style="color:rgba(255,255,255,.45);font-size:11px;margin-top:28px;border-top:1px solid rgba(255,255,255,.1);padding-top:14px;text-align:center">Player · playerapp.ch</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>`
 }
 
 // Button: nur mit Farbverlauf umrandet, innen dunkel. Outlook kann keine
