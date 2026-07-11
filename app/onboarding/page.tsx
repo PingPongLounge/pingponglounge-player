@@ -118,10 +118,13 @@ export default function OnboardingPage() {
   async function genNicknames() {
     setLoadingNicks(true)
     const supabase = createClient()
-    const { data } = await supabase.from("profiles").select("name")
-    const taken = (data || []).map((p: { name: string }) => p.name.toLowerCase())
+    // public_profiles statt profiles: RLS auf profiles lässt jeden nur die EIGENE
+    // Zeile lesen — die Liste der vergebenen Namen wäre sonst immer leer.
+    const { data } = await supabase.from("public_profiles").select("name")
+    const taken = (data || []).map((p: { name: string | null }) => (p.name || "").toLowerCase()).filter(Boolean)
     const available = ALL_NICKS.filter(n => !taken.includes(n.toLowerCase()))
-    setNicks([...available].sort(() => Math.random() - 0.5).slice(0, 3))
+    const pool = available.length ? available : ALL_NICKS
+    setNicks([...pool].sort(() => Math.random() - 0.5).slice(0, 3))
     setLoadingNicks(false)
   }
 
@@ -196,6 +199,14 @@ export default function OnboardingPage() {
         {CANTONS.map(c => <option key={c} value={c}>{c}</option>)}
       </select>
       <button style={primaryBtn(!name.trim() || !realName.trim())} disabled={!name.trim() || !realName.trim()} onClick={() => setStep(pending ? 3 : 1)}>Weiter</button>
+      {/* Der Button war bisher ohne jede Erklärung ausgegraut — genau hier sind Leute abgesprungen. */}
+      {(!realName.trim() || !name.trim()) && (
+        <p style={{ fontSize: "12px", color: MUTED, textAlign: "center", marginTop: "10px", lineHeight: 1.5 }}>
+          {!realName.trim() && !name.trim() ? "Noch nötig: Vor- und Nachname sowie ein Spielername."
+            : !realName.trim() ? "Es fehlt noch dein Vor- und Nachname."
+            : "Es fehlt noch dein Spielername — nimm einen Vorschlag oder erfinde einen."}
+        </p>
+      )}
     </div></div>
   )
 

@@ -46,6 +46,35 @@ function outlineButton(href: string, label: string): string {
   </a>`
 }
 
+// Erinnerung an alle, die sich registriert, das Onboarding aber nie beendet haben.
+export async function sendOnboardingReminder(opts: { to: string }) {
+  const url = `${BASE_URL}/onboarding`
+  return sendEmail({
+    to: opts.to,
+    subject: "Dein Profil ist noch nicht fertig — 1 Minute, dann bist du drin",
+    html: shell(`
+      <h1 style="font-size:22px;font-weight:900;margin:0 0 10px;color:#fff">Fast geschafft</h1>
+      <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.55;margin:0 0 20px">
+        Du hast dich registriert, aber dein Profil ist noch nicht fertig — deshalb bist du weder in der Rangliste
+        noch in der Liga sichtbar.
+      </p>
+
+      <div style="background:${CARD};border-radius:18px;padding:20px;margin-bottom:20px">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px">Was noch fehlt</div>
+        <table style="width:100%;border-collapse:collapse">
+          <tr><td style="padding:5px 0;color:rgba(255,255,255,.8);font-size:14px">Dein Spielername</td></tr>
+          <tr><td style="padding:5px 0;color:rgba(255,255,255,.8);font-size:14px">Deine Level-Einstufung</td></tr>
+        </table>
+        <div style="margin-top:14px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08);font-size:12.5px;color:rgba(255,255,255,.55);line-height:1.5">
+          Danach hast du sofort einen Rang, kannst Gegner fordern und in der Liga mitspielen.
+        </div>
+      </div>
+
+      ${outlineButton(url, "Profil fertigstellen")}
+    `),
+  })
+}
+
 // Gegner bittet um Bestätigung eines eingetragenen Liga-Ergebnisses.
 // Enthält einen signierten Ein-Klick-Link (kein Login nötig) und zeigt,
 // was die Bestätigung mit ELO und Rang macht.

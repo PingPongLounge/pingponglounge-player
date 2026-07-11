@@ -7,6 +7,10 @@
     {
       "path": "/api/liga/auto-confirm",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/onboarding/reminder",
+      "schedule": "0 10 * * *"
     }
   ]
 }
