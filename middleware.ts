@@ -3,6 +3,11 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 const PUBLIC_PATHS = ['/', '/login', '/auth', '/spielen', '/entdecken']
 
+// Routen, die bewusst OHNE Login funktionieren müssen:
+// - confirm-email: der Ein-Klick-Link aus der Bestätigungs-Mail (signiert, prüft sich selbst)
+// - webhook: Stripe ruft ihn auf, hat keine Session (prüft die Stripe-Signatur)
+const PUBLIC_API = ['/api/liga/confirm-email', '/api/booking/webhook']
+
 export async function middleware(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -29,6 +34,9 @@ export async function middleware(request: NextRequest) {
   // Öffentliche Pfade: immer zugänglich (auch ausgeloggt → /entdecken zeigt die Teaser-Startseite)
   const isPublic = PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith('/auth'))
   if (isPublic) return supabaseResponse
+
+  // Signierte bzw. selbst-verifizierende API-Routen: kein Login-Redirect
+  if (PUBLIC_API.some(p => pathname === p)) return supabaseResponse
 
   // Nicht eingeloggt → Login
   if (!user) {
