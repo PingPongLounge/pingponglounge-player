@@ -25,13 +25,25 @@ export async function sendEmail(opts: { to: string; subject: string; html: strin
   }
 }
 
+const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
+const CARD = "#2A2F39"
+
 function shell(inner: string): string {
   return `
   <div style="font-family:system-ui,-apple-system,sans-serif;max-width:520px;margin:0 auto;padding:28px 24px;background:#20242C;border-radius:20px;color:#fff">
-    <div style="font-size:13px;font-weight:800;letter-spacing:.22em;color:${G};text-transform:uppercase;margin-bottom:22px">Player</div>
+    <img src="${BASE_URL}/logo-mail.png" alt="Player — Table Tennis Next Level" width="190" style="display:block;width:190px;max-width:190px;height:auto;margin-bottom:24px;border:0">
     ${inner}
-    <p style="color:rgba(255,255,255,.45);font-size:11px;margin-top:26px;border-top:1px solid rgba(255,255,255,.1);padding-top:14px">Ping Pong Lounge · pingponglounge.ch</p>
+    <p style="color:rgba(255,255,255,.45);font-size:11px;margin-top:26px;border-top:1px solid rgba(255,255,255,.1);padding-top:14px">Player · playerapp.ch</p>
   </div>`
+}
+
+// Button: nur mit Farbverlauf umrandet, innen dunkel. Outlook kann keine
+// Verläufe → dort greift die Hintergrundfarbe als Fallback.
+function outlineButton(href: string, label: string): string {
+  return `
+  <a href="${href}" style="display:block;text-decoration:none;background-color:${G};background-image:${GRAD};border-radius:14px;padding:2px">
+    <span style="display:block;background:${CARD};border-radius:12px;padding:15px;text-align:center;font-size:15px;font-weight:800;color:${G};text-transform:uppercase;letter-spacing:.04em">${label}</span>
+  </a>`
 }
 
 // Gegner bittet um Bestätigung eines eingetragenen Liga-Ergebnisses.
@@ -60,38 +72,42 @@ export async function sendResultConfirmRequest(opts: {
     subject: `${opts.opponentName} hat euer Ergebnis eingetragen (${opts.scoreLine}) — bitte bestätigen`,
     html: shell(`
       <h1 style="font-size:22px;font-weight:900;margin:0 0 10px;color:#fff">Ergebnis bestätigen</h1>
-      <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.55;margin:0 0 18px">
+      <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.55;margin:0 0 20px">
         Hallo ${opts.recipientName},<br>
         <strong style="color:#fff">${opts.opponentName}</strong> hat euer Liga-Match vom ${opts.playedLabel} eingetragen.
       </p>
 
-      <div style="background:#2A2F39;border-radius:14px;padding:18px;text-align:center;margin-bottom:12px">
-        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Dein Ergebnis · ${opts.won ? "Sieg" : "Niederlage"}</div>
-        <div style="font-size:36px;font-weight:900;color:#fff">${opts.scoreLine}</div>
-        <div style="font-size:11px;color:rgba(255,255,255,.4);margin-top:4px">du : ${opts.opponentName}</div>
-      </div>
-
-      <div style="background:#2A2F39;border-radius:14px;padding:16px 18px;margin-bottom:18px">
-        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px">Wenn du bestätigst</div>
+      <!-- Rang-Karte, gross wie in der App -->
+      <div style="background:${CARD};border-radius:18px;padding:22px;margin-bottom:12px">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:12px">Dein Rang</div>
         <table style="width:100%;border-collapse:collapse">
           <tr>
-            <td style="padding:4px 0;color:rgba(255,255,255,.7);font-size:13px">ELO</td>
-            <td style="padding:4px 0;text-align:right;font-size:14px;color:#fff;font-weight:800">
-              ${opts.eloNow} → ${opts.eloAfter}
-              <span style="color:${deltaColor};font-weight:900;margin-left:6px">${deltaLabel}</span>
+            <td style="vertical-align:middle">
+              <span style="font-size:52px;font-weight:900;color:${G};line-height:1">${opts.rankNow ? `#${opts.rankNow}` : "—"}</span>
+            </td>
+            <td style="vertical-align:middle;text-align:right">
+              <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">ELO</div>
+              <div style="font-size:20px;font-weight:900;color:#fff">${opts.eloNow} <span style="color:rgba(255,255,255,.35);font-weight:700">→</span> ${opts.eloAfter}</div>
+              <div style="font-size:15px;font-weight:900;color:${deltaColor};margin-top:2px">${deltaLabel}</div>
             </td>
           </tr>
-          ${opts.rankNow ? `<tr>
-            <td style="padding:4px 0;color:rgba(255,255,255,.7);font-size:13px">Dein Rang aktuell</td>
-            <td style="padding:4px 0;text-align:right;font-size:14px;color:#fff;font-weight:800">#${opts.rankNow}</td>
-          </tr>` : ""}
         </table>
+        <div style="margin-top:16px;padding-top:14px;border-top:1px solid rgba(255,255,255,.08)">
+          <table style="width:100%;border-collapse:collapse">
+            <tr>
+              <td style="font-size:12px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.06em">${opts.won ? "Sieg" : "Niederlage"} gegen ${opts.opponentName}</td>
+              <td style="text-align:right;font-size:26px;font-weight:900;color:#fff">${opts.scoreLine}</td>
+            </tr>
+          </table>
+        </div>
       </div>
 
-      <a href="${opts.confirmUrl}" style="display:block;text-align:center;background:${G};color:#06210F;border-radius:12px;padding:15px;font-size:15px;font-weight:800;text-decoration:none;text-transform:uppercase;letter-spacing:.03em">Ergebnis bestätigen</a>
-      <a href="${appUrl}" style="display:block;text-align:center;margin-top:9px;color:rgba(255,255,255,.65);font-size:13px;text-decoration:none;padding:11px;border:1px solid rgba(255,255,255,.18);border-radius:12px">Stimmt nicht — in der App widersprechen</a>
+      <p style="font-size:12px;color:rgba(255,255,255,.45);text-align:center;margin:0 0 16px">So sieht es aus, wenn du bestätigst.</p>
 
-      <p style="color:rgba(255,255,255,.5);font-size:12.5px;line-height:1.5;margin:16px 0 0">
+      ${outlineButton(opts.confirmUrl, "Ergebnis bestätigen")}
+      <a href="${appUrl}" style="display:block;text-align:center;margin-top:9px;color:rgba(255,255,255,.6);font-size:13px;text-decoration:none;padding:12px;border:1px solid rgba(255,255,255,.16);border-radius:14px">Stimmt nicht — hier widersprechen</a>
+
+      <p style="color:rgba(255,255,255,.5);font-size:12.5px;line-height:1.5;margin:18px 0 0">
         Du hast <strong style="color:#fff">24 Stunden</strong> Zeit. Reagierst du nicht, wird das Ergebnis automatisch bestätigt und für ELO &amp; Rangliste gewertet.
       </p>
     `),

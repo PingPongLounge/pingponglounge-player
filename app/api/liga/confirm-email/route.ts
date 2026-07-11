@@ -11,15 +11,20 @@ export const runtime = "nodejs"
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://pingponglounge-player.vercel.app"
 const G = "#39FF14"
 
+const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
+const CARD = "#2A2F39"
+
 function page(title: string, text: string, ok: boolean) {
   return new NextResponse(
     `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>
     <body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#20242C;font-family:system-ui,-apple-system,sans-serif;padding:24px">
-      <div style="max-width:420px;width:100%;background:#2A2F39;border-radius:24px;padding:34px 26px;text-align:center;color:#fff">
-        <div style="font-size:13px;font-weight:800;letter-spacing:.22em;color:${G};text-transform:uppercase;margin-bottom:20px">Player</div>
+      <div style="max-width:420px;width:100%;background:${CARD};border-radius:24px;padding:34px 26px;text-align:center;color:#fff">
+        <img src="${BASE_URL}/logo-mail.png" alt="Player" width="170" style="display:block;margin:0 auto 22px;width:170px;height:auto">
         <div style="font-size:23px;font-weight:900;margin-bottom:10px;color:${ok ? G : "#fff"}">${title}</div>
         <div style="font-size:14px;line-height:1.55;color:rgba(255,255,255,.7)">${text}</div>
-        <a href="${BASE_URL}/liga" style="display:block;margin-top:24px;background:${G};color:#06210F;border-radius:12px;padding:15px;font-size:15px;font-weight:800;text-decoration:none;text-transform:uppercase;letter-spacing:.03em">Zur Liga</a>
+        <a href="${BASE_URL}/liga" style="display:block;margin-top:26px;text-decoration:none;background-image:${GRAD};background-color:${G};border-radius:14px;padding:2px">
+          <span style="display:block;background:${CARD};border-radius:12px;padding:15px;font-size:15px;font-weight:800;color:${G};text-transform:uppercase;letter-spacing:.04em">Zur Liga</span>
+        </a>
       </div>
     </body>`,
     { status: ok ? 200 : 400, headers: { "Content-Type": "text/html; charset=utf-8" } },
