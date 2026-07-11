@@ -3,7 +3,7 @@
 const RESEND_URL = "https://api.resend.com/emails"
 // Absender frei konfigurierbar via Vercel-Env RESEND_FROM.
 // Die Domain muss in Resend verifiziert sein, sonst lehnt Resend den Versand ab.
-const FROM = process.env.RESEND_FROM || "Player <points@player.ch>"
+const FROM = process.env.RESEND_FROM || "Player <points@playerapp.ch>"
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://pingponglounge-player.vercel.app"
 
 const G = "#39FF14"
