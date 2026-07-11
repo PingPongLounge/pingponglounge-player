@@ -48,7 +48,9 @@ export const LEVEL_DESCS: Record<string, string> = {
 
 // Mindest-ELO je Level
 export const LEVEL_ELO: Record<string, number> = {
-  '1': 0, '2': 1050, '3': 1150, '4': 1250, '5': 1350, '6': 1450, '7': 1600,
+  // Level 1 stand hier auf 0 — ein Anfänger wäre mit 0 Punkten gestartet.
+  // 950 liegt sauber unter Level 2 (1050).
+  '1': 950, '2': 1050, '3': 1150, '4': 1250, '5': 1350, '6': 1450, '7': 1600,
 }
 
 export const LEVEL_GRADIENTS: Record<string, string> = {
