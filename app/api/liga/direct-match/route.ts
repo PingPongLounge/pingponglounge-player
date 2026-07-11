@@ -32,7 +32,9 @@ export async function POST(req: NextRequest) {
     .from("league_matches")
     .select("id,status")
     .eq("season_id", season_id)
-    .in("status", ["challenge_sent", "accepted", "pending", "p1_entered"])
+    // "p1_entered" blockiert NICHT mehr: ein weiteres Ergebnis darf eingetragen werden,
+    // während ein früheres noch auf die Bestätigung des Gegners wartet.
+    .in("status", ["challenge_sent", "accepted", "pending"])
     .or(`and(p1_id.eq.${user.id},p2_id.eq.${opponent_id}),and(p1_id.eq.${opponent_id},p2_id.eq.${user.id})`)
     .maybeSingle()
 

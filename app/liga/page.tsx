@@ -294,10 +294,11 @@ export default function LigaPage(){
                         const btnBase:React.CSSProperties={border:"1.4px solid transparent",borderRadius:10,padding:"7px 10px",fontSize:10,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:"pointer",whiteSpace:"nowrap",fontFamily:"inherit"}
                         if(!om) return <button onClick={()=>openForder(r)} style={btnBase}>Fordern</button>
                         if(om.status==="challenge_sent"&&!om.iAmP1) return <button onClick={()=>acceptChallenge(om.id)} style={{...btnBase,background:GRAD,color:"#06210F"}}>Annehmen ✓</button>
-                        if(om.status==="challenge_sent"&&om.iAmP1) return <span style={{fontSize:10,color:MUT,whiteSpace:"nowrap"}}>⏳ Ausstehend</span>
+                        if(om.status==="challenge_sent"&&om.iAmP1) return <span style={{fontSize:10,fontWeight:700,color:MUT,whiteSpace:"nowrap",textTransform:"uppercase",letterSpacing:".04em"}}>Ausstehend</span>
                         if(om.status==="accepted"||om.status==="pending") return <Link href={`/liga/match/${om.id}`} style={{...btnBase,textDecoration:"none",display:"inline-block"}}>Spiel eintragen →</Link>
                         if(om.status==="p1_entered"&&!om.iAmP1) return <Link href={`/liga/match/${om.id}`} style={{...btnBase,background:GRAD,color:"#06210F",textDecoration:"none",display:"inline-block"}}>Bestätigen ✓</Link>
-                        return <span style={{fontSize:10,color:MUT,whiteSpace:"nowrap"}}>⏳ Warte</span>
+                        // Ergebnis wartet auf Bestätigung → weiteres Ergebnis trotzdem erlauben
+                        return <button onClick={()=>openForder(r)} style={btnBase}>Fordern</button>
                       })()}
                     </div>
                   )
