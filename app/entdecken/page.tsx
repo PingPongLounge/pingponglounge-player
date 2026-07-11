@@ -18,8 +18,11 @@ function Logo() {
   return (
     <svg width={56} height={56} viewBox="0 0 80 80" fill="none" style={{ display: 'block' }}>
       <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#39FF14" /><stop offset="100%" stopColor="#1FD1C4" /></linearGradient></defs>
-      <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="2.5" strokeLinejoin="round" />
-      <circle cx="63" cy="58" r="6" fill="url(#lg)" />
+      {/* P immer nur Outline; um -2 verschoben, damit das P selbst mittig sitzt (Ball hängt raus) */}
+      <g transform="translate(-2,0)">
+        <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="2.5" strokeLinejoin="round" />
+        <circle cx="63" cy="58" r="6" fill="url(#lg)" />
+      </g>
     </svg>
   )
 }
@@ -49,9 +52,12 @@ export default async function EntdeckenPage() {
         <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '0 18px 110px' }}>
           <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(180deg, rgba(20,23,30,.35) 0%, rgba(20,23,30,.72) 50%, rgba(20,23,30,.97) 100%), url('/hero-poster.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
           <div style={{ position: 'relative', zIndex: 2 }}>
-            <Logo />
-            <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '.26em', marginTop: 8, ...gt }}>PLAYER</div>
-            <div style={{ fontSize: 9, fontWeight: 600, letterSpacing: '.22em', color: MUT, textTransform: 'uppercase', marginTop: 4 }}>Next Level Table Tennis</div>
+            {/* Logo-Block: P mittig über PLAYER, Tagline exakt auf Wortmarken-Breite */}
+            <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'stretch' }}>
+              <div style={{ display: 'flex', justifyContent: 'center' }}><Logo /></div>
+              <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '.26em', marginTop: 8, textAlign: 'center', ...gt }}>PLAYER</div>
+              <div style={{ fontSize: 9, fontWeight: 600, color: MUT, textTransform: 'uppercase', marginTop: 5, textAlign: 'justify', textAlignLast: 'justify' }}>Next Level Table Tennis</div>
+            </div>
             <div style={{ display: 'inline-block', fontSize: 9, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#06210F', background: GRAD, borderRadius: 999, padding: '3px 9px', marginTop: 10 }}>Beta Version</div>
             <div style={{ marginTop: 26 }}>
               <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 15, padding: 17, fontSize: 18, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.04em', color: '#06210F', background: GRAD, textDecoration: 'none' }}>Login / Registrieren</Link>

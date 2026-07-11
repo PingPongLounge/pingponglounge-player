@@ -1,8 +1,22 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 80" fill="none">
-  <!-- P-Paddle solid -->
-  <path d="M 6 68 L 6 12 L 30 12 C 44 12 52 20 52 34 C 52 48 44 56 30 56 L 22 56 L 22 68 Z" fill="#39FF14"/>
-  <!-- Ball -->
-  <circle cx="62" cy="64" r="7" fill="#39FF14"/>
-  <!-- PLAYER outline wordmark -->
-  <text x="76" y="66" font-family="'League Spartan', system-ui, sans-serif" font-size="58" font-weight="900" letter-spacing="2" fill="none" stroke="#39FF14" stroke-width="2.2" paint-order="stroke">PLAYER</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 360 132" fill="none">
+  <defs>
+    <linearGradient id="lp" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#39FF14"/>
+      <stop offset="100%" stop-color="#1FD1C4"/>
+    </linearGradient>
+  </defs>
+  <!-- P-Paddle: IMMER nur Outline, nie ausgefüllt. Mittig über dem Schriftzug. -->
+  <g transform="translate(131,4)">
+    <path d="M 10 56 L 10 4 L 34 4 C 48 4 56 12 56 26 C 56 40 48 48 34 48 L 24 48 L 24 56 Z"
+          fill="none" stroke="url(#lp)" stroke-width="4" stroke-linejoin="round"/>
+    <circle cx="64" cy="52" r="6.5" fill="url(#lp)"/>
+  </g>
+  <!-- Wortmarke -->
+  <text x="180" y="106" text-anchor="middle" font-family="'League Spartan', system-ui, sans-serif"
+        font-size="42" font-weight="900" letter-spacing="2.5"
+        fill="none" stroke="url(#lp)" stroke-width="1.8" paint-order="stroke">PLAYER</text>
+  <!-- Tagline, genau auf Breite der Wortmarke -->
+  <text x="180" y="126" text-anchor="middle" font-family="'League Spartan', system-ui, sans-serif"
+        font-size="9" font-weight="800" letter-spacing="2.4"
+        fill="rgba(255,255,255,.6)">NEXT LEVEL TABLE TENNIS</text>
 </svg>

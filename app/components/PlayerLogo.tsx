@@ -49,7 +49,10 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
           </filter>
         </defs>
 
-        {/* P-Form — exakt wie bestätigt */}
+        {/* Das P ist auf die Mitte ausgerichtet (der Ball hängt rechts raus) —
+            P spannt x 20..64, Mitte 42 → Verschiebung um -2 zentriert es exakt. */}
+        <g transform="translate(-2,0)">
+        {/* P-Form — IMMER nur Outline, nie ausgefüllt */}
         <path
           d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z"
           fill="none"
@@ -83,36 +86,44 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
             repeatCount="indefinite"
           />
         </circle>
+        </g>
       </svg>
 
-      {/* PLAYER — Gradient wie im bestätigten Logo */}
-      <span style={{
-        fontSize: textSize,
-        fontWeight: 900,
-        letterSpacing: "3px",
-        textTransform: "uppercase" as const,
-        lineHeight: 1,
-        fontFamily: "'League Spartan', system-ui, sans-serif",
-        userSelect: "none" as const,
-        background: "linear-gradient(135deg, #39FF14 0%, #1FD1C4 100%)",
-        WebkitBackgroundClip: "text",
-        WebkitTextFillColor: "transparent",
-        backgroundClip: "text",
-      }}>
-        PLAYER
-      </span>
-
-      {showTagline && (
+      {/* Wortmarke + Tagline: der Block ist exakt so breit wie "PLAYER",
+          die Tagline wird darauf ausgerichtet und läuft nie darüber hinaus. */}
+      <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "stretch" }}>
         <span style={{
-          fontSize: tagSize,
-          fontWeight: 700,
-          color: "rgba(255,255,255,0.66)",
-          letterSpacing: "0.18em",
+          fontSize: textSize,
+          fontWeight: 900,
+          letterSpacing: "3px",
           textTransform: "uppercase" as const,
+          lineHeight: 1,
+          fontFamily: "'League Spartan', system-ui, sans-serif",
+          userSelect: "none" as const,
+          background: "linear-gradient(135deg, #39FF14 0%, #1FD1C4 100%)",
+          WebkitBackgroundClip: "text",
+          WebkitTextFillColor: "transparent",
+          backgroundClip: "text",
         }}>
-          next level Table Tennis
+          PLAYER
         </span>
-      )}
+
+        {showTagline && (
+          <span style={{
+            display: "block",
+            marginTop: 7,
+            fontSize: tagSize,
+            fontWeight: 700,
+            color: "rgba(255,255,255,0.6)",
+            letterSpacing: "0.08em",
+            textTransform: "uppercase" as const,
+            textAlign: "justify" as const,
+            textAlignLast: "justify" as const,
+          }}>
+            Next Level Table Tennis
+          </span>
+        )}
+      </div>
     </div>
   )
 }

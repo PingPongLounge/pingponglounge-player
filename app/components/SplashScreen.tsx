@@ -90,28 +90,31 @@ export default function SplashScreen() {
             </linearGradient>
           </defs>
 
-          {/* P-Paddle: stroke draw-in */}
-          <path
-            d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z"
-            fill="none"
-            stroke="url(#sg)"
-            strokeWidth="3"
-            strokeLinejoin="round"
-            strokeDasharray="280"
-            strokeDashoffset="0"
-            style={{ animation: "drawPath 0.7s cubic-bezier(0.4,0,0.2,1) forwards" }}
-          />
-
-          {/* Ball: fällt von oben, bounced */}
-          {showBall && (
-            <circle
-              cx="63"
-              cy="58"
-              r="6"
-              fill="url(#sg)"
-              style={{ animation: "ballBounce 0.55s cubic-bezier(0.22,0.61,0.36,1) forwards" }}
+          {/* Das P sitzt mittig (Ball hängt rechts raus) */}
+          <g transform="translate(-2,0)">
+            {/* P-Paddle: stroke draw-in — nie ausgefüllt */}
+            <path
+              d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z"
+              fill="none"
+              stroke="url(#sg)"
+              strokeWidth="3"
+              strokeLinejoin="round"
+              strokeDasharray="280"
+              strokeDashoffset="0"
+              style={{ animation: "drawPath 0.7s cubic-bezier(0.4,0,0.2,1) forwards" }}
             />
-          )}
+
+            {/* Ball: fällt von oben, bounced */}
+            {showBall && (
+              <circle
+                cx="63"
+                cy="58"
+                r="6"
+                fill="url(#sg)"
+                style={{ animation: "ballBounce 0.55s cubic-bezier(0.22,0.61,0.36,1) forwards" }}
+              />
+            )}
+          </g>
         </svg>
 
         {/* Glow pulse nach Zeichnen */}
@@ -168,7 +171,7 @@ export default function SplashScreen() {
           marginTop: 2,
         }}
       >
-        Table Tennis Next Level
+        Next Level Table Tennis
       </span>
 
       <style>{`
