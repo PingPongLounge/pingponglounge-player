@@ -246,7 +246,7 @@ export default function LigaPage(){
                 {([
                   ["1","Beitreten","Wähle Einstieg (Level 1–3) oder Pro (Level 4–7) — passend zu deinem Niveau."],
                   ["2","Spielen & fordern","Fordere andere aus deiner Klasse — jedes Resultat zählt."],
-                  ["3","Aufsteigen","Gewinnst du, steigst du in der Rangliste und sammelst PingPoints."],
+                  ["3","Aufsteigen","Gewinnst du, steigst du in der Rangliste und kletterst in deiner Klasse."],
                 ] as [string,string,string][]).map(([n,t,d])=>(
                   <div key={n} style={{display:"flex",gap:13,alignItems:"flex-start",marginBottom:14}}>
                     <span style={{width:27,height:27,borderRadius:"50%",background:GRAD,color:"#06210F",fontSize:13,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{n}</span>
@@ -352,7 +352,7 @@ export default function LigaPage(){
               </>
             ):(
               <>
-                <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Schon gespielt? Trag die Sätze ein — {fTarget.name} bestätigt, dann zählt&apos;s (ELO + PingPoints).</div>
+                <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Schon gespielt? Trag die Sätze ein — {fTarget.name} bestätigt, dann zählt&apos;s für ELO &amp; Rangliste.</div>
 
                 <div style={{marginBottom:18}}>
                   <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Wann gespielt?</div>

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
+import { createClient } from "@/lib/supabase/server"
 
 // Lazy init — verhindert Build-Crash wenn STRIPE_SECRET_KEY fehlt
 function getStripe() {
@@ -32,6 +33,11 @@ export async function POST(req: NextRequest) {
   try {
     const { reservation_id, location_name, date_label, time_label, email } = await req.json()
     if (!reservation_id) return NextResponse.json({ error: "reservation_id fehlt" }, { status: 400 })
+
+    // Eingeloggter Spieler (optional) — nur damit der Webhook die PingPoints
+    // dem richtigen Konto gutschreiben kann. Nie vom Client übernehmen.
+    const sb = await createClient()
+    const { data: { user } } = await sb.auth.getUser()
 
     // 1. Reservation bei Planyo verifizieren
     const url = new URL(PLANYO_BASE)
@@ -68,7 +74,7 @@ export async function POST(req: NextRequest) {
       }, quantity: 1 }],
       mode: "payment",
       customer_email: email || undefined,
-      metadata: { reservation_id: String(reservation_id), location_name: String(location_name || ""), amount: String(amount) },
+      metadata: { reservation_id: String(reservation_id), location_name: String(location_name || ""), amount: String(amount), player_id: user?.id || "" },
       success_url: `${BASE_URL}/buchen?paid=1`,
       cancel_url:  `${BASE_URL}/buchen`,
     })

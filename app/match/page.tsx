@@ -77,7 +77,7 @@ export default function MatchPage() {
       <SectionTopBar section="Open Game" />
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "6px 16px 0" }}>
         <SectionHero eyebrow="Player · Open Game" title="Open Game" subtitle="Spiel wann du willst — tritt bei oder erstelle dein eigenes." />
-        <SectionIntro storageKey="intro_match" title="So funktioniert Open Game" steps={[["1", "Finde ein Spiel", "Filter nach Level und Standort — sieh, was heute läuft."], ["2", "Mitspielen oder erstellen", "Tritt einem offenen Spiel bei oder starte dein eigenes."], ["3", "Ergebnis eintragen", "Nach dem Spiel Resultat erfassen — dein Rang & die PingPoints steigen."]]} cta={{ label: "Open Game erstellen", href: "/match/create" }} />
+        <SectionIntro storageKey="intro_match" title="So funktioniert Open Game" steps={[["1", "Finde ein Spiel", "Filter nach Level und Standort — sieh, was heute läuft."], ["2", "Mitspielen oder erstellen", "Tritt einem offenen Spiel bei oder starte dein eigenes."], ["3", "Ergebnis eintragen", "Nach dem Spiel Resultat erfassen — dein Rang steigt."]]} cta={{ label: "Open Game erstellen", href: "/match/create" }} />
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "20px 0 12px" }}>
           <p style={{ ...body }}>{games.length} offen · {filtered.length} angezeigt</p>

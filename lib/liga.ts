@@ -1,4 +1,3 @@
-import { LIGA_CONFIG } from "@/lib/rewards"
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 // Bestätigt ein Liga-Match (von p1_entered -> confirmed): ELO, Statistik,
@@ -39,13 +38,8 @@ export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string)
       { player_id: m.winner_id, elo: newW, delta: newW - wElo, match_id: matchId, note: "liga" },
       { player_id: loserId, elo: newL, delta: newL - lElo, match_id: matchId, note: "liga" },
     ])
-    await admin.from("ping_points_transactions").insert([
-      { player_id: m.winner_id, amount: 15, source: "liga_win", description: "Liga-Match gewonnen", ref_id: matchId },
-      { player_id: loserId, amount: 5, source: "liga_played", description: "Liga-Match gespielt", ref_id: matchId },
-    ])
-    if (lElo - wElo >= LIGA_CONFIG.upsetEloDiff) {
-      await admin.from("ping_points_transactions").insert({ player_id: m.winner_id, amount: LIGA_CONFIG.upsetPingPoints, source: "liga_upset", description: `Upset-Sieg (+${lElo - wElo} ELO)`, ref_id: matchId })
-    }
+    // Keine PingPoints für Liga-Matches — PingPoints gibt es nur für
+    // Turnier-Podest (1–3) und bezahlte Buchungen. Siehe PP_CONFIG in lib/rewards.ts.
   }
 
   // Chat-Feed: Match-Ergebnis automatisch als strukturierter Post

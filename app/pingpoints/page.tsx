@@ -13,17 +13,14 @@ const sourceIcon: Record<string,string> = {
   booking:"📅", food:"🍔", referral:"👥", manual:"⭐"
 }
 
-const EARN = [
-  { action: "Liga-Match spielen",     points: "+5",   icon: "🏓" },
-  { action: "Liga-Match gewinnen",    points: "+15",  icon: "🏆" },
-  { action: "Upset-Sieg (>100 ELO)",  points: "+10",  icon: "⚡" },
-  { action: "Turnier anmelden",       points: "+10",  icon: "📋" },
-  { action: "Turnier-Match gewinnen", points: "+20",  icon: "⚔️" },
-  { action: "Turnier gewinnen",       points: "+100", icon: "👑" },
-  { action: "Open Match spielen",     points: "+5",   icon: "🎯" },
-  { action: "Tisch buchen (pro h)",   points: "+10",  icon: "📅", soon: true },
-  { action: "F&B (pro CHF)",          points: "+5",   icon: "🍔", soon: true },
-  { action: "Freund einladen",        points: "+50",  icon: "👥", soon: true },
+// PingPoints gibt es nur fürs Turnier-Podest und für bezahlte Buchungen.
+// Liga- und Open-Game-Resultate zählen für ELO & Rang — nicht für PingPoints.
+const EARN: Array<{ action: string; points: string; note?: string; soon?: boolean }> = [
+  { action: "Buchung bezahlen",  points: "+5",   note: "Tisch, Training oder Open Game — 10 Buchungen = 1 Stunde gratis" },
+  { action: "Turnier — Platz 1", points: "+100", note: "Turniersieg" },
+  { action: "Turnier — Platz 2", points: "+50" },
+  { action: "Turnier — Platz 3", points: "+25" },
+  { action: "Registrierung",     points: "+15", note: "einmaliger Willkommens-Bonus" },
 ]
 
 type Transaction = { id:string; amount:number; source:string; description:string; created_at:string }
@@ -137,7 +134,7 @@ export default function PingPointsPage(){
             <div style={{...card,padding:"32px 20px",textAlign:"center"}}>
               <p style={{fontSize:28,marginBottom:12}}>⭐</p>
               <p style={{fontSize:14,fontWeight:700,color:W,marginBottom:6}}>Noch keine Punkte</p>
-              <p style={{...body}}>Spiel dein erstes Match um PingPoints zu verdienen!</p>
+              <p style={{...body}}>PingPoints sammelst du mit bezahlten Buchungen und auf dem Turnier-Podest.</p>
             </div>
           ):(
             <div style={{...card}}>
@@ -163,15 +160,18 @@ export default function PingPointsPage(){
         {tab==="earn"&&(
           <div style={{...card}}>
             {EARN.map((e,i)=>(
-              <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",borderTop:i>0?"1px solid rgba(255,255,255,.06)":"none",opacity:e.soon?0.45:1}}>
-                <span style={{fontSize:20,flexShrink:0}}>{e.icon}</span>
+              <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"13px 16px",borderTop:i>0?"1px solid rgba(255,255,255,.06)":"none",opacity:e.soon?0.45:1}}>
                 <div style={{flex:1}}>
-                  <p style={{fontSize:13,fontWeight:600,color:W}}>{e.action}</p>
+                  <p style={{fontSize:13.5,fontWeight:700,color:W}}>{e.action}</p>
+                  {e.note&&<p style={{...meta,fontSize:11,marginTop:2}}>{e.note}</p>}
                   {e.soon&&<p style={{...meta,fontSize:10}}>bald verfügbar</p>}
                 </div>
-                <span style={{fontSize:14,fontWeight:800,color:W}}>{e.points}</span>
+                <span style={{fontSize:15,fontWeight:900,...gt,flexShrink:0}}>{e.points}</span>
               </div>
             ))}
+            <div style={{padding:"12px 16px",borderTop:"1px solid rgba(255,255,255,.06)"}}>
+              <p style={{...meta,fontSize:11,lineHeight:1.5}}>Liga- und Open-Game-Resultate zählen für ELO &amp; Rangliste — nicht für PingPoints.</p>
+            </div>
           </div>
         )}
 
