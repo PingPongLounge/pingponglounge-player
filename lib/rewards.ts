@@ -32,7 +32,7 @@ export const PP_REWARDS: Reward[] = [
 // Darüber hinaus kann weitergespielt und eingetragen werden — das Ergebnis
 // erscheint in Historie und Chat, zählt aber nicht mehr. Schützt die Rangliste
 // davor, dass jemand von einem Kumpel nach oben geschoben wird.
-export const MAX_RANKED_PER_OPPONENT = 7
+export const MAX_RANKED_PER_OPPONENT = 5
 
 export const LIGA_CONFIG = {
   minMatchesForRanking: 6,
