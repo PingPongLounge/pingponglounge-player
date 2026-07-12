@@ -56,6 +56,7 @@ export default function LigaPage(){
   const [fFriendly,setFFriendly]=useState(false) // Freundschaftsspiel: ohne Liga-Punkte
   const [fNoteRanked,setFNoteRanked]=useState<string|null>(null) // Hinweis, wenn das Gegner-Limit greift
   const [rankedVs,setRankedVs]=useState<Record<string,number>>({}) // gewertete Spiele je Gegner
+  const [pickOpen,setPickOpen]=useState(false)         // "Gegen wen hast du gespielt?"-Auswahl
   const [pOpen,setPOpen]=useState<string|null>(null)   // Spieler-Popup: wessen Profil?
   const [pData,setPData]=useState<PlayerInfo|null>(null)
   const [pLoading,setPLoading]=useState(false)
@@ -182,7 +183,7 @@ export default function LigaPage(){
     else flash(j.error||"Fehler")
   }
   function today(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` }
-  function openForder(r:Row){ setFTarget({id:r.user_id,name:r.name}); setFTab("challenge"); setFDate(""); setFTime(""); setFMy(0); setFOpp(0); setFRDate(today()); setFDone([]); setFFriendly(false); setFNoteRanked(null) }
+  function openForder(r:Row,tab:"challenge"|"result"="challenge"){ setFTarget({id:r.user_id,name:r.name}); setFTab(tab); setFDate(""); setFTime(""); setFMy(0); setFOpp(0); setFRDate(today()); setFDone([]); setFFriendly(false); setFNoteRanked(null) }
   async function sendChallenge(){
     if(!fTarget) return
     setBusy(true)
@@ -332,6 +333,18 @@ export default function LigaPage(){
             </div>
           )}
 
+          {/* Ergebnis eintragen — die wichtigste Handlung, deshalb ganz vorn.
+              Vorher versteckte sie sich hinter dem Button "Fordern", wo sie niemand suchte. */}
+          {myReg&&rows.length>1&&(
+            <div style={{padding:"14px 14px 0"}}>
+              <button onClick={()=>setPickOpen(true)}
+                style={{display:"flex",alignItems:"center",justifyContent:"center",gap:9,width:"100%",background:GRAD,color:"#06210F",borderRadius:16,padding:"16px",fontSize:15.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:"pointer",fontFamily:"inherit",boxShadow:SHADOW}}>
+                Ergebnis eintragen
+              </button>
+              <div style={{fontSize:11.5,color:MUT,textAlign:"center",marginTop:7}}>Schon gespielt? Trag das Resultat hier ein.</div>
+            </div>
+          )}
+
           {/* Rangliste */}
           <div style={{padding:"16px 14px 0"}}>
             <div style={{...card,borderRadius:24,padding:"20px 16px"}}>
@@ -387,6 +400,32 @@ export default function LigaPage(){
           </div>
         </>)}
       </div>
+
+      {/* Gegner-Auswahl: "Gegen wen hast du gespielt?" → direkt ins Ergebnis-Formular */}
+      {pickOpen&&(
+        <div onClick={()=>setPickOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:60,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"84vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
+              <div style={{fontSize:20,fontWeight:900,color:W}}>Gegen wen hast du gespielt?</div>
+              <button onClick={()=>setPickOpen(false)} style={{background:"none",border:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
+            </div>
+            <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Wähl deinen Gegner — danach trägst du das Resultat ein.</div>
+            <div style={{background:CELL,borderRadius:14,overflow:"hidden"}}>
+              {rows.filter(r=>r.user_id!==userId).map((r,i)=>(
+                <button key={r.user_id} onClick={()=>{setPickOpen(false); openForder(r,"result")}}
+                  style={{display:"flex",alignItems:"center",gap:11,width:"100%",padding:"13px 14px",background:"none",border:"none",borderTop:i===0?"none":`1px solid ${LINE}`,cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:14.5,fontWeight:800,color:W}}>{r.name}</div>
+                    {r.real&&<div style={{fontSize:11,color:MUT,marginTop:1}}>{r.real}</div>}
+                  </div>
+                  {r.level&&<span style={levelBadge(r.level)}>L{r.level}</span>}
+                  <span style={{fontSize:13,fontWeight:800,color:SUB}}>{r.elo}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Spieler-Popup: Bilanz, Siegquote, letzte Spiele, direkter Vergleich */}
       {pOpen&&(
