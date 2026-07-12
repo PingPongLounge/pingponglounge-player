@@ -8,12 +8,17 @@ type PubProfile = { id: string; name: string; elo: number; level: string }
 export async function GET() {
   const sb = await createClient()
 
+  // Nur Spiele ab heute — vergangene Termine standen bisher ewig als "offen" in der Liste.
+  const heute = new Date().toISOString().slice(0, 10)
+
   const { data: games, error } = await sb
     .from("open_games")
     .select("id,created_by,location_name,date,start_hour,duration_minutes,max_players,current_players,price_per_player,level,status,notes,created_at")
     .in("status", ["open", "full"])
-    .order("date", { ascending: true, nullsFirst: false })
-    .order("created_at", { ascending: false })
+    .not("date", "is", null)
+    .gte("date", heute)
+    .order("date", { ascending: true })
+    .order("start_hour", { ascending: true })
     .limit(40)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 

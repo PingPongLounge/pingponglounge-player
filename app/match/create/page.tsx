@@ -25,13 +25,16 @@ export default function CreateMatchPage() {
   const [error, setError]       = useState("")
 
   async function submit() {
+    // Datum und Zeit sind Pflicht — ein Open Game ohne Termin kann niemand besuchen.
     if (!level || !city) { setError("Level und Standort wählen"); return }
+    if (!date) { setError("Wann soll gespielt werden? Bitte Datum wählen"); return }
+    if (hour === "") { setError("Bitte eine Uhrzeit wählen"); return }
     setLoading(true); setError("")
     const res = await fetch("/api/match", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        level, location_name: city, date: date || null,
+        level, location_name: city, date,
         start_hour: hour === "" ? null : hour, duration_minutes: duration,
         max_players: maxPlayers, price_per_player: Number(price) || 0, notes: msg || null,
       }),

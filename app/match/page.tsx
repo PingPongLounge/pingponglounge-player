@@ -64,8 +64,10 @@ export default function MatchPage() {
 
   async function cancel(id: string) { await fetch(`/api/match/${id}/cancel`, { method: "POST" }); load() }
 
-  const LEVELS = ["Rookie", "Challenger", "Advanced", "Elite"]
-  const CITIES = ["Glattbrugg", "Oerlikon", "Zürich", "Winterthur", "Baden"]
+  // Der Filter lief noch auf dem alten System (Rookie/Challenger/Advanced/Elite),
+  // erstellt werden Open Games aber mit Level 1–7 → der Filter traf nie zu.
+  const LEVELS = ["1", "2", "3", "4", "5", "6", "7"]
+  const CITIES = ["Glattbrugg", "Oerlikon", "Langstrasse", "St. Gallen", "Basel", "Luzern"]
 
   const filtered = games.filter(g =>
     (!filterLevel || g.level === filterLevel) &&
@@ -91,7 +93,7 @@ export default function MatchPage() {
         {/* Filter */}
         <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
           {LEVELS.map(l => { const active = filterLevel === l; return (
-            <button key={l} onClick={() => setFilterLevel(active ? "" : l)} style={chipBtn(active)}>{l}</button>
+            <button key={l} onClick={() => setFilterLevel(active ? "" : l)} style={chipBtn(active)}>L{l}</button>
           )})}
         </div>
         <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}>
