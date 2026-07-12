@@ -103,6 +103,37 @@ export default function PingPointsPage(){
             <span style={{...gt,fontSize:18,fontWeight:700}}>PP</span>
           </div>
           <p style={{...meta,marginTop:8}}>PingPoints</p>
+          {/* Was ist ein Punkt wert? Ohne diese Zeile ist die Zahl bedeutungslos. */}
+          <p style={{fontSize:12.5,color:SUB,marginTop:6}}>
+            {balance>=50
+              ? `Reicht für ${Math.floor(balance/50)}× 1 Stunde Tisch gratis`
+              : `Noch ${50-balance} Punkte bis zur ersten Gratis-Stunde`}
+          </p>
+        </div>
+
+        {/* Die Regeln auf einen Blick — vorher musste man sie sich zusammenreimen */}
+        <div style={{...card,padding:"18px 18px",marginBottom:16}}>
+          <p style={{fontSize:13.5,fontWeight:800,color:W,marginBottom:12}}>So funktionieren PingPoints</p>
+
+          <div style={{display:"flex",gap:8,marginBottom:14}}>
+            {[
+              {v:"5",   l:"pro bezahlter\nBuchung"},
+              {v:"100", l:"Turniersieg\n(2./3.: 50/25)"},
+              {v:"50",  l:"= 1 Stunde\nTisch gratis"},
+            ].map(s=>(
+              <div key={s.l} style={{flex:1,background:CELL,borderRadius:12,padding:"12px 6px",textAlign:"center"}}>
+                <div style={{fontSize:20,fontWeight:900,...gt}}>{s.v}</div>
+                <div style={{fontSize:10,color:MUT,fontWeight:600,marginTop:3,lineHeight:1.35,whiteSpace:"pre-line"}}>{s.l}</div>
+              </div>
+            ))}
+          </div>
+
+          <p style={{fontSize:12,color:SUB,lineHeight:1.6,margin:0}}>
+            Punkte bekommst du fürs <strong style={{color:W}}>Bezahlen</strong> (Tisch, Training, Open Game) und fürs
+            <strong style={{color:W}}> Turnier-Podest</strong>. Liga- und Open-Game-Resultate zählen für ELO und Rang,
+            aber nicht für PingPoints — sonst könnte man sie sich gegenseitig zuschieben.
+            Einlösen kannst du sie unten unter „Einlösen": ab 50 Punkten eine Gratis-Stunde, danach Rabatte und Prämien.
+          </p>
         </div>
 
         {/* Progress Bar */}

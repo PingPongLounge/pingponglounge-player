@@ -53,13 +53,28 @@ export async function POST(req: NextRequest) {
           .maybeSingle()
 
         if (!existing) {
-          await admin.from("ping_points_transactions").insert({
+          const rows: Array<Record<string, unknown>> = [{
             player_id: playerId,
             amount: PP_CONFIG.perPaidBooking,
             source: "booking_paid",
             description: `Buchung bezahlt${s.metadata?.location_name ? ` — ${s.metadata.location_name}` : ""}`,
             ref_id: refId,
-          })
+          }]
+
+          // Eingelöste Punkte erst hier abziehen — nicht schon beim Checkout.
+          // Sonst wären die Punkte weg, auch wenn der Kunde die Bezahlung abbricht.
+          const eingeloest = parseInt(s.metadata?.redeemed_points || "0", 10)
+          if (Number.isInteger(eingeloest) && eingeloest > 0) {
+            rows.push({
+              player_id: playerId,
+              amount: -eingeloest,
+              source: "redeem",
+              description: "Rabatt auf Buchung",
+              ref_id: refId,
+            })
+          }
+
+          await admin.from("ping_points_transactions").insert(rows)
         }
       }
     }

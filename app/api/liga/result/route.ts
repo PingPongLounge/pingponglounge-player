@@ -59,6 +59,44 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
+  // SOFORT in die Nachrichtenzentrale — nicht erst nach der Bestätigung.
+  // Vorher tauchte ein Spiel im Chat erst auf, wenn der Gegner reagiert hatte;
+  // oft einen Tag später, und niemand bekam es mit. Der Post wird beim Bestätigen
+  // aktualisiert (siehe applyLeagueConfirm), nicht doppelt angelegt.
+  try {
+    const opponentId2 = match.p1_id === user.id ? match.p2_id : match.p1_id
+    const { data: seasonRow } = await admin.from("league_matches").select("season_id").eq("id", match_id).single()
+    const { data: nm } = await admin.from("public_profiles").select("id,name").in("id", [user.id, opponentId2])
+    const nameOf = (id: string) => (nm || []).find(n => n.id === id)?.name || "Spieler"
+
+    const setsArr = sets as Array<{ p1: number; p2: number }>
+    const meWins = setsArr.filter(s => s.p1 > s.p2).length
+    const oppWins = setsArr.filter(s => s.p2 > s.p1).length
+    const iWon = winner_id === user.id
+    const loserId2 = iWon ? opponentId2 : user.id
+
+    if (seasonRow?.season_id) {
+      await admin.from("league_messages").insert({
+        season_id: seasonRow.season_id,
+        user_id: null,
+        kind: "match",
+        match_id,
+        text: JSON.stringify({
+          winner: nameOf(winner_id),
+          loser: nameOf(loserId2),
+          wSets: iWon ? meWins : oppWins,
+          lSets: iWon ? oppWins : meWins,
+          detail: setsArr.map(s => `${s.p1}:${s.p2}`).join(" · "),
+          ranked: true,
+          pending: true,               // wartet noch auf die Bestätigung des Gegners
+          enteredBy: nameOf(user.id),
+        }),
+      })
+    }
+  } catch (e) {
+    console.error("Chat-Post beim Eintragen fehlgeschlagen:", e)
+  }
+
   // Gegner per E-Mail zur Bestätigung auffordern (24h, danach automatisch bestätigt).
   // Fehler beim Mailversand dürfen das Eintragen nie scheitern lassen.
   try {

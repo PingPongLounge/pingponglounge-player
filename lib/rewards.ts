@@ -28,6 +28,11 @@ export const PP_REWARDS: Reward[] = [
   { threshold: 500, type: "product",                       label: "Gratis Schlägerhülle", description: "PPL Branded Schlägerhülle — abholbar in deiner Lounge" },
 ]
 
+// Was ein PingPoint wert ist. EINE Zahl für alles: 50 Punkte = 1 Stunde Tisch
+// (≈ CHF 25) → 1 Punkt = CHF 0.50. Beim Buchen war ein Punkt vorher CHF 2 wert,
+// also das Vierfache — derselbe Punkt hatte je nach Bildschirm einen anderen Preis.
+export const PP_CHF = 0.5
+
 // Wie oft darf ein Spiel gegen DENSELBEN Gegner pro Saison für ELO/Rang zählen?
 // Darüber hinaus kann weitergespielt und eingetragen werden — das Ergebnis
 // erscheint in Historie und Chat, zählt aber nicht mehr. Schützt die Rangliste

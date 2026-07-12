@@ -55,13 +55,28 @@ export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string)
   const detail = sets.map(s => `${s.p1}:${s.p2}`).join(" · ")
   const { data: names } = await admin.from("public_profiles").select("id,name").in("id", [m.winner_id, loserId])
   const nameOf = (id: string) => (names || []).find(n => n.id === id)?.name || "Spieler"
-  await admin.from("league_messages").insert({
-    season_id: m.season_id,
-    user_id: null,
-    kind: "match",
-    match_id: matchId,
-    text: JSON.stringify({ winner: nameOf(m.winner_id), loser: nameOf(loserId), wSets, lSets, detail, ranked }),
-  })
+  const payload = JSON.stringify({ winner: nameOf(m.winner_id), loser: nameOf(loserId), wSets, lSets, detail, ranked, pending: false })
+
+  // Der Post steht schon seit dem Eintragen im Chat (als "wartet auf Bestätigung").
+  // Jetzt wird er nur noch aktualisiert — sonst stünde dasselbe Spiel zweimal drin.
+  const { data: vorhanden } = await admin
+    .from("league_messages")
+    .select("id")
+    .eq("match_id", matchId)
+    .eq("kind", "match")
+    .maybeSingle()
+
+  if (vorhanden) {
+    await admin.from("league_messages").update({ text: payload }).eq("id", vorhanden.id)
+  } else {
+    await admin.from("league_messages").insert({
+      season_id: m.season_id,
+      user_id: null,
+      kind: "match",
+      match_id: matchId,
+      text: payload,
+    })
+  }
 
   return { ok: true }
 }

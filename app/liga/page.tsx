@@ -611,16 +611,21 @@ export default function LigaPage(){
             <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:10}}>
               {msgs.length===0?<p style={{textAlign:"center",color:MUT,fontSize:13,marginTop:20}}>Noch keine Nachrichten — schreib die erste 👋</p>:msgs.map(m=>{
                 if(m.kind==="match"){
-                  let d:{winner:string,loser:string,wSets:number,lSets:number,detail:string,ranked?:boolean}|null=null
+                  let d:{winner:string,loser:string,wSets:number,lSets:number,detail:string,ranked?:boolean,pending?:boolean,enteredBy?:string}|null=null
                   try{d=JSON.parse(m.text)}catch{/**/}
                   const r=m.reactions
                   return(
                     <div key={m.id} style={{alignSelf:"stretch"}}>
                       <div style={{background:"linear-gradient(135deg,rgba(57,255,20,.10),rgba(31,209,196,.07))",border:"1px solid rgba(57,255,20,.18)",borderRadius:14,padding:"11px 14px"}}>
-                        <div style={{fontSize:10,fontWeight:700,color:d?.ranked===false?MUT:"rgba(57,255,20,.7)",letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>{d?.ranked===false?"Match · zählt nicht":"Match bestätigt"}</div>
+                        <div style={{fontSize:10,fontWeight:700,color:d?.pending?"rgba(255,255,255,.6)":d?.ranked===false?MUT:"rgba(57,255,20,.7)",letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>
+                          {d?.pending?"Neues Ergebnis · wartet auf Bestätigung":d?.ranked===false?"Match · zählt nicht":"Match bestätigt"}
+                        </div>
                         {d&&<>
-                          <div style={{fontSize:14,fontWeight:800,color:W,marginBottom:2}}>{d.winner} <span style={{color:d.ranked===false?MUT:"rgba(57,255,20,.9)"}}>schlägt</span> {d.loser}</div>
-                          <div style={{fontSize:12,color:MUT,marginBottom:8}}>{d.wSets}:{d.lSets} Sätze{d.detail?` · ${d.detail}`:""}{d.ranked===false?" · ohne Liga-Punkte":""}</div>
+                          <div style={{fontSize:14,fontWeight:800,color:W,marginBottom:2}}>{d.winner} <span style={{color:d.pending?MUT:d.ranked===false?MUT:"rgba(57,255,20,.9)"}}>schlägt</span> {d.loser}</div>
+                          <div style={{fontSize:12,color:MUT,marginBottom:8}}>
+                            {d.wSets}:{d.lSets} Sätze{d.detail?` · ${d.detail}`:""}{d.ranked===false?" · ohne Liga-Punkte":""}
+                            {d.pending&&d.enteredBy?` · eingetragen von ${d.enteredBy}`:""}
+                          </div>
                         </>}
                         <div style={{display:"flex",gap:6}}>
                           {(["heart","fire","laugh"] as const).map(type=>{

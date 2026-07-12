@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
+import { PP_CHF } from "@/lib/rewards"
 
 // Lazy init — verhindert Build-Crash wenn STRIPE_SECRET_KEY fehlt
 function getStripe() {
@@ -31,7 +33,7 @@ function parsePlanyoTime(t: string | number): Date | null {
 
 export async function POST(req: NextRequest) {
   try {
-    const { reservation_id, location_name, date_label, time_label, email } = await req.json()
+    const { reservation_id, location_name, date_label, time_label, email, redeem_points } = await req.json()
     if (!reservation_id) return NextResponse.json({ error: "reservation_id fehlt" }, { status: 400 })
 
     // Eingeloggter Spieler (optional) — nur damit der Webhook die PingPoints
@@ -65,21 +67,52 @@ export async function POST(req: NextRequest) {
 
     if (amount <= 0) return NextResponse.json({ error: "Ungültiger Betrag" }, { status: 400 })
 
+    // PingPoints-Rabatt. Die App hat ihn bisher nur ANGEZEIGT und an diese Route
+    // geschickt — hier wurde er ignoriert. Der Kunde sah "CHF 25 − 10 = 15" und
+    // wurde trotzdem mit 25 belastet, ohne dass Punkte abgezogen wurden.
+    // Das Guthaben wird serverseitig geprüft, der Client-Wert nie geglaubt.
+    let discount = 0
+    let punkte = 0
+    if (user && Number.isInteger(redeem_points) && redeem_points > 0) {
+      const admin = createAdminClient()
+      const { data: tx } = await admin
+        .from("ping_points_transactions")
+        .select("amount")
+        .eq("player_id", user.id)
+      const guthaben = (tx || []).reduce((s: number, t: { amount: number }) => s + t.amount, 0)
+
+      // Höchstens so viele Punkte, wie er hat — und nie mehr als der Betrag hergibt
+      punkte = Math.min(redeem_points, guthaben, Math.floor(amount / PP_CHF))
+      if (punkte > 0) discount = punkte * PP_CHF
+    }
+
+    const zuZahlen = Math.max(0, amount - discount)
+    if (zuZahlen <= 0) return NextResponse.json({ error: "Bitte weniger Punkte einlösen — der Betrag muss über 0 liegen" }, { status: 400 })
+
     const session = await getStripe().checkout.sessions.create({
       payment_method_types: ["card"],
       line_items: [{ price_data: {
         currency: "chf",
-        product_data: { name: `Ping Pong Lounge ${location_name || ""}`.trim(), description: `${date_label} · ${time_label}` },
-        unit_amount: Math.round(amount * 100),
+        product_data: {
+          name: `Ping Pong Lounge ${location_name || ""}`.trim(),
+          description: `${date_label} · ${time_label}${punkte > 0 ? ` · ${punkte} PingPoints eingelöst (−CHF ${discount.toFixed(2)})` : ""}`,
+        },
+        unit_amount: Math.round(zuZahlen * 100),
       }, quantity: 1 }],
       mode: "payment",
       customer_email: email || undefined,
-      metadata: { reservation_id: String(reservation_id), location_name: String(location_name || ""), amount: String(amount), player_id: user?.id || "" },
+      metadata: {
+        reservation_id: String(reservation_id),
+        location_name: String(location_name || ""),
+        amount: String(zuZahlen),
+        player_id: user?.id || "",
+        redeemed_points: String(punkte),
+      },
       success_url: `${BASE_URL}/buchen?paid=1`,
       cancel_url:  `${BASE_URL}/buchen`,
     })
 
-    return NextResponse.json({ url: session.url, amount })
+    return NextResponse.json({ url: session.url, amount: zuZahlen, discount, redeemed: punkte })
   } catch (e) {
     console.error("Stripe checkout error:", e)
     return NextResponse.json({ error: "Stripe Fehler" }, { status: 500 })

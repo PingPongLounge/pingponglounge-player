@@ -221,8 +221,11 @@ export default function BuchenPage() {
   const durH         = duration === 0.5 ? 0.5 : duration
   const priceBase    = duration === 0.5 ? locHalfPrice * tables : Math.round(locPrice * tables * durH)
   const pingPoints   = authUser?.pingPoints ?? 0
-  const maxRedeem    = Math.min(pingPoints, Math.floor(priceBase / 2))
-  const discount     = redeemPoints * 2
+  // 1 PingPoint = CHF 0.50 — dieselbe Rechnung wie bei den Prämien (50 Punkte =
+  // 1 Stunde Tisch ≈ CHF 25). Vorher war ein Punkt hier CHF 2 wert, also das
+  // Vierfache: derselbe Punkt hatte je nach Bildschirm einen anderen Wert.
+  const maxRedeem    = Math.min(pingPoints, Math.floor(priceBase / 0.5))
+  const discount     = redeemPoints * 0.5
   const grandTotal   = Math.max(0, priceBase - discount)
 
   // Öffnungszeiten für gewähltes Datum
@@ -308,12 +311,15 @@ export default function BuchenPage() {
           return
         }
 
-        // Ohne Zahlung: PingPoints direkt abziehen falls eingelöst
+        // Ohne Zahlung (Gratis-Buchung): PingPoints direkt abziehen.
+        // Bei bezahlten Buchungen macht das der Stripe-Webhook — erst wenn das
+        // Geld auch wirklich da ist. Sonst wären die Punkte weg, obwohl der
+        // Kunde den Kauf abgebrochen hat.
         if (redeemPoints > 0 && authUser) {
           await supabase.from("ping_points_transactions").insert({
             player_id: authUser.id, amount: -redeemPoints,
-            description: `${redeemPoints}P = CHF ${redeemPoints * 2} Rabatt · Buchung #${resId}`,
-            created_at: new Date().toISOString(),
+            source: "redeem",
+            description: `Rabatt auf Buchung #${resId}`,
           })
         }
         setStep("done")
@@ -669,7 +675,7 @@ export default function BuchenPage() {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <div>
                 <p style={{ fontSize: 13, color: TEXT, fontWeight: 900 }}>PingPoints einlösen</p>
-                <p style={{ ...meta, marginTop: 2 }}>{pingPoints} Punkte · 1 Punkt = CHF 2 Rabatt</p>
+                <p style={{ ...meta, marginTop: 2 }}>{pingPoints} Punkte · 1 Punkt = CHF 0.50 Rabatt</p>
               </div>
               <span style={{ fontSize: 14, color: G, fontWeight: 900 }}>{pingPoints}P</span>
             </div>
