@@ -12,8 +12,15 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   const { data: game } = await admin.from("open_games").select("id,created_by,status").eq("id", id).single()
   if (!game) return NextResponse.json({ error: "Spiel nicht gefunden" }, { status: 404 })
   if (game.created_by === user.id) return NextResponse.json({ error: "Als Ersteller bitte das Spiel löschen" }, { status: 400 })
-  // Ein abgesagtes Spiel darf nicht durch Austreten wieder auf "open" springen.
-  if (game.status === "cancelled") return NextResponse.json({ error: "Dieses Spiel wurde abgesagt" }, { status: 400 })
+
+  // KRITISCH: Austreten darf NUR aus einem noch offenen Spiel möglich sein.
+  // Vorher setzte diese Route den Status bedingungslos auf "open" zurück — auch
+  // bei einem bereits gewerteten Spiel. Damit liess sich dasselbe Spiel durch
+  // Austreten → Wiederbeitreten → erneut eintragen beliebig oft werten und ELO
+  // unbegrenzt farmen. Ebenso wurde ein abgesagtes Spiel wiederbelebt.
+  if (!["open", "full"].includes(game.status)) {
+    return NextResponse.json({ error: "Dieses Spiel ist nicht mehr offen" }, { status: 400 })
+  }
 
   // Eigene Teilnahme entfernen
   const { error: delErr } = await admin.from("open_game_players").delete().eq("game_id", id).eq("user_id", user.id)

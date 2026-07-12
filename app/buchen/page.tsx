@@ -613,7 +613,7 @@ export default function BuchenPage() {
           <div style={{ ...cardPad, padding: "12px 16px", marginBottom: 16 }}>
             <p style={{ fontSize: 13, fontWeight: 700, color: G, marginBottom: 2 }}>Ihr seid {persons} Personen — Teamevent-Pakete verfügbar.</p>
             <p style={{ ...meta }}>Quick Social CHF 49/P. · Team Night CHF 89/P. · All-In CHF 139/P.</p>
-            <Link href="/teamevents" style={{ fontSize: 12, color: G, fontWeight: 700, textDecoration: "none" }}>Pakete ansehen →</Link>
+            <a href="https://pingponglounge.ch/teamevents" target="_blank" rel="noopener noreferrer" style={{ fontSize: 12, color: G, fontWeight: 700, textDecoration: "none" }}>Pakete ansehen →</a>
           </div>
         )}
 

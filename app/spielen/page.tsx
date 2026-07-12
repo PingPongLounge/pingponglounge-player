@@ -8,12 +8,17 @@ const DARK = BG
 const TEXT = W
 const MUTED = MUT
 
-// Level-Logik analog zum Onboarding (LEVELS-Array dort).
+// Level 1–7 wie im Rest der App. Hier standen noch die abgeschafften Namen
+// Rookie/Challenger/Advanced/Elite — der Neuling bekam ein Level angezeigt,
+// das es gar nicht mehr gibt (und wegen der festen Start-ELO immer dasselbe).
 const LEVELS = [
-  { name: "Rookie",     elo: 1000 },
-  { name: "Challenger", elo: 1100 },
-  { name: "Advanced",   elo: 1300 },
-  { name: "Elite",      elo: 1500 },
+  { name: "1", elo: 950 },
+  { name: "2", elo: 1050 },
+  { name: "3", elo: 1150 },
+  { name: "4", elo: 1250 },
+  { name: "5", elo: 1350 },
+  { name: "6", elo: 1450 },
+  { name: "7", elo: 1600 },
 ]
 
 // Nächstkleineres Level zu einer ELO (gleiche Idee wie calcLevel im Onboarding)

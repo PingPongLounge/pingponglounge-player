@@ -9,7 +9,7 @@ export async function GET() {
   // Profil
   const { data: profile } = await sb
     .from("profiles")
-    .select("id,name,real_name,elo,level,matches_played,matches_won,canton,created_at")
+    .select("id,name,real_name,elo,level,matches_played,matches_won,canton,created_at,avatar_url")
     .eq("id", user.id)
     .single()
 

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { applyElo, eloPreview } from "@/lib/elo"
 import { sendResultConfirmRequest } from "@/lib/email"
 import { signAction } from "@/lib/token"
+import { MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
 import { NextRequest, NextResponse } from "next/server"
 
 // Ergebnis eines Open Games eintragen und bestätigen.
@@ -45,8 +46,33 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   // ── Eintragen ─────────────────────────────────────────────────────────────
   if (action === "enter") {
-    if (game.status === "confirmed") return NextResponse.json({ error: "Dieses Spiel ist bereits gewertet" }, { status: 400 })
-    if (game.status === "cancelled") return NextResponse.json({ error: "Dieses Spiel wurde abgesagt" }, { status: 400 })
+    if (!["open", "full"].includes(game.status))
+      return NextResponse.json({ error: "Für dieses Spiel kann kein Ergebnis mehr eingetragen werden" }, { status: 400 })
+
+    // Ein Spiel, das erst in der Zukunft stattfindet, kann noch nicht gespielt sein.
+    const heute = new Date().toISOString().slice(0, 10)
+    if (game.date && game.date > heute)
+      return NextResponse.json({ error: "Dieses Spiel findet erst später statt" }, { status: 400 })
+
+    // Gegner-Limit wie in der Liga: max. 5 gewertete Open Games gegen denselben
+    // Gegner pro 90 Tagen. Ohne das wäre die Rangliste über Open Games frei
+    // manipulierbar (zwei Kollegen tragen sich gegenseitig beliebig oft Siege ein),
+    // während sie in der Liga geschützt ist.
+    const seit = new Date(Date.now() - 90 * 24 * 3600 * 1000).toISOString()
+    const { data: vorherige } = await admin
+      .from("open_games")
+      .select("id, open_game_players!inner(user_id)")
+      .eq("status", "confirmed")
+      .gte("confirmed_at", seit)
+    const gegenIhn = (vorherige || []).filter(g => {
+      const uids = (g.open_game_players as unknown as Array<{ user_id: string }>).map(p => p.user_id)
+      return uids.includes(user.id) && uids.includes(opponentId) && uids.length === 2
+    }).length
+    if (gegenIhn >= MAX_RANKED_PER_OPPONENT) {
+      return NextResponse.json({
+        error: `Ihr habt in den letzten 90 Tagen schon ${MAX_RANKED_PER_OPPONENT} gewertete Open Games gegeneinander gespielt. Weitere zählen nicht mehr für ELO — trag das Ergebnis in der Liga ein.`,
+      }, { status: 400 })
+    }
 
     const my = Number(my_sets), opp = Number(opp_sets)
     if (!Number.isInteger(my) || !Number.isInteger(opp) || my < 0 || opp < 0 || my > 7 || opp > 7)

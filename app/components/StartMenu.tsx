@@ -63,9 +63,14 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
               <span style={{ color: "#39FF14", fontSize: 18 }}>›</span>
             </Link>
 
+            {/* "einstellungen" zeigte auf dasselbe Ziel wie "profil" — es gibt gar
+                keine Einstellungen. Stattdessen die Rangliste, die bisher über
+                keinen einzigen Link erreichbar war. */}
             <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, overflow: "hidden", marginTop: 10 }}>
               <Link2 href="/profil" label="profil" icon={<Icon d='<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>' />} />
-              <Link2 href="/profil" label="einstellungen" icon={<Icon d='<circle cx="12" cy="12" r="3"/><path d="M19.4 15a8 8 0 0 0 .1-3l1.5-1.1-1.9-3.3-1.8.8a8 8 0 0 0-2.6-1.5L14 3.2h-4l-.3 2.2a8 8 0 0 0-2.6 1.5l-1.8-.8L3.4 9.4 5 10.5a8 8 0 0 0 0 3l-1.5 1.1 1.9 3.3 1.8-.8a8 8 0 0 0 2.6 1.5L10 20.8h4l.3-2.2a8 8 0 0 0 2.6-1.5l1.8.8 1.9-3.3z"/>' />} />
+              <Link2 href="/rangliste" label="rangliste" icon={<Icon d='<path d="M5 20v-6M12 20v-11M19 20v-8"/>' />} />
+              <Link2 href="/matchhistorie" label="deine spiele" icon={<Icon d='<path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/>' />} />
+              <Link2 href="/pingpoints" label="pingpoints" icon={<Icon d='<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>' />} />
             </div>
 
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.5)", textTransform: "uppercase", letterSpacing: ".06em", margin: "22px 4px 8px" }}>spielen &amp; buchen</div>

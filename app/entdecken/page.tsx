@@ -84,7 +84,7 @@ export default async function EntdeckenPage() {
   // Level-Gate: Wer noch keine Einstufung hat, wird zuerst zum Onboarding (Level-Abfrage) geschickt.
   if (!profile || !profile.level) redirect('/onboarding')
   const elo = profile?.elo ?? 1000
-  const lvl = profile?.level || 'Rookie'
+  const lvl = profile?.level || '1'
   const firstName = profile?.name?.split(' ')[0] || 'Spieler'
   const initials = initialsFrom(profile?.name)
   const wins = profile?.matches_won ?? 0
@@ -94,7 +94,9 @@ export default async function EntdeckenPage() {
   const [higherRes, ppRes, gamesRes, tourRes, membershipRes] = await Promise.all([
     sb.from('public_profiles').select('*', { count: 'exact', head: true }).gt('elo', elo).gt('matches_played', 0),
     sb.from('ping_points_transactions').select('amount').eq('player_id', user.id),
-    sb.from('open_games').select('id,location_name,date,start_hour,level,max_players,current_players,status').eq('status', 'open').order('date', { ascending: true, nullsFirst: false }).order('start_hour', { ascending: true, nullsFirst: false }).limit(12),
+    // Nur bevorstehende Spiele — vorher standen Spiele von letzter Woche ganz
+    // oben in der Liste, weil das Datum nicht gefiltert wurde.
+    sb.from('open_games').select('id,location_name,date,start_hour,level,max_players,current_players,status').eq('status', 'open').not('date', 'is', null).gte('date', new Date().toISOString().slice(0, 10)).order('date', { ascending: true }).order('start_hour', { ascending: true, nullsFirst: false }).limit(12),
     sb.from('player_tournaments').select('id,name,date,format,status').in('status', ['open', 'running']).order('date', { ascending: true, nullsFirst: false }).limit(1).maybeSingle(),
     sb.from('league_registrations').select('season_id, league_seasons(id,city,skill_class)').eq('player_id', user.id).limit(1).maybeSingle(),
   ])

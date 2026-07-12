@@ -1,5 +1,6 @@
 import { SupabaseClient } from "@supabase/supabase-js"
 import { applyLeagueConfirm } from "@/lib/liga"
+import { applyElo } from "@/lib/elo"
 import { sendOnboardingReminder } from "@/lib/email"
 
 // Frist, in der ein Gegner ein eingetragenes Ergebnis bestätigen kann.
@@ -16,6 +17,9 @@ export const CONFIRM_WINDOW_HOURS = 24
  */
 export async function autoConfirmOverdue(admin: SupabaseClient): Promise<number> {
   const cutoff = new Date(Date.now() - CONFIRM_WINDOW_HOURS * 3600 * 1000).toISOString()
+  let confirmed = 0
+
+  // Liga-Matches
   const { data: overdue } = await admin
     .from("league_matches")
     .select("id")
@@ -25,11 +29,39 @@ export async function autoConfirmOverdue(admin: SupabaseClient): Promise<number>
     .lt("entered_at", cutoff)
     .limit(200)
 
-  let confirmed = 0
   for (const m of overdue || []) {
     const r = await applyLeagueConfirm(admin, m.id)
     if (r.ok) confirmed++
   }
+
+  // Open Games — die Bestätigungs-Mail verspricht dasselbe ("nach 24 Stunden
+  // automatisch bestätigt"), aber es gab dafür schlicht keinen Mechanismus:
+  // reagierte der Gegner nie, blieb das Spiel für immer hängen.
+  const { data: games } = await admin
+    .from("open_games")
+    .select("id,winner_id")
+    .eq("status", "p1_entered")
+    .not("winner_id", "is", null)
+    .not("entered_at", "is", null)
+    .lt("entered_at", cutoff)
+    .limit(200)
+
+  for (const g of games || []) {
+    const { data: players } = await admin
+      .from("open_game_players").select("user_id").eq("game_id", g.id).neq("status", "left")
+    const ids = (players || []).map(p => p.user_id)
+    if (ids.length !== 2 || !g.winner_id) continue
+
+    const { data: upd } = await admin.from("open_games")
+      .update({ status: "confirmed", confirmed_at: new Date().toISOString() })
+      .eq("id", g.id).eq("status", "p1_entered").select("id").maybeSingle()
+    if (!upd) continue
+
+    const loserId = g.winner_id === ids[0] ? ids[1] : ids[0]
+    await applyElo(admin, g.winner_id, loserId, "open_game", null)
+    confirmed++
+  }
+
   return confirmed
 }
 

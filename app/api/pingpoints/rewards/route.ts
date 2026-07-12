@@ -44,5 +44,16 @@ export async function POST(req: NextRequest) {
     player_id: user.id, reward_threshold: threshold,
     reward_label: reward.label, status: "pending",
   })
+
+  // Punkte auch tatsächlich abziehen. Bisher wurde nur ein Claim angelegt — wer
+  // 500 Punkte hatte, konnte alle Prämien nacheinander holen und behielt seine
+  // 500 Punkte. "Guthaben" und "einlösen" waren damit blosse Behauptungen.
+  await admin.from("ping_points_transactions").insert({
+    player_id: user.id,
+    amount: -threshold,
+    source: "redeem",
+    description: `Eingelöst: ${reward.label}`,
+  })
+
   return NextResponse.json({ ok: true, message: `${reward.label} angefordert — wir melden uns!` })
 }

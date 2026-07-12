@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react"
+import { useEffect, useState, use } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import {
@@ -11,7 +11,10 @@ import {
 type SetScore={p1:string,p2:string}
 type MatchData={id:string,season_id:string,round:number,p1_id:string,p1_name:string,p2_id:string,p2_name:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,status:string}
 
-export default function MatchPage({params}:{params:{id:string}}){
+// Next 16: params ist in Client Components IMMER ein Promise. Der synchrone
+// Zugriff (matchId) lieferte undefined — die Seite hing ewig auf "Lädt …".
+export default function MatchPage({params}:{params:Promise<{id:string}>}){
+  const {id:matchId}=use(params)
   const [match,setMatch]=useState<MatchData|null>(null)
   const [userId,setUserId]=useState<string|null>(null)
   const [sets,setSets]=useState<SetScore[]>([{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""}])
@@ -27,12 +30,20 @@ export default function MatchPage({params}:{params:{id:string}}){
       const {data:{user}}=await sb.auth.getUser()
       if(!user){window.location.href="/login";return}
       setUserId(user.id)
-      const {data}=await sb.from("league_matches").select("id,season_id,round,p1_id,p2_id,sets,winner_id,status,p1:profiles!league_matches_p1_id_fkey(name),p2:profiles!league_matches_p2_id_fkey(name)").eq("id",params.id).single()
-      if(data) setMatch({...data,p1_name:((data.p1 as unknown as {name:string}[]|null)?.[0]?.name)||"?",p2_name:((data.p2 as unknown as {name:string}[]|null)?.[0]?.name)||"?"} as MatchData)
+      const {data}=await sb.from("league_matches")
+        .select("id,season_id,round,p1_id,p2_id,sets,winner_id,status")
+        .eq("id",matchId).maybeSingle()
+      if(data){
+        // Namen über public_profiles — RLS auf profiles gibt jedem nur die EIGENE
+        // Zeile heraus, der Gegner hiess deshalb immer "?".
+        const {data:names}=await sb.from("public_profiles").select("id,name").in("id",[data.p1_id,data.p2_id])
+        const nameOf=(id:string)=>(names||[]).find(n=>n.id===id)?.name||"Spieler"
+        setMatch({...data,p1_name:nameOf(data.p1_id),p2_name:nameOf(data.p2_id)} as MatchData)
+      }
       setLoading(false)
     }
     load()
-  },[params.id])
+  },[matchId])
 
   function addSet(){setSets(s=>[...s,{p1:"",p2:""}])}
   function removeSet(i:number){setSets(s=>s.filter((_,j)=>j!==i))}
@@ -60,7 +71,7 @@ export default function MatchPage({params}:{params:{id:string}}){
     const {valid,winner,parsedSets}=validateSets()
     if(!valid){setError("Ungültiges Ergebnis — mindestens 3 Sätze, einer muss 3 Sätze gewonnen haben");return}
     setSaving(true);setError("")
-    const res=await fetch("/api/liga/result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:params.id,sets:parsedSets,winner_id:winner})})
+    const res=await fetch("/api/liga/result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId,sets:parsedSets,winner_id:winner})})
     if(res.ok){setSubmitted(true);setSaving(false)}
     else{const d=await res.json();setError(d.error||"Fehler");setSaving(false)}
   }
@@ -77,7 +88,7 @@ export default function MatchPage({params}:{params:{id:string}}){
 
   async function handleConfirm(){
     setSaving(true)
-    const res=await fetch("/api/liga/confirm",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:params.id})})
+    const res=await fetch("/api/liga/confirm",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId})})
     if(res.ok){window.location.href=`/liga/${match?.season_id}`}
     else{const d=await res.json();setError(d.error||"Fehler");setSaving(false)}
   }

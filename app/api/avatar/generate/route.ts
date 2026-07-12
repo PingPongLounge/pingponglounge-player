@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
+import { createClient } from "@/lib/supabase/server"
 
 const REPLICATE_KEY = process.env.REPLICATE_API_KEY || ""
 const MODEL_VERSION = "2e4785a4d80dadf580077b2244c8d7c05d8e3faac04a04c02d8e099dd2876789"
@@ -38,12 +39,19 @@ const STYLE_PROMPTS: Record<string, { prompt: string; negative: string }> = {
 export async function POST(req: NextRequest) {
   if (!REPLICATE_KEY) return NextResponse.json({ error: "REPLICATE_API_KEY nicht gesetzt" }, { status: 500 })
 
-  const { imageDataUrl, style = "graffiti", userId } = await req.json()
+  // Diese Route hatte KEINE Anmeldepflicht, und das Rate-Limit hing an einer
+  // userId, die der Client selbst mitschickte — wer sie rotierte, konnte
+  // unbegrenzt Replicate-Credits verbrennen. Auf fremde Kosten.
+  const sb = await createClient()
+  const { data: { user } } = await sb.auth.getUser()
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+
+  const { imageDataUrl, style = "graffiti" } = await req.json()
   if (!imageDataUrl) return NextResponse.json({ error: "imageDataUrl fehlt" }, { status: 400 })
 
-  const ip = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "anon"
-  const rateKey = userId || ip
-  if (rateLimited(rateKey)) return NextResponse.json({ error: "Limit erreicht (3/Stunde). Bitte später nochmals." }, { status: 429 })
+  // Rate-Limit an der ECHTEN Nutzer-ID aus der Session, nicht an einer vom Client
+  // gelieferten Zahl.
+  if (rateLimited(user.id)) return NextResponse.json({ error: "Limit erreicht (3/Stunde). Bitte später nochmals." }, { status: 429 })
 
   const sp = STYLE_PROMPTS[style] || STYLE_PROMPTS.graffiti
 
