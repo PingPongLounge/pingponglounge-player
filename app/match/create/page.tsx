@@ -35,7 +35,7 @@ export default function CreateMatchPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         level, location_name: city, date,
-        start_hour: hour === "" ? null : hour, duration_minutes: duration,
+        start_hour: hour, duration_minutes: duration,
         max_players: maxPlayers, price_per_player: Number(price) || 0, notes: msg || null,
       }),
     })
