@@ -16,6 +16,12 @@ const HERO="#14171E"
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number}
 type Row={user_id:string,name:string,elo:number,level:string,real?:string|null}
 type OpenMatch={id:string,status:string,iAmP1:boolean}
+type PlayerInfo={
+  player:{id:string,name:string,real_short?:string|null,level:string,elo:number,matches_played:number,matches_won:number,lost:number,winRate:number|null,canton?:string|null},
+  recent:Array<{id:string,opponent:string,won:boolean,score:string,date:string|null,ranked:boolean}>,
+  head:{played:number,myWins:number,theirWins:number,rankedLeft:number}|null,
+  maxRanked:number,
+}
 type Reactions={heart:number,fire:number,laugh:number,myReacts:string[]}
 type Msg={id:string,user_id:string|null,name:string,text:string,kind?:string,match_id?:string,reactions:Reactions}
 
@@ -49,6 +55,20 @@ export default function LigaPage(){
   const [fDone,setFDone]=useState<string[]>([]) // in dieser Session eingetragene Ergebnisse
   const [fFriendly,setFFriendly]=useState(false) // Freundschaftsspiel: ohne Liga-Punkte
   const [fNoteRanked,setFNoteRanked]=useState<string|null>(null) // Hinweis, wenn das Gegner-Limit greift
+  const [rankedVs,setRankedVs]=useState<Record<string,number>>({}) // gewertete Spiele je Gegner
+  const [pOpen,setPOpen]=useState<string|null>(null)   // Spieler-Popup: wessen Profil?
+  const [pData,setPData]=useState<PlayerInfo|null>(null)
+  const [pLoading,setPLoading]=useState(false)
+
+  async function openPlayer(id:string){
+    setPOpen(id); setPData(null); setPLoading(true)
+    try{
+      const r=await fetch(`/api/liga/player?id=${id}&season_id=${seasonId}`)
+      const j=await r.json()
+      if(r.ok) setPData(j)
+    }catch{ /* Popup zeigt dann nur den Namen */ }
+    setPLoading(false)
+  }
 
   const flash=(t:string)=>{setToast(t);setTimeout(()=>setToast(""),2500)}
 
@@ -100,8 +120,23 @@ export default function LigaPage(){
         map[oppId]={id:m.id,status:m.status,iAmP1:m.p1_id===userId}
       }
       setOpenMatches(map)
+
+      // Wie viele GEWERTETE Spiele habe ich gegen wen schon? → "noch X×"
+      const {data:rk}=await sb.from("league_matches")
+        .select("p1_id,p2_id")
+        .eq("season_id",sid)
+        .eq("ranked",true)
+        .in("status",["p1_entered","confirmed"])
+        .or(`p1_id.eq.${userId},p2_id.eq.${userId}`)
+      const cnt:Record<string,number>={}
+      for(const m of rk||[]){
+        const oppId=m.p1_id===userId?m.p2_id:m.p1_id
+        cnt[oppId]=(cnt[oppId]||0)+1
+      }
+      setRankedVs(cnt)
     } else {
       setOpenMatches({})
+      setRankedVs({})
     }
   },[userId])
 
@@ -311,10 +346,18 @@ export default function LigaPage(){
                   return(
                     <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 8px",borderTop:i===0?"none":`1px solid ${LINE}`,...(me?{background:"rgba(57,255,20,.07)",borderRadius:12}:{})}}>
                       <span style={{width:26,textAlign:"center",fontSize:15,fontWeight:900,...(i<3?gt:{color:SUB})}}>{i+1}</span>
-                      <div style={{flex:1,minWidth:0}}>
+                      {/* Name antippen → Spielerprofil mit Bilanz und letzten Spielen */}
+                      <button onClick={()=>openPlayer(r.user_id)} style={{flex:1,minWidth:0,background:"none",border:"none",padding:0,textAlign:"left",cursor:"pointer",fontFamily:"inherit"}}>
                         <span style={{fontSize:15,fontWeight:800,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 6px",marginLeft:7,color:SUB}}>Du</span>}</span>
                         {r.real&&<div style={{fontSize:11,color:MUT,fontWeight:500,marginTop:1}}>{r.real}</div>}
-                      </div>
+                        {!me&&myReg&&(()=>{
+                          const left=MAX_RANKED_PER_OPPONENT-(rankedVs[r.user_id]||0)
+                          if(left>=MAX_RANKED_PER_OPPONENT) return null
+                          return <div style={{fontSize:10,color:left<=0?MUT:SUB,fontWeight:600,marginTop:2}}>
+                            {left<=0?"zählt nicht mehr":`noch ${left}× gewertet`}
+                          </div>
+                        })()}
+                      </button>
                       {r.level&&<span style={levelBadge(r.level)}>L{r.level}</span>}
                       <span style={{fontSize:14,fontWeight:800,...(me?gt:{color:SUB})}}>{r.elo}</span>
                       {!me&&myReg&&(()=>{
@@ -336,6 +379,91 @@ export default function LigaPage(){
           </div>
         </>)}
       </div>
+
+      {/* Spieler-Popup: Bilanz, Siegquote, letzte Spiele, direkter Vergleich */}
+      {pOpen&&(
+        <div onClick={()=>setPOpen(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:60,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
+            {pLoading&&<div style={{textAlign:"center",color:MUT,fontSize:13,padding:"30px 0"}}>lädt…</div>}
+
+            {!pLoading&&pData&&(<>
+              <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:18}}>
+                <div>
+                  <div style={{fontSize:22,fontWeight:900,color:W}}>{pData.player.name}</div>
+                  {pData.player.real_short&&<div style={{fontSize:12.5,color:MUT,marginTop:2}}>{pData.player.real_short}</div>}
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8}}>
+                    {pData.player.level&&<span style={levelBadge(pData.player.level)}>L{pData.player.level}</span>}
+                    <span style={{fontSize:13,fontWeight:800,...gt}}>ELO {pData.player.elo}</span>
+                  </div>
+                </div>
+                <button onClick={()=>setPOpen(null)} style={{background:"none",border:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
+              </div>
+
+              {/* Bilanz */}
+              <div style={{display:"flex",gap:8,marginBottom:16}}>
+                {[
+                  {v:String(pData.player.matches_won), l:"Siege"},
+                  {v:String(pData.player.lost),        l:"Niederlagen"},
+                  {v:pData.player.winRate!==null?`${pData.player.winRate}%`:"—", l:"Siegquote"},
+                ].map(s=>(
+                  <div key={s.l} style={{flex:1,background:CELL,borderRadius:14,padding:"13px 8px",textAlign:"center"}}>
+                    <div style={{fontSize:20,fontWeight:900,color:W}}>{s.v}</div>
+                    <div style={{fontSize:10,color:MUT,fontWeight:600,textTransform:"uppercase",letterSpacing:".05em",marginTop:2}}>{s.l}</div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Direkter Vergleich */}
+              {pData.head&&(
+                <div style={{background:CELL,borderRadius:14,padding:"14px 15px",marginBottom:16}}>
+                  <div style={{fontSize:10.5,fontWeight:700,color:MUT,textTransform:"uppercase",letterSpacing:".08em",marginBottom:9}}>Ihr beide</div>
+                  {pData.head.played===0
+                    ? <div style={{fontSize:13,color:SUB,fontWeight:300}}>Ihr habt diese Saison noch nicht gegeneinander gespielt.</div>
+                    : <div style={{display:"flex",alignItems:"baseline",gap:8}}>
+                        <span style={{fontSize:24,fontWeight:900,...gt}}>{pData.head.myWins}</span>
+                        <span style={{fontSize:16,fontWeight:900,color:MUT}}>:</span>
+                        <span style={{fontSize:24,fontWeight:900,color:W}}>{pData.head.theirWins}</span>
+                        <span style={{fontSize:12,color:MUT,marginLeft:6}}>aus {pData.head.played} Spielen</span>
+                      </div>}
+                  <div style={{fontSize:11.5,color:pData.head.rankedLeft<=0?MUT:SUB,marginTop:9,lineHeight:1.5}}>
+                    {pData.head.rankedLeft<=0
+                      ? `Limit erreicht — weitere Spiele gegen ${pData.player.name} zählen nicht mehr für ELO und Rang.`
+                      : `Noch ${pData.head.rankedLeft} von ${pData.maxRanked} gewerteten Spielen diese Saison.`}
+                  </div>
+                </div>
+              )}
+
+              {/* Letzte Spiele */}
+              <div style={{fontSize:10.5,fontWeight:700,color:MUT,textTransform:"uppercase",letterSpacing:".08em",marginBottom:8}}>Letzte Spiele</div>
+              {pData.recent.length===0
+                ? <div style={{background:CELL,borderRadius:14,padding:"16px 15px",fontSize:13,color:SUB,fontWeight:300}}>Noch keine bestätigten Spiele.</div>
+                : <div style={{background:CELL,borderRadius:14,overflow:"hidden"}}>
+                    {pData.recent.map((m,i)=>(
+                      <div key={m.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 14px",borderTop:i===0?"none":`1px solid ${LINE}`}}>
+                        <span style={{width:22,height:22,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:900,background:m.won?GRAD:"#20242C",color:m.won?"#06210F":MUT}}>{m.won?"S":"N"}</span>
+                        <div style={{flex:1,minWidth:0}}>
+                          <div style={{fontSize:13,fontWeight:700,color:W,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.opponent}</div>
+                          {(m.date||!m.ranked)&&<div style={{fontSize:10.5,color:MUT,marginTop:1}}>
+                            {m.date?new Date(m.date).toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"2-digit"}):""}
+                            {!m.ranked?(m.date?" · ":"")+"ohne Punkte":""}
+                          </div>}
+                        </div>
+                        <span style={{fontSize:14,fontWeight:900,color:m.won?W:MUT}}>{m.score}</span>
+                      </div>
+                    ))}
+                  </div>}
+
+              {/* Direkt fordern */}
+              {pOpen!==userId&&myReg&&(
+                <button onClick={()=>{const row=rows.find(r=>r.user_id===pOpen); setPOpen(null); if(row) openForder(row)}}
+                  style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:"pointer",fontFamily:"inherit"}}>
+                  Fordern
+                </button>
+              )}
+            </>)}
+          </div>
+        </div>
+      )}
 
       {/* Fordern-Popup */}
       {fTarget&&(
