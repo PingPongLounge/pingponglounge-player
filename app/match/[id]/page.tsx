@@ -15,7 +15,7 @@ function whenLabel(date: string | null, hour: number | null, dur: number): strin
 }
 
 type Player = { user_id: string; name: string; elo: number; level: string; is_creator: boolean }
-type Game = { id: string; created_by: string; location_name: string; date: string | null; start_hour: number | null; duration_minutes: number; max_players: number; current_players: number; price_per_player: number; level: string; status: string; notes: string | null }
+type Game = { id: string; created_by: string; location_name: string; date: string | null; start_hour: number | null; duration_minutes: number; max_players: number; current_players: number; price_per_player: number; level: string; status: string; notes: string | null; winner_id?: string | null; entered_by?: string | null; sets?: Array<{p1:number;p2:number}> | null }
 type Data = { game: Game; players: Player[]; userId: string | null; isCreator: boolean; isJoined: boolean }
 
 export default function MatchDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -26,6 +26,8 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
   const [busy, setBusy] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [err, setErr] = useState("")
+  const [myS, setMyS] = useState(0)   // Ergebnis-Zähler
+  const [oppS, setOppS] = useState(0)
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/match/${matchId}`)
@@ -38,12 +40,33 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
   async function leave() { setBusy(true); setErr(""); const r = await fetch(`/api/match/${matchId}/leave`, { method: "POST" }); if (!r.ok) { const j = await r.json(); setErr(j.error || "Fehler") } await load(); setBusy(false) }
   async function del() { setBusy(true); await fetch(`/api/match/${matchId}/cancel`, { method: "POST" }); router.push("/match") }
 
+  async function sendResult(action: "enter" | "confirm") {
+    setBusy(true); setErr("")
+    const r = await fetch(`/api/match/${matchId}/result`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action, my_sets: myS, opp_sets: oppS }),
+    })
+    if (r.status === 401) { window.location.href = "/login"; return }
+    if (!r.ok) { const j = await r.json().catch(() => ({})); setErr(j.error || "Fehler") }
+    await load(); setBusy(false)
+  }
+
   if (loading || !data) return <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center" }}><p style={body}>Lädt …</p><BottomNav /></main>
 
-  const { game: g, players, isCreator, isJoined } = data
+  const { game: g, players, isCreator, isJoined, userId } = data
   const full = g.current_players >= g.max_players
   const slots = Array.from({ length: g.max_players })
   const cancelled = g.status === "cancelled"
+
+  // Ergebnisse nur bei Spielen zu zweit — bei 3–4 Spielern ist unklar, wer gegen wen spielte
+  const duo = players.length === 2
+  const opponent = players.find(p => p.user_id !== userId)
+  const enteredByMe = g.entered_by === userId
+  const iWon = g.winner_id === userId
+  const sets = g.sets || []
+  const mySets = sets.filter(s => (g.entered_by === userId ? s.p1 > s.p2 : s.p2 > s.p1)).length
+  const oppSets = sets.length - mySets
 
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
@@ -89,6 +112,59 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
           {g.notes && <div style={{ ...cardPad, padding: "12px 16px", marginBottom: 12 }}><p style={{ ...body, fontStyle: "italic" }}>&quot;{g.notes}&quot;</p></div>}
 
           {err && <p style={{ color: DANGER, fontSize: 13, marginBottom: 12, textAlign: "center" }}>{err}</p>}
+
+          {/* Ergebnis — bisher gab es das gar nicht: ein Open Game konnte nie enden,
+              obwohl die App "Resultat erfassen, dein Rang steigt" versprach. */}
+          {isJoined && duo && !cancelled && (<>
+            {g.status === "confirmed" ? (
+              <div style={{ ...cardPad, padding: "18px 16px", textAlign: "center", marginBottom: 12 }}>
+                <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", color: M, marginBottom: 6 }}>Gewertet</p>
+                <p style={{ fontSize: 20, fontWeight: 900, color: G }}>{iWon ? "Sieg" : "Niederlage"}</p>
+                <p style={{ ...body, marginTop: 4 }}>ELO und Rangliste sind aktualisiert.</p>
+              </div>
+            ) : g.status === "p1_entered" ? (
+              enteredByMe ? (
+                <div style={{ ...cardPad, padding: "16px", textAlign: "center", marginBottom: 12 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: W, marginBottom: 4 }}>Ergebnis eingetragen</p>
+                  <p style={{ ...body, lineHeight: 1.5 }}>{opponent?.name || "Dein Gegner"} bekommt eine E-Mail und muss noch bestätigen.</p>
+                </div>
+              ) : (
+                <div style={{ ...cardPad, padding: "18px 16px", marginBottom: 12 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: W, marginBottom: 4, textAlign: "center" }}>Ergebnis bestätigen</p>
+                  <p style={{ ...body, textAlign: "center", marginBottom: 12 }}>
+                    {opponent?.name || "Dein Gegner"} hat eingetragen: <strong style={{ color: W }}>{mySets}:{oppSets}</strong> für dich
+                  </p>
+                  <button onClick={() => sendResult("confirm")} disabled={busy} style={{ ...btn, width: "100%", padding: 14, fontSize: 14 }}>
+                    {busy ? "…" : "Bestätigen ✓"}
+                  </button>
+                </div>
+              )
+            ) : (
+              <div style={{ ...cardPad, padding: "18px 16px", marginBottom: 12 }}>
+                <p style={{ fontSize: 14, fontWeight: 800, color: W, marginBottom: 3, textAlign: "center" }}>Schon gespielt?</p>
+                <p style={{ ...body, textAlign: "center", marginBottom: 16 }}>Trag die Sätze ein — {opponent?.name || "dein Gegner"} bestätigt, dann zählt&apos;s für ELO &amp; Rang.</p>
+                <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "center", gap: 12 }}>
+                  {([["Du", myS, setMyS], [opponent?.name || "Gegner", oppS, setOppS]] as [string, number, (n: number) => void][]).map(([lab, val, set], idx) => (
+                    <div key={idx} style={{ display: "flex", alignItems: "flex-end", gap: 12 }}>
+                      {idx === 1 && <span style={{ fontSize: 26, fontWeight: 900, color: M, paddingBottom: 4 }}>:</span>}
+                      <div style={{ textAlign: "center" }}>
+                        <div style={{ fontSize: 10.5, color: M, fontWeight: 700, textTransform: "uppercase", marginBottom: 8, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lab}</div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                          <button onClick={() => set(Math.max(0, val - 1))} style={{ width: 32, height: 32, borderRadius: "50%", background: B, border: "none", color: W, fontSize: 19, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>−</button>
+                          <span style={{ fontSize: 32, fontWeight: 900, width: 30, textAlign: "center", color: G }}>{val}</span>
+                          <button onClick={() => set(Math.min(7, val + 1))} style={{ width: 32, height: 32, borderRadius: "50%", background: B, border: "none", color: W, fontSize: 19, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>+</button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <button onClick={() => sendResult("enter")} disabled={busy || myS === oppS} style={{ ...btn, width: "100%", padding: 14, fontSize: 14, marginTop: 18, opacity: myS === oppS ? .5 : 1, cursor: myS === oppS ? "not-allowed" : "pointer" }}>
+                  {busy ? "…" : "Ergebnis absenden"}
+                </button>
+                {myS === oppS && <p style={{ ...body, textAlign: "center", marginTop: 8, fontSize: 12 }}>Kein Unentschieden möglich.</p>}
+              </div>
+            )}
+          </>)}
 
           {/* Aktion */}
           {isCreator ? (

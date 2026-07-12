@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { applyLeagueConfirm } from "@/lib/liga"
+import { applyElo } from "@/lib/elo"
 import { verifyAction } from "@/lib/token"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -33,14 +34,48 @@ function page(title: string, text: string, ok: boolean) {
 
 export async function GET(req: NextRequest) {
   const matchId = req.nextUrl.searchParams.get("m") || ""
+  const gameId = req.nextUrl.searchParams.get("g") || ""   // Open Game
   const playerId = req.nextUrl.searchParams.get("p") || ""
   const token = req.nextUrl.searchParams.get("t") || ""
 
+  const admin = createAdminClient()
+
+  // ── Open Game bestätigen ────────────────────────────────────────────────
+  if (gameId) {
+    if (!playerId || !token || !verifyAction("confirm-game", gameId, playerId, token)) {
+      return page("Link ungültig", "Dieser Bestätigungs-Link ist nicht gültig. Bestätige das Ergebnis bitte direkt in der App.", false)
+    }
+
+    const { data: g } = await admin
+      .from("open_games")
+      .select("id,status,winner_id,entered_by")
+      .eq("id", gameId)
+      .maybeSingle()
+    if (!g) return page("Spiel nicht gefunden", "Dieses Open Game existiert nicht mehr.", false)
+    if (g.entered_by === playerId) return page("Nicht möglich", "Du hast dieses Ergebnis selbst eingetragen. Bestätigen muss es dein Gegner.", false)
+    if (g.status === "confirmed") return page("Bereits bestätigt", "Dieses Ergebnis ist schon gewertet. Dein ELO und dein Rang sind aktuell.", true)
+    if (g.status !== "p1_entered" || !g.winner_id) return page("Nichts zu bestätigen", "Für dieses Spiel liegt kein eingetragenes Ergebnis vor.", false)
+
+    const { data: players } = await admin
+      .from("open_game_players").select("user_id").eq("game_id", gameId).neq("status", "left")
+    const ids = (players || []).map(p => p.user_id)
+    if (!ids.includes(playerId)) return page("Nicht berechtigt", "Du bist an diesem Spiel nicht beteiligt.", false)
+
+    const { data: upd } = await admin.from("open_games")
+      .update({ status: "confirmed", confirmed_at: new Date().toISOString() })
+      .eq("id", gameId).eq("status", "p1_entered").select("id").maybeSingle()
+    if (!upd) return page("Bereits bestätigt", "Dieses Ergebnis wurde soeben gewertet.", true)
+
+    const loserId = g.winner_id === ids[0] ? ids[1] : ids[0]
+    await applyElo(admin, g.winner_id, loserId, "open_game", null)
+
+    return page("Ergebnis bestätigt", "Danke! Das Spiel ist gewertet — ELO und Rangliste sind aktualisiert.", true)
+  }
+
+  // ── Liga-Match bestätigen ───────────────────────────────────────────────
   if (!matchId || !playerId || !token || !verifyAction("confirm", matchId, playerId, token)) {
     return page("Link ungültig", "Dieser Bestätigungs-Link ist nicht gültig. Bestätige das Ergebnis bitte direkt in der App.", false)
   }
-
-  const admin = createAdminClient()
   const { data: m } = await admin
     .from("league_matches")
     .select("id,status,p1_id,p2_id,entered_by")

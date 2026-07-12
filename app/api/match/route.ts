@@ -14,7 +14,7 @@ export async function GET() {
   const { data: games, error } = await sb
     .from("open_games")
     .select("id,created_by,location_name,date,start_hour,duration_minutes,max_players,current_players,price_per_player,level,status,notes,created_at")
-    .in("status", ["open", "full"])
+    .in("status", ["open", "full", "p1_entered"])
     .not("date", "is", null)
     .gte("date", heute)
     .order("date", { ascending: true })
