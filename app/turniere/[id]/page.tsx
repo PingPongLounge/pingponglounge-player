@@ -9,7 +9,8 @@ const M=MUT, C=CARD, B=CELL, G=GREEN
 
 type Profile={name:string,elo:number,level?:string}
 type TMatch={id:string,round:number,match_number:number,p1_id:string|null,p2_id:string|null,winner_id:string|null,sets:Array<{p1:number,p2:number}>|null,status:string,p1:Profile|Profile[]|null,p2:Profile|Profile[]|null}
-type Tournament={id:string,name:string,date:string,city:string,skill_class:string,max_players:number,status:string,format:string,description:string,created_by:string,entry_fee_chf?:number,counts_for_rank?:boolean}
+type Tournament={id:string,name:string,date:string,city:string,skill_class:string,max_players:number,status:string,format:string,description:string,created_by:string,entry_fee_chf?:number,counts_for_rank?:boolean,champion_id?:string|null}
+type Reg={player_id:string,seed:number|null,profiles:Profile|null}
 
 function getName(p:Profile|Profile[]|null):string{
   if(!p) return "?"
@@ -51,7 +52,7 @@ function BracketMatch({m,userId,onResult}:{m:TMatch,userId:string|null,onResult:
 export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}){
   const {id:tournamentId}=use(params)
   const router=useRouter()
-  const [data,setData]=useState<{tournament:Tournament,registrations:unknown[],matches:TMatch[],isRegistered:boolean,userId:string|null}|null>(null)
+  const [data,setData]=useState<{tournament:Tournament,registrations:Reg[],matches:TMatch[],isRegistered:boolean,userId:string|null}|null>(null)
   const [loading,setLoading]=useState(true)
   const [registering,setRegistering]=useState(false)
   const [regError,setRegError]=useState("")
@@ -60,22 +61,53 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
   const [sets,setSets]=useState([{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""}])
   const [tab,setTab]=useState<"bracket"|"spieler">("bracket")
 
+  const [loadError,setLoadError]=useState("")
+
   const load=useCallback(async()=>{
-    const res=await fetch(`/api/turniere/${tournamentId}`)
-    const json=await res.json()
-    setData(json)
+    setLoadError("")
+    try{
+      const res=await fetch(`/api/turniere/${tournamentId}`)
+      // Abgelaufene Session → sauber zum Login statt weisser Seite
+      if(res.status===401){ window.location.href="/login"; return }
+      const json=await res.json()
+      // Ohne diese Prüfung war `data` bei einem 404 zwar gesetzt, aber ohne
+      // `tournament` — die Seite ist dann beim Rendern abgestürzt (weisser Screen).
+      if(!res.ok||!json?.tournament){ setLoadError(json?.error||"Turnier nicht gefunden"); setLoading(false); return }
+      setData(json)
+    }catch{
+      setLoadError("Turnier konnte nicht geladen werden")
+    }
     setLoading(false)
   },[tournamentId])
 
   useEffect(()=>{load()},[load])
 
   async function register(){
-    setRegistering(true)
+    setRegistering(true); setRegError("")
     const res=await fetch(`/api/turniere/${tournamentId}/register`,{method:"POST"})
-    const json=await res.json()
+    if(res.status===401){ window.location.href="/login"; return }
+    const json=await res.json().catch(()=>({}))
     if(!res.ok){setRegError(json.error||"Fehler bei der Anmeldung");setRegistering(false);return}
     load()
     setRegistering(false)
+  }
+
+  async function unregister(){
+    setRegistering(true); setRegError("")
+    const res=await fetch(`/api/turniere/${tournamentId}/unregister`,{method:"POST"})
+    if(res.status===401){ window.location.href="/login"; return }
+    const json=await res.json().catch(()=>({}))
+    if(!res.ok){setRegError(json.error||"Abmeldung fehlgeschlagen");setRegistering(false);return}
+    load()
+    setRegistering(false)
+  }
+
+  async function cancelTournament(){
+    if(!confirm("Turnier wirklich absagen? Das lässt sich nicht rückgängig machen.")) return
+    const res=await fetch(`/api/turniere/${tournamentId}/cancel`,{method:"POST"})
+    if(res.status===401){ window.location.href="/login"; return }
+    if(res.ok) router.push("/turniere")
+    else { const j=await res.json().catch(()=>({})); setRegError(j.error||"Absagen fehlgeschlagen") }
   }
 
   const [starting,setStarting]=useState(false)
@@ -97,9 +129,18 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({match_id:resultMatch.id,sets:sets.filter(s=>s.p1!==""&&s.p2!=="").map(s=>`${s.p1}:${s.p2}`),action})
     })
-    if(res.ok){setResultMatch(null);load()}
-    else{const j=await res.json();setResultError(j.error||"Fehler beim Eintragen")}
+    if(res.status===401){ window.location.href="/login"; return }
+    if(res.ok){setResultMatch(null);setResultError("");load()}
+    else{const j=await res.json().catch(()=>({}));setResultError(j.error||"Fehler beim Eintragen")}
   }
+
+  if(loadError) return(
+    <main style={{minHeight:"100vh",background:BG,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:20}}>
+      <p style={{...body,marginBottom:16,textAlign:"center"}}>{loadError}</p>
+      <Link href="/turniere" style={{...btn,display:"inline-block",padding:"12px 24px",textDecoration:"none"}}>Zurück zu den Turnieren</Link>
+      <BottomNav />
+    </main>
+  )
 
   if(loading||!data) return(
     <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -129,30 +170,57 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
           </div>
         </div>
 
+        {/* Sieger — wurde bisher gespeichert, aber nirgends angezeigt.
+            Man gewann ein Turnier und sah es schlicht nicht. */}
+        {t.status==="finished"&&t.champion_id&&(
+          <div style={{...cardPad,padding:"22px 20px",marginBottom:16,textAlign:"center",border:"1.5px solid transparent",background:`linear-gradient(${CARD},${CARD}) padding-box, linear-gradient(135deg,#39FF14,#1FD1C4) border-box`}}>
+            <p style={{fontSize:11,fontWeight:800,letterSpacing:".14em",textTransform:"uppercase",color:M,marginBottom:8}}>Turniersieger</p>
+            <p style={{fontSize:26,fontWeight:900,color:G}}>{(registrations as Reg[]).find(r=>r.player_id===t.champion_id)?.profiles?.name||"Champion"}</p>
+            <p style={{...body,marginTop:6}}>+100 PingPoints</p>
+          </div>
+        )}
+
         {/* Anmelden Button */}
         {t.status==="open"&&(
           <div style={{marginBottom:16}}>
             {isRegistered?(
-              <div style={{...cardPad,padding:"12px 16px",textAlign:"center"}}>
+              <div style={{...cardPad,padding:"14px 16px",textAlign:"center"}}>
                 <p style={{fontSize:13,fontWeight:700,color:G}}>✓ Du bist angemeldet</p>
-                <p style={{...body,marginTop:2}}>{(registrations as unknown[]).length}/{t.max_players} Spieler</p>
+                <p style={{...body,marginTop:2,marginBottom:10}}>{registrations.length}/{t.max_players} Spieler</p>
+                {/* Abmelden war bisher unmöglich — der Platz blieb für immer belegt. */}
+                <button onClick={unregister} disabled={registering} style={{...btnGhost,display:"inline-block",padding:"9px 18px",fontSize:12}}>
+                  {registering?"…":"Abmelden"}
+                </button>
+                {regError&&<p style={{color:DANGER,fontSize:12.5,marginTop:9}}>{regError}</p>}
               </div>
-            ):(
-              <button onClick={register} disabled={registering} style={{...btn,width:"100%",padding:14,fontSize:14}}>
-                {registering?"Wird angemeldet …":"Jetzt anmelden →"}
-              </button>
-            )}
+            ):(() => {
+              // Vorher war der Button auch bei vollem Turnier aktiv und der Fehler
+              // ("Turnier ist voll") wurde nirgends angezeigt → toter Button.
+              const voll=registrations.length>=t.max_players
+              return(<>
+                <button onClick={register} disabled={registering||voll}
+                  style={{...btn,width:"100%",padding:14,fontSize:14,opacity:voll?.5:1,cursor:voll?"not-allowed":"pointer"}}>
+                  {voll?"Turnier ist voll":registering?"Wird angemeldet …":"Jetzt anmelden →"}
+                </button>
+                {regError&&<p style={{color:DANGER,fontSize:13,marginTop:10,textAlign:"center"}}>{regError}</p>}
+              </>)
+            })()}
           </div>
         )}
 
         {/* Ersteller: Bracket starten */}
         {t.status==="open"&&t.created_by===userId&&(
           <div style={{marginBottom:16}}>
-            <button onClick={startBracket} disabled={starting||(registrations as unknown[]).length<2} style={{...btn,width:"100%",padding:14,fontSize:14,opacity:(registrations as unknown[]).length<2?0.5:1,cursor:(registrations as unknown[]).length<2?"default":"pointer"}}>
-              {starting?"Bracket wird erstellt …":(registrations as unknown[]).length<2?"Mind. 2 Spieler nötig":"⚔️ Bracket erstellen & starten"}
+            <button onClick={startBracket} disabled={starting||registrations.length<2} style={{...btn,width:"100%",padding:14,fontSize:14,opacity:registrations.length<2?0.5:1,cursor:registrations.length<2?"default":"pointer"}}>
+              {starting?"Bracket wird erstellt …":registrations.length<2?"Mind. 2 Spieler nötig":"⚔️ Bracket erstellen & starten"}
             </button>
             <p style={{...body,textAlign:"center",marginTop:8,fontSize:11}}>Setzliste automatisch nach Elo · danach läuft das Turnier</p>
             {startError&&<p style={{fontSize:12,color:DANGER,textAlign:"center",marginTop:6}}>{startError}</p>}
+            {/* Absagen war bisher unmöglich — ein Turnier ohne Teilnehmer blockierte
+                den Ersteller dauerhaft ("beende oder lösche zuerst eines"). */}
+            <button onClick={cancelTournament} style={{...btnGhost,display:"block",width:"100%",marginTop:10,padding:11,fontSize:12}}>
+              Turnier absagen
+            </button>
           </div>
         )}
 
@@ -223,6 +291,9 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
                   <p style={{fontSize:13,color:W,marginBottom:16,textAlign:"center",fontWeight:700}}>
                     {resultMatch.sets?.map(s=>`${s.p1}:${s.p2}`).join("  ")}
                   </p>
+                  {/* Der Fehler wurde hier nie angezeigt: wer selbst eingetragen hat,
+                      bekam beim Bestätigen ein 403 und sah — nichts. */}
+                  {resultError&&<p style={{color:DANGER,fontSize:13,marginBottom:12,textAlign:"center",lineHeight:1.5}}>{resultError}</p>}
                   <div style={{display:"flex",gap:8}}>
                     <button onClick={()=>setResultMatch(null)} style={{...btnGhost,flex:1,padding:12,fontSize:13}}>Abbrechen</button>
                     <button onClick={()=>submitResult("confirm")} style={{...btnInCard,flex:1,display:"block",textAlign:"center",padding:12,fontSize:13}}>Bestätigen ✓</button>

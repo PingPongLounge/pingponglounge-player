@@ -2,13 +2,12 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { BG, CARD, CELL, W, MUT, DANGER, btn, chipBtn, h1, body, label as themeLabel, input as themeInput, backLink } from "@/app/theme"
+import { BG, CARD, CELL, W, MUT, DANGER, CITIES, btn, chipBtn, h1, body, label as themeLabel, input as themeInput, backLink } from "@/app/theme"
 
 const M=MUT, C=CARD, B=CELL
 
 const LEVELS = ["1", "2", "3", "4", "5", "6", "7"]
 const LEVEL_LABEL = (l: string) => `Level ${l}`
-const CITIES = ["Glattbrugg", "Oerlikon", "Zürich", "Winterthur", "Baden", "Andere"]
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 7) // 7-22 Uhr
 
 export default function CreateMatchPage() {

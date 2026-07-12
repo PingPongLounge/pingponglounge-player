@@ -3,10 +3,9 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import { BG, CARD, CELL, W, MUT, GREEN, DANGER, cardPad, btn, chipBtn, h1, body, input as themeInput, backLink } from "@/app/theme"
+import { BG, CARD, CELL, W, MUT, GREEN, DANGER, CITIES, cardPad, btn, chipBtn, h1, body, input as themeInput, backLink } from "@/app/theme"
 
 const M=MUT, C=CARD, B=CELL, G=GREEN
-const CITIES=["Glattbrugg","Oerlikon","Zürich","Winterthur","Baden","Tessin"]
 const LEVELS=["alle","1","2","3","4","5","6","7"]
 const LEVEL_LABEL=(l:string)=>l==="alle"?"Alle Level":`Level ${l}`
 
@@ -15,7 +14,7 @@ const inputStyle=themeInput
 export default function NeuesTurnierPage(){
   const router=useRouter()
   const [name,setName]=useState("")
-  const [city,setCity]=useState(CITIES[0])
+  const [city,setCity]=useState<string>(CITIES[0])
   const [date,setDate]=useState("")
   const [skill,setSkill]=useState("alle")
   const [format,setFormat]=useState<"ko"|"gruppen_ko">("ko")

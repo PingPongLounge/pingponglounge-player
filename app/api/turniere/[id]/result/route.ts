@@ -23,10 +23,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const admin = createAdminClient()
 
   if (action === "enter") {
+    // KRITISCH: ohne diese Prüfung liess sich ein bereits bestätigtes Match erneut
+    // eintragen und bestätigen — das überschrieb den Bracket-Fortschritt, vergab
+    // ELO doppelt und liess die Podest-PingPoints beliebig oft farmen.
+    if (match.status === "confirmed")
+      return NextResponse.json({ error: "Dieses Match ist bereits bestätigt" }, { status: 400 })
+
+    if (!Array.isArray(sets) || sets.length === 0 || sets.length > 7)
+      return NextResponse.json({ error: "Ungültige Satzzahl" }, { status: 400 })
+
     const parsed: Array<{ p1: number; p2: number }> = (sets as string[]).map(s => {
-      const [a, b] = s.split(":").map(Number)
+      const [a, b] = String(s).split(":").map(Number)
       return { p1: a, p2: b }
     })
+    if (parsed.some(s => !Number.isFinite(s.p1) || !Number.isFinite(s.p2) || s.p1 < 0 || s.p2 < 0 || s.p1 > 30 || s.p2 > 30))
+      return NextResponse.json({ error: "Ungültige Satzwerte" }, { status: 400 })
     if (parsed.length === 0) return NextResponse.json({ error: "Kein Resultat" }, { status: 400 })
     const p1wins = parsed.filter(s => s.p1 > s.p2).length
     const p2wins = parsed.filter(s => s.p2 > s.p1).length

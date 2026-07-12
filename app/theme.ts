@@ -47,6 +47,13 @@ export const LEVEL_DESCS: Record<string, string> = {
 }
 
 // Mindest-ELO je Level
+// EINE Standortliste für alles — Open Game, Turniere, Filter. Vorher hatte jede
+// Seite ihre eigene: die Filter in der Open-Game-Liste enthielten Städte, die man
+// beim Erstellen gar nicht wählen konnte → vier Filter-Buttons ohne jede Wirkung.
+export const CITIES = [
+  "Glattbrugg", "Oerlikon", "Langstrasse", "St. Gallen", "Basel", "Luzern", "Andere",
+] as const
+
 export const LEVEL_ELO: Record<string, number> = {
   // Level 1 stand hier auf 0 — ein Anfänger wäre mit 0 Punkten gestartet.
   // 950 liegt sauber unter Level 2 (1050).

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
-import { BG, CARD, W, MUT, GREEN, card, cardPad, cardActive, cell, chip, btn, btnInCard, btnGhost, chipBtn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
+import { BG, CARD, W, MUT, GREEN, CITIES, card, cardPad, cardActive, cell, chip, btn, btnInCard, btnGhost, chipBtn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
 import { SectionHero, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
 
 const M=MUT, G=GREEN, C=CARD
@@ -67,7 +67,6 @@ export default function MatchPage() {
   // Der Filter lief noch auf dem alten System (Rookie/Challenger/Advanced/Elite),
   // erstellt werden Open Games aber mit Level 1–7 → der Filter traf nie zu.
   const LEVELS = ["1", "2", "3", "4", "5", "6", "7"]
-  const CITIES = ["Glattbrugg", "Oerlikon", "Langstrasse", "St. Gallen", "Basel", "Luzern"]
 
   const filtered = games.filter(g =>
     (!filterLevel || g.level === filterLevel) &&

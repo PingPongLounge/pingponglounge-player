@@ -78,14 +78,29 @@ export async function POST(req: NextRequest) {
   const notes = body.notes ? String(body.notes).slice(0, 300) : null
 
   const admin = createAdminClient()
-  // Nur 1 aktives selbst erstelltes Spiel pro Spieler
-  const { data: existing } = await admin
+
+  // Nur 1 aktives selbst erstelltes Spiel pro Spieler — aber nur solange es noch
+  // BEVORSTEHT. Vorher zählten auch vergangene Spiele: sie verschwanden aus der
+  // Liste (die zeigt nur ab heute), blockierten das Erstellen aber für immer.
+  // Der Spieler konnte nie wieder ein Open Game anlegen und kam da nicht raus.
+  const heuteStr = new Date().toISOString().slice(0, 10)
+  const { data: existingList } = await admin
     .from("open_games")
     .select("id")
     .eq("created_by", user.id)
     .in("status", ["open", "full"])
-    .maybeSingle()
-  if (existing) return NextResponse.json({ error: "Du hast bereits ein offenes Spiel" }, { status: 409 })
+    .gte("date", heuteStr)
+    .limit(1)
+  if ((existingList || []).length > 0) {
+    return NextResponse.json({ error: "Du hast bereits ein offenes Spiel" }, { status: 409 })
+  }
+
+  // Abgelaufene eigene Spiele automatisch schliessen, damit sie nichts mehr blockieren
+  await admin.from("open_games")
+    .update({ status: "expired", updated_at: new Date().toISOString() })
+    .eq("created_by", user.id)
+    .in("status", ["open", "full"])
+    .lt("date", heuteStr)
 
   const { data: game, error } = await admin
     .from("open_games")
