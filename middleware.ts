@@ -50,6 +50,16 @@ export async function middleware(request: NextRequest) {
   if (!user) {
     const redirect = NextResponse.redirect(new URL('/login', request.url))
     supabaseResponse.cookies.getAll().forEach(c => redirect.cookies.set(c))
+
+    // Endlosschleife brechen: Ist noch ein Supabase-Cookie da, obwohl der Server
+    // keine gültige Session erkennt, ist der Token tot (z.B. weil ein früherer
+    // Redirect den erneuerten Token verworfen hat). Der Browser hält ihn aber
+    // weiter — die App wirkt "eingeloggt", jeder Klick landet auf /login.
+    // Also das tote Cookie entfernen, damit ein sauberer Login möglich ist.
+    const stale = request.cookies.getAll().filter(c => c.name.startsWith('sb-'))
+    const refreshed = new Set(supabaseResponse.cookies.getAll().map(c => c.name))
+    stale.forEach(c => { if (!refreshed.has(c.name)) redirect.cookies.delete(c.name) })
+
     return redirect
   }
 
