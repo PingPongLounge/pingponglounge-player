@@ -38,9 +38,19 @@ export async function middleware(request: NextRequest) {
   // Signierte bzw. selbst-verifizierende API-Routen: kein Login-Redirect
   if (PUBLIC_API.some(p => pathname === p)) return supabaseResponse
 
-  // Nicht eingeloggt → Login
+  // Nicht eingeloggt → Login.
+  //
+  // WICHTIG: Supabase rotiert beim Erneuern der Session die Tokens und setzt sie
+  // über setAll() auf `supabaseResponse`. Gibt man hier einfach ein neues
+  // NextResponse.redirect() zurück, gehen diese frischen Cookies verloren — der
+  // Browser behält den alten, bereits entwerteten Token und ist beim nächsten
+  // Aufruf wieder ausgeloggt. Genau das führte dazu, dass Spieler sich
+  // "immer wieder neu anmelden" mussten.
+  // Deshalb: die Cookies der Supabase-Antwort auf die Weiterleitung übertragen.
   if (!user) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    const redirect = NextResponse.redirect(new URL('/login', request.url))
+    supabaseResponse.cookies.getAll().forEach(c => redirect.cookies.set(c))
+    return redirect
   }
 
   return supabaseResponse

@@ -197,11 +197,18 @@ export default function LigaPage(){
     } else flash(j.error||"Fehler")
     setBusy(false)
   }
+  // Session abgelaufen → sauber zum Login statt "Fehler" anzuzeigen
+  function checkAuth(r:Response){
+    if(r.status===401){ window.location.href="/login"; return false }
+    return true
+  }
+
   async function sendResult(){
     if(!fTarget||!userId) return
     if(fMy===fOpp){ flash("Kein Unentschieden möglich"); return }
     setBusy(true)
     const dm=await fetch("/api/liga/direct-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,opponent_id:fTarget.id,friendly:fFriendly})})
+    if(!checkAuth(dm)){ setBusy(false); return }
     const dj=await dm.json().catch(()=>({}))
     const matchId=dm.ok?dj.id:dj.existing_id
     if(!matchId){ flash(dj.error||"Fehler beim Anlegen"); setBusy(false); return }
@@ -211,6 +218,7 @@ export default function LigaPage(){
     const winner_id=fMy>fOpp?userId:fTarget.id
     const played_at=fRDate?new Date(`${fRDate}T20:00:00`).toISOString():undefined
     const rr=await fetch("/api/liga/result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId,sets,winner_id,played_at})})
+    if(!checkAuth(rr)){ setBusy(false); return }
     const rj=await rr.json().catch(()=>({}))
     if(rr.ok){
       // Popup bleibt offen → direkt das nächste Ergebnis eintragen
