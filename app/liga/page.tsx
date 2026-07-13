@@ -3,7 +3,8 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import { MAX_RANKED_PER_OPPONENT, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO } from "@/lib/rewards"
+import RankIcon, { RANK_NAMES } from "@/app/components/RankIcon"
+import { MAX_RANKED_PER_OPPONENT, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO, LIGEN, ligaForLevel, type LigaKey } from "@/lib/rewards"
 import {
   BG, CARD, CELL, W, SUB, MUT, GREEN, LINE,
   gt, GRAD, card, levelBadge,
@@ -38,6 +39,7 @@ export default function LigaPage(){
   const [busy,setBusy]=useState(false)
   const [toast,setToast]=useState("")
   const [showCity,setShowCity]=useState(false)
+  const [ligaTab,setLigaTab]=useState<LigaKey|null>(null)   // welche der vier Ligen wird gezeigt?
   const [openMatches,setOpenMatches]=useState<Record<string,OpenMatch>>({})
   // chat
   const [chatOpen,setChatOpen]=useState(false)
@@ -191,16 +193,37 @@ export default function LigaPage(){
   // zu meinem Rang scrollen
   useEffect(()=>{ if(rows.length&&meRef.current){ meRef.current.scrollIntoView({block:"center",behavior:"smooth"}) } },[rows])
 
-  // Chat laden + Poll
+  // Chat laden + Poll. Läuft AUCH bei geschlossenem Chat, sonst wüsste niemand,
+  // dass etwas Neues drinsteht — und ungelesene Nachrichten sind der halbe Grund,
+  // die App zu öffnen.
   const loadChat=useCallback(async(sid:string)=>{
     const r=await fetch(`/api/liga/chat?season_id=${sid}`); if(r.ok){const j=await r.json();setMsgs(j.messages||[])}
   },[])
   useEffect(()=>{
-    if(!chatOpen||!seasonId) return
+    if(!seasonId) return
     loadChat(seasonId)
-    const t=setInterval(()=>loadChat(seasonId),5000)
+    const t=setInterval(()=>loadChat(seasonId),chatOpen?5000:25000)
     return ()=>clearInterval(t)
   },[chatOpen,seasonId,loadChat])
+
+  // Gelesen-Stand pro Saison
+  const [gesehen,setGesehen]=useState(0)
+  useEffect(()=>{
+    if(!seasonId) return
+    const v=parseInt(localStorage.getItem(`liga-gesehen-${seasonId}`)||"0")
+    setGesehen(Number.isFinite(v)?v:0)
+  },[seasonId])
+  const ungelesen=Math.max(0,msgs.length-gesehen)
+  useEffect(()=>{
+    if(!chatOpen||!seasonId||msgs.length===0) return
+    localStorage.setItem(`liga-gesehen-${seasonId}`,String(msgs.length))
+    setGesehen(msgs.length)
+  },[chatOpen,seasonId,msgs.length])
+
+  // Direkt aus der Bestätigung heraus: /liga?chat=1 öffnet den Chat
+  useEffect(()=>{
+    if(new URLSearchParams(window.location.search).get("chat")==="1") setChatOpen(true)
+  },[])
 
   async function join(){
     setBusy(true)
@@ -296,6 +319,35 @@ export default function LigaPage(){
   const myIndex=rows.findIndex(r=>r.user_id===userId)
   const myRow=myIndex>=0?rows[myIndex]:null
 
+  // Die vier Ligen. Gespielt wird im Paar (dieselbe Saison), aber jede Liga
+  // hat ihre eigene Tabelle — der Tab entscheidet, welche du gerade siehst.
+  const meineLiga=ligaForLevel(myRow?.level??myLevel)
+  const aktiveLiga=ligaTab??meineLiga?.key??"advanced"
+  const zaehlen=(k:LigaKey)=>rows.filter(r=>ligaForLevel(r.level)?.key===k).length
+  const ligaRows=rows.filter(r=>ligaForLevel(r.level)?.key===aktiveLiga)
+  const aktivDef=LIGEN.find(l=>l.key===aktiveLiga)!
+  // Mein Platz IN MEINER LIGA (nicht in der Gesamtliste)
+  const meineRows=meineLiga?rows.filter(r=>ligaForLevel(r.level)?.key===meineLiga.key):rows
+  const meinRang=Math.max(1,meineRows.findIndex(r=>r.user_id===userId)+1)
+  // Gegen wen darf ich fordern? Gegen alle in MEINEM Paar — also auch eine Liga höher.
+  // Ohne eigene Liga (kein Level) wäre der Vergleich undefined===undefined → true.
+  // Deshalb explizit: kein Level, kein Fordern.
+  const imPaar=(r:Row)=>!!meineLiga&&ligaForLevel(r.level)?.pair===meineLiga.pair
+
+  // Vorschau der letzten Nachricht für die Chat-Zeile
+  const letzte=msgs[msgs.length-1]
+  const letzteNachricht=(()=>{
+    if(!letzte) return "Noch nichts geschrieben — mach den Anfang."
+    if(letzte.kind==="match"){
+      try{
+        const d=JSON.parse(letzte.text) as {winner:string,loser:string,wSets:number,lSets:number}
+        return `${d.winner} schlägt ${d.loser} ${d.wSets}:${d.lSets}`
+      }catch{ return "Neues Ergebnis" }
+    }
+    const wer=letzte.user_id===userId?"Du":letzte.name
+    return `${wer}: ${letzte.text}`
+  })()
+
   return (
     <main style={{minHeight:"100vh",background:BG,paddingBottom:90}}>
       {/* Topbar */}
@@ -306,8 +358,14 @@ export default function LigaPage(){
         </Link>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button onClick={()=>setShowCity(v=>!v)} style={{background:"rgba(6,33,15,.15)",border:"none",color:"#06210F",fontSize:12,fontWeight:800,cursor:"pointer",borderRadius:10,padding:"7px 11px"}}>{city||"Stadt"} ▾</button>
-          <button onClick={()=>setChatOpen(true)} aria-label="Chat" style={{width:36,height:36,borderRadius:10,background:"rgba(6,33,15,.15)",border:"none",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer"}}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#06210F" strokeWidth="2"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
+          {/* Beschriftet, nicht nur ein Symbol — ein nacktes Sprechblasen-Icon
+              erkennt niemand als "hier redet deine Liga". */}
+          <button onClick={()=>setChatOpen(true)} style={{position:"relative",display:"flex",alignItems:"center",gap:6,borderRadius:10,background:"rgba(6,33,15,.15)",border:"none",padding:"7px 11px",cursor:"pointer",fontFamily:"inherit"}}>
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#06210F" strokeWidth="2.2"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
+            <span style={{fontSize:12,fontWeight:800,color:"#06210F"}}>Chat</span>
+            {ungelesen>0&&(
+              <span style={{position:"absolute",top:-5,right:-5,minWidth:17,height:17,borderRadius:999,background:"#06210F",color:GREEN,fontSize:10,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 4px"}}>{ungelesen>9?"9+":ungelesen}</span>
+            )}
           </button>
         </div>
       </div>
@@ -341,13 +399,23 @@ export default function LigaPage(){
           </div>
 
           {myReg&&myRow&&(<>
-            {/* Deine Position */}
+            {/* Deine Position — in DEINER Liga, nicht in der Gesamtliste. Sonst
+                steht im Kopf "#7" und in der Tabelle daneben "3". */}
             <div style={{display:"flex",alignItems:"center",gap:16,padding:"16px 20px",borderTop:`1px solid ${LINE}`}}>
-              <div style={{fontSize:44,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{myIndex+1}</div>
-              <div>
-                <div style={{fontSize:10.5,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position</div>
+              <div style={{fontSize:44,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{meinRang}</div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:10.5,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>
+                  Deine Position{meineLiga?` · ${meineLiga.name}`:""}
+                </div>
                 <div style={{fontSize:13.5,color:SUB,fontWeight:400,marginTop:3}}>{myRow.level?`Level ${myRow.level}`:""} · ELO {myRow.elo}</div>
               </div>
+              {/* Dein Rang — sichtbar, sonst weiss niemand, wofür er spielt */}
+              {myRow.level&&(
+                <div style={{textAlign:"center",flexShrink:0}}>
+                  <RankIcon level={myRow.level} size={40} color={GREEN}/>
+                  <div style={{fontSize:8.5,fontWeight:800,letterSpacing:".07em",textTransform:"uppercase",color:MUT,marginTop:2}}>{RANK_NAMES[parseInt(myRow.level)]}</div>
+                </div>
+              )}
             </div>
             {/* Monatspflicht */}
             <div style={{display:"flex",alignItems:"center",gap:13,padding:"13px 20px 16px",borderTop:`1px solid ${LINE}`}}>
@@ -375,6 +443,22 @@ export default function LigaPage(){
                 <span style={{fontSize:15,fontWeight:800,color:GREEN}}>→</span>
               </button>
             )}
+            {/* Liga-Chat als eigene Zeile — mit der letzten Nachricht als Köder.
+                Ein Symbol oben rechts findet niemand. */}
+            <button onClick={()=>setChatOpen(true)}
+              style={{display:"flex",alignItems:"center",gap:11,width:"100%",background:"none",border:"none",borderTop:`1px solid ${LINE}`,padding:"12px 20px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
+              <span style={{width:30,height:30,borderRadius:9,flexShrink:0,background:CELL,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2.2"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
+              </span>
+              <span style={{flex:1,minWidth:0}}>
+                <span style={{display:"block",fontSize:12.5,fontWeight:800,color:W}}>Liga-Chat</span>
+                <span style={{display:"block",fontSize:11,color:MUT,marginTop:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{letzteNachricht}</span>
+              </span>
+              {ungelesen>0&&(
+                <span style={{minWidth:19,height:19,borderRadius:999,background:GRAD,color:"#06210F",fontSize:10.5,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 5px",flexShrink:0}}>{ungelesen>9?"9+":ungelesen}</span>
+              )}
+              <span style={{fontSize:15,color:MUT,flexShrink:0}}>›</span>
+            </button>
           </>)}
         </div>
 
@@ -405,15 +489,33 @@ export default function LigaPage(){
             </div>
           )}
 
-          {/* Rangliste */}
+          {/* Rangliste — mit den vier Ligen als Tabs darüber */}
           <div style={{padding:"14px 14px 0"}}>
-            <div style={{...card,borderRadius:24,padding:"18px 14px"}}>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:8}}>
-                <img src="/icons/liga.svg" alt="" style={{width:26,height:26}}/>
-                <span style={{fontSize:17,fontWeight:800,letterSpacing:".01em",color:W}}>Rangliste</span>
+            <div style={{...card,borderRadius:24,padding:"16px 12px"}}>
+              <div style={{display:"flex",gap:5,background:CELL,borderRadius:14,padding:4}}>
+                {LIGEN.map(l=>{
+                  const on=l.key===aktiveLiga
+                  const meins=meineLiga?.key===l.key
+                  return(
+                    <button key={l.key} onClick={()=>setLigaTab(l.key)}
+                      style={{flex:1,position:"relative",border:"none",borderRadius:11,padding:"9px 4px",background:on?GRAD:"none",color:on?"#06210F":MUT,fontFamily:"inherit",fontSize:11.5,fontWeight:800,cursor:"pointer"}}>
+                      {l.name}
+                      {meins&&<span style={{position:"absolute",top:5,right:7,width:5,height:5,borderRadius:"50%",background:on?"#06210F":GREEN}}/>}
+                    </button>
+                  )
+                })}
+              </div>
+              <div style={{textAlign:"center",fontSize:10.5,color:MUT,margin:"9px 0 10px"}}>
+                Level {aktivDef.levels.join("–")} · {zaehlen(aktiveLiga)} Spieler
+                {meineLiga?.key===aktiveLiga?" · deine Liga":""}
               </div>
               <div>
-                {rows.map((r,i)=>{
+                {ligaRows.length===0&&(
+                  <div style={{textAlign:"center",fontSize:12.5,color:MUT,padding:"26px 16px",lineHeight:1.6}}>
+                    Hier steht noch niemand.<br/>Spiel dich hoch — der erste Platz ist frei.
+                  </div>
+                )}
+                {ligaRows.map((r,i)=>{
                   const me=r.user_id===userId
                   const initialen=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                   return(
@@ -438,9 +540,11 @@ export default function LigaPage(){
                           </div>
                         })()}
                       </button>
-                      {r.level&&<span style={levelBadge(r.level)}>L{r.level}</span>}
+                      <RankIcon level={r.level} size={20} color={me?GREEN:SUB}/>
                       <span style={{fontSize:13.5,fontWeight:800,...(me?gt:{color:SUB})}}>{r.elo}</span>
-                      {!me&&myReg&&(()=>{
+                      {/* Fordern nur innerhalb des eigenen Paares — gegen Rookie/Challenger
+                          spielst du nicht, wenn du Advanced/Elite bist. */}
+                      {!me&&myReg&&imPaar(r)&&(()=>{
                         const om=openMatches[r.user_id]
                         const btnBase:React.CSSProperties={border:"1.4px solid transparent",borderRadius:10,padding:"7px 10px",fontSize:10,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:"pointer",whiteSpace:"nowrap",fontFamily:"inherit"}
                         if(!om) return <button onClick={()=>openForder(r)} style={btnBase}>Fordern</button>

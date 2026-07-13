@@ -42,8 +42,35 @@ export const MAX_RANKED_PER_OPPONENT = 5
 // Aktivitätspflicht statt Gegner-Zuteilung: Wer im Monat zu wenig spielt,
 // verliert Punkte. Keine Vorschriften, gegen WEN — nur, DASS gespielt wird.
 // Open Games sind das Gefäss dafür.
-export const MIN_MATCHES_PER_MONTH = 2   // gewertete Liga-Matches
+export const MIN_MATCHES_PER_MONTH = 4   // gewertete Liga-Matches
 export const MONTHLY_PENALTY_ELO = 20    // Abzug, wenn nicht erreicht
+
+// Die vier Ligen. Gespielt wird paarweise (Rookie+Challenger in einer Tabelle,
+// Advanced+Elite in der anderen) — die Liga selbst ist aber echt und hat ihre
+// eigene Rangliste. Wer im Level aufsteigt, wechselt die Liga.
+export const LIGEN = [
+  { key: "rookie",     name: "Rookie",     levels: [1, 2], pair: "einstieg" },
+  { key: "challenger", name: "Challenger", levels: [3, 4], pair: "einstieg" },
+  { key: "advanced",   name: "Advanced",   levels: [5, 6], pair: "pro" },
+  { key: "elite",      name: "Elite",      levels: [7],    pair: "pro" },
+] as const
+
+export type LigaKey = (typeof LIGEN)[number]["key"]
+
+export function ligaForLevel(level: string | number | null | undefined) {
+  const l = typeof level === "string" ? parseInt(level) : level
+  if (!l) return null
+  return LIGEN.find(x => (x.levels as readonly number[]).includes(l)) || null
+}
+
+// Fertige Sprüche nach dem Bestätigen — Kommentieren muss ein Tipp sein,
+// kein Aufsatz. Freitext geht trotzdem.
+export const MATCH_SPRUECHE = [
+  "Gut gespielt!",
+  "Nächstes Mal bist du dran.",
+  "Keine Chance gehabt — du Rakete.",
+  "Revanche?",
+] as const
 
 export const LIGA_CONFIG = {
   minMatchesForRanking: 6,

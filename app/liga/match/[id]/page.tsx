@@ -3,10 +3,11 @@ import { useEffect, useState, use } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import {
-  BG, CELL, W, MUT, GREEN, DANGER,
+  BG, CARD, CELL, W, SUB, MUT, GREEN, DANGER, GRAD,
   cardPad, cardActive, btn, btnGhost, input, label,
   body, meta, eyebrow, backLink,
 } from "@/app/theme"
+import { MATCH_SPRUECHE } from "@/lib/rewards"
 
 type SetScore={p1:string,p2:string}
 type MatchData={id:string,season_id:string,round:number,p1_id:string,p1_name:string,p2_id:string,p2_name:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,status:string}
@@ -23,6 +24,8 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
   const [loading,setLoading]=useState(true)
   const [submitted,setSubmitted]=useState(false)
   const [nextMatchId,setNextMatchId]=useState<string|null>(null)
+  const [askComment,setAskComment]=useState(false)   // "Spiel kommentieren?"
+  const [comment,setComment]=useState("")
 
   useEffect(()=>{
     async function load(){
@@ -86,11 +89,22 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
     else{setError(d.error||"Fehler");setSaving(false)}
   }
 
+  // Nach dem Bestätigen NICHT stumm zurückspringen: das Spiel steht jetzt im
+  // Liga-Chat und will einen Spruch. Ein Tipp genügt.
   async function handleConfirm(){
     setSaving(true)
     const res=await fetch("/api/liga/confirm",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId})})
-    if(res.ok){window.location.href=`/liga/${match?.season_id}`}
+    if(res.ok){setSaving(false);setAskComment(true)}
     else{const d=await res.json();setError(d.error||"Fehler");setSaving(false)}
+  }
+
+  async function postComment(text:string){
+    const t=text.trim()
+    if(!t||!match) return
+    setSaving(true)
+    await fetch("/api/liga/chat",{method:"POST",headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({season_id:match.season_id,match_id:match.id,text:t})}).catch(()=>{})
+    window.location.href=`/liga?chat=1`
   }
 
   if(loading||!match) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:MUT}}>Lädt …</p></main>
@@ -197,6 +211,43 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
           </div>
         )}
       </div>
+
+      {/* Spiel bestätigt → Spruch dazu. Das Spiel steht jetzt im Liga-Chat,
+          und ein Match ohne Kommentar ist nur eine Zahl. */}
+      {askComment&&(
+        <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:140,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+          <div style={{width:"100%",maxWidth:400,background:CARD,borderRadius:24,padding:"24px 20px",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
+            <div style={{fontSize:11,fontWeight:800,letterSpacing:".12em",textTransform:"uppercase",color:GREEN,marginBottom:6}}>✓ Bestätigt</div>
+            <div style={{fontSize:21,fontWeight:900,color:W,marginBottom:5}}>Spiel kommentieren?</div>
+            <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16,lineHeight:1.5}}>
+              Das Spiel steht im Liga-Chat — alle sehen es. Sag was dazu.
+            </div>
+
+            <div style={{display:"flex",flexWrap:"wrap",gap:7,marginBottom:14}}>
+              {MATCH_SPRUECHE.map(s=>(
+                <button key={s} onClick={()=>postComment(s)} disabled={saving}
+                  style={{border:"1.4px solid transparent",borderRadius:999,padding:"9px 13px",fontSize:12.5,fontWeight:700,color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:saving?"wait":"pointer",fontFamily:"inherit"}}>
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            <div style={{display:"flex",gap:7}}>
+              <input value={comment} onChange={e=>setComment(e.target.value)}
+                onKeyDown={e=>{if(e.key==="Enter")postComment(comment)}}
+                placeholder="Oder schreib selbst …"
+                style={{flex:1,minWidth:0,background:BG,border:`1px solid ${CELL}`,borderRadius:999,padding:"11px 14px",color:W,fontSize:13,outline:"none",fontFamily:"inherit"}}/>
+              <button onClick={()=>postComment(comment)} disabled={saving||!comment.trim()}
+                style={{width:44,flexShrink:0,borderRadius:999,border:"none",background:GRAD,color:"#06210F",fontSize:16,fontWeight:900,cursor:(saving||!comment.trim())?"not-allowed":"pointer",opacity:(saving||!comment.trim())?.4:1,fontFamily:"inherit"}}>→</button>
+            </div>
+
+            <button onClick={()=>{window.location.href=`/liga`}}
+              style={{display:"block",width:"100%",marginTop:14,background:"none",border:"none",color:MUT,fontSize:12.5,fontWeight:600,cursor:"pointer",fontFamily:"inherit",padding:6}}>
+              Ohne Kommentar zurück
+            </button>
+          </div>
+        </div>
+      )}
     </main>
   )
 }

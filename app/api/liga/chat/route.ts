@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await sb.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { season_id, text, parent_id } = await req.json()
+  const { season_id, text, parent_id, match_id } = await req.json()
   const clean = String(text || "").trim().slice(0, 500)
   if (!season_id || !clean) return NextResponse.json({ error: "Leer" }, { status: 400 })
 
@@ -64,14 +64,24 @@ export async function POST(req: NextRequest) {
 
   // Kommentar zu einem Spiel: parent_id muss eine Nachricht DERSELBEN Saison sein
   // und selbst kein Kommentar (keine Threads in Threads).
+  // Alternativ genügt die match_id — dann suchen wir den Match-Post selbst.
   let parent: string | null = null
-  if (parent_id) {
+  const parentRef = parent_id || null
+
+  if (parentRef) {
     const { data: p } = await admin.from("league_messages")
-      .select("id,season_id,parent_id").eq("id", parent_id).maybeSingle()
+      .select("id,season_id,parent_id").eq("id", parentRef).maybeSingle()
     if (!p || p.season_id !== season_id || p.parent_id) {
       return NextResponse.json({ error: "Ungültiger Bezug" }, { status: 400 })
     }
     parent = p.id
+  } else if (match_id) {
+    const { data: post } = await admin.from("league_messages")
+      .select("id,season_id").eq("match_id", match_id).is("parent_id", null).maybeSingle()
+    if (!post || post.season_id !== season_id) {
+      return NextResponse.json({ error: "Kein Spiel-Eintrag gefunden" }, { status: 400 })
+    }
+    parent = post.id
   }
 
   const { error } = await admin.from("league_messages")
