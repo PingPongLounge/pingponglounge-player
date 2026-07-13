@@ -5,7 +5,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 import { BG, CARD, W, MUT, GREEN, CITIES, card, cardPad, cardActive, cell, chip, btn, btnInCard, btnGhost, chipBtn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
-import { SectionHero, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
+import { SectionBlock, SectionStat, SectionRow, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
 
 const M=MUT, G=GREEN, C=CARD
 
@@ -73,11 +73,27 @@ export default function MatchPage() {
     (!filterCity  || g.location_name === filterCity)
   )
 
+  // Zahlen für den Kopfblock
+  const freiePlaetze = games.reduce((n, g) => n + Math.max(0, g.max_players - g.current_players), 0)
+  const meineSpiele = games.filter(g => g.players.some(p => p.user_id === userId)).length
+
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "0 0 100px" }}>
       <SectionTopBar section="Open Game" />
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "6px 16px 0" }}>
-        <SectionHero eyebrow="Player · Open Game" title="Open Game" subtitle="Spiel wann du willst — tritt bei oder erstelle dein eigenes." />
+        {/* Derselbe Block wie in der Liga: Bild, darunter deine Lage, darunter die Handlung. */}
+        <SectionBlock
+          title="Open Game"
+          meta={`${games.length} offen · ${freiePlaetze} ${freiePlaetze === 1 ? "Platz" : "Plätze"} frei`}
+          img="/gl-tische.jpg"
+        >
+          <SectionStat
+            big={String(meineSpiele)}
+            label={meineSpiele === 1 ? "Du bist angemeldet" : "Deine Anmeldungen"}
+            sub={meineSpiele > 0 ? "Trag nach dem Spiel dein Resultat ein." : "Tritt einem Spiel bei — oder erstell dein eigenes."}
+          />
+          <SectionRow label="Open Game erstellen" href="/match/create" />
+        </SectionBlock>
         <SectionIntro storageKey="intro_match" title="So funktioniert Open Game" steps={[["1", "Finde ein Spiel", "Filter nach Level und Standort — sieh, was heute läuft."], ["2", "Mitspielen oder erstellen", "Tritt einem offenen Spiel bei oder starte dein eigenes."], ["3", "Ergebnis eintragen", "Nach dem Spiel Resultat erfassen — dein Rang steigt."]]} cta={{ label: "Open Game erstellen", href: "/match/create" }} />
 
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "20px 0 12px" }}>

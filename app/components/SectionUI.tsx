@@ -26,6 +26,63 @@ export function SectionTopBar({ section }: { section: string }) {
   )
 }
 
+const HERO = "#14171E", LINE = "rgba(255,255,255,.07)", GREEN = "#39FF14"
+
+/**
+ * DAS MUSTER — ein Block für jede Sektion, wie in der Liga:
+ * Bild oben (halbe Höhe, trägt Titel und die eine Zahl, die zählt),
+ * darunter Zeilen, getrennt durch feine Linien. Keine Kästchen-Sammlung.
+ * Zeilen kommen als children (SectionStat, SectionRow).
+ */
+export function SectionBlock({ title, meta, img = "/gl-tische.jpg", children }: {
+  title: string; meta?: string; img?: string; children?: React.ReactNode
+}) {
+  return (
+    <div style={{ margin: "14px 0 0", borderRadius: 22, overflow: "hidden", boxShadow: SHADOW, background: HERO }}>
+      <div style={{ position: "relative", height: 132 }}>
+        <img src={img} alt="" style={{ width: "100%", height: 132, objectFit: "cover", display: "block" }} />
+        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(20,23,30,.1) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.92) 100%)" }} />
+        <div style={{ position: "absolute", left: 20, right: 20, bottom: 13 }}>
+          <div style={{ fontSize: 34, fontWeight: 900, lineHeight: .9, textTransform: "uppercase", letterSpacing: "-.02em", color: W }}>{title}</div>
+          {meta && <div style={{ fontSize: 12, color: SUB, fontWeight: 400, marginTop: 5 }}>{meta}</div>}
+        </div>
+      </div>
+      {children}
+    </div>
+  )
+}
+
+/** Grosse Zahl links, Beschriftung rechts — "deine Lage" in einer Zeile. */
+export function SectionStat({ big, label, sub }: { big: string; label: string; sub?: string }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderTop: `1px solid ${LINE}` }}>
+      <div style={{ fontSize: 40, fontWeight: 900, lineHeight: .85, letterSpacing: "-.03em", flexShrink: 0, ...gt }}>{big}</div>
+      <div style={{ flex: 1, minWidth: 0 }}>
+        <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: MUT }}>{label}</div>
+        {sub && <div style={{ fontSize: 13, color: SUB, fontWeight: 400, marginTop: 3 }}>{sub}</div>}
+      </div>
+    </div>
+  )
+}
+
+/** Die Handlung — eine leise Zeile mit Pfeil, kein knallgrüner Balken. */
+export function SectionRow({ label, href, onClick, external }: {
+  label: string; href?: string; onClick?: () => void; external?: boolean
+}) {
+  const inner = (<>
+    <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: ".02em", ...gt }}>{label}</span>
+    <span style={{ fontSize: 15, fontWeight: 800, color: GREEN }}>→</span>
+  </>)
+  const style: React.CSSProperties = {
+    display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%",
+    background: "none", border: "none", borderTop: `1px solid ${LINE}`, padding: "13px 20px",
+    cursor: "pointer", fontFamily: "inherit", textAlign: "left", textDecoration: "none", color: W,
+  }
+  if (href && external) return <a href={href} target="_blank" rel="noopener noreferrer" style={style}>{inner}</a>
+  if (href) return <Link href={href} style={style}>{inner}</Link>
+  return <button onClick={onClick} style={style}>{inner}</button>
+}
+
 export function SectionHero({ eyebrow, title, subtitle, img = "/gl-tische.jpg", align = "left" }: { eyebrow: string; title: string; subtitle: string; img?: string; align?: "left" | "right" }) {
   // align="right": für Bilder, deren Motiv links liegt (z.B. der Bracket-Zettel
   // beim Turnier). Sonst läge der Text mitten auf dem Motiv.

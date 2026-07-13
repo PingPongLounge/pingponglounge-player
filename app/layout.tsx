@@ -3,14 +3,38 @@ import "./globals.css"
 import AppHeader from "./components/AppHeader"
 import SplashScreen from "./components/SplashScreen"
 
+// Ohne og:image kommt beim Teilen in WhatsApp eine nackte Zeile an — genau der
+// Moment, in dem die Leute entscheiden, ob sie tippen. Deshalb: Karte, Titel, Text.
+const BASE = "https://playerapp.ch"
+
 export const metadata: Metadata = {
-  title: "Next Level Table Tennis",
-  description: "Finde Mitspieler, spiel in der Liga und verfolge dein ELO-Ranking.",
+  metadataBase: new URL(BASE),
+  title: "Player — Next Level Table Tennis",
+  description: "Liga, Open Games und Turniere — vom Anfänger bis zum Profi. Spiel, trag dein Resultat ein, steig auf.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
-  }
+    apple: "/favicon.svg",
+  },
+  openGraph: {
+    type: "website",
+    locale: "de_CH",
+    url: BASE,
+    siteName: "Player",
+    title: "Player — Spiel. Trag ein. Steig auf.",
+    description: "Liga, Open Games und Turniere — vom Anfänger bis zum Profi.",
+    images: [{ url: "/share-card.jpg", width: 1200, height: 630, alt: "Player — Next Level Table Tennis" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Player — Spiel. Trag ein. Steig auf.",
+    description: "Liga, Open Games und Turniere — vom Anfänger bis zum Profi.",
+    images: ["/share-card.jpg"],
+  },
 }
+
+// themeColor gehört seit Next 14 in den viewport-Export, nicht in metadata.
+export const viewport = { themeColor: "#20242C" }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (

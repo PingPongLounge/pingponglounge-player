@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { autoConfirmOverdue } from "@/lib/cron-tasks"
+import { autoConfirmOverdue, expireOldChallenges } from "@/lib/cron-tasks"
 import { NextResponse } from "next/server"
 
 // Wird beim Öffnen der Liga aufgerufen und bestätigt überfällige Ergebnisse.
@@ -13,6 +13,8 @@ export async function POST() {
   const { data: { user } } = await sb.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const confirmed = await autoConfirmOverdue(createAdminClient())
-  return NextResponse.json({ ok: true, confirmed })
+  const admin = createAdminClient()
+  const confirmed = await autoConfirmOverdue(admin)
+  const expired = await expireOldChallenges(admin)
+  return NextResponse.json({ ok: true, confirmed, expired })
 }

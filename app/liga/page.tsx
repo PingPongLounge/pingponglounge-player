@@ -311,6 +311,13 @@ export default function LigaPage(){
     else flash(rj.error||"Fehler")
     setBusy(false)
   }
+  async function declineChallenge(matchId:string){
+    const r=await fetch("/api/liga/challenge/decline",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId})})
+    if(!checkAuth(r)) return
+    const j=await r.json().catch(()=>({}))
+    if(r.ok){flash("Forderung abgesagt");loadStandings(seasonId)}
+    else flash(j.error||"Fehler")
+  }
   async function acceptChallenge(matchId:string){
     const r=await fetch("/api/liga/challenge/accept",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId})})
     const j=await r.json().catch(()=>({}))
@@ -570,9 +577,19 @@ export default function LigaPage(){
                       {!me&&myReg&&imPaar(r)&&(()=>{
                         const om=openMatches[r.user_id]
                         const btnBase:React.CSSProperties={border:"1.4px solid transparent",borderRadius:10,padding:"7px 10px",fontSize:10,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:"pointer",whiteSpace:"nowrap",fontFamily:"inherit"}
+                        const kleinX:React.CSSProperties={background:"none",border:`1px solid ${MUT}`,borderRadius:9,padding:"6px 8px",fontSize:10,fontWeight:800,color:MUT,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap"}
                         if(!om) return <button onClick={()=>openForder(r)} style={btnBase}>Fordern</button>
-                        if(om.status==="challenge_sent"&&!om.iAmP1) return <button onClick={()=>acceptChallenge(om.id)} style={{...btnBase,background:GRAD,color:"#06210F"}}>Annehmen ✓</button>
-                        if(om.status==="challenge_sent"&&om.iAmP1) return <span style={{fontSize:10,fontWeight:700,color:MUT,whiteSpace:"nowrap",textTransform:"uppercase",letterSpacing:".04em"}}>Ausstehend</span>
+                        // Ablehnen und Zurückziehen gab es nur auf einer verwaisten Altseite.
+                        // Eine Forderung blockierte das Paar dadurch für immer.
+                        if(om.status==="challenge_sent"&&!om.iAmP1) return (
+                          <span style={{display:"flex",gap:5}}>
+                            <button onClick={()=>acceptChallenge(om.id)} style={{...btnBase,background:GRAD,color:"#06210F"}}>Annehmen ✓</button>
+                            <button onClick={()=>declineChallenge(om.id)} title="Ablehnen" style={kleinX}>✕</button>
+                          </span>
+                        )
+                        if(om.status==="challenge_sent"&&om.iAmP1) return (
+                          <button onClick={()=>declineChallenge(om.id)} style={kleinX}>Zurückziehen</button>
+                        )
                         if(om.status==="accepted"||om.status==="pending") return <Link href={`/liga/match/${om.id}`} style={{...btnBase,textDecoration:"none",display:"inline-block"}}>Spiel eintragen →</Link>
                         if(om.status==="p1_entered"&&!om.iAmP1) return <Link href={`/liga/match/${om.id}`} style={{...btnBase,background:GRAD,color:"#06210F",textDecoration:"none",display:"inline-block"}}>Bestätigen ✓</Link>
                         // Ergebnis wartet auf Bestätigung → weiteres Ergebnis trotzdem erlauben

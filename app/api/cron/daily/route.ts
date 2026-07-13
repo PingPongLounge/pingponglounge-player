@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin"
-import { autoConfirmOverdue, remindStuckOnboarding } from "@/lib/cron-tasks"
+import { autoConfirmOverdue, remindStuckOnboarding, expireOldChallenges } from "@/lib/cron-tasks"
 import { applyMonthlyPenalties, warnMonthlyOpen } from "@/lib/monthly"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -16,6 +16,7 @@ async function run(req: NextRequest) {
 
   const confirmed = await autoConfirmOverdue(admin)
   const reminded = await remindStuckOnboarding(admin)
+  const expired = await expireOldChallenges(admin)   // Forderungen verfallen nach 7 Tagen
 
   // Aktivitätspflicht: den Vormonat abrechnen, ab dem 25. warnen.
   // Die Abrechnung läuft JEDEN Tag, nicht nur am 1. — sie ist idempotent
@@ -46,7 +47,7 @@ async function run(req: NextRequest) {
     console.error("Inaktivitäts-Lauf fehlgeschlagen:", e)
   }
 
-  return NextResponse.json({ ok: true, confirmed, reminded, penalties, warned, inactivity })
+  return NextResponse.json({ ok: true, confirmed, reminded, expired, penalties, warned, inactivity })
 }
 
 export const GET = run

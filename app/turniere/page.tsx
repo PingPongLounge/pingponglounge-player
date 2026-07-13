@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { BG, CARD, CELL, W, MUT, GREEN, cardPad, chip, btn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
-import { SectionHero, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
+import { SectionBlock, SectionStat, SectionRow, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
 
 const M=MUT, C=CARD, B=CELL, G=GREEN
 const statusLabel=(s:string)=>({open:"offen",running:"läuft",finished:"beendet"}[s]||s)
@@ -41,16 +41,37 @@ export default function TurnierePage(){
     </main>
   )
 
+  // Das nächste offene Turnier — die Zahl, die im Kopfblock zählt
+  const naechstes = tournaments
+    .filter(t => t.status === "open" && (!t.date || new Date(t.date) >= new Date(new Date().toDateString())))
+    .sort((a, b) => (a.date || "").localeCompare(b.date || ""))[0]
+  const naechstesFrei = naechstes
+    ? Math.max(0, naechstes.max_players - (naechstes.tournament_registrations?.[0]?.count ?? 0))
+    : 0
+  const naechstesDatum = naechstes?.date
+    ? new Date(naechstes.date).toLocaleDateString("de-CH", { weekday: "short", day: "numeric", month: "short" })
+    : ""
+
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"0 0 100px"}}>
       <SectionTopBar section="Turnier" />
       <div style={{maxWidth:560,margin:"0 auto",padding:"6px 16px 0"}}>
-        <SectionHero eyebrow="Player · Turnier" title="Turniere" subtitle="KO-Bracket · zählt für deinen Rang." img="/turnier-hero.jpg" align="right" />
+        {/* Derselbe Block wie in der Liga */}
+        <SectionBlock
+          title="Turnier"
+          meta={naechstes ? `Nächstes: ${naechstesDatum} · ${naechstesFrei} von ${naechstes.max_players} Plätzen frei` : "KO-Bracket · zählt für deinen Rang"}
+          img="/turnier-hero.jpg"
+        >
+          {naechstes ? (
+            <SectionStat big={String(naechstesFrei)} label="Plätze frei" sub={`${naechstes.name} · ${naechstesDatum}`} />
+          ) : (
+            <SectionStat big="0" label="Offene Turniere" sub="Bald startet das nächste — bleib dran." />
+          )}
+          <SectionRow label="Eigenes Turnier erstellen" href="/turniere/neu" />
+        </SectionBlock>
         <SectionIntro storageKey="intro_turniere" title="So funktioniert ein Turnier" steps={[["1","Turnier finden","Sieh dir offene Turniere in deiner Stadt an."],["2","Anmelden","Sichere dir deinen Platz, solang welche frei sind."],["3","KO-Bracket spielen","Gewinne dich nach oben — die Resultate zählen für ELO & Rang."]]} />
 
-        <Link href="/turniere/neu" style={{...btn,margin:"18px 0 20px"}}>
-          + Eigenes Turnier erstellen
-        </Link>
+        <div style={{height:20}}/>
 
         {loading?(
           <div style={{textAlign:"center",padding:"60px 0",color:M}}>

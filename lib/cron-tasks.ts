@@ -65,6 +65,34 @@ export async function autoConfirmOverdue(admin: SupabaseClient): Promise<number>
   return confirmed
 }
 
+// Wie lange darf eine Forderung offen liegen, bevor sie verfällt?
+export const CHALLENGE_EXPIRY_DAYS = 7
+
+/**
+ * Lässt Forderungen verfallen, auf die niemand reagiert hat.
+ * Ohne das blockiert eine einzige unbeantwortete Forderung das Paar für immer:
+ * ein zweites Match gegen denselben Gegner lässt sich nicht mehr anlegen.
+ */
+export async function expireOldChallenges(admin: SupabaseClient): Promise<number> {
+  const cutoff = new Date(Date.now() - CHALLENGE_EXPIRY_DAYS * 24 * 3600 * 1000).toISOString()
+  const { data: alt } = await admin
+    .from("league_matches")
+    .select("id")
+    .eq("status", "challenge_sent")
+    .lt("created_at", cutoff)
+    .limit(200)
+
+  let verfallen = 0
+  for (const m of alt || []) {
+    const { data: upd } = await admin.from("league_matches")
+      .update({ status: "cancelled" })
+      .eq("id", m.id).eq("status", "challenge_sent")
+      .select("id").maybeSingle()
+    if (upd) verfallen++
+  }
+  return verfallen
+}
+
 /**
  * Erinnert alle, die sich vor über 24h registriert, aber das Onboarding nie
  * beendet haben (level is null). Jeder bekommt die Mail genau einmal.
