@@ -58,6 +58,8 @@ export default function LigaPage(){
   const [fRDate,setFRDate]=useState("")        // Wann wurde gespielt?
   const [fDone,setFDone]=useState<string[]>([]) // in dieser Session eingetragene Ergebnisse
   const [fFriendly,setFFriendly]=useState(false) // Freundschaftsspiel: ohne Liga-Punkte
+  const [fDetail,setFDetail]=useState(false)     // Sätze genau eintragen statt nur zählen
+  const [fSets,setFSets]=useState<Array<{p1:string,p2:string}>>([{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""}])
   const [fNoteRanked,setFNoteRanked]=useState<string|null>(null) // Hinweis, wenn das Gegner-Limit greift
   const [rankedVs,setRankedVs]=useState<Record<string,number>>({}) // gewertete Spiele je Gegner
   const [monatCount,setMonatCount]=useState(0)   // gewertete Liga-Matches diesen Monat
@@ -239,7 +241,17 @@ export default function LigaPage(){
     else flash(j.error||"Fehler")
   }
   function today(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` }
-  function openForder(r:Row,tab:"challenge"|"result"="challenge"){ setFTarget({id:r.user_id,name:r.name}); setFTab(tab); setFDate(""); setFTime(""); setFMy(0); setFOpp(0); setFRDate(today()); setFDone([]); setFFriendly(false); setFNoteRanked(null) }
+  function openForder(r:Row,tab:"challenge"|"result"="challenge"){ setFTarget({id:r.user_id,name:r.name}); setFTab(tab); setFDate(""); setFTime(""); setFMy(0); setFOpp(0); setFRDate(today()); setFDone([]); setFFriendly(false); setFNoteRanked(null); setFDetail(false); setFSets([{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""}]) }
+
+  // Genaue Sätze → gewonnene Sätze je Seite. Leere Zeilen zählen nicht.
+  function satzBilanz(){
+    const parsed=fSets.map(s=>({p1:parseInt(s.p1),p2:parseInt(s.p2)})).filter(s=>Number.isFinite(s.p1)&&Number.isFinite(s.p2)&&(s.p1>0||s.p2>0))
+    return {
+      parsed,
+      my:parsed.filter(s=>s.p1>s.p2).length,
+      opp:parsed.filter(s=>s.p2>s.p1).length,
+    }
+  }
   async function sendChallenge(){
     if(!fTarget) return
     setBusy(true)
@@ -263,25 +275,36 @@ export default function LigaPage(){
 
   async function sendResult(){
     if(!fTarget||!userId) return
-    if(fMy===fOpp){ flash("Kein Unentschieden möglich"); return }
+
+    // Zwei Wege: Sätze zählen (schnell) oder Sätze genau eintragen (ehrlich).
+    const det=satzBilanz()
+    const my=fDetail?det.my:fMy
+    const opp=fDetail?det.opp:fOpp
+    if(fDetail&&det.parsed.length===0){ flash("Trag mindestens einen Satz ein"); return }
+    if(my===opp){ flash("Kein Unentschieden möglich"); return }
     setBusy(true)
     const dm=await fetch("/api/liga/direct-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,opponent_id:fTarget.id,friendly:fFriendly})})
     if(!checkAuth(dm)){ setBusy(false); return }
     const dj=await dm.json().catch(()=>({}))
     const matchId=dm.ok?dj.id:dj.existing_id
     if(!matchId){ flash(dj.error||"Fehler beim Anlegen"); setBusy(false); return }
-    // Limit von 7 gewerteten Spielen gegen denselben Gegner erreicht → zählt nicht mehr
+    // Limit gewerteter Spiele gegen denselben Gegner erreicht → zählt nicht mehr
     if(dm.ok&&dj.limitReached&&!fFriendly) setFNoteRanked(`Ihr habt schon ${MAX_RANKED_PER_OPPONENT} gewertete Spiele diese Saison — dieses zählt nicht für ELO und Rang.`)
-    const sets=[...Array(fMy)].map(()=>({p1:11,p2:7})).concat([...Array(fOpp)].map(()=>({p1:7,p2:11})))
-    const winner_id=fMy>fOpp?userId:fTarget.id
+    // Genaue Sätze, wenn eingetragen. Sonst Platzhalter aus der Satzzahl —
+    // fürs ELO gleichwertig, in der Historie steht dann aber 11:7.
+    const sets=fDetail
+      ? det.parsed
+      : [...Array(my)].map(()=>({p1:11,p2:7})).concat([...Array(opp)].map(()=>({p1:7,p2:11})))
+    const winner_id=my>opp?userId:fTarget.id
     const played_at=fRDate?new Date(`${fRDate}T20:00:00`).toISOString():undefined
     const rr=await fetch("/api/liga/result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId,sets,winner_id,played_at})})
     if(!checkAuth(rr)){ setBusy(false); return }
     const rj=await rr.json().catch(()=>({}))
     if(rr.ok){
       // Popup bleibt offen → direkt das nächste Ergebnis eintragen
-      setFDone(d=>[...d,`${fMy}:${fOpp}`])
+      setFDone(d=>[...d,`${my}:${opp}`])
       setFMy(0); setFOpp(0)
+      setFSets([{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""}])
       flash("✓ Eingetragen — warte auf Bestätigung")
       loadStandings(seasonId)
     }
@@ -744,21 +767,62 @@ export default function LigaPage(){
                   <input type="date" max={today()} value={fRDate} onChange={e=>setFRDate(e.target.value)} style={{width:"100%",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                 </div>
 
-                <div style={{display:"flex",alignItems:"flex-end",justifyContent:"center",gap:14}}>
-                  {([["Du",fMy,setFMy],[fTarget.name,fOpp,setFOpp]] as [string,number,(n:number)=>void][]).map(([lab,val,set],idx)=>(
-                    <>
-                      {idx===1&&<span style={{fontSize:30,fontWeight:900,color:MUT,paddingBottom:4}}>:</span>}
-                      <div key={idx} style={{textAlign:"center"}}>
-                        <div style={{fontSize:11,color:MUT,fontWeight:700,textTransform:"uppercase",marginBottom:9,maxWidth:110,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lab}</div>
-                        <div style={{display:"flex",alignItems:"center",gap:9}}>
-                          <button onClick={()=>set(Math.max(0,val-1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,border:"none",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>−</button>
-                          <span style={{fontSize:36,fontWeight:900,width:34,textAlign:"center",...gt}}>{val}</span>
-                          <button onClick={()=>set(Math.min(7,val+1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,border:"none",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>+</button>
+                {!fDetail?(
+                  <div style={{display:"flex",alignItems:"flex-end",justifyContent:"center",gap:14}}>
+                    {([["Du",fMy,setFMy],[fTarget.name,fOpp,setFOpp]] as [string,number,(n:number)=>void][]).map(([lab,val,set],idx)=>(
+                      <>
+                        {idx===1&&<span style={{fontSize:30,fontWeight:900,color:MUT,paddingBottom:4}}>:</span>}
+                        <div key={idx} style={{textAlign:"center"}}>
+                          <div style={{fontSize:11,color:MUT,fontWeight:700,textTransform:"uppercase",marginBottom:9,maxWidth:110,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lab}</div>
+                          <div style={{display:"flex",alignItems:"center",gap:9}}>
+                            <button onClick={()=>set(Math.max(0,val-1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,border:"none",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>−</button>
+                            <span style={{fontSize:36,fontWeight:900,width:34,textAlign:"center",...gt}}>{val}</span>
+                            <button onClick={()=>set(Math.min(7,val+1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,border:"none",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>+</button>
+                          </div>
                         </div>
+                      </>
+                    ))}
+                  </div>
+                ):(
+                  /* Genaue Sätze — dann steht in der Historie, was wirklich gespielt wurde */
+                  <div>
+                    <div style={{display:"flex",gap:10,marginBottom:9,paddingLeft:52}}>
+                      <div style={{flex:1,fontSize:10.5,color:MUT,fontWeight:700,textTransform:"uppercase",textAlign:"center"}}>Du</div>
+                      <div style={{width:10}}/>
+                      <div style={{flex:1,fontSize:10.5,color:MUT,fontWeight:700,textTransform:"uppercase",textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{fTarget.name}</div>
+                    </div>
+                    {fSets.map((s,i)=>(
+                      <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
+                        <span style={{width:42,flexShrink:0,fontSize:11,color:MUT,fontWeight:700}}>Satz {i+1}</span>
+                        <input type="number" inputMode="numeric" min={0} max={30} value={s.p1}
+                          onChange={e=>setFSets(v=>v.map((x,j)=>j===i?{...x,p1:e.target.value}:x))}
+                          placeholder="11"
+                          style={{flex:1,minWidth:0,background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
+                        <span style={{width:10,textAlign:"center",color:MUT,fontWeight:800}}>:</span>
+                        <input type="number" inputMode="numeric" min={0} max={30} value={s.p2}
+                          onChange={e=>setFSets(v=>v.map((x,j)=>j===i?{...x,p2:e.target.value}:x))}
+                          placeholder="7"
+                          style={{flex:1,minWidth:0,background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
+                        {i>=3&&(
+                          <button onClick={()=>setFSets(v=>v.filter((_,j)=>j!==i))} style={{background:"none",border:"none",color:MUT,fontSize:16,cursor:"pointer",flexShrink:0}}>×</button>
+                        )}
                       </div>
-                    </>
-                  ))}
-                </div>
+                    ))}
+                    {fSets.length<7&&(
+                      <button onClick={()=>setFSets(v=>[...v,{p1:"",p2:""}])}
+                        style={{width:"100%",background:"none",border:`1px dashed ${CELL}`,borderRadius:12,padding:10,color:MUT,fontSize:12.5,cursor:"pointer",fontFamily:"inherit"}}>+ Satz</button>
+                    )}
+                    <div style={{textAlign:"center",fontSize:13,fontWeight:800,marginTop:11,...gt}}>
+                      {satzBilanz().my} : {satzBilanz().opp} Sätze
+                    </div>
+                  </div>
+                )}
+
+                {/* Umschalter: schnell zählen oder genau eintragen */}
+                <button onClick={()=>setFDetail(v=>!v)}
+                  style={{display:"block",width:"100%",marginTop:14,background:"none",border:"none",color:MUT,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",padding:6,textDecoration:"underline"}}>
+                  {fDetail?"Nur Sätze zählen":"Satzergebnisse genau eintragen"}
+                </button>
                 {/* Freundschaftsspiel: Ergebnis wird gespeichert und im Chat gezeigt, zählt aber nicht */}
                 <button onClick={()=>setFFriendly(v=>!v)} style={{display:"flex",alignItems:"center",gap:11,width:"100%",marginTop:20,background:CELL,border:"none",borderRadius:14,padding:"13px 14px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
                   <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:fFriendly?GRAD:"transparent",border:fFriendly?"none":`1.5px solid ${MUT}`,color:"#06210F",fontSize:13,fontWeight:900}}>{fFriendly?"✓":""}</span>
