@@ -48,11 +48,15 @@ export const MONTHLY_PENALTY_ELO = 20    // Abzug, wenn nicht erreicht
 // Die vier Ligen. Gespielt wird paarweise (Rookie+Challenger in einer Tabelle,
 // Advanced+Elite in der anderen) — die Liga selbst ist aber echt und hat ihre
 // eigene Rangliste. Wer im Level aufsteigt, wechselt die Liga.
+// Der Schnitt folgt der Saison-Einteilung: Einstieg = Level 1–3, Pro = Level 4–7.
+// Vorher lag Challenger auf 3–4 und damit quer über beide Saisons — ein Level-4-
+// Spieler sass in der Pro-Saison, gehörte aber ins Einstieg-Paar und konnte
+// deshalb niemanden fordern.
 export const LIGEN = [
   { key: "rookie",     name: "Rookie",     levels: [1, 2], pair: "einstieg" },
-  { key: "challenger", name: "Challenger", levels: [3, 4], pair: "einstieg" },
-  { key: "advanced",   name: "Advanced",   levels: [5, 6], pair: "pro" },
-  { key: "elite",      name: "Elite",      levels: [7],    pair: "pro" },
+  { key: "challenger", name: "Challenger", levels: [3],    pair: "einstieg" },
+  { key: "advanced",   name: "Advanced",   levels: [4, 5], pair: "pro" },
+  { key: "elite",      name: "Elite",      levels: [6, 7], pair: "pro" },
 ] as const
 
 export type LigaKey = (typeof LIGEN)[number]["key"]

@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
   const admin = createAdminClient()
   const { data: match } = await admin
     .from("league_matches")
-    .select("p1_id,p2_id,status")
+    .select("p1_id,p2_id,status,ranked")
     .eq("id", match_id)
     .single()
 
@@ -87,7 +87,7 @@ export async function POST(req: NextRequest) {
           wSets: iWon ? meWins : oppWins,
           lSets: iWon ? oppWins : meWins,
           detail: setsArr.map(s => `${s.p1}:${s.p2}`).join(" · "),
-          ranked: true,
+          ranked: match.ranked !== false,   // Freundschaftsspiele stehen nicht als gewertet drin
           pending: true,               // wartet noch auf die Bestätigung des Gegners
           enteredBy: nameOf(user.id),
         }),
@@ -145,6 +145,7 @@ export async function POST(req: NextRequest) {
         eloAfter: oppAfter,
         rankNow,
         confirmUrl,
+        ranked: match.ranked !== false,   // sonst verspricht die Mail ELO, wo keine kommt
       })
     }
   } catch (e) {

@@ -54,12 +54,22 @@ export async function applyMonthlyPenalties(admin: SupabaseClient): Promise<numb
 
   let abzuege = 0
 
+  const { bis: vormonatEnde } = monthRange(vormonat)
+
   for (const s of seasons || []) {
     const { data: regs } = await admin
-      .from("league_registrations").select("player_id").eq("season_id", s.id)
+      .from("league_registrations").select("player_id,created_at").eq("season_id", s.id)
 
     for (const r of regs || []) {
       const pid = r.player_id as string
+
+      // Wer erst NACH dem abzurechnenden Monat beigetreten ist, wird nicht für
+      // einen Monat bestraft, in dem er gar nicht dabei war. Und wer erst
+      // mittendrin dazukam, bekommt den ersten Monat geschenkt.
+      const beitritt = r.created_at ? new Date(r.created_at as string) : null
+      const { von: vormonatStart } = monthRange(vormonat)
+      if (beitritt && beitritt >= new Date(vormonatStart)) continue
+      if (beitritt && beitritt >= new Date(vormonatEnde)) continue
 
       // Schon abgerechnet? Dann überspringen.
       const { count: schon } = await admin
@@ -138,6 +148,10 @@ export async function warnMonthlyOpen(admin: SupabaseClient): Promise<number> {
       const { data: p } = await admin.from("profiles").select("name,elo").eq("id", pid).single()
       if (!p) continue
 
+      // warned_month wird NUR gesetzt, wenn die Mail tatsächlich rausging.
+      // Vorher galt jemand auch dann als gewarnt, wenn der Versand scheiterte —
+      // und kassierte die Strafe ohne je eine Warnung gesehen zu haben.
+      let verschickt = false
       try {
         const { data: authUser } = await admin.auth.admin.getUserById(pid)
         const mail = authUser?.user?.email
@@ -151,15 +165,18 @@ export async function warnMonthlyOpen(admin: SupabaseClient): Promise<number> {
             daysLeft: tageBleiben,
             penalty: MONTHLY_PENALTY_ELO,
           })
+          verschickt = true
           gewarnt++
         }
       } catch (e) {
         console.error("Warn-Mail fehlgeschlagen für", pid, e)
       }
 
-      await admin.from("league_registrations")
-        .update({ warned_month: monat })
-        .eq("season_id", s.id).eq("player_id", pid)
+      if (verschickt) {
+        await admin.from("league_registrations")
+          .update({ warned_month: monat })
+          .eq("season_id", s.id).eq("player_id", pid)
+      }
     }
   }
 

@@ -17,13 +17,13 @@ async function run(req: NextRequest) {
   const confirmed = await autoConfirmOverdue(admin)
   const reminded = await remindStuckOnboarding(admin)
 
-  // Aktivitätspflicht: am 1. den Vormonat abrechnen, ab dem 25. warnen.
-  // Beides idempotent — läuft der Cron doppelt, passiert nichts.
+  // Aktivitätspflicht: den Vormonat abrechnen, ab dem 25. warnen.
+  // Die Abrechnung läuft JEDEN Tag, nicht nur am 1. — sie ist idempotent
+  // (elo_history.note), und fiel der Cron am 1. aus, wurde der Monat vorher
+  // nie nachgeholt.
   let penalties = 0
-  if (new Date().getDate() === 1) {
-    try { penalties = await applyMonthlyPenalties(admin) }
-    catch (e) { console.error("Monatsabrechnung fehlgeschlagen:", e) }
-  }
+  try { penalties = await applyMonthlyPenalties(admin) }
+  catch (e) { console.error("Monatsabrechnung fehlgeschlagen:", e) }
 
   let warned = 0
   try { warned = await warnMonthlyOpen(admin) }
@@ -34,7 +34,10 @@ async function run(req: NextRequest) {
   let inactivity: unknown = null
   try {
     const base = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
+    // POST, nicht GET: die Route exportiert nur POST — der Aufruf lief bisher
+    // in einen 405, der Inaktivitäts-Abzug hat also nie stattgefunden.
     const r = await fetch(`${base}/api/liga/inactivity`, {
+      method: "POST",
       headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
       signal: AbortSignal.timeout(20000),
     })

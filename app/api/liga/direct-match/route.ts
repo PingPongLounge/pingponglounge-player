@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
-import { MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
+import { MAX_RANKED_PER_OPPONENT, ligaForLevel } from "@/lib/rewards"
 
 // Erstellt ein neues Match direkt im Status "accepted" zwischen dem eingeloggten
 // Spieler und einem Gegner innerhalb derselben Liga-Saison.
@@ -28,6 +28,16 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Spieler nicht in dieser Saison registriert" }, { status: 403 })
   }
 
+  // Nur im eigenen Paar (Rookie+Challenger / Advanced+Elite). Ohne diese Prüfung
+  // konnte ein Rookie ein gewertetes Ergebnis gegen einen Elite-Spieler eintragen
+  // — die Regel stand bisher nur im UI.
+  const { data: lvls } = await admin.from("profiles").select("id,level").in("id", [user.id, opponent_id])
+  const meinPaar = ligaForLevel((lvls || []).find(p => p.id === user.id)?.level)?.pair
+  const seinPaar = ligaForLevel((lvls || []).find(p => p.id === opponent_id)?.level)?.pair
+  if (!meinPaar || !seinPaar || meinPaar !== seinPaar) {
+    return NextResponse.json({ error: "Dieser Spieler ist nicht in deiner Liga" }, { status: 400 })
+  }
+
   // Kein offenes Match zwischen diesen zwei Spielern?
   const { data: existing } = await admin
     .from("league_matches")
@@ -52,7 +62,7 @@ export async function POST(req: NextRequest) {
 
   const round = season?.current_round ?? 1
 
-  // Limit: max. 7 GEWERTETE Spiele gegen denselben Gegner pro Saison.
+  // Limit: max. MAX_RANKED_PER_OPPONENT gewertete Spiele gegen denselben Gegner.
   // Darüber hinaus darf man weiterspielen und eintragen — es zählt dann nur
   // nicht mehr für ELO und Rang. Verhindert, dass jemand von einem Kumpel
   // durch wiederholtes Absichtsverlieren nach oben geschoben wird.

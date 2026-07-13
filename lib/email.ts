@@ -215,8 +215,10 @@ export async function sendResultConfirmRequest(opts: {
   eloAfter: number
   rankNow: number | null
   confirmUrl: string     // signierter Ein-Klick-Link
+  ranked?: boolean       // zählt das Spiel für ELO und Rang?
 }) {
-  const delta = opts.eloAfter - opts.eloNow
+  const gewertet = opts.ranked !== false
+  const delta = gewertet ? opts.eloAfter - opts.eloNow : 0
   const deltaColor = delta >= 0 ? G : "#FF5C5C"
   const deltaLabel = `${delta >= 0 ? "+" : ""}${delta}`
   const appUrl = `${BASE_URL}/liga/match/${opts.matchId}`
@@ -241,8 +243,13 @@ export async function sendResultConfirmRequest(opts: {
             </td>
             <td style="vertical-align:middle;text-align:right">
               <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">ELO</div>
+              ${gewertet ? `
               <div style="font-size:20px;font-weight:900;color:#fff">${opts.eloNow} <span style="color:rgba(255,255,255,.35);font-weight:700">→</span> ${opts.eloAfter}</div>
               <div style="font-size:15px;font-weight:900;color:${deltaColor};margin-top:2px">${deltaLabel}</div>
+              ` : `
+              <div style="font-size:20px;font-weight:900;color:#fff">${opts.eloNow}</div>
+              <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.45);margin-top:2px">bleibt gleich</div>
+              `}
             </td>
           </tr>
         </table>
@@ -256,13 +263,15 @@ export async function sendResultConfirmRequest(opts: {
         </div>
       </div>
 
-      <p style="font-size:12px;color:rgba(255,255,255,.45);text-align:center;margin:0 0 16px">So sieht es aus, wenn du bestätigst.</p>
+      <p style="font-size:12px;color:rgba(255,255,255,.45);text-align:center;margin:0 0 16px">
+        ${gewertet ? "So sieht es aus, wenn du bestätigst." : "Freundschaftsspiel — es zählt nicht für ELO und Rang."}
+      </p>
 
       ${outlineButton(opts.confirmUrl, "Ergebnis bestätigen")}
       <a href="${appUrl}" style="display:block;text-align:center;margin-top:9px;color:rgba(255,255,255,.6);font-size:13px;text-decoration:none;padding:12px;border:1px solid rgba(255,255,255,.16);border-radius:14px">Stimmt nicht — hier widersprechen</a>
 
       <p style="color:rgba(255,255,255,.5);font-size:12.5px;line-height:1.5;margin:18px 0 0">
-        Du hast <strong style="color:#fff">24 Stunden</strong> Zeit. Reagierst du nicht, wird das Ergebnis automatisch bestätigt und für ELO &amp; Rangliste gewertet.
+        Du hast <strong style="color:#fff">24 Stunden</strong> Zeit. Reagierst du nicht, wird das Ergebnis automatisch bestätigt${gewertet ? " und für ELO &amp; Rangliste gewertet" : " — gewertet wird es nicht"}.
       </p>
     `),
   })

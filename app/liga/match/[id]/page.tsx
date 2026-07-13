@@ -10,7 +10,7 @@ import {
 import { MATCH_SPRUECHE } from "@/lib/rewards"
 
 type SetScore={p1:string,p2:string}
-type MatchData={id:string,season_id:string,round:number,p1_id:string,p1_name:string,p2_id:string,p2_name:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,status:string}
+type MatchData={id:string,season_id:string,round:number,p1_id:string,p1_name:string,p2_id:string,p2_name:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,status:string,entered_by:string|null}
 
 // Next 16: params ist in Client Components IMMER ein Promise. Der synchrone
 // Zugriff (matchId) lieferte undefined — die Seite hing ewig auf "Lädt …".
@@ -34,7 +34,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
       if(!user){window.location.href="/login";return}
       setUserId(user.id)
       const {data}=await sb.from("league_matches")
-        .select("id,season_id,round,p1_id,p2_id,sets,winner_id,status")
+        .select("id,season_id,round,p1_id,p2_id,sets,winner_id,status,entered_by")
         .eq("id",matchId).maybeSingle()
       if(data){
         // Namen über public_profiles — RLS auf profiles gibt jedem nur die EIGENE
@@ -165,8 +165,10 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
           </div>
         )}
 
-        {/* P1: enter result */}
-        {(isP1||isP2)&&match.status==="pending"&&!submitted&&(
+        {/* Ergebnis eintragen — auch bei "accepted". direct-match legt Matches in
+            genau diesem Status an; das Formular hing nur an "pending", weshalb
+            "Weiteres Spiel eintragen" auf einer leeren Seite endete. */}
+        {(isP1||isP2)&&(match.status==="pending"||match.status==="accepted")&&!submitted&&(
           <div>
             <div style={{...label,marginBottom:12}}>Ergebnis eingeben (Sätze)</div>
             {sets.map((s,i)=>(
@@ -186,12 +188,13 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
           </div>
         )}
 
-        {/* P2: confirm */}
-        {isP2&&match.status==="p1_entered"&&(
+        {/* Bestätigen darf, wer NICHT eingetragen hat — nicht "p2". Eintragen
+            dürfen beide, also war der Button vorher regelmässig beim Falschen. */}
+        {(isP1||isP2)&&match.status==="p1_entered"&&match.entered_by!==userId&&(
           <div>
             <div style={{...cardPad,marginBottom:16}}>
               <p style={{fontSize:13,color:"#FACC15",fontWeight:700,marginBottom:4}}>⏳ Ergebnis eingereicht</p>
-              <p style={{...meta}}>{match.p1_name} hat folgendes Ergebnis eingetragen:</p>
+              <p style={{...meta}}>{match.entered_by===match.p1_id?match.p1_name:match.p2_name} hat folgendes Ergebnis eingetragen:</p>
               {match.sets&&<p style={{fontSize:15,fontWeight:700,color:W,marginTop:8}}>{match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ")}</p>}
             </div>
             {error&&<p style={{color:DANGER,fontSize:13,marginBottom:8}}>{error}</p>}
@@ -202,11 +205,11 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
           </div>
         )}
 
-        {/* Waiting state for P1 */}
-        {isP1&&match.status==="p1_entered"&&(
+        {/* Wer eingetragen hat, wartet */}
+        {(isP1||isP2)&&match.status==="p1_entered"&&match.entered_by===userId&&(
           <div style={{...cardPad,textAlign:"center"}}>
             <p style={{fontSize:32,marginBottom:8}}>⏳</p>
-            <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:4}}>Warten auf {match.p2_name}</p>
+            <p style={{fontSize:15,fontWeight:700,color:W,marginBottom:4}}>Warten auf {isP1?match.p2_name:match.p1_name}</p>
             <p style={{...meta}}>Automatisch bestätigt nach 24 h.</p>
           </div>
         )}

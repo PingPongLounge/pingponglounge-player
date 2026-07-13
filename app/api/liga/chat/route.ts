@@ -7,8 +7,15 @@ export async function GET(req: NextRequest) {
   const { data: { user } } = await sb.auth.getUser()
   const seasonId = req.nextUrl.searchParams.get("season_id")
   if (!seasonId) return NextResponse.json({ messages: [] })
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const admin = createAdminClient()
+
+  // Mitlesen darf nur, wer in dieser Liga ist. Bisher konnte jeder eingeloggte
+  // Nutzer den Chat JEDER Saison abrufen — schreiben war geschützt, lesen nicht.
+  const { data: mitglied } = await admin.from("league_registrations")
+    .select("id").eq("season_id", seasonId).eq("player_id", user.id).maybeSingle()
+  if (!mitglied) return NextResponse.json({ messages: [] })
   const { data: msgs } = await admin
     .from("league_messages")
     .select("id,user_id,text,created_at,kind,match_id,parent_id")

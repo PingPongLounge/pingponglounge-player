@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendChallengeNotice } from "@/lib/email"
+import { ligaForLevel, MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
@@ -20,18 +21,38 @@ export async function POST(req: NextRequest) {
   if (!regs || regs.length < 2)
     return NextResponse.json({ error: "Spieler nicht angemeldet" }, { status: 400 })
 
-  // Kein doppelter offener Challenge
+  // Kein doppelter offener Challenge. "accepted" gehörte hier immer schon dazu —
+  // sonst konnte man neben einem angenommenen Match ein zweites eröffnen, das
+  // im UI unsichtbar blieb.
   const { data: existing } = await admin.from("league_matches")
     .select("id").eq("season_id", season_id)
-    .in("status", ["challenge_sent", "pending", "p1_entered"])
+    .in("status", ["challenge_sent", "accepted", "pending", "p1_entered"])
     .or(`and(p1_id.eq.${user.id},p2_id.eq.${challenged_id}),and(p1_id.eq.${challenged_id},p2_id.eq.${user.id})`)
     .maybeSingle()
   if (existing)
     return NextResponse.json({ error: "Bereits ein offenes Match" }, { status: 400 })
 
+  // Nur im eigenen Paar fordern (Rookie+Challenger / Advanced+Elite). Die Regel
+  // stand bisher nur im UI — über die API war sie wirkungslos.
+  const { data: lvls } = await admin.from("profiles").select("id,level").in("id", [user.id, challenged_id])
+  const meinPaar = ligaForLevel((lvls || []).find(p => p.id === user.id)?.level)?.pair
+  const seinPaar = ligaForLevel((lvls || []).find(p => p.id === challenged_id)?.level)?.pair
+  if (!meinPaar || !seinPaar || meinPaar !== seinPaar)
+    return NextResponse.json({ error: "Nicht in deiner Liga" }, { status: 400 })
+
+  // Das Limit gegen denselben Gegner galt bisher NUR beim direkten Eintragen.
+  // Über "Fordern" liess es sich beliebig oft umgehen — genau das, was
+  // MAX_RANKED_PER_OPPONENT verhindern soll.
+  const { count: gewertet } = await admin.from("league_matches")
+    .select("id", { count: "exact", head: true })
+    .eq("season_id", season_id).eq("ranked", true)
+    .in("status", ["p1_entered", "confirmed"])
+    .or(`and(p1_id.eq.${user.id},p2_id.eq.${challenged_id}),and(p1_id.eq.${challenged_id},p2_id.eq.${user.id})`)
+  const ranked = (gewertet ?? 0) < MAX_RANKED_PER_OPPONENT
+
   const { data, error } = await admin.from("league_matches").insert({
     season_id, p1_id: user.id, p2_id: challenged_id,
-    status: "challenge_sent", round: 0,
+    status: "challenge_sent", round: 0, ranked,
   }).select("id").single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

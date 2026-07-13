@@ -601,7 +601,9 @@ export default function LigaPage(){
             </div>
             <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Wähl deinen Gegner — danach trägst du das Resultat ein.</div>
             <div style={{background:CELL,borderRadius:14,overflow:"hidden"}}>
-              {rows.filter(r=>r.user_id!==userId).map((r,i)=>(
+              {/* Nur Gegner aus dem eigenen Paar — sonst trägt ein Rookie ein
+                  gewertetes Ergebnis gegen einen Elite-Spieler ein. */}
+              {rows.filter(r=>r.user_id!==userId&&imPaar(r)).map((r,i)=>(
                 <button key={r.user_id} onClick={()=>{setPickOpen(false); openForder(r,"result")}}
                   style={{display:"flex",alignItems:"center",gap:11,width:"100%",padding:"13px 14px",background:"none",border:"none",borderTop:i===0?"none":`1px solid ${LINE}`,cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
                   <div style={{flex:1,minWidth:0}}>
@@ -690,8 +692,8 @@ export default function LigaPage(){
                     ))}
                   </div>}
 
-              {/* Direkt fordern */}
-              {pOpen!==userId&&myReg&&(
+              {/* Direkt fordern — auch hier nur im eigenen Paar */}
+              {pOpen!==userId&&myReg&&(()=>{const row=rows.find(r=>r.user_id===pOpen); return !!row&&imPaar(row)})()&&(
                 <button onClick={()=>{const row=rows.find(r=>r.user_id===pOpen); setPOpen(null); if(row) openForder(row)}}
                   style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:"pointer",fontFamily:"inherit"}}>
                   Fordern
