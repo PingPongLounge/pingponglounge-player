@@ -28,7 +28,7 @@ export default function TrainingPage() {
     <main style={{ minHeight: "100vh", background: BG, padding: "0 0 100px" }}>
       <SectionTopBar section="Training" />
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "6px 16px 0" }}>
-        <SectionHero eyebrow="Player · Academy" title="Training" subtitle="Wöchentliches Coaching von Beginner bis Pro · Glattbrugg." />
+        <SectionHero eyebrow="Player · Academy" title="Training" subtitle="Coaching von Beginner bis Pro · Glattbrugg." img="/training-hero.jpg" />
         <SectionIntro storageKey="intro_training" title="So funktioniert das Training" steps={[["1", "Kurs wählen", "Von Beginner bis Pro — wöchentlich in der Lounge Glattbrugg."], ["2", "Termin sichern", "Anmeldung & Bezahlung laufen direkt über Eversports."], ["3", "Besser werden", "Regelmässiges Coaching, Drills und Matchpraxis."]]} />
 
         {/* Dein nächstes Training */}
