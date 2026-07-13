@@ -324,17 +324,58 @@ export default function LigaPage(){
       )}
 
       <div style={{maxWidth:480,margin:"0 auto"}}>
-        {/* Foto-Hero — halbiert. Statt Werbespruch trägt er jetzt die Fakten:
-            welche Klasse, welche Stadt, wie viele Spieler. */}
-        <div style={{position:"relative",height:132,margin:"14px 14px 0",borderRadius:22,overflow:"hidden",boxShadow:SHADOW}}>
-          <img src="/liga-hero.jpg" alt="" style={{width:"100%",height:132,objectFit:"cover",display:"block"}}/>
-          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(20,23,30,.1) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.9) 100%)"}}/>
-          <div style={{position:"absolute",left:20,right:20,bottom:14}}>
-            <div style={{fontSize:34,fontWeight:900,lineHeight:.9,textTransform:"uppercase",letterSpacing:"-.02em",color:W}}>Liga</div>
-            <div style={{fontSize:12,color:SUB,fontWeight:400,marginTop:5}}>
-              {sel?(isPro(sel)?"Pro":"Einstieg"):""}{city?` · ${city}`:""}{count?` · ${count} Spieler`:""}
+        {/* EIN Block: Bild, Position, Monatspflicht — durch Linien getrennt statt
+            durch Lücken. Vorher schwebten zwei Kästchen mit Abstand übereinander,
+            obwohl sie dasselbe erzählen: deine Liga. */}
+        <div style={{margin:"14px 14px 0",borderRadius:22,overflow:"hidden",boxShadow:SHADOW,background:HERO}}>
+          {/* Bild */}
+          <div style={{position:"relative",height:132}}>
+            <img src="/liga-hero.jpg" alt="" style={{width:"100%",height:132,objectFit:"cover",display:"block"}}/>
+            <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(20,23,30,.1) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.92) 100%)"}}/>
+            <div style={{position:"absolute",left:20,right:20,bottom:13}}>
+              <div style={{fontSize:34,fontWeight:900,lineHeight:.9,textTransform:"uppercase",letterSpacing:"-.02em",color:W}}>Liga</div>
+              <div style={{fontSize:12,color:SUB,fontWeight:400,marginTop:5}}>
+                {sel?(isPro(sel)?"Pro":"Einstieg"):""}{city?` · ${city}`:""}{count?` · ${count} Spieler`:""}
+              </div>
             </div>
           </div>
+
+          {myReg&&myRow&&(<>
+            {/* Deine Position */}
+            <div style={{display:"flex",alignItems:"center",gap:16,padding:"16px 20px",borderTop:`1px solid ${LINE}`}}>
+              <div style={{fontSize:44,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{myIndex+1}</div>
+              <div>
+                <div style={{fontSize:10.5,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position</div>
+                <div style={{fontSize:13.5,color:SUB,fontWeight:400,marginTop:3}}>{myRow.level?`Level ${myRow.level}`:""} · ELO {myRow.elo}</div>
+              </div>
+            </div>
+            {/* Monatspflicht */}
+            <div style={{display:"flex",alignItems:"center",gap:13,padding:"13px 20px 16px",borderTop:`1px solid ${LINE}`}}>
+              <div style={{fontSize:22,fontWeight:900,lineHeight:1,flexShrink:0,...(monatOk?gt:{color:W})}}>
+                {monatCount}<span style={{fontSize:13,color:MUT,fontWeight:800}}>/{MIN_MATCHES_PER_MONTH}</span>
+              </div>
+              <div style={{flex:1,minWidth:0}}>
+                <div style={{fontSize:12,fontWeight:800,color:W}}>Liga-Matches diesen Monat</div>
+                <div style={{fontSize:11,color:monatOk?SUB:MUT,marginTop:2,lineHeight:1.4}}>
+                  {monatOk
+                    ? "Soll erfüllt — jedes weitere Spiel bringt Punkte."
+                    : `Noch ${MIN_MATCHES_PER_MONTH-monatCount} bis Monatsende, sonst −${MONTHLY_PENALTY_ELO} Punkte.`}
+                </div>
+                <div style={{height:3,borderRadius:99,background:CELL,marginTop:7,overflow:"hidden"}}>
+                  <div style={{height:"100%",width:`${Math.min(100,(monatCount/MIN_MATCHES_PER_MONTH)*100)}%`,background:GRAD}}/>
+                </div>
+              </div>
+            </div>
+            {/* Ergebnis eintragen — gehört in denselben Block, aber leise:
+                eine Zeile, kein Werbeplakat. */}
+            {rows.length>1&&(
+              <button onClick={()=>setPickOpen(true)}
+                style={{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",background:"none",border:"none",borderTop:`1px solid ${LINE}`,padding:"13px 20px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
+                <span style={{fontSize:13,fontWeight:800,letterSpacing:".02em",...gt}}>Ergebnis eintragen</span>
+                <span style={{fontSize:15,fontWeight:800,color:GREEN}}>→</span>
+              </button>
+            )}
+          </>)}
         </div>
 
         {loading?(
@@ -361,48 +402,6 @@ export default function LigaPage(){
                 ))}
                 <button onClick={join} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:6,background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":"Liga beitreten"}</button>
               </div>
-            </div>
-          )}
-
-          {/* EINE Karte: wo du stehst UND was du tun musst, um dort zu bleiben.
-              Vorher waren das zwei Karten übereinander — dieselbe Sache, zweimal. */}
-          {myReg&&myRow&&(
-            <div style={{padding:"14px 14px 0"}}>
-              <div style={{background:HERO,borderRadius:22,boxShadow:SHADOW,overflow:"hidden"}}>
-                <div style={{display:"flex",alignItems:"center",gap:16,padding:"18px 20px"}}>
-                  <div style={{fontSize:46,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{myIndex+1}</div>
-                  <div>
-                    <div style={{fontSize:10.5,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position</div>
-                    <div style={{fontSize:13.5,color:SUB,fontWeight:400,marginTop:3}}>{myRow.level?`Level ${myRow.level}`:""} · ELO {myRow.elo}</div>
-                  </div>
-                </div>
-                <div style={{display:"flex",alignItems:"center",gap:13,padding:"13px 20px 16px",borderTop:`1px solid ${LINE}`}}>
-                  <div style={{fontSize:22,fontWeight:900,lineHeight:1,flexShrink:0,...(monatOk?gt:{color:W})}}>
-                    {monatCount}<span style={{fontSize:13,color:MUT,fontWeight:800}}>/{MIN_MATCHES_PER_MONTH}</span>
-                  </div>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:12,fontWeight:800,color:W}}>Liga-Matches diesen Monat</div>
-                    <div style={{fontSize:11,color:monatOk?SUB:MUT,marginTop:2,lineHeight:1.4}}>
-                      {monatOk
-                        ? "Soll erfüllt — jedes weitere Spiel bringt Punkte."
-                        : `Noch ${MIN_MATCHES_PER_MONTH-monatCount} bis Monatsende, sonst −${MONTHLY_PENALTY_ELO} Punkte.`}
-                    </div>
-                    <div style={{height:3,borderRadius:99,background:CELL,marginTop:7,overflow:"hidden"}}>
-                      <div style={{height:"100%",width:`${Math.min(100,(monatCount/MIN_MATCHES_PER_MONTH)*100)}%`,background:GRAD}}/>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {/* Ergebnis eintragen — die wichtigste Handlung, deshalb ganz vorn. */}
-          {myReg&&rows.length>1&&(
-            <div style={{padding:"12px 14px 0"}}>
-              <button onClick={()=>setPickOpen(true)}
-                style={{display:"flex",alignItems:"center",justifyContent:"center",gap:9,width:"100%",background:GRAD,color:"#06210F",borderRadius:16,padding:"16px",fontSize:15.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:"pointer",fontFamily:"inherit",boxShadow:SHADOW}}>
-                Ergebnis eintragen
-              </button>
             </div>
           )}
 
