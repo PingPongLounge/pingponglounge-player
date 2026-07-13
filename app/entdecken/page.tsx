@@ -27,13 +27,6 @@ function Logo() {
   )
 }
 
-const CIRCLES: [string, string, string][] = [
-  ['Open Game', '/match', 'open-game-black'],
-  ['Liga', '/liga', 'liga-black'],
-  ['Turniere', '/turniere', 'turnier-black'],
-  ['Tisch buchen', '/buchen', 'tisch-black'],
-]
-
 function initialsFrom(name?: string | null): string {
   if (!name) return 'PP'
   const parts = name.trim().split(/\s+/).filter(Boolean)
@@ -47,31 +40,79 @@ export default async function EntdeckenPage() {
   const { data: { user } } = await sb.auth.getUser()
 
   if (!user) {
+    // Wie viele spielen schon mit? Der stärkste Grund mitzumachen ist,
+    // dass es bereits läuft.
+    const { count: spielerCount } = await sb
+      .from('public_profiles')
+      .select('id', { count: 'exact', head: true })
+
+    const CARD: React.CSSProperties = { background: '#2A2F39', borderRadius: 22, padding: 20, marginBottom: 12, boxShadow: '0 1px 4px rgba(0,0,0,.14)' }
+    const CHEAD: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, marginBottom: 8 }
+    const CTITLE: React.CSSProperties = { fontSize: 19, fontWeight: 900, letterSpacing: '-.01em', color: W }
+    const CSUB: React.CSSProperties = { fontSize: 13.5, color: MUT, textAlign: 'center', lineHeight: 1.5, margin: 0 }
+    const GHOST: React.CSSProperties = { display: 'block', textAlign: 'center', marginTop: 14, border: '1px solid #353B46', borderRadius: 13, padding: 12, fontSize: 13, fontWeight: 700, color: SUB, textDecoration: 'none' }
+    const FACT: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderTop: '1px solid rgba(255,255,255,.07)' }
+    const FK: React.CSSProperties = { fontSize: 12.5, color: MUT, fontWeight: 500 }
+    const FV: React.CSSProperties = { fontSize: 13, fontWeight: 800, color: W }
+
     return (
-      <main style={{ minHeight: '100vh', background: BG, paddingBottom: 100, position: 'relative' }}>
-        <div style={{ maxWidth: 480, margin: '0 auto', minHeight: '100vh', position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '0 18px 110px' }}>
-          <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(180deg, rgba(20,23,30,.35) 0%, rgba(20,23,30,.72) 50%, rgba(20,23,30,.97) 100%), url('/hero-poster.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-          <div style={{ position: 'relative', zIndex: 2 }}>
-            {/* Logo-Block: P mittig über PLAYER, Tagline exakt auf Wortmarken-Breite */}
-            <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'stretch' }}>
-              <div style={{ display: 'flex', justifyContent: 'center' }}><Logo /></div>
-              <div style={{ fontSize: 14, fontWeight: 700, letterSpacing: '.26em', marginTop: 8, textAlign: 'center', ...gt }}>PLAYER</div>
-              <div style={{ fontSize: 9, fontWeight: 600, color: MUT, textTransform: 'uppercase', marginTop: 5, textAlign: 'justify', textAlignLast: 'justify' }}>Next Level Table Tennis</div>
+      <main style={{ minHeight: '100vh', background: BG, paddingBottom: 100 }}>
+        <div style={{ maxWidth: 480, margin: '0 auto' }}>
+
+          {/* Hero — dasselbe Bild wie in Liga, Open Game und Turnier */}
+          <div style={{ position: 'relative', minHeight: 430, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '26px 22px 28px' }}>
+            <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(180deg, rgba(20,23,30,.2) 0%, rgba(20,23,30,.72) 52%, ${BG} 100%), url('/gl-tische.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+
+            <div style={{ position: 'relative', zIndex: 2 }}>
+              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 22 }}>
+                <Logo />
+                <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'stretch' }}>
+                  <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: '.26em', lineHeight: 1, ...gt }}>PLAYER</div>
+                  <div style={{ fontSize: 8, fontWeight: 700, color: MUT, textTransform: 'uppercase', marginTop: 5, textAlign: 'justify', textAlignLast: 'justify' }}>Next Level Table Tennis</div>
+                </div>
+                <span style={{ alignSelf: 'center', fontSize: 8.5, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#06210F', background: GRAD, borderRadius: 999, padding: '3px 8px' }}>Beta</span>
+              </div>
+
+              <h1 style={{ fontSize: 30, fontWeight: 900, lineHeight: 1.06, letterSpacing: '-.025em', margin: '0 0 10px', color: W }}>
+                Spiel. Trag ein.<br /><span style={gt}>Steig auf.</span>
+              </h1>
+              <p style={{ fontSize: 14, color: SUB, fontWeight: 300, lineHeight: 1.55, margin: '0 0 24px' }}>
+                Die Liga der Ping Pong Lounge. Fordere andere, trag dein Resultat ein — dein Rang aktualisiert sich sofort.
+              </p>
+
+              <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 15, padding: 17, fontSize: 16, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: '#06210F', background: GRAD, textDecoration: 'none' }}>Login / Registrieren</Link>
+              <Link href="/spielen" style={{ display: 'block', textAlign: 'center', marginTop: 13, color: SUB, fontSize: 13.5, fontWeight: 500, textDecoration: 'none' }}>Schon gespielt? Resultat eintragen →</Link>
             </div>
-            <div style={{ display: 'inline-block', fontSize: 9, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#06210F', background: GRAD, borderRadius: 999, padding: '3px 9px', marginTop: 10 }}>Beta Version</div>
-            <div style={{ marginTop: 26 }}>
-              <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 15, padding: 17, fontSize: 18, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.04em', color: '#06210F', background: GRAD, textDecoration: 'none' }}>Login / Registrieren</Link>
-              <Link href="/spielen" style={{ display: 'block', textAlign: 'center', marginTop: 12, color: SUB, fontSize: 14, fontWeight: 500, textDecoration: 'none' }}>Schon gespielt? Resultat eintragen →</Link>
+          </div>
+
+          {/* Dieselben Karten wie eingeloggt — wer sich registriert, erkennt die App wieder */}
+          <div style={{ padding: '8px 14px 18px' }}>
+            <div style={CARD}>
+              <div style={CHEAD}><img src="/icons/liga.svg" alt="" style={{ width: 26, height: 26 }} /><span style={CTITLE}>Liga</span></div>
+              <p style={CSUB}>Spiel in deiner Klasse, sammle ELO-Punkte, steig in der Rangliste.</p>
+              <div style={{ marginTop: 14 }}>
+                <div style={{ ...FACT, borderTop: 'none' }}><span style={FK}>Klassen</span><span style={FV}>Einstieg · Pro</span></div>
+                <div style={FACT}><span style={FK}>Spieler</span><span style={FV}>{spielerCount ?? 0} dabei</span></div>
+              </div>
+              <Link href="/login" style={GHOST}>Rangliste ansehen</Link>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', margin: '26px 0 0' }}>
-              {CIRCLES.map(([label, , icon]) => (
-                <Link key={label} href="/login" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, width: 64, textDecoration: 'none' }}>
-                  <div style={{ width: 56, height: 56, borderRadius: '50%', border: '2px solid transparent', background: `linear-gradient(#fff,#fff) padding-box, ${GRAD} border-box`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <img src={`/icons/${icon}.svg`} alt="" style={{ width: 32, height: 32 }} />
-                  </div>
-                  <div style={{ fontSize: 8.5, color: SUB, fontWeight: 600, textAlign: 'center', textTransform: 'uppercase', letterSpacing: '.04em' }}>{label}</div>
-                </Link>
-              ))}
+
+            <div style={CARD}>
+              <div style={CHEAD}><img src="/icons/open-game.svg" alt="" style={{ width: 26, height: 26 }} /><span style={CTITLE}>Open Game</span></div>
+              <p style={CSUB}>Tisch und Zeit reinstellen — wer Lust hat, spielt mit.</p>
+              <Link href="/login" style={GHOST}>Offene Spiele ansehen</Link>
+            </div>
+
+            <div style={CARD}>
+              <div style={CHEAD}><img src="/icons/turnier.svg" alt="" style={{ width: 26, height: 26 }} /><span style={CTITLE}>Turnier</span></div>
+              <p style={CSUB}>KO-Bracket, Podest, PingPoints. Zählt für deinen Rang.</p>
+              <Link href="/login" style={GHOST}>Turniere ansehen</Link>
+            </div>
+
+            <div style={CARD}>
+              <div style={CHEAD}><img src="/icons/paddles.svg" alt="" style={{ width: 26, height: 26 }} /><span style={CTITLE}>Training</span></div>
+              <p style={CSUB}>Coaching und Drills von Beginner bis Pro — in Glattbrugg.</p>
+              <Link href="/login" style={GHOST}>Trainings ansehen</Link>
             </div>
           </div>
         </div>
