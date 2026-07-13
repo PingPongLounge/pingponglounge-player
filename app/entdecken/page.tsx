@@ -77,7 +77,7 @@ export default async function EntdeckenPage() {
                 Spiel. Trag ein.<br /><span style={gt}>Steig auf.</span>
               </h1>
               <p style={{ fontSize: 14, color: SUB, fontWeight: 300, lineHeight: 1.55, margin: '0 0 24px' }}>
-                Die Liga der Ping Pong Lounge. Fordere andere, trag dein Resultat ein — dein Rang aktualisiert sich sofort.
+                Liga, Turniere und Trainings — vom Anfänger bis zum Profi. Fordere andere, trag dein Resultat ein, steig auf.
               </p>
 
               <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 15, padding: 17, fontSize: 16, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: '#06210F', background: GRAD, textDecoration: 'none' }}>Login / Registrieren</Link>
@@ -173,10 +173,10 @@ export default async function EntdeckenPage() {
   if (seasonId) {
     // "4-7" ist der interne Schlüssel, kein Name für Spieler. In der App heissen
     // die Klassen Einstieg (Level 1–3) und Pro (Level 4–7).
+    // Nicht der Klassen-Bereich ("4-7"), sondern die Klasse plus DEIN Level.
     const sc = season?.skill_class || ''
-    seasonLabel = /4|5|6|7/.test(sc) ? 'Pro · Level 4–7'
-      : /1|2|3/.test(sc) ? 'Einstieg · Level 1–3'
-      : (sc || 'Liga')
+    const klasse = /4|5|6|7/.test(sc) ? 'Pro' : /1|2|3/.test(sc) ? 'Einstieg' : (sc || 'Liga')
+    seasonLabel = lvl ? `${klasse} · Level ${lvl}` : klasse
     const { data: regs } = await sb.from('league_registrations').select('player_id').eq('season_id', seasonId)
     const ids = (regs || []).map(r => r.player_id)
     if (ids.length > 0) {
