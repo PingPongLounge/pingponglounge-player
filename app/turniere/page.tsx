@@ -45,7 +45,7 @@ export default function TurnierePage(){
     <main style={{minHeight:"100vh",background:BG,padding:"0 0 100px"}}>
       <SectionTopBar section="Turnier" />
       <div style={{maxWidth:560,margin:"0 auto",padding:"6px 16px 0"}}>
-        <SectionHero eyebrow="Player · Turnier" title="Turniere" subtitle="Community-Turniere · KO-Bracket · zählt für deinen Rang." />
+        <SectionHero eyebrow="Player · Turnier" title="Turniere" subtitle="KO-Bracket · zählt für deinen Rang." img="/turnier-hero.jpg" align="right" />
         <SectionIntro storageKey="intro_turniere" title="So funktioniert ein Turnier" steps={[["1","Turnier finden","Sieh dir offene Turniere in deiner Stadt an."],["2","Anmelden","Sichere dir deinen Platz, solang welche frei sind."],["3","KO-Bracket spielen","Gewinne dich nach oben — die Resultate zählen für ELO & Rang."]]} />
 
         <Link href="/turniere/neu" style={{...btn,margin:"18px 0 20px"}}>

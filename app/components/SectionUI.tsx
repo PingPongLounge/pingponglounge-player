@@ -26,12 +26,20 @@ export function SectionTopBar({ section }: { section: string }) {
   )
 }
 
-export function SectionHero({ eyebrow, title, subtitle, img = "/gl-tische.jpg" }: { eyebrow: string; title: string; subtitle: string; img?: string }) {
+export function SectionHero({ eyebrow, title, subtitle, img = "/gl-tische.jpg", align = "left" }: { eyebrow: string; title: string; subtitle: string; img?: string; align?: "left" | "right" }) {
+  // align="right": für Bilder, deren Motiv links liegt (z.B. der Bracket-Zettel
+  // beim Turnier). Sonst läge der Text mitten auf dem Motiv.
+  const right = align === "right"
   return (
     <div style={{ position: "relative", height: 190, margin: "14px 0 0", borderRadius: 24, overflow: "hidden", boxShadow: SHADOW }}>
       <img src={img} alt="" style={{ width: "100%", height: 190, objectFit: "cover", display: "block" }} />
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(20,23,30,.15) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.9) 100%)" }} />
-      <div style={{ position: "absolute", left: 22, right: 22, bottom: 18 }}>
+      <div style={{
+        position: "absolute", inset: 0,
+        background: right
+          ? "linear-gradient(100deg,rgba(20,23,30,0) 30%,rgba(20,23,30,.75) 62%,rgba(20,23,30,.94) 100%)"
+          : "linear-gradient(180deg,rgba(20,23,30,.15) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.9) 100%)",
+      }} />
+      <div style={{ position: "absolute", left: right ? "auto" : 22, right: 22, bottom: 18, maxWidth: right ? "58%" : "auto", textAlign: right ? "right" : "left" }}>
         <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".22em", textTransform: "uppercase", color: SUB }}>{eyebrow}</div>
         <div style={{ fontSize: 42, fontWeight: 900, lineHeight: .88, textTransform: "uppercase", letterSpacing: "-.02em", color: W, marginTop: 5 }}>{title}</div>
         <div style={{ fontSize: 13, color: SUB, fontWeight: 300, marginTop: 7 }}>{subtitle}</div>
