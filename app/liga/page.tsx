@@ -56,6 +56,23 @@ export default function LigaPage(){
   const [fFriendly,setFFriendly]=useState(false) // Freundschaftsspiel: ohne Liga-Punkte
   const [fNoteRanked,setFNoteRanked]=useState<string|null>(null) // Hinweis, wenn das Gegner-Limit greift
   const [rankedVs,setRankedVs]=useState<Record<string,number>>({}) // gewertete Spiele je Gegner
+  const [reqCity,setReqCity]=useState("")              // Liga-Anfrage: welche Stadt?
+  const [reqDone,setReqDone]=useState(false)
+  const [reqCount,setReqCount]=useState(0)
+
+  async function sendLigaAnfrage(){
+    if(!reqCity.trim()) return
+    setBusy(true)
+    try{
+      const r=await fetch("/api/liga/anfrage",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({city:reqCity.trim()})})
+      if(r.status===401){ window.location.href="/login"; return }
+      const j=await r.json().catch(()=>({}))
+      if(r.ok){ setReqDone(true); setReqCount(j.count||1) }
+      else flash(j.error||"Anfrage fehlgeschlagen")
+    }catch{ flash("Anfrage fehlgeschlagen") }
+    setBusy(false)
+  }
+
   const [pickOpen,setPickOpen]=useState(false)         // "Gegen wen hast du gespielt?"-Auswahl
   const [pOpen,setPOpen]=useState<string|null>(null)   // Spieler-Popup: wessen Profil?
   const [pData,setPData]=useState<PlayerInfo|null>(null)
@@ -105,8 +122,8 @@ export default function LigaPage(){
     const isReg=!!userId&&ids.includes(userId)
     setMyReg(isReg)
     if(ids.length===0){setRows([]);return}
-    const {data:profs}=await sb.from("public_profiles").select("id,name,elo,level,real_short").in("id",ids)
-    const list=(profs||[]).map(p=>({user_id:p.id,name:p.name,elo:p.elo??1000,level:p.level||"",real:(p as {real_short?:string|null}).real_short})).sort((a,b)=>b.elo-a.elo)
+    const {data:profs}=await sb.from("public_profiles").select("id,name,elo,level,real_short,avatar_url").in("id",ids)
+    const list=(profs||[]).map(p=>({user_id:p.id,name:p.name,elo:p.elo??1000,level:p.level||"",real:(p as {real_short?:string|null}).real_short,avatar:(p as {avatar_url?:string|null}).avatar_url})).sort((a,b)=>b.elo-a.elo)
     setRows(list)
     // Offene Matches des eingeloggten Spielers laden
     if(userId&&isReg){
@@ -319,6 +336,33 @@ export default function LigaPage(){
               </div>
             </div>
           )}
+
+          {/* Keine Liga in deiner Stadt? Anfragen statt wegklicken. */}
+          <div style={{padding:"14px 14px 0"}}>
+            <div style={{background:CARD,borderRadius:20,padding:"18px 18px",boxShadow:SHADOW}}>
+              {reqDone ? (
+                <div style={{textAlign:"center"}}>
+                  <div style={{fontSize:14,fontWeight:800,color:W,marginBottom:5}}>Anfrage ist da — danke!</div>
+                  <div style={{fontSize:12.5,color:MUT,lineHeight:1.5}}>
+                    {reqCount>1
+                      ? `${reqCount} Leute wollen eine Liga in ${reqCity}. Wir melden uns, sobald sie steht.`
+                      : `Wir melden uns, sobald sich genug Leute für ${reqCity} finden.`}
+                  </div>
+                </div>
+              ) : (<>
+                <div style={{fontSize:14.5,fontWeight:800,color:W,marginBottom:4}}>Keine Liga in deiner Stadt?</div>
+                <div style={{fontSize:12.5,color:MUT,lineHeight:1.5,marginBottom:13}}>
+                  Sag uns wo — sobald sich genug Leute melden, machen wir eine auf.
+                </div>
+                <input value={reqCity} onChange={e=>setReqCity(e.target.value)} placeholder="Stadt, z.B. Winterthur"
+                  style={{width:"100%",boxSizing:"border-box",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:10}}/>
+                <button onClick={sendLigaAnfrage} disabled={busy||!reqCity.trim()}
+                  style={{display:"block",width:"100%",textAlign:"center",border:"1.5px solid transparent",borderRadius:12,padding:13,fontSize:13.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:(busy||!reqCity.trim())?"not-allowed":"pointer",opacity:(busy||!reqCity.trim())?.5:1,fontFamily:"inherit"}}>
+                  {busy?"…":"Liga anfragen"}
+                </button>
+              </>)}
+            </div>
+          </div>
 
           {/* Deine Position (nur Mitglieder) */}
           {myReg&&myRow&&(

@@ -51,6 +51,54 @@ export default function AvatarPage() {
     finally { setLoading(false) }
   }
 
+  // Foto quadratisch zuschneiden und auf 400px verkleinern — sonst landen
+  // 5-MB-Handyfotos im Storage und die Rangliste lädt ewig.
+  function squareResize(dataUrl: string, size = 400): Promise<Blob> {
+    return new Promise((resolve, reject) => {
+      const img = new Image()
+      img.onload = () => {
+        const canvas = document.createElement("canvas")
+        canvas.width = size; canvas.height = size
+        const ctx = canvas.getContext("2d")
+        if (!ctx) { reject(new Error("Canvas nicht verfügbar")); return }
+        // Mittigen quadratischen Ausschnitt nehmen
+        const s = Math.min(img.width, img.height)
+        const sx = (img.width - s) / 2
+        const sy = (img.height - s) / 2
+        ctx.drawImage(img, sx, sy, s, s, 0, 0, size, size)
+        canvas.toBlob(b => b ? resolve(b) : reject(new Error("Konvertierung fehlgeschlagen")), "image/jpeg", 0.85)
+      }
+      img.onerror = () => reject(new Error("Bild konnte nicht gelesen werden"))
+      img.src = dataUrl
+    })
+  }
+
+  // Eigenes Foto direkt als Profilbild verwenden — ohne KI.
+  async function saveOriginal() {
+    if (!photo) return
+    setSaving(true); setError("")
+    try {
+      const sb = createClient()
+      const { data: { user } } = await sb.auth.getUser()
+      if (!user) { setError("Nicht eingeloggt"); return }
+
+      const blob = await squareResize(photo)
+      const filename = `avatar-${user.id}-${Date.now()}.jpg`
+      const { error: uploadErr } = await sb.storage
+        .from("avatars")
+        .upload(filename, blob, { contentType: "image/jpeg", upsert: true })
+      if (uploadErr) { setError("Upload fehlgeschlagen: " + uploadErr.message); return }
+
+      const { data: { publicUrl } } = sb.storage.from("avatars").getPublicUrl(filename)
+      const { error: updateErr } = await sb.from("profiles").update({ avatar_url: publicUrl }).eq("id", user.id)
+      if (updateErr) { setError("Profil konnte nicht aktualisiert werden"); return }
+
+      setSaved(true)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Speicherfehler")
+    } finally { setSaving(false) }
+  }
+
   async function save() {
     if (!result) return
     setSaving(true); setError("")
@@ -133,10 +181,25 @@ export default function AvatarPage() {
             onChange={e => { const f=e.target.files?.[0]; if(f) handleFile(f) }} />
         </div>
 
+        {/* Foto direkt verwenden — ohne KI. Bisher war das Foto nur Vorlage,
+            man konnte sein eigenes Bild gar nicht als Profilbild nehmen. */}
+        {photo && !loading && !result && (
+          <>
+            <button onClick={saveOriginal} disabled={saving} style={{ ...btn, width:"100%", padding:"15px", marginBottom:10, opacity: saving ? .6 : 1 }}>
+              {saving ? "Wird gespeichert …" : "Dieses Foto als Profilbild"}
+            </button>
+            <div style={{ display:"flex", alignItems:"center", gap:12, margin:"14px 0" }}>
+              <div style={{ flex:1, height:1, background:"rgba(255,255,255,.1)" }} />
+              <span style={{ fontSize:11, color:M, textTransform:"uppercase", letterSpacing:".08em", fontWeight:700 }}>oder</span>
+              <div style={{ flex:1, height:1, background:"rgba(255,255,255,.1)" }} />
+            </div>
+          </>
+        )}
+
         {/* Generieren Button */}
         {photo && !loading && (
-          <button onClick={generate} style={{ ...btn, width:"100%", padding:"15px", marginBottom:16 }}>
-            {genCount === 0 ? "🎨 Avatar generieren" : "🔄 Nochmals generieren"}
+          <button onClick={generate} style={{ ...btnGhost, width:"100%", padding:"15px", marginBottom:16 }}>
+            {genCount === 0 ? "Avatar daraus generieren" : "Nochmals generieren"}
           </button>
         )}
 
