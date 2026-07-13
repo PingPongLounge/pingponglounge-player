@@ -61,7 +61,7 @@ export default async function EntdeckenPage() {
 
           {/* Hero — dasselbe Bild wie in Liga, Open Game und Turnier */}
           <div style={{ position: 'relative', minHeight: 430, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '26px 22px 28px' }}>
-            <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(180deg, rgba(20,23,30,.2) 0%, rgba(20,23,30,.72) 52%, ${BG} 100%), url('/gl-tische.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+            <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(180deg, rgba(20,23,30,.15) 0%, rgba(20,23,30,.7) 50%, ${BG} 100%), url('/hero-pokal.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
 
             <div style={{ position: 'relative', zIndex: 2 }}>
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 22 }}>
