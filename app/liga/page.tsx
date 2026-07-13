@@ -385,7 +385,6 @@ export default function LigaPage(){
                 style={{display:"flex",alignItems:"center",justifyContent:"center",gap:9,width:"100%",background:GRAD,color:"#06210F",borderRadius:16,padding:"16px",fontSize:15.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:"pointer",fontFamily:"inherit",boxShadow:SHADOW}}>
                 Ergebnis eintragen
               </button>
-              <div style={{fontSize:11.5,color:MUT,textAlign:"center",marginTop:7}}>Schon gespielt? Trag das Resultat hier ein.</div>
             </div>
           )}
 
