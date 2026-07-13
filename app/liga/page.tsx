@@ -350,10 +350,7 @@ export default function LigaPage(){
                   </div>
                 </div>
               ) : (<>
-                <div style={{fontSize:14.5,fontWeight:800,color:W,marginBottom:4}}>Keine Liga in deiner Stadt?</div>
-                <div style={{fontSize:12.5,color:MUT,lineHeight:1.5,marginBottom:13}}>
-                  Sag uns wo — sobald sich genug Leute melden, machen wir eine auf.
-                </div>
+                <div style={{fontSize:14.5,fontWeight:800,color:W,marginBottom:11}}>Keine Liga in deiner Stadt?</div>
                 <input value={reqCity} onChange={e=>setReqCity(e.target.value)} placeholder="Stadt, z.B. Winterthur"
                   style={{width:"100%",boxSizing:"border-box",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:10}}/>
                 <button onClick={sendLigaAnfrage} disabled={busy||!reqCity.trim()}
@@ -415,10 +412,11 @@ export default function LigaPage(){
                         <span style={{fontSize:15,fontWeight:800,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 6px",marginLeft:7,color:SUB}}>Du</span>}</span>
                         {r.real&&<div style={{fontSize:11,color:MUT,fontWeight:500,marginTop:1}}>{r.real}</div>}
                         {!me&&myReg&&(()=>{
-                          const left=MAX_RANKED_PER_OPPONENT-(rankedVs[r.user_id]||0)
-                          if(left>=MAX_RANKED_PER_OPPONENT) return null
-                          return <div style={{fontSize:10,color:left<=0?MUT:SUB,fontWeight:600,marginTop:2}}>
-                            {left<=0?"zählt nicht mehr":`noch ${left}× gewertet`}
+                          const gespielt=rankedVs[r.user_id]||0
+                          if(gespielt===0) return null
+                          const voll=gespielt>=MAX_RANKED_PER_OPPONENT
+                          return <div style={{fontSize:10,color:voll?MUT:SUB,fontWeight:600,marginTop:2}}>
+                            {gespielt}/{MAX_RANKED_PER_OPPONENT} Liga-Matches{voll?" · zählt nicht mehr":""}
                           </div>
                         })()}
                       </button>
