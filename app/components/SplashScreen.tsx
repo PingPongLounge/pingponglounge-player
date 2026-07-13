@@ -14,15 +14,12 @@ const PLAYER_LETTERS = ["P", "L", "A", "Y", "E", "R"]
 export default function SplashScreen() {
   const [phase, setPhase] = useState<"show" | "fade" | "done">("show")
   const [showBall, setShowBall] = useState(false)
-  const [showText, setShowText] = useState(false)
-  const [showTagline, setShowTagline] = useState(false)
   const [letterIndex, setLetterIndex] = useState(0)
 
   useEffect(() => {
-    // Sequenz: Paddle zeichnen → Ball → Buchstaben → Tagline
+    // Sequenz: Paddle zeichnen → Ball → Buchstaben. Keine Tagline —
+    // "Next Level Table Tennis" steht auf der Startseite, hier braucht es sie nicht.
     const t1 = setTimeout(() => setShowBall(true), 260)
-    const t2 = setTimeout(() => setShowText(true), 380)
-    const t3 = setTimeout(() => setShowTagline(true), 620)
 
     // Buchstaben nach und nach einblenden
     const letterTimers: ReturnType<typeof setTimeout>[] = []
@@ -40,7 +37,7 @@ export default function SplashScreen() {
     // Ist die Seite schon fertig, verschwindet er praktisch sofort.
     if (document.readyState === "complete") {
       const minTimer = setTimeout(dismiss, 350)
-      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(minTimer); letterTimers.forEach(clearTimeout) }
+      return () => { clearTimeout(t1); clearTimeout(minTimer); letterTimers.forEach(clearTimeout) }
     }
 
     let loaded = false
@@ -52,7 +49,7 @@ export default function SplashScreen() {
     const minTimer = setTimeout(() => { minDone = true; tryDismiss() }, 900)
 
     return () => {
-      clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(minTimer)
+      clearTimeout(t1); clearTimeout(minTimer)
       letterTimers.forEach(clearTimeout)
       window.removeEventListener("load", onLoad)
     }
@@ -78,10 +75,10 @@ export default function SplashScreen() {
       }}
     >
       {/* Logo SVG */}
-      <div style={{ position: "relative", width: 120, height: 120 }}>
+      <div style={{ position: "relative", width: 200, height: 200 }}>
         <svg
-          width="120"
-          height="120"
+          width="200"
+          height="200"
           viewBox="0 0 80 80"
           fill="none"
         >
@@ -126,15 +123,15 @@ export default function SplashScreen() {
       {/* PLAYER Buchstaben */}
       <div style={{
         display: "flex",
-        gap: 3,
-        height: 28,
+        gap: 5,
+        height: 44,
         alignItems: "center",
       }}>
         {PLAYER_LETTERS.map((l, i) => (
           <span
             key={l}
             style={{
-              fontSize: 20,
+              fontSize: 34,
               fontWeight: 900,
               letterSpacing: ".18em",
               fontFamily: "system-ui, sans-serif",
@@ -149,24 +146,6 @@ export default function SplashScreen() {
           </span>
         ))}
       </div>
-
-      {/* Tagline */}
-      <span
-        style={{
-          fontSize: 11,
-          fontWeight: 600,
-          letterSpacing: ".2em",
-          textTransform: "uppercase",
-          color: "rgba(255,255,255,0.45)",
-          fontFamily: "system-ui, sans-serif",
-          opacity: showTagline ? 1 : 0,
-          transform: showTagline ? "translateY(0)" : "translateY(6px)",
-          transition: "opacity 0.5s ease, transform 0.5s ease",
-          marginTop: 2,
-        }}
-      >
-        Next Level Table Tennis
-      </span>
 
       <style>{`
         @keyframes drawPath {
