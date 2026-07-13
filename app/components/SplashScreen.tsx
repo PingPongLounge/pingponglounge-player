@@ -20,14 +20,14 @@ export default function SplashScreen() {
 
   useEffect(() => {
     // Sequenz: Paddle zeichnen → Ball → Buchstaben → Tagline
-    const t1 = setTimeout(() => setShowBall(true), 450)
-    const t2 = setTimeout(() => setShowText(true), 700)
-    const t3 = setTimeout(() => setShowTagline(true), 1300)
+    const t1 = setTimeout(() => setShowBall(true), 260)
+    const t2 = setTimeout(() => setShowText(true), 380)
+    const t3 = setTimeout(() => setShowTagline(true), 620)
 
     // Buchstaben nach und nach einblenden
     const letterTimers: ReturnType<typeof setTimeout>[] = []
     PLAYER_LETTERS.forEach((_, i) => {
-      letterTimers.push(setTimeout(() => setLetterIndex(i + 1), 750 + i * 80))
+      letterTimers.push(setTimeout(() => setLetterIndex(i + 1), 400 + i * 45))
     })
 
     const dismiss = () => {
@@ -35,8 +35,11 @@ export default function SplashScreen() {
       setTimeout(() => setPhase("done"), 700)
     }
 
+    // Der Splash hielt die App 2,2 Sekunden künstlich fest — auch wenn längst
+    // alles geladen war. Das fühlte sich an, als würde die Seite ewig laden.
+    // Ist die Seite schon fertig, verschwindet er praktisch sofort.
     if (document.readyState === "complete") {
-      const minTimer = setTimeout(dismiss, 2200)
+      const minTimer = setTimeout(dismiss, 350)
       return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(minTimer); letterTimers.forEach(clearTimeout) }
     }
 
@@ -46,7 +49,7 @@ export default function SplashScreen() {
 
     const onLoad = () => { loaded = true; tryDismiss() }
     window.addEventListener("load", onLoad)
-    const minTimer = setTimeout(() => { minDone = true; tryDismiss() }, 2200)
+    const minTimer = setTimeout(() => { minDone = true; tryDismiss() }, 900)
 
     return () => {
       clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(minTimer)
@@ -81,7 +84,6 @@ export default function SplashScreen() {
           height="120"
           viewBox="0 0 80 80"
           fill="none"
-          style={{ filter: "drop-shadow(0 0 10px #39FF1466)" }}
         >
           <defs>
             <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -117,16 +119,8 @@ export default function SplashScreen() {
           </g>
         </svg>
 
-        {/* Glow pulse nach Zeichnen */}
-        {showBall && (
-          <div style={{
-            position: "absolute",
-            inset: 0,
-            borderRadius: "50%",
-            animation: "glowRing 1.5s ease-in-out infinite",
-            pointerEvents: "none",
-          }} />
-        )}
+        {/* Der pulsierende Glow-Ring um das Logo ist raus — er zeichnete einen
+            Kreis, der im Logo nichts zu suchen hat. */}
       </div>
 
       {/* PLAYER Buchstaben */}
@@ -185,10 +179,6 @@ export default function SplashScreen() {
           75%  { transform: translateY(-10px); }
           90%  { transform: translateY(3px); }
           100% { transform: translateY(0); }
-        }
-        @keyframes glowRing {
-          0%, 100% { box-shadow: 0 0 0px 0px #39FF1400; }
-          50%       { box-shadow: 0 0 18px 4px #39FF1440; }
         }
       `}</style>
     </div>
