@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { autoConfirmOverdue, remindStuckOnboarding } from "@/lib/cron-tasks"
+import { applyMonthlyPenalties, warnMonthlyOpen } from "@/lib/monthly"
 import { NextRequest, NextResponse } from "next/server"
 
 // EIN täglicher Cron für alles — der Vercel-Hobby-Plan erlaubt nur tägliche Crons
@@ -16,6 +17,19 @@ async function run(req: NextRequest) {
   const confirmed = await autoConfirmOverdue(admin)
   const reminded = await remindStuckOnboarding(admin)
 
+  // Aktivitätspflicht: am 1. den Vormonat abrechnen, ab dem 25. warnen.
+  // Beides idempotent — läuft der Cron doppelt, passiert nichts.
+  let penalties = 0
+  if (new Date().getDate() === 1) {
+    try { penalties = await applyMonthlyPenalties(admin) }
+    catch (e) { console.error("Monatsabrechnung fehlgeschlagen:", e) }
+  }
+
+  let warned = 0
+  try { warned = await warnMonthlyOpen(admin) }
+  catch (e) { console.error("Monats-Warnungen fehlgeschlagen:", e) }
+
+
   // Inaktivitäts-Abzug läuft weiter in seiner eigenen Route
   let inactivity: unknown = null
   try {
@@ -29,7 +43,7 @@ async function run(req: NextRequest) {
     console.error("Inaktivitäts-Lauf fehlgeschlagen:", e)
   }
 
-  return NextResponse.json({ ok: true, confirmed, reminded, inactivity })
+  return NextResponse.json({ ok: true, confirmed, reminded, penalties, warned, inactivity })
 }
 
 export const GET = run

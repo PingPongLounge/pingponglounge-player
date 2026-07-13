@@ -78,5 +78,18 @@ export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string)
     })
   }
 
+  // Monats-Zuteilung abhaken, falls dieses Paar für den laufenden Monat
+  // eingeteilt war. Nur gewertete Spiele zählen — ein Freundschaftsspiel
+  // erfüllt die Zuteilung nicht.
+  if (ranked) {
+    const monat = new Date().toISOString().slice(0, 7)
+    await admin.from("league_fixtures")
+      .update({ status: "done", match_id: matchId, done_at: new Date().toISOString() })
+      .eq("season_id", m.season_id)
+      .eq("month", monat)
+      .eq("status", "open")
+      .or(`and(p1_id.eq.${m.p1_id},p2_id.eq.${m.p2_id}),and(p1_id.eq.${m.p2_id},p2_id.eq.${m.p1_id})`)
+  }
+
   return { ok: true }
 }

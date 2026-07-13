@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import { MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
+import { MAX_RANKED_PER_OPPONENT, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO } from "@/lib/rewards"
 import {
   BG, CARD, CELL, W, SUB, MUT, GREEN, LINE,
   gt, GRAD, card, levelBadge,
@@ -14,7 +14,7 @@ const SHADOW="0 1px 4px rgba(0,0,0,.14)"
 const HERO="#14171E"
 
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number}
-type Row={user_id:string,name:string,elo:number,level:string,real?:string|null}
+type Row={user_id:string,name:string,elo:number,level:string,real?:string|null,avatar?:string|null}
 type OpenMatch={id:string,status:string,iAmP1:boolean}
 type PlayerInfo={
   player:{id:string,name:string,real_short?:string|null,level:string,elo:number,matches_played:number,matches_won:number,lost:number,winRate:number|null,canton?:string|null},
@@ -23,7 +23,7 @@ type PlayerInfo={
   maxRanked:number,
 }
 type Reactions={heart:number,fire:number,laugh:number,myReacts:string[]}
-type Msg={id:string,user_id:string|null,name:string,text:string,kind?:string,match_id?:string,reactions:Reactions}
+type Msg={id:string,user_id:string|null,name:string,text:string,kind?:string,match_id?:string,parent_id?:string|null,created_at?:string,reactions:Reactions}
 
 export default function LigaPage(){
   const [userId,setUserId]=useState<string|null>(null)
@@ -43,6 +43,8 @@ export default function LigaPage(){
   const [chatOpen,setChatOpen]=useState(false)
   const [msgs,setMsgs]=useState<Msg[]>([])
   const [msg,setMsg]=useState("")
+  const [cmt,setCmt]=useState<Record<string,string>>({})      // Kommentar-Entwurf je Spiel
+  const [cmtOpen,setCmtOpen]=useState<Record<string,boolean>>({}) // welcher Thread ist offen?
   const meRef=useRef<HTMLDivElement|null>(null)
   // Fordern-Popup
   const [fTarget,setFTarget]=useState<{id:string,name:string}|null>(null)
@@ -56,7 +58,9 @@ export default function LigaPage(){
   const [fFriendly,setFFriendly]=useState(false) // Freundschaftsspiel: ohne Liga-Punkte
   const [fNoteRanked,setFNoteRanked]=useState<string|null>(null) // Hinweis, wenn das Gegner-Limit greift
   const [rankedVs,setRankedVs]=useState<Record<string,number>>({}) // gewertete Spiele je Gegner
+  const [monatCount,setMonatCount]=useState(0)   // gewertete Liga-Matches diesen Monat
   const [reqCity,setReqCity]=useState("")              // Liga-Anfrage: welche Stadt?
+  const [reqOpen,setReqOpen]=useState(false)
   const [reqDone,setReqDone]=useState(false)
   const [reqCount,setReqCount]=useState(0)
 
@@ -89,6 +93,7 @@ export default function LigaPage(){
   }
 
   const flash=(t:string)=>{setToast(t);setTimeout(()=>setToast(""),2500)}
+  const monatOk=monatCount>=MIN_MATCHES_PER_MONTH
 
   // Saisons laden — getUser + Seasons parallel
   useEffect(()=>{(async()=>{
@@ -152,9 +157,20 @@ export default function LigaPage(){
         cnt[oppId]=(cnt[oppId]||0)+1
       }
       setRankedVs(cnt)
+
+      // Wie viele gewertete Liga-Matches habe ich DIESEN Monat gespielt?
+      const jetzt=new Date()
+      const von=new Date(jetzt.getFullYear(),jetzt.getMonth(),1).toISOString()
+      const {count:mc}=await sb.from("league_matches")
+        .select("id",{count:"exact",head:true})
+        .eq("season_id",sid).eq("ranked",true).eq("status","confirmed")
+        .gte("confirmed_at",von)
+        .or(`p1_id.eq.${userId},p2_id.eq.${userId}`)
+      setMonatCount(mc??0)
     } else {
       setOpenMatches({})
       setRankedVs({})
+      setMonatCount(0)
     }
   },[userId])
 
@@ -204,7 +220,8 @@ export default function LigaPage(){
   async function sendChallenge(){
     if(!fTarget) return
     setBusy(true)
-    const r=await fetch("/api/liga/challenge",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,challenged_id:fTarget.id})})
+    const when=[fDate,fTime].filter(Boolean).join(" ")
+    const r=await fetch("/api/liga/challenge",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,challenged_id:fTarget.id,when})})
     const j=await r.json().catch(()=>({}))
     if(r.ok){
       if(fDate||fTime){
@@ -264,6 +281,13 @@ export default function LigaPage(){
     await fetch("/api/liga/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,text:t})})
     loadChat(seasonId)
   }
+  // Kommentar zu EINEM Spiel — hängt als Antwort unter dem Match-Post.
+  async function sendComment(parentId:string){
+    const t=(cmt[parentId]||"").trim(); if(!t) return
+    setCmt(c=>({...c,[parentId]:""}))
+    await fetch("/api/liga/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,text:t,parent_id:parentId})})
+    loadChat(seasonId)
+  }
 
   const cities=[...new Set(seasons.map(s=>s.city))]
   const citySeasons=seasons.filter(s=>s.city===city)
@@ -300,13 +324,16 @@ export default function LigaPage(){
       )}
 
       <div style={{maxWidth:480,margin:"0 auto"}}>
-        {/* Foto-Hero (Glattbrugg-Tische, ohne Leute) */}
-        <div style={{position:"relative",height:190,margin:"14px 14px 0",borderRadius:24,overflow:"hidden",boxShadow:SHADOW}}>
-          <img src="/gl-tische.jpg" alt="" style={{width:"100%",height:190,objectFit:"cover",display:"block"}}/>
-          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(20,23,30,.15) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.9) 100%)"}}/>
-          <div style={{position:"absolute",left:22,right:22,bottom:18}}>
-            <div style={{fontSize:42,fontWeight:900,lineHeight:.88,textTransform:"uppercase",letterSpacing:"-.02em",color:W}}>Liga</div>
-            <div style={{fontSize:13,color:SUB,fontWeight:300,marginTop:7}}>Steig auf · gewinne Punkte · fordere heraus</div>
+        {/* Foto-Hero — halbiert. Statt Werbespruch trägt er jetzt die Fakten:
+            welche Klasse, welche Stadt, wie viele Spieler. */}
+        <div style={{position:"relative",height:132,margin:"14px 14px 0",borderRadius:22,overflow:"hidden",boxShadow:SHADOW}}>
+          <img src="/liga-hero.jpg" alt="" style={{width:"100%",height:132,objectFit:"cover",display:"block"}}/>
+          <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(20,23,30,.1) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.9) 100%)"}}/>
+          <div style={{position:"absolute",left:20,right:20,bottom:14}}>
+            <div style={{fontSize:34,fontWeight:900,lineHeight:.9,textTransform:"uppercase",letterSpacing:"-.02em",color:W}}>Liga</div>
+            <div style={{fontSize:12,color:SUB,fontWeight:400,marginTop:5}}>
+              {sel?(isPro(sel)?"Pro":"Einstieg"):""}{city?` · ${city}`:""}{count?` · ${count} Spieler`:""}
+            </div>
           </div>
         </div>
 
@@ -337,47 +364,41 @@ export default function LigaPage(){
             </div>
           )}
 
-          {/* Keine Liga in deiner Stadt? Anfragen statt wegklicken. */}
-          <div style={{padding:"14px 14px 0"}}>
-            <div style={{background:CARD,borderRadius:20,padding:"18px 18px",boxShadow:SHADOW}}>
-              {reqDone ? (
-                <div style={{textAlign:"center"}}>
-                  <div style={{fontSize:14,fontWeight:800,color:W,marginBottom:5}}>Anfrage ist da — danke!</div>
-                  <div style={{fontSize:12.5,color:MUT,lineHeight:1.5}}>
-                    {reqCount>1
-                      ? `${reqCount} Leute wollen eine Liga in ${reqCity}. Wir melden uns, sobald sie steht.`
-                      : `Wir melden uns, sobald sich genug Leute für ${reqCity} finden.`}
+          {/* EINE Karte: wo du stehst UND was du tun musst, um dort zu bleiben.
+              Vorher waren das zwei Karten übereinander — dieselbe Sache, zweimal. */}
+          {myReg&&myRow&&(
+            <div style={{padding:"14px 14px 0"}}>
+              <div style={{background:HERO,borderRadius:22,boxShadow:SHADOW,overflow:"hidden"}}>
+                <div style={{display:"flex",alignItems:"center",gap:16,padding:"18px 20px"}}>
+                  <div style={{fontSize:46,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{myIndex+1}</div>
+                  <div>
+                    <div style={{fontSize:10.5,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position</div>
+                    <div style={{fontSize:13.5,color:SUB,fontWeight:400,marginTop:3}}>{myRow.level?`Level ${myRow.level}`:""} · ELO {myRow.elo}</div>
                   </div>
                 </div>
-              ) : (<>
-                <div style={{fontSize:14.5,fontWeight:800,color:W,marginBottom:11}}>Keine Liga in deiner Stadt?</div>
-                <input value={reqCity} onChange={e=>setReqCity(e.target.value)} placeholder="Stadt, z.B. Winterthur"
-                  style={{width:"100%",boxSizing:"border-box",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:10}}/>
-                <button onClick={sendLigaAnfrage} disabled={busy||!reqCity.trim()}
-                  style={{display:"block",width:"100%",textAlign:"center",border:"1.5px solid transparent",borderRadius:12,padding:13,fontSize:13.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:(busy||!reqCity.trim())?"not-allowed":"pointer",opacity:(busy||!reqCity.trim())?.5:1,fontFamily:"inherit"}}>
-                  {busy?"…":"Liga anfragen"}
-                </button>
-              </>)}
-            </div>
-          </div>
-
-          {/* Deine Position (nur Mitglieder) */}
-          {myReg&&myRow&&(
-            <div style={{padding:"4px 14px 0"}}>
-              <div style={{background:HERO,borderRadius:22,padding:"20px 22px",boxShadow:SHADOW,display:"flex",alignItems:"center",gap:16}}>
-                <div style={{fontSize:52,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{myIndex+1}</div>
-                <div>
-                  <div style={{fontSize:11,fontWeight:700,letterSpacing:".18em",textTransform:"uppercase",color:MUT}}>Deine Position · {sel?isPro(sel)?"Pro":"Einstieg":""}</div>
-                  <div style={{fontSize:14,color:SUB,fontWeight:300,marginTop:3}}>{myRow.level?`Level ${myRow.level}`:(sel?.skill_class?`Level ${sel.skill_class}`:'')} · ELO {myRow.elo}</div>
+                <div style={{display:"flex",alignItems:"center",gap:13,padding:"13px 20px 16px",borderTop:`1px solid ${LINE}`}}>
+                  <div style={{fontSize:22,fontWeight:900,lineHeight:1,flexShrink:0,...(monatOk?gt:{color:W})}}>
+                    {monatCount}<span style={{fontSize:13,color:MUT,fontWeight:800}}>/{MIN_MATCHES_PER_MONTH}</span>
+                  </div>
+                  <div style={{flex:1,minWidth:0}}>
+                    <div style={{fontSize:12,fontWeight:800,color:W}}>Liga-Matches diesen Monat</div>
+                    <div style={{fontSize:11,color:monatOk?SUB:MUT,marginTop:2,lineHeight:1.4}}>
+                      {monatOk
+                        ? "Soll erfüllt — jedes weitere Spiel bringt Punkte."
+                        : `Noch ${MIN_MATCHES_PER_MONTH-monatCount} bis Monatsende, sonst −${MONTHLY_PENALTY_ELO} Punkte.`}
+                    </div>
+                    <div style={{height:3,borderRadius:99,background:CELL,marginTop:7,overflow:"hidden"}}>
+                      <div style={{height:"100%",width:`${Math.min(100,(monatCount/MIN_MATCHES_PER_MONTH)*100)}%`,background:GRAD}}/>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Ergebnis eintragen — die wichtigste Handlung, deshalb ganz vorn.
-              Vorher versteckte sie sich hinter dem Button "Fordern", wo sie niemand suchte. */}
+          {/* Ergebnis eintragen — die wichtigste Handlung, deshalb ganz vorn. */}
           {myReg&&rows.length>1&&(
-            <div style={{padding:"14px 14px 0"}}>
+            <div style={{padding:"12px 14px 0"}}>
               <button onClick={()=>setPickOpen(true)}
                 style={{display:"flex",alignItems:"center",justifyContent:"center",gap:9,width:"100%",background:GRAD,color:"#06210F",borderRadius:16,padding:"16px",fontSize:15.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:"pointer",fontFamily:"inherit",boxShadow:SHADOW}}>
                 Ergebnis eintragen
@@ -386,30 +407,28 @@ export default function LigaPage(){
           )}
 
           {/* Rangliste */}
-          <div style={{padding:"16px 14px 0"}}>
-            <div style={{...card,borderRadius:24,padding:"20px 16px"}}>
-              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:6}}>
-                <img src="/icons/liga.svg" alt="" style={{width:30,height:30}}/>
-                <span style={{fontSize:19,fontWeight:800,letterSpacing:".01em",color:W}}>Rangliste · {count} Spieler</span>
+          <div style={{padding:"14px 14px 0"}}>
+            <div style={{...card,borderRadius:24,padding:"18px 14px"}}>
+              <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,marginBottom:8}}>
+                <img src="/icons/liga.svg" alt="" style={{width:26,height:26}}/>
+                <span style={{fontSize:17,fontWeight:800,letterSpacing:".01em",color:W}}>Rangliste</span>
               </div>
-              <div style={{maxHeight:420,overflowY:"auto"}}>
-                {Array.from({length:50}).map((_,i)=>{
-                  const r=rows[i]
-                  if(!r){
-                    return(
-                      <div key={`empty-${i}`} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 8px",borderTop:i===0?"none":`1px solid ${LINE}`,opacity:.38}}>
-                        <span style={{width:26,textAlign:"center",fontSize:15,fontWeight:900,color:MUT}}>{i+1}</span>
-                        <div style={{flex:1,minWidth:0}}><span style={{fontSize:14,fontWeight:500,color:MUT}}>frei</span></div>
-                      </div>
-                    )
-                  }
+              <div>
+                {rows.map((r,i)=>{
                   const me=r.user_id===userId
+                  const initialen=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                   return(
-                    <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 8px",borderTop:i===0?"none":`1px solid ${LINE}`,...(me?{background:"rgba(57,255,20,.07)",borderRadius:12}:{})}}>
-                      <span style={{width:26,textAlign:"center",fontSize:15,fontWeight:900,...(i<3?gt:{color:SUB})}}>{i+1}</span>
+                    <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:9,padding:"10px 6px",borderTop:i===0?"none":`1px solid ${LINE}`,...(me?{background:"rgba(57,255,20,.07)",borderRadius:12}:{})}}>
+                      <span style={{width:20,textAlign:"center",fontSize:14,fontWeight:900,flexShrink:0,...(i<3?gt:{color:SUB})}}>{i+1}</span>
+                      {/* Gesicht statt Textwüste */}
+                      <div style={{width:32,height:32,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:CELL,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                        {r.avatar
+                          ? <img src={r.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                          : <span style={{fontSize:11,fontWeight:800,color:MUT}}>{initialen}</span>}
+                      </div>
                       {/* Name antippen → Spielerprofil mit Bilanz und letzten Spielen */}
                       <button onClick={()=>openPlayer(r.user_id)} style={{flex:1,minWidth:0,background:"none",border:"none",padding:0,textAlign:"left",cursor:"pointer",fontFamily:"inherit"}}>
-                        <span style={{fontSize:15,fontWeight:800,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 6px",marginLeft:7,color:SUB}}>Du</span>}</span>
+                        <span style={{fontSize:14.5,fontWeight:800,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 6px",marginLeft:7,color:SUB}}>Du</span>}</span>
                         {r.real&&<div style={{fontSize:11,color:MUT,fontWeight:500,marginTop:1}}>{r.real}</div>}
                         {!me&&myReg&&(()=>{
                           const gespielt=rankedVs[r.user_id]||0
@@ -421,7 +440,7 @@ export default function LigaPage(){
                         })()}
                       </button>
                       {r.level&&<span style={levelBadge(r.level)}>L{r.level}</span>}
-                      <span style={{fontSize:14,fontWeight:800,...(me?gt:{color:SUB})}}>{r.elo}</span>
+                      <span style={{fontSize:13.5,fontWeight:800,...(me?gt:{color:SUB})}}>{r.elo}</span>
                       {!me&&myReg&&(()=>{
                         const om=openMatches[r.user_id]
                         const btnBase:React.CSSProperties={border:"1.4px solid transparent",borderRadius:10,padding:"7px 10px",fontSize:10,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:"pointer",whiteSpace:"nowrap",fontFamily:"inherit"}
@@ -438,6 +457,33 @@ export default function LigaPage(){
                 })}
               </div>
             </div>
+          </div>
+
+          {/* Liga anfragen — gehört ans Ende. Es richtet sich an Leute OHNE Liga,
+              stand aber ganz oben bei Leuten, die längst in einer sind. */}
+          <div style={{padding:"18px 14px 6px",textAlign:"center"}}>
+            {reqDone ? (
+              <div style={{fontSize:12.5,color:SUB,lineHeight:1.5}}>
+                {reqCount>1
+                  ? `Danke — ${reqCount} Leute wollen eine Liga in ${reqCity}. Wir melden uns, sobald sie steht.`
+                  : `Danke — wir melden uns, sobald sich genug Leute für ${reqCity} finden.`}
+              </div>
+            ) : reqOpen ? (
+              <div style={{background:CARD,borderRadius:18,padding:"16px 16px",boxShadow:SHADOW,textAlign:"left"}}>
+                <div style={{fontSize:13.5,fontWeight:800,color:W,marginBottom:10}}>In welcher Stadt fehlt dir eine Liga?</div>
+                <input value={reqCity} onChange={e=>setReqCity(e.target.value)} placeholder="z.B. Winterthur" autoFocus
+                  style={{width:"100%",boxSizing:"border-box",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:10}}/>
+                <button onClick={sendLigaAnfrage} disabled={busy||!reqCity.trim()}
+                  style={{display:"block",width:"100%",textAlign:"center",border:"1.5px solid transparent",borderRadius:12,padding:12,fontSize:13,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:(busy||!reqCity.trim())?"not-allowed":"pointer",opacity:(busy||!reqCity.trim())?.5:1,fontFamily:"inherit"}}>
+                  {busy?"…":"Anfrage senden"}
+                </button>
+              </div>
+            ) : (
+              <button onClick={()=>setReqOpen(true)}
+                style={{background:"none",border:"none",color:MUT,fontSize:12.5,fontWeight:600,cursor:"pointer",fontFamily:"inherit",padding:6}}>
+                Keine Liga in deiner Stadt? Anfragen →
+              </button>
+            )}
           </div>
         </>)}
       </div>
@@ -641,16 +687,18 @@ export default function LigaPage(){
         </div>
       )}
 
-      {/* Chat */}
+      {/* Chat — z-index 130: die Bottom-Nav liegt auf 100 und hat das Schreibfeld
+          bisher komplett verdeckt. Man sah es schlicht nicht. */}
       {chatOpen&&(
-        <div onClick={()=>setChatOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.4)",zIndex:50,display:"flex",justifyContent:"flex-end"}}>
+        <div onClick={()=>setChatOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.4)",zIndex:130,display:"flex",justifyContent:"flex-end"}}>
           <div onClick={e=>e.stopPropagation()} style={{background:BG,borderLeft:`1px solid ${B}`,height:"100%",width:"83%",maxWidth:380,display:"flex",flexDirection:"column",boxShadow:"-22px 0 50px rgba(0,0,0,.55)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"15px 16px",borderBottom:`1px solid ${B}`}}>
               <span style={{fontSize:15,fontWeight:600,color:W}}>Liga-Chat · {sel?isPro(sel)?"Pro":"Einstieg":""}</span>
               <button onClick={()=>setChatOpen(false)} style={{background:"none",border:"none",color:M,fontSize:18,cursor:"pointer"}}>✕</button>
             </div>
             <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:10}}>
-              {msgs.length===0?<p style={{textAlign:"center",color:MUT,fontSize:13,marginTop:20}}>Noch keine Nachrichten — schreib die erste 👋</p>:msgs.map(m=>{
+              {msgs.length===0?<p style={{textAlign:"center",color:MUT,fontSize:13,marginTop:20}}>Noch keine Nachrichten — schreib die erste 👋</p>:msgs.filter(m=>!m.parent_id).map(m=>{
+                const kommentare=msgs.filter(k=>k.parent_id===m.id)
                 if(m.kind==="match"){
                   let d:{winner:string,loser:string,wSets:number,lSets:number,detail:string,ranked?:boolean,pending?:boolean,enteredBy?:string}|null=null
                   try{d=JSON.parse(m.text)}catch{/**/}
@@ -680,7 +728,37 @@ export default function LigaPage(){
                               </button>
                             )
                           })}
+                          {/* Kommentieren — das Spiel selbst ist der Gesprächsanlass */}
+                          <button onClick={()=>setCmtOpen(o=>({...o,[m.id]:!o[m.id]}))}
+                            style={{display:"flex",alignItems:"center",gap:5,marginLeft:"auto",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.08)",borderRadius:99,padding:"4px 10px",fontSize:11,fontWeight:700,color:kommentare.length?W:MUT,cursor:"pointer",fontFamily:"inherit"}}>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
+                            {kommentare.length>0?kommentare.length:"Kommentieren"}
+                          </button>
                         </div>
+
+                        {/* Kommentare */}
+                        {(kommentare.length>0||cmtOpen[m.id])&&(
+                          <div style={{marginTop:11,paddingTop:10,borderTop:"1px solid rgba(255,255,255,.08)",display:"flex",flexDirection:"column",gap:7}}>
+                            {kommentare.map(k=>(
+                              <div key={k.id} style={{display:"flex",gap:7,alignItems:"baseline"}}>
+                                <span style={{fontSize:11,fontWeight:800,color:k.user_id===userId?"rgba(57,255,20,.9)":SUB,flexShrink:0}}>{k.user_id===userId?"Du":k.name}</span>
+                                <span style={{fontSize:12.5,color:W,fontWeight:500,lineHeight:1.45,wordBreak:"break-word"}}>{k.text}</span>
+                              </div>
+                            ))}
+                            {myReg&&(
+                              <div style={{display:"flex",gap:6,marginTop:3}}>
+                                <input
+                                  value={cmt[m.id]||""}
+                                  onChange={e=>setCmt(c=>({...c,[m.id]:e.target.value}))}
+                                  onKeyDown={e=>{if(e.key==="Enter")sendComment(m.id)}}
+                                  placeholder="Kommentar zum Spiel …"
+                                  style={{flex:1,minWidth:0,background:"rgba(0,0,0,.25)",border:`1px solid ${B}`,borderRadius:999,padding:"9px 12px",color:W,fontSize:12.5,outline:"none",fontFamily:"inherit"}}/>
+                                <button onClick={()=>sendComment(m.id)} aria-label="Kommentar senden"
+                                  style={{width:36,flexShrink:0,borderRadius:999,border:"1.5px solid transparent",background:`linear-gradient(${BG},${BG}) padding-box, ${GRAD} border-box`,color:W,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>→</button>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
                     </div>
                   )

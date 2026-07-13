@@ -65,6 +65,112 @@ function outlineButton(href: string, label: string): string {
   </a>`
 }
 
+// Jemand hat dich herausgefordert. Ohne diese Mail merkt es niemand — bisher
+// erfuhr man von einer Forderung nur, wenn man zufällig die App öffnete.
+export async function sendChallengeNotice(opts: {
+  to: string
+  challengerName: string
+  recipientName: string
+  challengerLevel?: string | null
+  challengerElo?: number | null
+  when?: string | null
+}) {
+  return sendEmail({
+    to: opts.to,
+    subject: `${opts.challengerName} fordert dich heraus`,
+    html: shell(`
+      <h1 style="font-size:22px;font-weight:900;margin:0 0 10px;color:#fff">Du wurdest gefordert</h1>
+      <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.55;margin:0 0 20px">
+        Hallo ${opts.recipientName},<br>
+        <strong style="color:#fff">${opts.challengerName}</strong>${opts.challengerLevel ? ` (Level ${opts.challengerLevel}${opts.challengerElo ? ` · ELO ${opts.challengerElo}` : ""})` : ""} will gegen dich spielen.
+      </p>
+      ${opts.when ? `<div style="background:${CARD};border-radius:14px;padding:15px;text-align:center;margin-bottom:18px">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Vorgeschlagen</div>
+        <div style="font-size:17px;font-weight:900;color:#fff">${opts.when}</div>
+      </div>` : ""}
+      ${outlineButton(`${BASE_URL}/liga`, "Annehmen")}
+      <p style="color:rgba(255,255,255,.5);font-size:12.5px;line-height:1.5;margin:16px 0 0">
+        Passt der Termin nicht? Schreib ihm im Liga-Chat.
+      </p>
+    `),
+  })
+}
+
+// Erinnerung gegen Monatsende: Soll noch nicht erfüllt.
+export async function sendMonthlyWarning(opts: {
+  to: string
+  name: string
+  monthLabel: string
+  played: number
+  required: number
+  daysLeft: number
+  penalty: number
+}) {
+  const fehlt = opts.required - opts.played
+  return sendEmail({
+    to: opts.to,
+    subject: `Noch ${fehlt} Liga-Match${fehlt > 1 ? "es" : ""} bis Monatsende`,
+    html: shell(`
+      <h1 style="font-size:22px;font-weight:900;margin:0 0 10px;color:#fff">Dir fehlt noch ein Spiel</h1>
+      <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.55;margin:0 0 20px">
+        Hallo ${opts.name}, im ${opts.monthLabel} hast du bisher
+        <strong style="color:#fff">${opts.played} von ${opts.required}</strong> Liga-Matches gespielt.
+      </p>
+
+      <div style="background:${CARD};border-radius:18px;padding:20px;text-align:center;margin-bottom:20px">
+        <div style="font-size:44px;font-weight:900;color:${G};line-height:1">${opts.played}/${opts.required}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.55);text-transform:uppercase;letter-spacing:.08em;margin-top:6px">Liga-Matches im ${opts.monthLabel}</div>
+        <div style="margin-top:14px;padding-top:13px;border-top:1px solid rgba(255,255,255,.08);font-size:13px;color:rgba(255,255,255,.7);line-height:1.5">
+          Noch <strong style="color:#fff">${opts.daysLeft} Tag${opts.daysLeft > 1 ? "e" : ""}</strong>.
+          Schaffst du es nicht, verlierst du <strong style="color:#FF5C5C">${opts.penalty} Punkte</strong>.
+        </div>
+      </div>
+
+      ${outlineButton(`${BASE_URL}/match`, "Open Game finden")}
+      <p style="color:rgba(255,255,255,.5);font-size:12.5px;line-height:1.5;margin:16px 0 0">
+        Am schnellsten geht es über ein Open Game — Tisch und Zeit reinstellen, wer Lust hat, spielt mit.
+        Oder fordere direkt jemanden aus der Rangliste.
+      </p>
+    `),
+  })
+}
+
+// Monatsabrechnung: Soll verfehlt, Punkte abgezogen.
+export async function sendMonthlyPenalty(opts: {
+  to: string
+  name: string
+  monthLabel: string
+  played: number
+  required: number
+  eloBefore: number
+  eloAfter: number
+}) {
+  return sendEmail({
+    to: opts.to,
+    subject: `${opts.monthLabel}: ${opts.eloBefore - opts.eloAfter} Punkte abgezogen`,
+    html: shell(`
+      <h1 style="font-size:22px;font-weight:900;margin:0 0 10px;color:#fff">Zu wenig gespielt im ${opts.monthLabel}</h1>
+      <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.55;margin:0 0 20px">
+        Hallo ${opts.name}, du hast ${opts.played} von ${opts.required} nötigen Liga-Matches gespielt.
+        Wer nicht spielt, rutscht in der Rangliste — so bleibt sie ehrlich.
+      </p>
+
+      <div style="background:${CARD};border-radius:18px;padding:20px;text-align:center;margin-bottom:20px">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Deine Punkte</div>
+        <div style="font-size:22px;font-weight:900;color:#fff">
+          ${opts.eloBefore} <span style="color:rgba(255,255,255,.35)">→</span> ${opts.eloAfter}
+          <span style="color:#FF5C5C;margin-left:8px">−${opts.eloBefore - opts.eloAfter}</span>
+        </div>
+      </div>
+
+      ${outlineButton(`${BASE_URL}/match`, "Diesen Monat besser machen")}
+      <p style="color:rgba(255,255,255,.5);font-size:12.5px;line-height:1.5;margin:16px 0 0">
+        ${opts.required} Spiele im Monat — das ist eines alle zwei Wochen. Stell ein Open Game rein, dann findet sich jemand.
+      </p>
+    `),
+  })
+}
+
 // Erinnerung an alle, die sich registriert, das Onboarding aber nie beendet haben.
 export async function sendOnboardingReminder(opts: { to: string }) {
   const url = `${BASE_URL}/onboarding`

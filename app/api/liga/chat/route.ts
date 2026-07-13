@@ -11,7 +11,7 @@ export async function GET(req: NextRequest) {
   const admin = createAdminClient()
   const { data: msgs } = await admin
     .from("league_messages")
-    .select("id,user_id,text,created_at,kind,match_id")
+    .select("id,user_id,text,created_at,kind,match_id,parent_id")
     .eq("season_id", seasonId)
     .order("created_at", { ascending: true })
     .limit(200)
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await sb.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
-  const { season_id, text } = await req.json()
+  const { season_id, text, parent_id } = await req.json()
   const clean = String(text || "").trim().slice(0, 500)
   if (!season_id || !clean) return NextResponse.json({ error: "Leer" }, { status: 400 })
 
@@ -62,7 +62,20 @@ export async function POST(req: NextRequest) {
     .select("id").eq("season_id", season_id).eq("player_id", user.id).maybeSingle()
   if (!reg) return NextResponse.json({ error: "Nur Liga-Mitglieder können schreiben" }, { status: 403 })
 
-  const { error } = await admin.from("league_messages").insert({ season_id, user_id: user.id, text: clean })
+  // Kommentar zu einem Spiel: parent_id muss eine Nachricht DERSELBEN Saison sein
+  // und selbst kein Kommentar (keine Threads in Threads).
+  let parent: string | null = null
+  if (parent_id) {
+    const { data: p } = await admin.from("league_messages")
+      .select("id,season_id,parent_id").eq("id", parent_id).maybeSingle()
+    if (!p || p.season_id !== season_id || p.parent_id) {
+      return NextResponse.json({ error: "Ungültiger Bezug" }, { status: 400 })
+    }
+    parent = p.id
+  }
+
+  const { error } = await admin.from("league_messages")
+    .insert({ season_id, user_id: user.id, text: clean, parent_id: parent, kind: parent ? "comment" : null })
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ ok: true })
 }

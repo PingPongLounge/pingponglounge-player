@@ -1,9 +1,10 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { sendChallengeNotice } from "@/lib/email"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
-  const { season_id, challenged_id } = await req.json()
+  const { season_id, challenged_id, when } = await req.json()
   const sb = await createClient()
   const { data: { user } } = await sb.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
@@ -34,5 +35,29 @@ export async function POST(req: NextRequest) {
   }).select("id").single()
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Den Geforderten per Mail informieren. Ohne das erfuhr er von der Forderung
+  // nur, wenn er zufällig die App öffnete — und deshalb passierte nichts.
+  try {
+    const { data: authOpp } = await admin.auth.admin.getUserById(challenged_id)
+    const oppEmail = authOpp?.user?.email
+    const { data: profs } = await admin.from("profiles").select("id,name,level,elo").in("id", [user.id, challenged_id])
+    const me = (profs || []).find(p => p.id === user.id)
+    const opp = (profs || []).find(p => p.id === challenged_id)
+
+    if (oppEmail && opp) {
+      await sendChallengeNotice({
+        to: oppEmail,
+        challengerName: me?.name || "Ein Spieler",
+        recipientName: opp.name || "Spieler",
+        challengerLevel: me?.level ?? null,
+        challengerElo: me?.elo ?? null,
+        when: typeof when === "string" && when.trim() ? when.trim().slice(0, 60) : null,
+      })
+    }
+  } catch (e) {
+    console.error("Forderungs-Mail fehlgeschlagen:", e)
+  }
+
   return NextResponse.json({ id: data.id })
 }

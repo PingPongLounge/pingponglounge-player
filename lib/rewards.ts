@@ -39,6 +39,12 @@ export const PP_CHF = 0.5
 // davor, dass jemand von einem Kumpel nach oben geschoben wird.
 export const MAX_RANKED_PER_OPPONENT = 5
 
+// Aktivitätspflicht statt Gegner-Zuteilung: Wer im Monat zu wenig spielt,
+// verliert Punkte. Keine Vorschriften, gegen WEN — nur, DASS gespielt wird.
+// Open Games sind das Gefäss dafür.
+export const MIN_MATCHES_PER_MONTH = 2   // gewertete Liga-Matches
+export const MONTHLY_PENALTY_ELO = 20    // Abzug, wenn nicht erreicht
+
 export const LIGA_CONFIG = {
   minMatchesForRanking: 6,
   inactivityDays: 30,
