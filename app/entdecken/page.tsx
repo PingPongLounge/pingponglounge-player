@@ -171,7 +171,12 @@ export default async function EntdeckenPage() {
 
   let leagueRank = 0, seasonLabel = ''
   if (seasonId) {
-    seasonLabel = season?.skill_class || 'Liga'
+    // "4-7" ist der interne Schlüssel, kein Name für Spieler. In der App heissen
+    // die Klassen Einstieg (Level 1–3) und Pro (Level 4–7).
+    const sc = season?.skill_class || ''
+    seasonLabel = /4|5|6|7/.test(sc) ? 'Pro · Level 4–7'
+      : /1|2|3/.test(sc) ? 'Einstieg · Level 1–3'
+      : (sc || 'Liga')
     const { data: regs } = await sb.from('league_registrations').select('player_id').eq('season_id', seasonId)
     const ids = (regs || []).map(r => r.player_id)
     if (ids.length > 0) {

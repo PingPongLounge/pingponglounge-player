@@ -143,7 +143,7 @@ export default function StartHomeV2(d: StartData) {
           {/* LIGA */}
           <div className="rev" style={card}>
             <div style={thead}><img src="/icons/liga.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Liga</span></div>
-            <div style={csub}>Spiel in deiner Klasse, sammle Punkte, steig auf.</div>
+            <div style={csub}>Spiel in deiner Klasse, sammle ELO-Punkte, steig auf.</div>
             <div style={{ marginTop: 14 }}>
               {d.season.has ? (
                 <>
