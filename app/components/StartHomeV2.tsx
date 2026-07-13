@@ -90,16 +90,37 @@ export default function StartHomeV2(d: StartData) {
             </div>
           </div>
 
-          {/* RANG */}
-          <div className="rev" style={{ ...card, background: HERO, textAlign: "center" }}>
-            <div style={ehead}><img src="/icons/levelup.svg" alt="" style={{ width: 18, height: 18 }} /><span style={eyebrow}>Dein Rang</span></div>
-            <div style={{ fontSize: 108, fontWeight: 900, lineHeight: .82, letterSpacing: "-.04em", margin: "8px 0 4px", ...gt }}>#{d.rank}</div>
-            <div style={{ fontSize: 15, color: SUB, fontWeight: 300 }}>{d.lvl} · ELO {d.elo}</div>
-            <div style={{ height: 8, background: "rgba(255,255,255,.14)", borderRadius: 8, overflow: "hidden", margin: "22px 0 9px" }}>
-              <div data-bar={String(d.pct)} style={{ height: "100%", width: 0, background: GRAD, transition: "width 1.1s cubic-bezier(.2,.7,.2,1)" }} />
+          {/* RANG — derselbe Block wie in der Liga: Bild oben, darunter die Zeilen,
+              getrennt durch Linien. Vorher eine schwarze Box ohne ein einziges Bild. */}
+          <div className="rev" style={{ margin: "0 16px 18px", borderRadius: 24, overflow: "hidden", boxShadow: SHADOW, background: HERO }}>
+            <div style={{ position: "relative", height: 132 }}>
+              <img src="/spotlight.jpg" alt="" style={{ width: "100%", height: 132, objectFit: "cover", display: "block" }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(20,23,30,.1) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.92) 100%)" }} />
+              <div style={{ position: "absolute", left: 20, right: 20, bottom: 13 }}>
+                <div style={{ fontSize: 34, fontWeight: 900, lineHeight: .9, textTransform: "uppercase", letterSpacing: "-.02em", color: W }}>Dein Rang</div>
+                <div style={{ fontSize: 12, color: SUB, fontWeight: 400, marginTop: 5 }}>{d.season.has ? `${d.season.label} · ${d.season.city}` : "Noch keine Liga"}</div>
+              </div>
             </div>
-            <div style={{ fontSize: 13, color: MUT }}>{d.nextLabel}</div>
-            <Link href="/match" style={cta}>Jetzt spielen</Link>
+
+            <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderTop: `1px solid ${LINE}` }}>
+              <div style={{ fontSize: 44, fontWeight: 900, lineHeight: .85, letterSpacing: "-.03em", ...gt }}>#{d.rank}</div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: MUT }}>Deine Position</div>
+                <div style={{ fontSize: 13.5, color: SUB, fontWeight: 400, marginTop: 3 }}>Level {d.lvl} · {d.elo} Punkte</div>
+              </div>
+            </div>
+
+            <div style={{ padding: "13px 20px 16px", borderTop: `1px solid ${LINE}` }}>
+              <div style={{ height: 4, background: "rgba(255,255,255,.14)", borderRadius: 8, overflow: "hidden" }}>
+                <div data-bar={String(d.pct)} style={{ height: "100%", width: 0, background: GRAD, transition: "width 1.1s cubic-bezier(.2,.7,.2,1)" }} />
+              </div>
+              <div style={{ fontSize: 11.5, color: MUT, marginTop: 7 }}>{d.nextLabel}</div>
+            </div>
+
+            <Link href="/match" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 20px", borderTop: `1px solid ${LINE}`, textDecoration: "none" }}>
+              <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: ".02em", ...gt }}>Jetzt spielen</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "#39FF14" }}>→</span>
+            </Link>
           </div>
 
           {/* STATS */}
