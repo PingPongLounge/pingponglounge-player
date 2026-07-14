@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
-import { MAX_RANKED_PER_OPPONENT, ligaForLevel } from "@/lib/rewards"
+import { MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
 
 // Erstellt ein neues Match direkt im Status "accepted" zwischen dem eingeloggten
 // Spieler und einem Gegner innerhalb derselben Liga-Saison.
@@ -28,15 +28,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Spieler nicht in dieser Saison registriert" }, { status: 403 })
   }
 
-  // Nur im eigenen Paar (Rookie+Challenger / Advanced+Elite). Ohne diese Prüfung
-  // konnte ein Rookie ein gewertetes Ergebnis gegen einen Elite-Spieler eintragen
-  // — die Regel stand bisher nur im UI.
-  const { data: lvls } = await admin.from("profiles").select("id,level").in("id", [user.id, opponent_id])
-  const meinPaar = ligaForLevel((lvls || []).find(p => p.id === user.id)?.level)?.pair
-  const seinPaar = ligaForLevel((lvls || []).find(p => p.id === opponent_id)?.level)?.pair
-  if (!meinPaar || !seinPaar || meinPaar !== seinPaar) {
-    return NextResponse.json({ error: "Dieser Spieler ist nicht in deiner Liga" }, { status: 400 })
-  }
+  // Gespielt wird innerhalb der Tabelle — beide sind in derselben Saison
+  // registriert (oben geprüft). Mehr braucht es nicht: die Liga ergibt sich
+  // aus dem Platz in dieser Tabelle, nicht aus dem Level.
 
   // Kein offenes Match zwischen diesen zwei Spielern?
   const { data: existing } = await admin

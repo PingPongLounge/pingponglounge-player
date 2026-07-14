@@ -48,23 +48,41 @@ export const MONTHLY_PENALTY_ELO = 20    // Abzug, wenn nicht erreicht
 // Die vier Ligen. Gespielt wird paarweise (Rookie+Challenger in einer Tabelle,
 // Advanced+Elite in der anderen) — die Liga selbst ist aber echt und hat ihre
 // eigene Rangliste. Wer im Level aufsteigt, wechselt die Liga.
-// Der Schnitt folgt der Saison-Einteilung: Einstieg = Level 1–3, Pro = Level 4–7.
-// Vorher lag Challenger auf 3–4 und damit quer über beide Saisons — ein Level-4-
-// Spieler sass in der Pro-Saison, gehörte aber ins Einstieg-Paar und konnte
-// deshalb niemanden fordern.
+// Die Liga ist ein PLATZ, kein Etikett. Zwei Tabellen — Einstieg (Level 1–3) und
+// Pro (Level 4–7). Innerhalb einer Tabelle gilt: Platz 1–24 ist die obere Liga,
+// ab Platz 25 die untere. Wer über die Linie klettert, steigt auf; wer darunter
+// fällt, ab. Kein Saisonende nötig, keine Zuteilung von Hand.
+//
+// Solange eine Tabelle weniger als 24 Spieler hat, stehen alle in der oberen
+// Liga — das ist gewollt: die untere füllt sich, sobald genug Leute da sind.
+export const LEAGUE_CUT = 24
+
 export const LIGEN = [
-  { key: "rookie",     name: "Rookie",     levels: [1, 2], pair: "einstieg" },
-  { key: "challenger", name: "Challenger", levels: [3],    pair: "einstieg" },
-  { key: "advanced",   name: "Advanced",   levels: [4, 5], pair: "pro" },
-  { key: "elite",      name: "Elite",      levels: [6, 7], pair: "pro" },
+  { key: "rookie",     name: "Rookie",     pair: "einstieg", oben: false },
+  { key: "challenger", name: "Challenger", pair: "einstieg", oben: true  },
+  { key: "advanced",   name: "Advanced",   pair: "pro",      oben: false },
+  { key: "elite",      name: "Elite",      pair: "pro",      oben: true  },
 ] as const
 
 export type LigaKey = (typeof LIGEN)[number]["key"]
+export type LigaPair = "einstieg" | "pro"
 
-export function ligaForLevel(level: string | number | null | undefined) {
+/** Welche Tabelle? Level 1–3 → Einstieg, 4–7 → Pro. */
+export function pairForLevel(level: string | number | null | undefined): LigaPair | null {
   const l = typeof level === "string" ? parseInt(level) : level
-  if (!l) return null
-  return LIGEN.find(x => (x.levels as readonly number[]).includes(l)) || null
+  if (!l || l < 1 || l > 7) return null
+  return l >= 4 ? "pro" : "einstieg"
+}
+
+/** Welche Tabelle gehört zu dieser Saison? ("1-3" / "4-7") */
+export function pairForSeason(skillClass: string | null | undefined): LigaPair {
+  return /5|6|7|pro/i.test(skillClass || "") ? "pro" : "einstieg"
+}
+
+/** Aus Tabelle + Platz wird die Liga. Platz 1 ist der beste. */
+export function ligaForRank(pair: LigaPair, rank: number) {
+  const oben = rank <= LEAGUE_CUT
+  return LIGEN.find(l => l.pair === pair && l.oben === oben)!
 }
 
 // Fertige Sprüche nach dem Bestätigen — Kommentieren muss ein Tipp sein,

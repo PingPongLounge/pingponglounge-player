@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendChallengeNotice } from "@/lib/email"
-import { ligaForLevel, MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
+import { MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
@@ -32,13 +32,9 @@ export async function POST(req: NextRequest) {
   if (existing)
     return NextResponse.json({ error: "Bereits ein offenes Match" }, { status: 400 })
 
-  // Nur im eigenen Paar fordern (Rookie+Challenger / Advanced+Elite). Die Regel
-  // stand bisher nur im UI — über die API war sie wirkungslos.
-  const { data: lvls } = await admin.from("profiles").select("id,level").in("id", [user.id, challenged_id])
-  const meinPaar = ligaForLevel((lvls || []).find(p => p.id === user.id)?.level)?.pair
-  const seinPaar = ligaForLevel((lvls || []).find(p => p.id === challenged_id)?.level)?.pair
-  if (!meinPaar || !seinPaar || meinPaar !== seinPaar)
-    return NextResponse.json({ error: "Nicht in deiner Liga" }, { status: 400 })
+  // Gefordert wird innerhalb der Tabelle: beide sind in derselben Saison
+  // registriert (oben geprüft). Die Liga ist ein Platz in dieser Tabelle,
+  // kein Level-Etikett — ein Rookie darf also den Tabellenersten fordern.
 
   // Das Limit gegen denselben Gegner galt bisher NUR beim direkten Eintragen.
   // Über "Fordern" liess es sich beliebig oft umgehen — genau das, was
