@@ -60,16 +60,25 @@ export default async function EntdeckenPage() {
             <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(180deg, rgba(20,23,30,.2) 0%, rgba(20,23,30,.72) 52%, ${BG} 100%), url('/hero-pokal.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
 
             <div style={{ position: 'relative', zIndex: 2 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
-                <Logo />
-                <span style={{ fontSize: 17, fontWeight: 900, letterSpacing: '.20em', ...gt }}>PLAYER</span>
-                <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#06210F', background: GRAD, borderRadius: 999, padding: '3px 8px' }}>Beta</span>
+              {/* Logo mittig und gross: P über der Wortmarke, Tagline exakt auf
+                  Wortmarkenbreite. Das P bleibt Outline, der Ball sitzt rechts unten. */}
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
+                <svg width="72" height="72" viewBox="0 0 80 80" fill="none" aria-hidden>
+                  <defs><linearGradient id="hlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14" /><stop offset="1" stopColor="#1FD1C4" /></linearGradient></defs>
+                  <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#hlg)" strokeWidth="3.6" strokeLinejoin="round" />
+                  <circle cx="63" cy="58" r="6.5" fill="url(#hlg)" />
+                </svg>
+                <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'stretch', marginTop: 8 }}>
+                  <div style={{ fontSize: 30, fontWeight: 900, letterSpacing: '.24em', lineHeight: 1, paddingLeft: '.24em', ...gt }}>PLAYER</div>
+                  <div style={{ fontSize: 9.5, fontWeight: 700, color: SUB, textTransform: 'uppercase', marginTop: 7, textAlign: 'justify', textAlignLast: 'justify' }}>Next Level Table Tennis</div>
+                </div>
+                <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#06210F', background: GRAD, borderRadius: 999, padding: '3px 8px', marginTop: 12 }}>Beta</span>
               </div>
 
-              <h1 style={{ fontSize: 32, fontWeight: 900, lineHeight: 1.05, letterSpacing: '-.025em', margin: '0 0 11px', color: W }}>
+              <h1 style={{ fontSize: 32, fontWeight: 900, lineHeight: 1.05, letterSpacing: '-.025em', margin: '0 0 11px', color: W, textAlign: 'center' }}>
                 Spiel. Trag ein.<br /><span style={gt}>Steig auf.</span>
               </h1>
-              <p style={{ fontSize: 14.5, color: SUB, fontWeight: 300, lineHeight: 1.55, margin: '0 0 26px' }}>
+              <p style={{ fontSize: 14.5, color: SUB, fontWeight: 300, lineHeight: 1.55, margin: '0 0 26px', textAlign: 'center' }}>
                 Liga, Turniere und Trainings — vom Anfänger bis zum Profi.
                 {spielerCount ? ` ${spielerCount} Spieler sind dabei.` : ''}
               </p>
