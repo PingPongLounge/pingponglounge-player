@@ -112,7 +112,7 @@ export default async function EntdeckenPage() {
               <span style={RIC}><img src="/icons/turnier.svg" alt="" style={{ width: 19, height: 19 }} /></span>
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ display: 'block', fontSize: 14, fontWeight: 800, color: W }}>Turnier &amp; Training</span>
-                <span style={{ display: 'block', fontSize: 12, color: MUT, marginTop: 2 }}>K.o.-Bracket, Podest, PingPoints. Coaching in Glattbrugg.</span>
+                <span style={{ display: 'block', fontSize: 12, color: MUT, marginTop: 2 }}>K.o.-Bracket, Podest, PingPoints. Dazu Coaching &amp; Drills.</span>
               </span>
             </div>
           </div>

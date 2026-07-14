@@ -29,13 +29,13 @@ export default function TrainingPage() {
       <SectionTopBar section="Training" />
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "6px 16px 0" }}>
         {/* Derselbe Block wie in der Liga: Bild, nächster Termin, Buchen-Zeile */}
-        <SectionBlock title="Training" meta="Jeden Donnerstag · Glattbrugg" img="/training-hero.jpg">
-          <SectionStat big="Do" label="Nächstes Training" sub="19:30–21:00 · Glattbrugg · Einsteiger & Medium · 8 Plätze" />
+        <SectionBlock title="Training" meta="Coaching &amp; Drills · jeden Donnerstag" img="/training-hero.jpg">
+          <SectionStat big="Do" label="Nächstes Training" sub="19:30–21:00 · Einsteiger & Medium · 8 Plätze" />
           <SectionRow label="Platz sichern" href={EVERSPORTS_STUDIO} external />
         </SectionBlock>
         <div style={{ textAlign: "center", marginTop: 9, fontSize: 11.5, color: MUT, fontWeight: 400 }}>Anmeldung &amp; Zahlung über Eversports</div>
 
-        <SectionIntro storageKey="intro_training" title="So funktioniert das Training" steps={[["1", "Kurs wählen", "Von Beginner bis Pro — wöchentlich in der Lounge Glattbrugg."], ["2", "Termin sichern", "Anmeldung & Bezahlung laufen direkt über Eversports."], ["3", "Besser werden", "Regelmässiges Coaching, Drills und Matchpraxis."]]} />
+        <SectionIntro storageKey="intro_training" title="So funktioniert das Training" steps={[["1", "Kurs wählen", "Von Beginner bis Pro — wöchentlich, an wechselnden Standorten."], ["2", "Termin sichern", "Anmeldung & Bezahlung laufen direkt über Eversports."], ["3", "Besser werden", "Regelmässiges Coaching, Drills und Matchpraxis."]]} />
 
         {/* Kursplan */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "26px 4px 12px" }}>
