@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 import { PP_REWARDS } from "@/lib/rewards"
+import { sendRewardClaimStaff, sendRewardClaimPlayer } from "@/lib/email"
 
 export async function GET() {
   const sb = await createClient()
@@ -55,5 +56,33 @@ export async function POST(req: NextRequest) {
     description: `Eingelöst: ${reward.label}`,
   })
 
-  return NextResponse.json({ ok: true, message: `${reward.label} angefordert — wir melden uns!` })
+  // "Wir melden uns" war bisher eine Lüge: Es gab keine Mail, keine Ansicht, und
+  // /staff/redeem kennt reward_claims gar nicht. Der Spieler zahlte Punkte und
+  // bekam einen Datenbankeintrag, den niemand je sah. Jetzt geht eine Mail ans
+  // Team UND eine Bestätigung an den Spieler.
+  try {
+    const { data: p } = await admin.from("profiles").select("name").eq("id", user.id).maybeSingle()
+    const { data: authUser } = await admin.auth.admin.getUserById(user.id)
+    const mail = authUser?.user?.email || null
+
+    await sendRewardClaimStaff({
+      playerName: p?.name || "Spieler",
+      playerEmail: mail,
+      rewardLabel: reward.label,
+      threshold,
+    })
+
+    if (mail) {
+      await sendRewardClaimPlayer({
+        to: mail,
+        name: p?.name || "Spieler",
+        rewardLabel: reward.label,
+        threshold,
+      })
+    }
+  } catch (e) {
+    console.error("Prämien-Mail fehlgeschlagen:", e)
+  }
+
+  return NextResponse.json({ ok: true, message: `${reward.label} angefordert — du bekommst gleich eine Bestätigung per Mail.` })
 }

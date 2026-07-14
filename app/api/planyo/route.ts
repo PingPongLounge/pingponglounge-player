@@ -43,7 +43,13 @@ export async function GET(req: NextRequest) {
             try {
               const r = await planyo("is_resource_available", { resource_id: resourceId, start_time: start, end_time: end, quantity: String(qty) })
               const v = r?.data?.is_available; return v === 1 || v === true
-            } catch { return true }
+            } catch {
+              // NICHT "frei" annehmen. Vorher gab dieser Catch bei jedem Fehler
+              // (auch bei fehlendem PLANYO_API_KEY) "verfügbar" zurück: die App
+              // zeigte jeden Tisch als frei, der Nutzer klickte sich durch drei
+              // Schritte und scheiterte erst beim Buchen.
+              return false
+            }
           })
         )
         let freeCount = 0

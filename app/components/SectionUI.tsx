@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import StartMenu from "./StartMenu"
 
 const CARD = "#2A2F39", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.88)", MUT = "rgba(255,255,255,.55)"
@@ -11,16 +12,24 @@ const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text"
 // Grüner Sektions-Balken: "PLAYER LIGA / TURNIER / OPEN GAME / TRAINING"
 // Logo + Wortmarke sind IMMER ein Link zurück auf die Startseite.
 export function SectionTopBar({ section }: { section: string }) {
+  // Dunkel, nicht grün: die grelle Leiste war das Lauteste auf dem Screen und
+  // sagte nichts. Grün nur im Logo — ein Akzent pro Screen, wie in der Liga.
+  //
+  // Und mit Menü: auf Open Game, Turnier und Training war der AppHeader
+  // ausgeblendet und diese Leiste hatte keinen Menü-Knopf — Profil, PingPoints,
+  // Rangliste und Shop waren von vier der fünf Hauptseiten aus unerreichbar.
   return (
-    <div style={{ position: "sticky", top: 0, zIndex: 50, background: GRAD }}>
-      <div style={{ maxWidth: 480, margin: "0 auto", padding: "11px 18px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+    <div style={{ position: "sticky", top: 0, zIndex: 50, background: "#1A1E25", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
+      <div style={{ maxWidth: 480, margin: "0 auto", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/entdecken" aria-label="Zur Startseite" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-          <svg width="22" height="22" viewBox="0 0 80 80" fill="none" aria-hidden>
-            <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="#06210F" strokeWidth="3.6" strokeLinejoin="round" />
-            <circle cx="63" cy="58" r="6.5" fill="#06210F" />
+          <svg width="21" height="21" viewBox="0 0 80 80" fill="none" aria-hidden>
+            <defs><linearGradient id="stbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14" /><stop offset="1" stopColor="#1FD1C4" /></linearGradient></defs>
+            <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#stbg)" strokeWidth="3.6" strokeLinejoin="round" />
+            <circle cx="63" cy="58" r="6.5" fill="url(#stbg)" />
           </svg>
-          <span style={{ fontSize: 13, fontWeight: 900, letterSpacing: ".20em", color: "#06210F" }}>PLAYER <span style={{ fontWeight: 600, color: "rgba(6,33,15,.72)" }}>{section.toUpperCase()}</span></span>
+          <span style={{ fontSize: 12.5, fontWeight: 900, letterSpacing: ".20em", color: W }}>PLAYER <span style={{ fontWeight: 600, color: MUT }}>{section.toUpperCase()}</span></span>
         </Link>
+        <StartMenu inline />
       </div>
     </div>
   )

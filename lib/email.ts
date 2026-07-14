@@ -1,3 +1,4 @@
+import { STAFF_EMAILS } from "@/lib/staff"
 // Transaktionale E-Mails via Resend (REST, ohne SDK). Ohne RESEND_API_KEY
 // passiert nichts — die App läuft normal weiter, es wird nur nicht gemailt.
 const RESEND_URL = "https://api.resend.com/emails"
@@ -273,6 +274,66 @@ export async function sendResultConfirmRequest(opts: {
       <p style="color:rgba(255,255,255,.5);font-size:12.5px;line-height:1.5;margin:18px 0 0">
         Du hast <strong style="color:#fff">24 Stunden</strong> Zeit. Reagierst du nicht, wird das Ergebnis automatisch bestätigt${gewertet ? " und für ELO &amp; Rangliste gewertet" : " — gewertet wird es nicht"}.
       </p>
+    `),
+  })
+}
+
+// ---------------------------------------------------------------------------
+// Prämien-Einlösung. Vorher stand in der App "wir melden uns" — es gab aber
+// weder eine Mail ans Team noch an den Spieler, und /staff/redeem kennt die
+// Tabelle reward_claims gar nicht. Punkte weg, Anspruch unsichtbar.
+// ---------------------------------------------------------------------------
+
+export async function sendRewardClaimStaff(opts: {
+  playerName: string
+  playerEmail: string | null
+  rewardLabel: string
+  threshold: number
+}) {
+  return sendEmail({
+    to: STAFF_EMAILS[0],
+    subject: `Prämie eingelöst: ${opts.rewardLabel} — ${opts.playerName}`,
+    html: shell(`
+      <h1 style="font-size:22px;font-weight:900;margin:0 0 10px;color:#fff">Prämie eingelöst</h1>
+      <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.55;margin:0 0 18px">
+        <strong style="color:#fff">${opts.playerName}</strong> hat <strong style="color:#fff">${opts.threshold} PingPoints</strong> eingelöst.
+      </p>
+      <div style="background:${CARD};border-radius:16px;padding:18px 20px;margin-bottom:16px">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:6px">Prämie</div>
+        <div style="font-size:19px;font-weight:900;color:${G}">${opts.rewardLabel}</div>
+        ${opts.playerEmail ? `<div style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:10px">${opts.playerEmail}</div>` : ""}
+      </div>
+      <p style="color:rgba(255,255,255,.5);font-size:12.5px;line-height:1.5;margin:0">
+        Die Punkte sind bereits abgezogen. Meld dich beim Spieler und übergib die Prämie in der Lounge.
+      </p>
+    `),
+  })
+}
+
+export async function sendRewardClaimPlayer(opts: {
+  to: string
+  name: string
+  rewardLabel: string
+  threshold: number
+}) {
+  return sendEmail({
+    to: opts.to,
+    subject: `Prämie eingelöst: ${opts.rewardLabel}`,
+    html: shell(`
+      <h1 style="font-size:22px;font-weight:900;margin:0 0 10px;color:#fff">Prämie eingelöst</h1>
+      <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.55;margin:0 0 18px">
+        Hallo ${opts.name},<br>
+        wir haben deine Einlösung erhalten.
+      </p>
+      <div style="background:${CARD};border-radius:16px;padding:20px;margin-bottom:16px;text-align:center">
+        <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px">Deine Prämie</div>
+        <div style="font-size:22px;font-weight:900;color:${G};margin-bottom:6px">${opts.rewardLabel}</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.6)">${opts.threshold} PingPoints abgezogen</div>
+      </div>
+      <p style="color:rgba(255,255,255,.6);font-size:13px;line-height:1.55;margin:0 0 16px">
+        Zeig diese Mail beim nächsten Besuch in der Lounge — wir lösen sie direkt vor Ort ein.
+      </p>
+      ${outlineButton(`${BASE_URL}/pingpoints`, "Deine PingPoints")}
     `),
   })
 }

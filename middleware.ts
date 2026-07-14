@@ -9,10 +9,32 @@ const PUBLIC_PATHS = ['/', '/login', '/auth', '/spielen', '/entdecken']
 // - spielen/preview: der Rang-Vorschau-Screen für NICHT eingeloggte Besucher
 //   (QR am Tisch). Die Middleware hat ihn bisher auf /login umgeleitet — deshalb
 //   stand dort immer "Dein Rang wird nach dem Sichern berechnet", nie ein Rang.
-const PUBLIC_API = ['/api/liga/confirm-email', '/api/booking/webhook', '/api/spielen/preview']
+// - cron/daily + liga/inactivity: Vercel ruft sie ohne Session auf. Die Middleware
+//   hat sie mit 401 abgewiesen, BEVOR der CRON_SECRET-Check greifen konnte —
+//   die Monatsabrechnung, die Warn-Mail und der Inaktivitäts-Abzug liefen deshalb
+//   nie. Die Routen schützen sich selbst über CRON_SECRET.
+const PUBLIC_API = [
+  '/api/liga/confirm-email',
+  '/api/booking/webhook',
+  '/api/spielen/preview',
+  '/api/cron/daily',
+  '/api/liga/inactivity',
+]
 
 export async function middleware(request: NextRequest) {
+  // Next.js lädt verlinkte Seiten im Hintergrund vor (Prefetch). Diese Anfragen
+  // laufen durch die Middleware. Trifft ein Prefetch genau in den Moment, in dem
+  // Supabase den Token erneuert, sieht die Middleware kurz "keine Session" —
+  // und hat unten die Cookies gelöscht. Ergebnis: Der Spieler war ausgeloggt,
+  // sobald er eine Seite ansteuerte, auf die ein Link zeigte.
+  // Prefetches werden deshalb nie umgeleitet und dürfen keine Cookies anfassen.
+  const istPrefetch =
+    request.headers.get('next-router-prefetch') === '1' ||
+    request.headers.get('purpose') === 'prefetch' ||
+    request.headers.get('x-middleware-prefetch') === '1'
+
   let supabaseResponse = NextResponse.next({ request })
+  if (istPrefetch) return supabaseResponse
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -61,18 +83,16 @@ export async function middleware(request: NextRequest) {
       return res
     }
 
+    // Cookies der Supabase-Antwort auf die Weiterleitung übertragen — sonst geht
+    // ein frisch erneuerter Token verloren.
+    //
+    // Was hier bewusst NICHT mehr passiert: das Löschen "toter" sb-Cookies.
+    // Das sollte eine Login-Schleife brechen, hat aber bei jeder Anfrage, die
+    // zufällig neben einer Token-Erneuerung lief, die gültige Session mitgerissen.
+    // Der Spieler flog raus, sobald er eine Seite ansteuerte. Eine echte Schleife
+    // gibt es nicht mehr, seit die Cookies korrekt weitergereicht werden.
     const redirect = NextResponse.redirect(new URL('/login', request.url))
     supabaseResponse.cookies.getAll().forEach(c => redirect.cookies.set(c))
-
-    // Endlosschleife brechen: Ist noch ein Supabase-Cookie da, obwohl der Server
-    // keine gültige Session erkennt, ist der Token tot (z.B. weil ein früherer
-    // Redirect den erneuerten Token verworfen hat). Der Browser hält ihn aber
-    // weiter — die App wirkt "eingeloggt", jeder Klick landet auf /login.
-    // Also das tote Cookie entfernen, damit ein sauberer Login möglich ist.
-    const stale = request.cookies.getAll().filter(c => c.name.startsWith('sb-'))
-    const refreshed = new Set(supabaseResponse.cookies.getAll().map(c => c.name))
-    stale.forEach(c => { if (!refreshed.has(c.name)) redirect.cookies.delete(c.name) })
-
     return redirect
   }
 
@@ -80,5 +100,8 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|favicon.svg|logo-player.svg|auth|join|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  // site.webmanifest, apple-touch-icon & Co. werden vom Browser OHNE Cookies
+  // geholt — sie liefen in die Login-Umleitung und kamen als HTML zurück.
+  // Deshalb hier ausgenommen.
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|favicon.svg|site.webmanifest|apple-touch-icon.png|logo-player.svg|auth|join|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|webmanifest)$).*)'],
 }

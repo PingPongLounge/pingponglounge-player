@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { rateLimited, clientIp } from "@/lib/ratelimit"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -49,8 +50,44 @@ export async function POST(req: NextRequest) {
     player_id: user.id,
     amount: 15,
     source: "welcome",
-    description: "Willkommen bei Ping Pong Lounge",
+    description: "Willkommen bei Player",
   })
+
+  // REFERRAL — das war bisher ein leeres Versprechen: /join setzte ein Cookie
+  // "ppl_ref", und niemand hat es je gelesen. Der Werber bekam nie etwas, obwohl
+  // /freunde und /join beiden "2 Gratisstunden" zusagen.
+  try {
+    const ref = req.cookies.get("ppl_ref")?.value?.trim()
+    if (ref) {
+      const admin = createAdminClient()
+
+      // Werber über referral_code ODER Spielername finden
+      const { data: werber } = await admin
+        .from("profiles")
+        .select("id")
+        .or(`referral_code.eq.${ref},name.eq.${ref}`)
+        .limit(1)
+        .maybeSingle()
+
+      // Sich selbst werben geht nicht
+      if (werber?.id && werber.id !== user.id) {
+        const exp = new Date()
+        exp.setMonth(exp.getMonth() + 6)
+
+        await admin.from("credits").insert({
+          user_id: werber.id,
+          hours: 2,
+          type: "referral",
+          redemption_code: genCode(),
+          expires_at: exp.toISOString(),
+          ref_id: user.id,          // wen er geworben hat — verhindert Doppel-Gutschriften
+        })
+      }
+    }
+  } catch (e) {
+    // Ein fehlgeschlagenes Referral darf die Registrierung nie scheitern lassen
+    console.error("Referral-Gutschrift fehlgeschlagen:", e)
+  }
 
   return NextResponse.json({ ok: true })
 }

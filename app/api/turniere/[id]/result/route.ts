@@ -74,27 +74,40 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       // Kein nächstes Match -> das war das Finale: Champion + Turnier beendet
       await admin.from("player_tournaments").update({ status: "finished", champion_id: m.winner_id, updated_at: new Date().toISOString() }).eq("id", m.tournament_id)
 
-      // PingPoints fürs Podest (Platz 1–3) — die einzige Art, mit Spielen PP zu verdienen.
-      const [p1pp, p2pp, p3pp] = PP_CONFIG.tournamentPodium
-      const finalLoser = m.winner_id === m.p1_id ? m.p2_id : m.p1_id
-      const rows: Array<{ player_id: string; amount: number; source: string; description: string; ref_id: string }> = []
-      if (m.winner_id) rows.push({ player_id: m.winner_id, amount: p1pp, source: "turnier_platz1", description: "Turniersieg — Platz 1", ref_id: m.tournament_id })
-      if (finalLoser)  rows.push({ player_id: finalLoser,  amount: p2pp, source: "turnier_platz2", description: "Turnier — Platz 2", ref_id: m.tournament_id })
+      // PingPoints fürs Podest — NUR bei Turnieren, die für den Rang zählen.
+      // Vorher wurden sie vor dieser Prüfung geschrieben: zwei Leute, ein
+      // Spass-Turnier ohne Wertung, 100 PingPoints = zwei Gratis-Stunden Tisch.
+      // Die Währung wäre am ersten Abend entwertet gewesen.
+      const { data: tRank } = await admin
+        .from("player_tournaments").select("counts_for_rank").eq("id", m.tournament_id).single()
+      const { count: teilnehmer } = await admin
+        .from("tournament_registrations")
+        .select("id", { count: "exact", head: true })
+        .eq("tournament_id", m.tournament_id)
 
-      // Platz 3: beide Halbfinal-Verlierer (Runde vor dem Finale)
-      if (m.round > 1) {
-        const { data: semis } = await admin
-          .from("tournament_matches")
-          .select("p1_id,p2_id,winner_id")
-          .eq("tournament_id", m.tournament_id)
-          .eq("round", m.round - 1)
-          .eq("status", "confirmed")
-        for (const s of semis || []) {
-          const loser = s.winner_id === s.p1_id ? s.p2_id : s.p1_id
-          if (loser) rows.push({ player_id: loser, amount: p3pp, source: "turnier_platz3", description: "Turnier — Platz 3", ref_id: m.tournament_id })
+      // Und erst ab 4 Teilnehmern — ein Podest unter zwei Leuten ist keins.
+      if (tRank?.counts_for_rank && (teilnehmer ?? 0) >= 4) {
+        const [p1pp, p2pp, p3pp] = PP_CONFIG.tournamentPodium
+        const finalLoser = m.winner_id === m.p1_id ? m.p2_id : m.p1_id
+        const rows: Array<{ player_id: string; amount: number; source: string; description: string; ref_id: string }> = []
+        if (m.winner_id) rows.push({ player_id: m.winner_id, amount: p1pp, source: "turnier_platz1", description: "Turniersieg — Platz 1", ref_id: m.tournament_id })
+        if (finalLoser)  rows.push({ player_id: finalLoser,  amount: p2pp, source: "turnier_platz2", description: "Turnier — Platz 2", ref_id: m.tournament_id })
+
+        // Platz 3: beide Halbfinal-Verlierer (Runde vor dem Finale)
+        if (m.round > 1) {
+          const { data: semis } = await admin
+            .from("tournament_matches")
+            .select("p1_id,p2_id,winner_id")
+            .eq("tournament_id", m.tournament_id)
+            .eq("round", m.round - 1)
+            .eq("status", "confirmed")
+          for (const s of semis || []) {
+            const loser = s.winner_id === s.p1_id ? s.p2_id : s.p1_id
+            if (loser) rows.push({ player_id: loser, amount: p3pp, source: "turnier_platz3", description: "Turnier — Platz 3", ref_id: m.tournament_id })
+          }
         }
+        if (rows.length) await admin.from("ping_points_transactions").insert(rows)
       }
-      if (rows.length) await admin.from("ping_points_transactions").insert(rows)
     }
 
     // ELO + Statistik — nur wenn das Turnier für den Rang zählt.
