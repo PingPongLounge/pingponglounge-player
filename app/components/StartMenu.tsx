@@ -71,6 +71,9 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
               <Link2 href="/rangliste" label="rangliste" icon={<Icon d='<path d="M5 20v-6M12 20v-11M19 20v-8"/>' />} />
               <Link2 href="/matchhistorie" label="deine spiele" icon={<Icon d='<path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/>' />} />
               <Link2 href="/pingpoints" label="pingpoints" icon={<Icon d='<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>' />} />
+              {/* Der Shop hing als Warenkorb-Symbol im Kopf der Startseite — dem
+                  prominentesten Platz der App, für einen Nebenschauplatz. */}
+              <Link2 href="/shop" label="shop" icon={<Icon d='<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2l2.2 12.2a1.5 1.5 0 0 0 1.5 1.3h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6"/>' />} />
             </div>
 
             <div style={{ fontSize: 11, color: "rgba(255,255,255,.5)", textTransform: "uppercase", letterSpacing: ".06em", margin: "22px 4px 8px" }}>spielen &amp; buchen</div>

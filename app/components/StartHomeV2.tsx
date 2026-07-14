@@ -73,22 +73,9 @@ export default function StartHomeV2(d: StartData) {
       <main style={{ minHeight: "100vh", background: BG, paddingBottom: 110 }}>
         <div ref={root} style={{ maxWidth: 480, margin: "0 auto", padding: "18px 0 90px" }}>
 
-          {/* Kopf */}
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 13, padding: "0 18px", marginBottom: 18 }}>
-            <div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div style={{ fontSize: 21, fontWeight: 800, color: W }}>Hi, {d.firstName} 👋</div>
-                <span style={{ fontSize: 9, fontWeight: 800, letterSpacing: ".08em", textTransform: "uppercase", color: "#06210F", background: GRAD, borderRadius: 999, padding: "2px 7px" }}>Beta</span>
-              </div>
-              <div style={{ fontSize: 13, color: MUT, fontWeight: 500, marginTop: 1 }}>{d.lvl} · #{d.rank}</div>
-            </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <a href="https://pingponglounge.ch/shop" target="_blank" rel="noopener noreferrer" aria-label="Shop" style={{ width: 44, height: 44, borderRadius: 12, border: `1px solid ${CELL}`, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none" }}>
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" /><path d="M2.5 3h2l2.2 12.2a1.5 1.5 0 0 0 1.5 1.3h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6" /></svg>
-              </a>
-              <StartMenu inline avatar={d.initials} name={d.firstName} sub={`${d.lvl} · #${d.rank}`} />
-            </div>
-          </div>
+          {/* Kein zweiter Kopf mehr: Avatar, Menü und Beta stehen jetzt oben im
+              Header. "Hi, …" kostete eine Zeile und sagte nichts — der Name steht
+              im Avatar, der Rang eine Zeile weiter unten. */}
 
           {/* RANG — derselbe Block wie in der Liga: Bild oben, darunter die Zeilen,
               getrennt durch Linien. Vorher eine schwarze Box ohne ein einziges Bild. */}
@@ -198,6 +185,19 @@ export default function StartHomeV2(d: StartData) {
             <div style={csub}>Coaching, Drills & Kurse — buch dich direkt in ein Training ein.</div>
             <Link href="/training" style={cta}>Trainings ansehen</Link>
           </div>
+
+          {/* SHOP — eine ruhige Zeile am Ende, kein Warenkorb im Kopf. Der Grund
+              zum Klicken steht dabei: hier werden die Punkte zu etwas. */}
+          <Link href="/shop" className="rev" style={{ display: "flex", alignItems: "center", gap: 13, background: CARD, borderRadius: 22, padding: "15px 18px", boxShadow: SHADOW, margin: "0 16px 18px", textDecoration: "none" }}>
+            <span style={{ width: 38, height: 38, borderRadius: 11, background: CELL, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#39FF14" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" /><path d="M2.5 3h2l2.2 12.2a1.5 1.5 0 0 0 1.5 1.3h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6" /></svg>
+            </span>
+            <span style={{ flex: 1, minWidth: 0 }}>
+              <span style={{ display: "block", fontSize: 13.5, fontWeight: 800, color: W }}>Shop</span>
+              <span style={{ display: "block", fontSize: 11.5, color: MUT, marginTop: 2 }}>Schläger, Bälle, PPL-Merch — PingPoints einlösen</span>
+            </span>
+            <span style={{ color: MUT, fontSize: 15 }}>›</span>
+          </Link>
 
         </div>
       </main>

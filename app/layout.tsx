@@ -11,11 +11,18 @@ export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   title: "Player — Next Level Table Tennis",
   description: "Liga, Open Games und Turniere — vom Anfänger bis zum Profi. Spiel, trag dein Resultat ein, steig auf.",
+  // Safari (Favoriten, Home-Bildschirm) und Android zeigen KEIN SVG-Favicon —
+  // ohne PNG/ICO kam die graue Kachel mit dem Anfangsbuchstaben.
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-    apple: "/favicon.svg",
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+      { url: "/favicon-16.png", sizes: "16x16", type: "image/png" },
+    ],
+    shortcut: "/favicon.ico",
+    apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
   },
+  manifest: "/site.webmanifest",
   openGraph: {
     type: "website",
     locale: "de_CH",
