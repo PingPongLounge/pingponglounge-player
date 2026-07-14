@@ -569,43 +569,41 @@ export default function LigaPage(){
                           ? <img src={r.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                           : <span style={{fontSize:11,fontWeight:800,color:MUT}}>{initialen}</span>}
                       </div>
-                      {/* Name antippen → Spielerprofil mit Bilanz und letzten Spielen */}
-                      <button onClick={()=>openPlayer(r.user_id)} style={{flex:1,minWidth:0,background:"none",border:"none",padding:0,textAlign:"left",cursor:"pointer",fontFamily:"inherit"}}>
-                        <span style={{fontSize:14.5,fontWeight:800,color:W}}>{r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 6px",marginLeft:7,color:SUB}}>Du</span>}</span>
-                        {r.real&&<div style={{fontSize:11,color:MUT,fontWeight:500,marginTop:1}}>{r.real}</div>}
-                        {!me&&myReg&&(()=>{
-                          const gespielt=rankedVs[r.user_id]||0
-                          if(gespielt===0) return null
-                          const voll=gespielt>=MAX_RANKED_PER_OPPONENT
-                          return <div style={{fontSize:10,color:voll?MUT:SUB,fontWeight:600,marginTop:2}}>
-                            {gespielt}/{MAX_RANKED_PER_OPPONENT} Liga-Matches{voll?" · zählt nicht mehr":""}
-                          </div>
-                        })()}
+                      {/* Name antippen → Spielerprofil mit Bilanz und letzten Spielen.
+                          Alles einzeilig mit Auslassungspunkten: lange Namen brachen
+                          um, das Level-Badge rutschte über den Namen, und
+                          "2/5 Liga-Matches" wuchs auf drei Zeilen. Dieser Zähler
+                          steht jetzt im Spieler-Popup, wo Platz dafür ist. */}
+                      <button onClick={()=>openPlayer(r.user_id)} style={{flex:1,minWidth:0,background:"none",border:"none",padding:0,textAlign:"left",cursor:"pointer",fontFamily:"inherit",overflow:"hidden"}}>
+                        <span style={{display:"block",fontSize:14,fontWeight:800,color:W,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+                          {r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 5px",marginLeft:6,color:SUB}}>Du</span>}
+                        </span>
+                        {r.real&&<span style={{display:"block",fontSize:10.5,color:MUT,fontWeight:500,marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{r.real}</span>}
                       </button>
-                      {/* Level als Badge — die Rangwinkel zeigten dieselbe Information
-                          doppelt, und der Level war dabei ganz verschwunden. */}
-                      {r.level&&<span style={levelBadge(r.level)}>L{r.level}</span>}
-                      <span style={{fontSize:13.5,fontWeight:800,width:42,textAlign:"right",...(me?gt:{color:SUB})}}>{r.elo}</span>
-                      {/* Gefordert wird innerhalb der Tabelle — also gegen jeden hier. */}
+                      {/* Level als Badge — fixe Breite, damit nichts überläuft */}
+                      {r.level&&<span style={{...levelBadge(r.level),flexShrink:0}}>L{r.level}</span>}
+                      <span style={{fontSize:13,fontWeight:800,width:38,textAlign:"right",flexShrink:0,...(me?gt:{color:SUB})}}>{r.elo}</span>
+                      {/* Eine Aktion, kurz und immer gleich breit. "SPIEL EINTRAGEN →"
+                          und "ZURÜCKZIEHEN" sprengten die Zeile. */}
                       {!me&&myReg&&(()=>{
                         const om=openMatches[r.user_id]
-                        // Stiller Button: sieben grün umrandete Knöpfe untereinander waren ein Zaun.
-                        const btnBase:React.CSSProperties={border:`1px solid ${CELL}`,borderRadius:10,padding:"7px 10px",fontSize:10,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:SUB,background:"none",cursor:"pointer",whiteSpace:"nowrap",fontFamily:"inherit"}
-                        const kleinX:React.CSSProperties={background:"none",border:`1px solid ${MUT}`,borderRadius:9,padding:"6px 8px",fontSize:10,fontWeight:800,color:MUT,cursor:"pointer",fontFamily:"inherit",whiteSpace:"nowrap"}
+                        const btnBase:React.CSSProperties={border:`1px solid ${CELL}`,borderRadius:9,padding:"7px 0",width:74,textAlign:"center",fontSize:10,fontWeight:800,textTransform:"uppercase",letterSpacing:".02em",color:SUB,background:"none",cursor:"pointer",whiteSpace:"nowrap",fontFamily:"inherit",flexShrink:0,display:"inline-block",textDecoration:"none"}
+                        const iconBtn:React.CSSProperties={background:"none",border:`1px solid ${CELL}`,borderRadius:9,width:30,height:30,fontSize:12,fontWeight:800,color:MUT,cursor:"pointer",fontFamily:"inherit",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}
                         if(!om) return <button onClick={()=>openForder(r)} style={btnBase}>Fordern</button>
-                        // Ablehnen und Zurückziehen gab es nur auf einer verwaisten Altseite.
-                        // Eine Forderung blockierte das Paar dadurch für immer.
                         if(om.status==="challenge_sent"&&!om.iAmP1) return (
-                          <span style={{display:"flex",gap:5}}>
-                            <button onClick={()=>acceptChallenge(om.id)} style={{...btnBase,background:GRAD,color:"#06210F"}}>Annehmen ✓</button>
-                            <button onClick={()=>declineChallenge(om.id)} title="Ablehnen" style={kleinX}>✕</button>
+                          <span style={{display:"flex",gap:5,flexShrink:0}}>
+                            <button onClick={()=>acceptChallenge(om.id)} style={{...btnBase,width:64,color:GREEN,borderColor:"rgba(57,255,20,.35)"}}>Annehmen</button>
+                            <button onClick={()=>declineChallenge(om.id)} title="Ablehnen" style={iconBtn}>✕</button>
                           </span>
                         )
                         if(om.status==="challenge_sent"&&om.iAmP1) return (
-                          <button onClick={()=>declineChallenge(om.id)} style={kleinX}>Zurückziehen</button>
+                          <span style={{display:"flex",alignItems:"center",gap:5,flexShrink:0}}>
+                            <span style={{fontSize:10,fontWeight:700,color:MUT,textTransform:"uppercase",whiteSpace:"nowrap"}}>Offen</span>
+                            <button onClick={()=>declineChallenge(om.id)} title="Zurückziehen" style={iconBtn}>✕</button>
+                          </span>
                         )
-                        if(om.status==="accepted"||om.status==="pending") return <Link href={`/liga/match/${om.id}`} style={{...btnBase,textDecoration:"none",display:"inline-block"}}>Spiel eintragen →</Link>
-                        if(om.status==="p1_entered"&&!om.iAmP1) return <Link href={`/liga/match/${om.id}`} style={{...btnBase,background:GRAD,color:"#06210F",textDecoration:"none",display:"inline-block"}}>Bestätigen ✓</Link>
+                        if(om.status==="accepted"||om.status==="pending") return <Link href={`/liga/match/${om.id}`} style={btnBase}>Eintragen</Link>
+                        if(om.status==="p1_entered"&&!om.iAmP1) return <Link href={`/liga/match/${om.id}`} style={{...btnBase,color:GREEN,borderColor:"rgba(57,255,20,.35)"}}>Bestätigen</Link>
                         // Ergebnis wartet auf Bestätigung → weiteres Ergebnis trotzdem erlauben
                         return <button onClick={()=>openForder(r)} style={btnBase}>Fordern</button>
                       })()}

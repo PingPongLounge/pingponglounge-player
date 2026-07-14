@@ -200,9 +200,13 @@ export const input: CSSProperties = { width: '100%', background: INPUTBG, border
 
 /* ---------- Badges ---------- */
 // Level-Pille: gefüllter Pastell-Metall-Verlauf + dunkle Schrift (Bronze/Silber/Gold lesbar)
-export const levelBadge = (level?: string | null): CSSProperties => ({
-  fontSize: 10.5, fontWeight: 800, color: '#15110A', background: lvGrad(level),
-  border: 'none', borderRadius: 999, padding: '3px 11px', display: 'inline-block', letterSpacing: '.02em',
+// Level-Badge: EINE ruhige Pille. Vorher hatte jedes Level seinen eigenen
+// Farbverlauf (gelb, blau, grau) — in einer Rangliste ergab das einen bunten
+// Flickenteppich, der den Blick von Platz und Punkten wegzog.
+export const levelBadge = (_level?: string | null): CSSProperties => ({
+  fontSize: 10, fontWeight: 800, color: SUB, background: 'none',
+  border: `1px solid ${CELL}`, borderRadius: 999, padding: '3px 8px',
+  display: 'inline-block', letterSpacing: '.02em', whiteSpace: 'nowrap',
 })
 // Neutrale Status-Pill (offen/läuft/beendet)
 export const statusPill: CSSProperties = { fontSize: 10, fontWeight: 500, color: SUB, border: `1px solid ${SUB}`, borderRadius: 999, padding: '3px 10px', display: 'inline-block' }
