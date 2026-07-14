@@ -46,77 +46,68 @@ export default async function EntdeckenPage() {
       .from('public_profiles')
       .select('id', { count: 'exact', head: true })
 
-    const CARD: React.CSSProperties = { background: '#2A2F39', borderRadius: 22, padding: 20, marginBottom: 12, boxShadow: '0 1px 4px rgba(0,0,0,.14)' }
-    const CHEAD: React.CSSProperties = { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 9, marginBottom: 8 }
-    const CTITLE: React.CSSProperties = { fontSize: 19, fontWeight: 900, letterSpacing: '-.01em', color: W }
-    const CSUB: React.CSSProperties = { fontSize: 13.5, color: MUT, textAlign: 'center', lineHeight: 1.5, margin: 0 }
-    const GHOST: React.CSSProperties = { display: 'block', textAlign: 'center', marginTop: 14, border: '1px solid #353B46', borderRadius: 13, padding: 12, fontSize: 13, fontWeight: 700, color: SUB, textDecoration: 'none' }
-    const FACT: React.CSSProperties = { display: 'flex', justifyContent: 'space-between', padding: '7px 0', borderTop: '1px solid rgba(255,255,255,.07)' }
-    const FK: React.CSSProperties = { fontSize: 12.5, color: MUT, fontWeight: 500 }
-    const FV: React.CSSProperties = { fontSize: 13, fontWeight: 800, color: W }
+    // Eine Zeile im Block — dasselbe Muster wie überall: Icon, Text, Linie.
+    const ROW: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 13, padding: '14px 18px', borderTop: '1px solid rgba(255,255,255,.07)' }
+    const RIC: React.CSSProperties = { width: 34, height: 34, borderRadius: 10, background: '#353B46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }
 
     return (
-      <main style={{ minHeight: '100vh', background: BG, paddingBottom: 100 }}>
+      <main style={{ minHeight: '100vh', background: BG, paddingBottom: 40 }}>
         <div style={{ maxWidth: 480, margin: '0 auto' }}>
 
-          {/* Hero — dasselbe Bild wie in Liga, Open Game und Turnier */}
-          <div style={{ position: 'relative', minHeight: 430, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '26px 22px 28px' }}>
-            <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(180deg, rgba(20,23,30,.15) 0%, rgba(20,23,30,.7) 50%, ${BG} 100%), url('/hero-pokal.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
+          {/* Ein Bild, ein Satz, ein Knopf. Vorher: Hero + VIER Karten + eine
+              Bottom-Nav, die für Ausgeloggte überall in die Login-Wand lief. */}
+          <div style={{ position: 'relative', minHeight: 470, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '26px 22px 30px' }}>
+            <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(180deg, rgba(20,23,30,.2) 0%, rgba(20,23,30,.72) 52%, ${BG} 100%), url('/hero-pokal.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
 
             <div style={{ position: 'relative', zIndex: 2 }}>
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 12, marginBottom: 22 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 24 }}>
                 <Logo />
-                <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'stretch' }}>
-                  <div style={{ fontSize: 15, fontWeight: 900, letterSpacing: '.26em', lineHeight: 1, ...gt }}>PLAYER</div>
-                  <div style={{ fontSize: 8, fontWeight: 700, color: MUT, textTransform: 'uppercase', marginTop: 5, textAlign: 'justify', textAlignLast: 'justify' }}>Next Level Table Tennis</div>
-                </div>
-                <span style={{ alignSelf: 'center', fontSize: 8.5, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#06210F', background: GRAD, borderRadius: 999, padding: '3px 8px' }}>Beta</span>
+                <span style={{ fontSize: 17, fontWeight: 900, letterSpacing: '.20em', ...gt }}>PLAYER</span>
+                <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#06210F', background: GRAD, borderRadius: 999, padding: '3px 8px' }}>Beta</span>
               </div>
 
-              <h1 style={{ fontSize: 30, fontWeight: 900, lineHeight: 1.06, letterSpacing: '-.025em', margin: '0 0 10px', color: W }}>
+              <h1 style={{ fontSize: 32, fontWeight: 900, lineHeight: 1.05, letterSpacing: '-.025em', margin: '0 0 11px', color: W }}>
                 Spiel. Trag ein.<br /><span style={gt}>Steig auf.</span>
               </h1>
-              <p style={{ fontSize: 14, color: SUB, fontWeight: 300, lineHeight: 1.55, margin: '0 0 24px' }}>
-                Liga, Turniere und Trainings — vom Anfänger bis zum Profi. Fordere andere, trag dein Resultat ein, steig auf.
+              <p style={{ fontSize: 14.5, color: SUB, fontWeight: 300, lineHeight: 1.55, margin: '0 0 26px' }}>
+                Liga, Turniere und Trainings — vom Anfänger bis zum Profi.
+                {spielerCount ? ` ${spielerCount} Spieler sind dabei.` : ''}
               </p>
 
               <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 15, padding: 17, fontSize: 16, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: '#06210F', background: GRAD, textDecoration: 'none' }}>Login / Registrieren</Link>
-              <Link href="/spielen" style={{ display: 'block', textAlign: 'center', marginTop: 13, color: SUB, fontSize: 13.5, fontWeight: 500, textDecoration: 'none' }}>Schon gespielt? Resultat eintragen →</Link>
+              <Link href="/spielen" style={{ display: 'block', textAlign: 'center', marginTop: 14, color: SUB, fontSize: 13.5, fontWeight: 500, textDecoration: 'none' }}>Schon gespielt? Resultat eintragen →</Link>
             </div>
           </div>
 
-          {/* Dieselben Karten wie eingeloggt — wer sich registriert, erkennt die App wieder */}
-          <div style={{ padding: '8px 14px 18px' }}>
-            <div style={CARD}>
-              <div style={CHEAD}><img src="/icons/liga.svg" alt="" style={{ width: 26, height: 26 }} /><span style={CTITLE}>Liga</span></div>
-              <p style={CSUB}>Spiel in deiner Klasse, sammle ELO-Punkte, steig in der Rangliste.</p>
-              <div style={{ marginTop: 14 }}>
-                <div style={{ ...FACT, borderTop: 'none' }}><span style={FK}>Klassen</span><span style={FV}>Einstieg · Pro</span></div>
-                <div style={FACT}><span style={FK}>Spieler</span><span style={FV}>{spielerCount ?? 0} dabei</span></div>
-              </div>
-              <Link href="/login" style={GHOST}>Rangliste ansehen</Link>
+          {/* EIN Block statt vier Karten — drei Zeilen sagen, was einen erwartet. */}
+          <div style={{ margin: '4px 14px 0', background: '#14171E', borderRadius: 22, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,.14)' }}>
+            <div style={{ padding: '15px 18px 3px', fontSize: 11, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: MUT }}>Was dich erwartet</div>
+
+            <div style={{ ...ROW, borderTop: 'none', paddingTop: 12 }}>
+              <span style={RIC}><img src="/icons/liga.svg" alt="" style={{ width: 19, height: 19 }} /></span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: 'block', fontSize: 14, fontWeight: 800, color: W }}>Liga</span>
+                <span style={{ display: 'block', fontSize: 12, color: MUT, marginTop: 2 }}>Fordere andere, trag dein Resultat ein, steig in der Tabelle.</span>
+              </span>
             </div>
 
-            <div style={CARD}>
-              <div style={CHEAD}><img src="/icons/open-game.svg" alt="" style={{ width: 26, height: 26 }} /><span style={CTITLE}>Open Game</span></div>
-              <p style={CSUB}>Tisch und Zeit reinstellen — wer Lust hat, spielt mit.</p>
-              <Link href="/login" style={GHOST}>Offene Spiele ansehen</Link>
+            <div style={ROW}>
+              <span style={RIC}><img src="/icons/open-game.svg" alt="" style={{ width: 19, height: 19 }} /></span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: 'block', fontSize: 14, fontWeight: 800, color: W }}>Open Game</span>
+                <span style={{ display: 'block', fontSize: 12, color: MUT, marginTop: 2 }}>Tisch und Zeit reinstellen — wer Lust hat, spielt mit.</span>
+              </span>
             </div>
 
-            <div style={CARD}>
-              <div style={CHEAD}><img src="/icons/turnier.svg" alt="" style={{ width: 26, height: 26 }} /><span style={CTITLE}>Turnier</span></div>
-              <p style={CSUB}>KO-Bracket, Podest, PingPoints. Zählt für deinen Rang.</p>
-              <Link href="/login" style={GHOST}>Turniere ansehen</Link>
-            </div>
-
-            <div style={CARD}>
-              <div style={CHEAD}><img src="/icons/paddles.svg" alt="" style={{ width: 26, height: 26 }} /><span style={CTITLE}>Training</span></div>
-              <p style={CSUB}>Coaching und Drills von Beginner bis Pro — in Glattbrugg.</p>
-              <Link href="/login" style={GHOST}>Trainings ansehen</Link>
+            <div style={ROW}>
+              <span style={RIC}><img src="/icons/turnier.svg" alt="" style={{ width: 19, height: 19 }} /></span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <span style={{ display: 'block', fontSize: 14, fontWeight: 800, color: W }}>Turnier &amp; Training</span>
+                <span style={{ display: 'block', fontSize: 12, color: MUT, marginTop: 2 }}>K.o.-Bracket, Podest, PingPoints. Coaching in Glattbrugg.</span>
+              </span>
             </div>
           </div>
         </div>
-        <BottomNav />
       </main>
     )
   }
