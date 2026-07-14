@@ -3,7 +3,23 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 // Eine ELO-Berechnung für alles: Liga, Open Game, Turnier.
 // Vorher stand dieselbe Formel dreimal im Code — mit dem Risiko, dass sie
 // auseinanderläuft. K=32, Untergrenze 100.
-const K = 32
+export const K = 32
+export const ELO_FLOOR = 100
+
+/**
+ * Die reine Rechnung — ohne Datenbank, deshalb testbar.
+ * Vorher steckte sie mitten in applyElo() und liess sich nur mit einer echten
+ * Supabase-Verbindung prüfen. Genau solche Stellen bleiben ungetestet.
+ */
+export function berechneElo(wElo: number, lElo: number): { neuW: number; neuL: number; gain: number } {
+  const ea = 1 / (1 + Math.pow(10, (lElo - wElo) / 400))
+  const gain = Math.round(K * (1 - ea))
+  return {
+    gain,
+    neuW: Math.max(ELO_FLOOR, wElo + gain),
+    neuL: Math.max(ELO_FLOOR, lElo - gain),
+  }
+}
 
 export async function applyElo(
   admin: SupabaseClient,
@@ -18,10 +34,7 @@ export async function applyElo(
 
   const wElo = w.elo ?? 1000
   const lElo = l.elo ?? 1000
-  const ea = 1 / (1 + Math.pow(10, (lElo - wElo) / 400))
-  const gain = Math.round(K * (1 - ea))
-  const newW = Math.max(100, wElo + gain)
-  const newL = Math.max(100, lElo - gain)
+  const { neuW: newW, neuL: newL } = berechneElo(wElo, lElo)
 
   await admin.from("profiles").update({
     elo: newW,
@@ -44,9 +57,6 @@ export async function applyElo(
 
 // Vorschau, ohne zu schreiben — für die E-Mail ("1350 → 1334")
 export function eloPreview(myElo: number, oppElo: number, iWin: boolean): number {
-  const wElo = iWin ? myElo : oppElo
-  const lElo = iWin ? oppElo : myElo
-  const ea = 1 / (1 + Math.pow(10, (lElo - wElo) / 400))
-  const gain = Math.round(K * (1 - ea))
-  return iWin ? Math.max(100, myElo + gain) : Math.max(100, myElo - gain)
+  const { neuW, neuL } = iWin ? berechneElo(myElo, oppElo) : berechneElo(oppElo, myElo)
+  return iWin ? neuW : neuL
 }

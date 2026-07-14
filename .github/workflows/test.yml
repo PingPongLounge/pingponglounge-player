@@ -1,0 +1,59 @@
+name: Tests
+
+# Läuft bei jedem Push und jedem Pull Request. Bricht ein Test, ist es sofort
+# sichtbar — statt erst dann, wenn ein Spieler anruft.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  regeln:
+    name: Regeln & Typen
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: TypeScript
+        run: npx tsc --noEmit
+      - name: Regeltests (ELO, Ligen, Limits, PingPoints)
+        run: npm test
+
+  browser:
+    name: Browser-Durchlauf
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci
+      - name: Playwright installieren
+        run: npx playwright install --with-deps chromium
+      - name: Bauen
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      - name: Durchlauf im Browser
+        run: npx playwright test
+        env:
+          CI: "1"
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          # Optionales Testkonto: ist es gesetzt, läuft auch der eingeloggte
+          # Durchlauf (Liga, Ergebnis eintragen, Chat). Ohne bleibt der Rauchtest.
+          E2E_EMAIL: ${{ secrets.E2E_EMAIL }}
+          E2E_PASSWORD: ${{ secrets.E2E_PASSWORD }}
+      - name: Spuren bei Fehlern hochladen
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
