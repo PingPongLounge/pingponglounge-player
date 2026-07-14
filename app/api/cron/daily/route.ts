@@ -1,5 +1,6 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { autoConfirmOverdue, remindStuckOnboarding, expireOldChallenges } from "@/lib/cron-tasks"
+import { ensureOpenGames } from "@/lib/opengames"
 import { applyMonthlyPenalties, warnMonthlyOpen } from "@/lib/monthly"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -17,6 +18,11 @@ async function run(req: NextRequest) {
   const confirmed = await autoConfirmOverdue(admin)
   const reminded = await remindStuckOnboarding(admin)
   const expired = await expireOldChallenges(admin)   // Forderungen verfallen nach 7 Tagen
+
+  // Offizielle Open Games für die nächsten drei Wochen anlegen (idempotent).
+  let angelegt = 0
+  try { angelegt = await ensureOpenGames(admin) }
+  catch (e) { console.error("Open Games anlegen fehlgeschlagen:", e) }
 
   // Aktivitätspflicht: den Vormonat abrechnen, ab dem 25. warnen.
   // Die Abrechnung läuft JEDEN Tag, nicht nur am 1. — sie ist idempotent
@@ -47,7 +53,7 @@ async function run(req: NextRequest) {
     console.error("Inaktivitäts-Lauf fehlgeschlagen:", e)
   }
 
-  return NextResponse.json({ ok: true, confirmed, reminded, expired, penalties, warned, inactivity })
+  return NextResponse.json({ ok: true, confirmed, reminded, expired, angelegt, penalties, warned, inactivity })
 }
 
 export const GET = run
