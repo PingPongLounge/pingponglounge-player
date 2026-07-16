@@ -279,9 +279,23 @@ export default function ProfilPage(){
             {href:"/pingpoints",    icon:"⚡", label:"PingPoints",      sub:`${ppBalance} PP Guthaben`},
             {href:"/liga",          icon:"🏓", label:"Liga",            sub:"Saisons & Challenges"},
             {href:"/freunde",       icon:"👥", label:"Freunde",         sub:"Spieler finden"},
-            {href:"/buchen",        icon:"📅", label:"Tisch buchen",    sub:"Standort & Zeit wählen"},
+            {href:"https://pingponglounge.ch/buchen", icon:"📅", label:"Tisch buchen", sub:"Auf der Website", extern:true},
             {href:"/profil/avatar", icon:"🎨", label:"Avatar ändern",   sub:"AI Comic Graffiti Stil"},
-          ].map(({href,icon,label,sub})=>(
+          ].map(({href,icon,label,sub,extern})=>(
+            extern ? (
+            <a key={href} href={href} target="_blank" rel="noopener noreferrer" style={{display:"block",textDecoration:"none"}}>
+              <div style={{...card,borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+                <div style={{display:"flex",alignItems:"center",gap:12}}>
+                  <div style={{width:38,height:38,borderRadius:10,background:CELL,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{icon}</div>
+                  <div>
+                    <p style={{fontSize:13,fontWeight:700,color:W}}>{label}</p>
+                    <p style={{fontSize:12.5,color:M}}>{sub}</p>
+                  </div>
+                </div>
+                <span style={{color:M,fontSize:16}}>↗</span>
+              </div>
+            </a>
+            ) : (
             <Link key={href} href={href} style={{display:"block",textDecoration:"none"}}>
               <div style={{...card,borderRadius:14,padding:"14px 18px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
                 <div style={{display:"flex",alignItems:"center",gap:12}}>
@@ -294,6 +308,7 @@ export default function ProfilPage(){
                 <span style={{color:G,fontWeight:700}}>→</span>
               </div>
             </Link>
+            )
           ))}
         </div>
 
