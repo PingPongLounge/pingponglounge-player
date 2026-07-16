@@ -4,7 +4,6 @@ import { useEffect, useRef, useState, useCallback } from "react"
 const CARD = "#2A2F39", CELL = "#353B46", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.82)"
 const LINE = "rgba(255,255,255,.07)"
-const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 
 type Msg = { id: string; user_id: string | null; text: string; created_at: string; kind: string | null; name: string }
 
@@ -56,8 +55,11 @@ export default function LigaChatHome({
           return (
             <div key={m.id} style={{ maxWidth: "80%", alignSelf: me ? "flex-end" : "flex-start" }}>
               <div style={{ fontSize: 11, fontWeight: 700, color: MUT, margin: me ? "0 11px 3px 0" : "0 0 3px 11px", textAlign: me ? "right" : "left" }}>{me ? "Du" : m.name}</div>
+              {/* Eigene Nachricht: graues Kästchen mit grüner Umrandung — kein
+                  grünes Schimmern. */}
               <div style={{
-                background: me ? "rgba(57,255,20,.13)" : CELL, color: W, borderRadius: 13,
+                background: CELL, color: W, borderRadius: 13,
+                border: me ? "1px solid rgba(57,255,20,.5)" : "1px solid transparent",
                 borderTopLeftRadius: me ? 13 : 4, borderTopRightRadius: me ? 4 : 13,
                 padding: "9px 13px", fontSize: 13.5, fontWeight: 300, lineHeight: 1.35,
               }}>{m.text}</div>
@@ -73,7 +75,7 @@ export default function LigaChatHome({
             placeholder="Nachricht an die Liga…"
             style={{ flex: 1, background: "#20242C", border: `1px solid ${LINE}`, borderRadius: 12, padding: "11px 14px", color: W, fontSize: 13, outline: "none", fontFamily: "inherit" }}
           />
-          <button onClick={send} disabled={sending} style={{ width: 44, border: "none", borderRadius: 12, background: GRAD, color: "#08120a", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>→</button>
+          <button onClick={send} disabled={sending} style={{ width: 44, border: "none", borderRadius: 12, background: "#39FF14", color: "#08120a", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>→</button>
         </div>
       ) : (
         <div style={{ padding: "12px 16px", borderTop: `1px solid ${LINE}`, textAlign: "center", fontSize: 12, color: MUT, fontWeight: 500 }}>

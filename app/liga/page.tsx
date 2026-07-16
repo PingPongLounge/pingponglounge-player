@@ -564,7 +564,7 @@ export default function LigaPage(){
                   const platz=ersterPlatz+i   // echter Tabellenplatz, nicht die Zeilennummer
                   const initialen=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                   return(
-                    <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:9,padding:"10px 6px",borderTop:i===0?"none":`1px solid ${LINE}`,...(me?{background:"rgba(57,255,20,.07)",borderRadius:12}:{})}}>
+                    <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:9,padding:"10px 6px",borderTop:i===0?"none":`1px solid ${LINE}`,...(me?{border:"1px solid rgba(57,255,20,.5)",borderRadius:12}:{})}}>
                       <span style={{width:22,textAlign:"center",fontSize:16,fontWeight:900,flexShrink:0,color:SUB}}>{platz}</span>
                       {/* Gesicht statt Textwüste */}
                       <div style={{width:34,height:34,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:CELL,display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -907,7 +907,7 @@ export default function LigaPage(){
                   const r=m.reactions
                   return(
                     <div key={m.id} style={{alignSelf:"stretch"}}>
-                      <div style={{background:"linear-gradient(135deg,rgba(57,255,20,.10),rgba(31,209,196,.07))",border:"1px solid rgba(57,255,20,.18)",borderRadius:14,padding:"11px 14px"}}>
+                      <div style={{background:C,border:`1px solid ${d?.pending?LINE:"rgba(57,255,20,.32)"}`,borderRadius:14,padding:"11px 14px"}}>
                         <div style={{fontSize:10,fontWeight:700,color:d?.pending?MUT:d?.ranked===false?MUT:"rgba(57,255,20,.7)",letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>
                           {d?.pending?"Neues Ergebnis · wartet auf Bestätigung":d?.ranked===false?"Match · zählt nicht":"Match bestätigt"}
                         </div>
@@ -924,7 +924,7 @@ export default function LigaPage(){
                             const cnt=r[type]
                             const active=r.myReacts.includes(type)
                             return(
-                              <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:active?"rgba(57,255,20,.15)":"rgba(255,255,255,.06)",border:active?"1px solid rgba(57,255,20,.4)":"1px solid rgba(255,255,255,.08)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:W,fontFamily:"inherit"}}>
+                              <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:"rgba(255,255,255,.06)",border:active?"1px solid rgba(57,255,20,.5)":"1px solid rgba(255,255,255,.08)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:W,fontFamily:"inherit"}}>
                                 <span>{emoji}</span>
                                 {cnt>0&&<span style={{fontSize:11,fontWeight:700,color:active?"#39FF14":MUT}}>{cnt}</span>}
                               </button>
@@ -956,7 +956,7 @@ export default function LigaPage(){
                                   placeholder="Kommentar zum Spiel …"
                                   style={{flex:1,minWidth:0,background:"rgba(0,0,0,.25)",border:`1px solid ${B}`,borderRadius:999,padding:"9px 12px",color:W,fontSize:12.5,outline:"none",fontFamily:"inherit"}}/>
                                 <button onClick={()=>sendComment(m.id)} aria-label="Kommentar senden"
-                                  style={{width:36,flexShrink:0,borderRadius:999,border:"1.5px solid transparent",background:`linear-gradient(${BG},${BG}) padding-box, ${GRAD} border-box`,color:W,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>→</button>
+                                  style={{width:36,flexShrink:0,borderRadius:999,border:"1.5px solid #39FF14",background:"none",color:"#39FF14",fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>→</button>
                               </div>
                             )}
                           </div>
@@ -969,7 +969,7 @@ export default function LigaPage(){
                 return(
                   <div key={m.id} style={{maxWidth:"80%",alignSelf:mine?"flex-end":"flex-start"}}>
                     {!mine&&<div style={{fontSize:10,color:MUT,margin:"0 0 3px 4px"}}>{m.name}</div>}
-                    <div style={{background:mine?"linear-gradient(135deg,rgba(57,255,20,.18),rgba(31,209,196,.10))":C,border:"none",borderRadius:14,padding:"9px 12px",fontSize:13,fontWeight:500,color:W}}>{m.text}</div>
+                    <div style={{background:C,border:mine?"1px solid rgba(57,255,20,.5)":"none",borderRadius:14,padding:"9px 12px",fontSize:13,fontWeight:500,color:W}}>{m.text}</div>
                   </div>
                 )
               })}

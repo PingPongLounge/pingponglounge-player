@@ -19,9 +19,11 @@ export function streakLine(won: boolean, streak: number): StreakInfo {
     return null                       // einzelner Sieg braucht keine Extra-Feier
   }
 
-  // Niederlage(n): nie tadeln, immer nach vorn zeigen — Richtung Training.
-  const train = { label: "Zum Training", href: "/training" }
-  if (streak >= 3) return { text: `Kopf hoch — die Serie dreht sich. Hol dir den Schliff im Training.`, fire: false, cta: train }
-  if (streak === 2) return { text: `Zwei knappe verloren — im Training feilst du am Feinschliff.`, fire: false, cta: train }
-  return { text: `Kann passieren — nächstes Mal packst du's. Tipps gibt's im Training.`, fire: false, cta: train }
+  // Niederlagen: NICHT bei jeder Niederlage nerven. Erst ab 4 in Folge
+  // aufmunternd + Verweis aufs Training. Darunter: gar keine Meldung.
+  if (streak >= 4) {
+    const train = { label: "Zum Training", href: "/training" }
+    return { text: `Kopf hoch — die Serie dreht sich. Hol dir den Schliff im Training.`, fire: false, cta: train }
+  }
+  return null
 }

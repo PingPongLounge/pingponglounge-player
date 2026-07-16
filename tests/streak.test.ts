@@ -20,12 +20,14 @@ describe("streakLine", () => {
     expect(three!.text).toMatch(/on fire|Folge/i)
   })
 
-  it("verweist bei Niederlagen aufs Training statt zu tadeln", () => {
-    for (const n of [1, 2, 3]) {
-      const l = streakLine(false, n)
-      expect(l).not.toBeNull()
-      expect(l!.fire).toBe(false)
-      expect(l!.cta?.href).toBe("/training")
-    }
+  it("nervt bei 1–3 Niederlagen NICHT (keine Meldung)", () => {
+    for (const n of [1, 2, 3]) expect(streakLine(false, n)).toBeNull()
+  })
+
+  it("verweist erst ab 4 Niederlagen in Folge aufs Training", () => {
+    const l = streakLine(false, 4)
+    expect(l).not.toBeNull()
+    expect(l!.fire).toBe(false)
+    expect(l!.cta?.href).toBe("/training")
   })
 })
