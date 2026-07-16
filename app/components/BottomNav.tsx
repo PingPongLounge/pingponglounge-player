@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation"
 
 const BG = "#1A1E25"
 const LINE = "rgba(255,255,255,.09)"
-const MUT = "rgba(255,255,255,.55)"
+const MUT = "rgba(255,255,255,.82)"
 const W = "#FFFFFF"
 
 const tabs = [

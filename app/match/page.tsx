@@ -122,9 +122,9 @@ export default function MatchPage() {
             label={meineSpiele === 1 ? "Du bist angemeldet" : "Deine Anmeldungen"}
             sub={meineSpiele > 0 ? "Trag nach dem Spiel dein Resultat ein." : "Tritt einem Spiel bei — oder erstell dein eigenes."}
           />
-          <SectionRow label="Open Game erstellen" href="/match/create" />
+          <SectionRow label="Eigenes Spiel erstellen" href="/match/create" />
         </SectionBlock>
-        <SectionIntro storageKey="intro_match" title="So funktioniert Open Game" steps={[["1", "Abend wählen", "Feste Abende in Glattbrugg und St. Gallen — je 6 Plätze pro Stärkeklasse."], ["2", "Platz sichern", `CHF ${OG_PREIS_CHF} für 4 Stunden. Absage bis ${OG_STORNO_STUNDEN} h vorher, Geld zurück.`], ["3", "Ergebnis eintragen", "Nach dem Spiel Resultat erfassen — dein Rang steigt."]]} />
+        <SectionIntro storageKey="intro_match" title="So funktioniert's" steps={[["1", "Abend wählen", "Feste Abende in Glattbrugg und St. Gallen — je 6 Plätze pro Stärkeklasse."], ["2", "Platz sichern", `CHF ${OG_PREIS_CHF} für 4 Stunden. Absage bis ${OG_STORNO_STUNDEN} h vorher, Geld zurück.`], ["3", "Ergebnis eintragen", "Nach dem Spiel Resultat erfassen — dein Rang steigt."]]} />
 
         {/* DIE FESTEN ABENDE — die eigentliche Sache. Vorher gab es nur die
             Spiele, die sich jemand selbst ausdachte; jetzt stehen die Abende

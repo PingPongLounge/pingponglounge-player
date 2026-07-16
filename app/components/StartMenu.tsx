@@ -76,7 +76,7 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
               <Link2 href="/shop" label="shop" icon={<Icon d='<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2l2.2 12.2a1.5 1.5 0 0 0 1.5 1.3h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6"/>' />} />
             </div>
 
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.5)", textTransform: "uppercase", letterSpacing: ".06em", margin: "22px 4px 8px" }}>spielen &amp; buchen</div>
+            <div style={{ fontSize: 11, color: "rgba(255,255,255,.82)", textTransform: "uppercase", letterSpacing: ".06em", margin: "22px 4px 8px" }}>spielen &amp; buchen</div>
             <div style={{ background: C, border: `1px solid ${B}`, borderRadius: 16, overflow: "hidden" }}>
               <Link2 href="/liga" label="liga" icon={<Icon d='<path d="M5 20v-4M12 20v-8M19 20v-12"/><circle cx="19" cy="4.6" r="1.6" fill="#fff" stroke="none"/>' />} />
               <Link2 href="/match" label="open game" icon={<Icon d='<g transform="translate(2.2 0)"><ellipse cx="10" cy="9.8" rx="6" ry="5.2" transform="rotate(-42 10 9.8)"/><path d="M14 13.6 18 17.6" stroke-width="3.4"/><circle cx="18.6" cy="5.7" r="1.6" fill="#fff" stroke="none"/></g>' />} />

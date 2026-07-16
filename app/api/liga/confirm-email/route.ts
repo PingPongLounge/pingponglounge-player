@@ -22,7 +22,7 @@ function page(title: string, text: string, ok: boolean) {
       <div style="max-width:420px;width:100%;background:${CARD};border-radius:24px;padding:34px 26px;text-align:center;color:#fff">
         <img src="${BASE_URL}/logo-mail.png" alt="Player" width="170" style="display:block;margin:0 auto 22px;width:170px;height:auto">
         <div style="font-size:23px;font-weight:900;margin-bottom:10px;color:${ok ? G : "#fff"}">${title}</div>
-        <div style="font-size:14px;line-height:1.55;color:rgba(255,255,255,.7)">${text}</div>
+        <div style="font-size:14px;line-height:1.55;color:rgba(255,255,255,.88)">${text}</div>
         <a href="${BASE_URL}/liga" style="display:block;margin-top:26px;text-decoration:none;background-image:${GRAD};background-color:${G};border-radius:14px;padding:2px">
           <span style="display:block;background:${CARD};border-radius:12px;padding:15px;font-size:15px;font-weight:800;color:${G};text-transform:uppercase;letter-spacing:.04em">Zur Liga</span>
         </a>

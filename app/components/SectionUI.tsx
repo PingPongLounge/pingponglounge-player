@@ -4,20 +4,17 @@ import Link from "next/link"
 import StartMenu from "./StartMenu"
 
 const CARD = "#2A2F39", W = "#FFFFFF"
-const SUB = "rgba(255,255,255,.88)", MUT = "rgba(255,255,255,.55)"
+const SUB = "rgba(255,255,255,.88)", MUT = "rgba(255,255,255,.82)"
 const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 const SHADOW = "0 1px 4px rgba(0,0,0,.14)"
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
 
 // Grüner Sektions-Balken: "PLAYER LIGA / TURNIER / OPEN GAME / TRAINING"
 // Logo + Wortmarke sind IMMER ein Link zurück auf die Startseite.
-export function SectionTopBar({ section }: { section: string }) {
-  // Dunkel, nicht grün: die grelle Leiste war das Lauteste auf dem Screen und
-  // sagte nichts. Grün nur im Logo — ein Akzent pro Screen, wie in der Liga.
-  //
-  // Und mit Menü: auf Open Game, Turnier und Training war der AppHeader
-  // ausgeblendet und diese Leiste hatte keinen Menü-Knopf — Profil, PingPoints,
-  // Rangliste und Shop waren von vier der fünf Hauptseiten aus unerreichbar.
+export function SectionTopBar({ section: _section }: { section: string }) {
+  // Nur "PLAYER" — der Sektionsname stand hier UND direkt darunter riesig im
+  // Bild. "Open Game" viermal auf einem Screen war zu viel. Der Hero-Titel und
+  // das aktive Nav-Symbol sagen ohnehin, wo man ist.
   return (
     <div style={{ position: "sticky", top: 0, zIndex: 50, background: "#1A1E25", borderBottom: "1px solid rgba(255,255,255,.08)" }}>
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -27,7 +24,7 @@ export function SectionTopBar({ section }: { section: string }) {
             <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#stbg)" strokeWidth="3.6" strokeLinejoin="round" />
             <circle cx="63" cy="58" r="6.5" fill="url(#stbg)" />
           </svg>
-          <span style={{ fontSize: 12.5, fontWeight: 900, letterSpacing: ".20em", color: W }}>PLAYER <span style={{ fontWeight: 600, color: MUT }}>{section.toUpperCase()}</span></span>
+          <span style={{ fontSize: 12.5, fontWeight: 900, letterSpacing: ".20em", color: W }}>PLAYER</span>
         </Link>
         <StartMenu inline />
       </div>

@@ -5,7 +5,7 @@ import BottomNav from "@/app/components/BottomNav"
 import { SectionBlock, SectionStat, SectionRow, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
 
 const BG = "#20242C", CARD = "#2A2F39", W = "#FFFFFF"
-const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.5)"
+const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.82)"
 const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 const EVERSPORTS_STUDIO = "https://www.eversports.ch/st/pingponglounge24"
 
@@ -35,7 +35,7 @@ export default function TrainingPage() {
         </SectionBlock>
         <div style={{ textAlign: "center", marginTop: 9, fontSize: 11.5, color: MUT, fontWeight: 400 }}>Anmeldung &amp; Zahlung über Eversports</div>
 
-        <SectionIntro storageKey="intro_training" title="So funktioniert das Training" steps={[["1", "Kurs wählen", "Von Beginner bis Pro — wöchentlich, an wechselnden Standorten."], ["2", "Termin sichern", "Anmeldung & Bezahlung laufen direkt über Eversports."], ["3", "Besser werden", "Regelmässiges Coaching, Drills und Matchpraxis."]]} />
+        <SectionIntro storageKey="intro_training" title="So funktioniert's" steps={[["1", "Kurs wählen", "Von Beginner bis Pro — wöchentlich, an wechselnden Standorten."], ["2", "Termin sichern", "Anmeldung & Bezahlung laufen direkt über Eversports."], ["3", "Besser werden", "Regelmässiges Coaching, Drills und Matchpraxis."]]} />
 
         {/* Kursplan */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "26px 4px 12px" }}>

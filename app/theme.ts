@@ -23,7 +23,7 @@ export const CELL   = '#353B46'                 // Zellen / Chips innerhalb Kart
 export const INPUTBG= '#20242C'                 // Eingabefelder (etwas dunkler)
 export const W      = '#FFFFFF'                  // Primärtext
 export const SUB    = 'rgba(255,255,255,.9)'   // Sekundärtext (gut lesbar)
-export const MUT    = 'rgba(255,255,255,.72)'    // Labels / gedämpft (Minimum für Text)
+export const MUT    = 'rgba(255,255,255,.82)'    // Labels / gedämpft (Minimum für Text)
 export const LINE   = 'rgba(255,255,255,.06)'   // ultra-dezente Trennlinie
 export const DANGER = '#E5484D'                 // Fehler / Löschen (klares, ruhiges Rot)
 

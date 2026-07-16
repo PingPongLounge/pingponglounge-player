@@ -5,7 +5,7 @@ import BottomNav from '@/app/components/BottomNav'
 import StartHomeV2, { Game } from '@/app/components/StartHomeV2'
 
 const BG = '#20242C', W = '#FFFFFF'
-const SUB = 'rgba(255,255,255,.9)', MUT = 'rgba(255,255,255,.72)'
+const SUB = 'rgba(255,255,255,.9)', MUT = 'rgba(255,255,255,.85)'
 const GRAD = 'linear-gradient(135deg,#39FF14,#1FD1C4)'
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }
 

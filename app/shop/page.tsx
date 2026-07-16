@@ -2,7 +2,7 @@ import Link from 'next/link'
 import BottomNav from '@/app/components/BottomNav'
 
 const BG = '#20242C', CARD = '#2A2F39', W = '#FFFFFF'
-const SUB = 'rgba(255,255,255,.88)', MUT = 'rgba(255,255,255,.55)'
+const SUB = 'rgba(255,255,255,.88)', MUT = 'rgba(255,255,255,.82)'
 const GRAD = 'linear-gradient(135deg,#39FF14,#1FD1C4)'
 
 export default function ShopPage() {

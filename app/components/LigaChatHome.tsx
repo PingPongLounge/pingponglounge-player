@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 
 const CARD = "#2A2F39", CELL = "#353B46", W = "#FFFFFF"
-const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.5)"
+const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.82)"
 const LINE = "rgba(255,255,255,.07)"
 const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 

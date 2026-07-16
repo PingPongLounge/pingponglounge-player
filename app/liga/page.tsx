@@ -394,7 +394,7 @@ export default function LigaPage(){
             <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#plg)" strokeWidth="3.6" strokeLinejoin="round"/>
             <circle cx="63" cy="58" r="6.5" fill="url(#plg)"/>
           </svg>
-          <span style={{fontSize:12.5,fontWeight:900,letterSpacing:".20em",color:W}}>PLAYER <span style={{fontWeight:600,color:MUT}}>LIGA</span></span>
+          <span style={{fontSize:12.5,fontWeight:900,letterSpacing:".20em",color:W}}>PLAYER</span>
         </Link>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <button onClick={()=>setShowCity(v=>!v)} style={{background:"none",border:`1px solid ${CELL}`,color:SUB,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 10px",fontFamily:"inherit"}}>{city||"Stadt"} ▾</button>
@@ -904,7 +904,7 @@ export default function LigaPage(){
                   return(
                     <div key={m.id} style={{alignSelf:"stretch"}}>
                       <div style={{background:"linear-gradient(135deg,rgba(57,255,20,.10),rgba(31,209,196,.07))",border:"1px solid rgba(57,255,20,.18)",borderRadius:14,padding:"11px 14px"}}>
-                        <div style={{fontSize:10,fontWeight:700,color:d?.pending?"rgba(255,255,255,.6)":d?.ranked===false?MUT:"rgba(57,255,20,.7)",letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>
+                        <div style={{fontSize:10,fontWeight:700,color:d?.pending?MUT:d?.ranked===false?MUT:"rgba(57,255,20,.7)",letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>
                           {d?.pending?"Neues Ergebnis · wartet auf Bestätigung":d?.ranked===false?"Match · zählt nicht":"Match bestätigt"}
                         </div>
                         {d&&<>

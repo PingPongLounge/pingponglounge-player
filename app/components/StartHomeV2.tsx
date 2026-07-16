@@ -5,7 +5,7 @@ import BottomNav from "./BottomNav"
 import StartMenu from "./StartMenu"
 
 const BG = "#20242C", CARD = "#2A2F39", CELL = "#353B46", HERO = "#14171E", W = "#FFFFFF"
-const SUB = "rgba(255,255,255,.88)", MUT = "rgba(255,255,255,.55)"
+const SUB = "rgba(255,255,255,.88)", MUT = "rgba(255,255,255,.82)"
 const LINE = "rgba(255,255,255,.09)"
 const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 const SHADOW = "0 1px 4px rgba(0,0,0,.14)"

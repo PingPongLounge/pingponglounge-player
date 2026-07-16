@@ -69,7 +69,7 @@ export default function TurnierePage(){
           )}
           <SectionRow label="Eigenes Turnier erstellen" href="/turniere/neu" />
         </SectionBlock>
-        <SectionIntro storageKey="intro_turniere" title="So funktioniert ein Turnier" steps={[["1","Turnier finden","Sieh dir offene Turniere in deiner Stadt an."],["2","Anmelden","Sichere dir deinen Platz, solang welche frei sind."],["3","KO-Bracket spielen","Gewinne dich nach oben — die Resultate zählen für ELO & Rang."]]} />
+        <SectionIntro storageKey="intro_turniere" title="So funktioniert's" steps={[["1","Turnier finden","Sieh dir offene Turniere in deiner Stadt an."],["2","Anmelden","Sichere dir deinen Platz, solang welche frei sind."],["3","KO-Bracket spielen","Gewinne dich nach oben — die Resultate zählen für ELO & Rang."]]} />
 
         <div style={{height:20}}/>
 
