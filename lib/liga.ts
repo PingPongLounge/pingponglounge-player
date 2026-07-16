@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
+import { berechneElo } from "@/lib/elo"
 
 // Bestätigt ein Liga-Match (von p1_entered -> confirmed): ELO, Statistik,
 // PingPoints und Chat-Feed. Wird von der manuellen Bestätigung UND der
@@ -31,11 +32,11 @@ export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string)
   const { data: w } = ranked ? await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", m.winner_id).single() : { data: null }
   const { data: l } = ranked ? await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", loserId).single() : { data: null }
   if (ranked && w && l) {
-    const K = 32
+    // Eine ELO-Rechnung für alles — berechneElo aus lib/elo.ts. Vorher stand die
+    // Formel hier inline (eigenes K=32), mit dem Risiko, dass Liga, Open Game und
+    // Turnier auseinanderlaufen. Genau das sollte die Zentralisierung verhindern.
     const wElo = w.elo ?? 1000, lElo = l.elo ?? 1000
-    const ea = 1 / (1 + Math.pow(10, (lElo - wElo) / 400))
-    const newW = Math.max(100, Math.round(wElo + K * (1 - ea)))
-    const newL = Math.max(100, Math.round(lElo - K * (1 - ea)))
+    const { neuW: newW, neuL: newL } = berechneElo(wElo, lElo)
     await admin.from("profiles").update({ elo: newW, matches_played: (w.matches_played ?? 0) + 1, matches_won: (w.matches_won ?? 0) + 1 }).eq("id", m.winner_id)
     await admin.from("profiles").update({ elo: newL, matches_played: (l.matches_played ?? 0) + 1 }).eq("id", loserId)
     await admin.from("elo_history").insert([

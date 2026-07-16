@@ -118,7 +118,7 @@ export default function AdminLigaPage(){
                 <span style={{fontSize:10,fontWeight:700,color:G,background:`${G}18`,borderRadius:999,padding:"2px 8px",textTransform:"uppercase"}}>{s.status as string}</span>
               </div>
               <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                <Link href={`/liga/${s.id as string}`} style={{fontSize:11,color:M,background:BG,border:`1px solid ${B}`,borderRadius:6,padding:"6px 10px",textDecoration:"none",fontWeight:700}}>Ansehen</Link>
+                <Link href="/liga" style={{fontSize:11,color:M,background:BG,border:`1px solid ${B}`,borderRadius:6,padding:"6px 10px",textDecoration:"none",fontWeight:700}}>Liga öffnen</Link>
                 {s.status==="open"&&<button onClick={()=>generateMatches(s.id as string)} disabled={generating===s.id} style={{fontSize:11,color:"#20242C",background:G,border:"none",borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>{generating===s.id?"...":"Matches generieren"}</button>}
                 {s.status==="open"&&<button onClick={()=>updateStatus(s.id as string,"running")} style={{fontSize:11,color:W,background:B,border:"none",borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>→ Running</button>}
                 {s.status==="running"&&<button onClick={()=>updateStatus(s.id as string,"finished")} style={{fontSize:11,color:W,background:B,border:"none",borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>→ Finished</button>}

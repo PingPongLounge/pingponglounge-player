@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 import { PP_CONFIG } from "@/lib/rewards"
+import { berechneElo } from "@/lib/elo"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -119,11 +120,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         const { data: w } = await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", m.winner_id).single()
         const { data: l } = await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", loserId).single()
         if (w && l) {
-          const K = 32
+          // Dieselbe zentrale ELO-Rechnung wie Liga und Open Game.
           const wElo = w.elo ?? 1000, lElo = l.elo ?? 1000
-          const ea = 1 / (1 + Math.pow(10, (lElo - wElo) / 400))
-          const newW = Math.max(100, Math.round(wElo + K * (1 - ea)))
-          const newL = Math.max(100, Math.round(lElo - K * (1 - ea)))
+          const { neuW: newW, neuL: newL } = berechneElo(wElo, lElo)
           await admin.from("profiles").update({ elo: newW, matches_played: (w.matches_played ?? 0) + 1, matches_won: (w.matches_won ?? 0) + 1 }).eq("id", m.winner_id)
           await admin.from("profiles").update({ elo: newL, matches_played: (l.matches_played ?? 0) + 1 }).eq("id", loserId)
           await admin.from("elo_history").insert([
