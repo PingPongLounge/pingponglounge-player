@@ -123,7 +123,6 @@ export default function StartHomeV2(d: StartData) {
           {/* OPEN GAME */}
           <div className="rev" style={card}>
             <div style={thead}><img src="/icons/open-game.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Open Game</span></div>
-            <div style={csub}>Spiel wann du willst — tritt bei oder erstell dein eigenes.</div>
             <div style={{ marginTop: 18, display: "flex", flexDirection: "column", maxHeight: 216, overflowY: "auto" }}>
               {d.games.length === 0 && (
                 <div style={{ textAlign: "center", color: MUT, fontSize: 13, fontWeight: 500, padding: "18px 0" }}>Aktuell keine offenen Spiele — erstelle das erste.</div>
@@ -151,8 +150,7 @@ export default function StartHomeV2(d: StartData) {
           {/* LIGA */}
           <div className="rev" style={card}>
             <div style={thead}><img src="/icons/liga.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Liga</span></div>
-            <div style={csub}>Spiel in deiner Klasse, sammle ELO-Punkte, steig auf.</div>
-            <div style={{ marginTop: 14 }}>
+            <div style={{ marginTop: 16 }}>
               {d.season.has ? (
                 <>
                   <div style={fact}><span style={factK}>Klasse</span><span style={factV}>{d.season.label}</span></div>
@@ -169,9 +167,9 @@ export default function StartHomeV2(d: StartData) {
           {/* TURNIER */}
           <div className="rev" style={card}>
             <div style={thead}><img src="/icons/turnier.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>{d.tour ? d.tour.name : "Turniere"}</span></div>
-            <div style={csub}>{d.tour ? "Das nächste Turnier — melde dich an, solang Plätze frei sind." : "Bald geht das nächste Turnier los."}</div>
+            {!d.tour && <div style={csub}>Bald geht das nächste los.</div>}
             {d.tour && (
-              <div style={{ marginTop: 14 }}>
+              <div style={{ marginTop: 16 }}>
                 <div style={fact}><span style={factK}>Wann</span><span style={factV}>{d.tour.dateLabel}</span></div>
                 <div style={fact}><span style={factK}>Format</span><span style={factV}>{d.tour.formatLabel}</span></div>
               </div>
@@ -182,8 +180,8 @@ export default function StartHomeV2(d: StartData) {
           {/* TRAINING */}
           <div className="rev" style={card}>
             <div style={thead}><img src="/icons/paddles.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Training</span></div>
-            <div style={csub}>Coaching, Drills & Kurse — buch dich direkt in ein Training ein.</div>
-            <Link href="/training" style={cta}>Trainings ansehen</Link>
+            <div style={csub}>Coaching & Drills · jeden Donnerstag.</div>
+            <Link href="/training" style={cta}>Ansehen</Link>
           </div>
 
           {/* SHOP — eine ruhige Zeile am Ende, kein Warenkorb im Kopf. Der Grund

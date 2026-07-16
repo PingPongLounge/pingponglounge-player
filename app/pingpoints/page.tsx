@@ -97,7 +97,7 @@ export default function PingPointsPage(){
 
         {/* Hero */}
         <div style={{textAlign:"center",margin:"24px 0 28px"}}>
-          <p style={{fontSize:11,fontWeight:700,color:MUT,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:8}}>Dein Guthaben</p>
+          <p style={{fontSize:12.5,fontWeight:700,color:MUT,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:8}}>Dein Guthaben</p>
           <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:10}}>
             <span style={{...gt,fontSize:64,fontWeight:900,lineHeight:1,letterSpacing:"-0.02em"}}>{balance}</span>
             <span style={{...gt,fontSize:18,fontWeight:700}}>PP</span>
@@ -123,7 +123,7 @@ export default function PingPointsPage(){
             ].map(s=>(
               <div key={s.l} style={{flex:1,background:CELL,borderRadius:12,padding:"12px 6px",textAlign:"center"}}>
                 <div style={{fontSize:20,fontWeight:900,...gt}}>{s.v}</div>
-                <div style={{fontSize:10,color:MUT,fontWeight:600,marginTop:3,lineHeight:1.35,whiteSpace:"pre-line"}}>{s.l}</div>
+                <div style={{fontSize:12,color:MUT,fontWeight:600,marginTop:3,lineHeight:1.35,whiteSpace:"pre-line"}}>{s.l}</div>
               </div>
             ))}
           </div>
@@ -176,7 +176,7 @@ export default function PingPointsPage(){
                   </div>
                   <div style={{flex:1}}>
                     <p style={{fontSize:13,fontWeight:600,color:W}}>{t.description}</p>
-                    <p style={{...meta,fontSize:11}}>{timeAgo(t.created_at)}</p>
+                    <p style={{...meta,fontSize:12.5}}>{timeAgo(t.created_at)}</p>
                   </div>
                   <span style={{fontSize:15,fontWeight:800,color:t.amount>0?W:SUB,flexShrink:0}}>
                     {t.amount>0?"+":""}{t.amount} PP
@@ -194,14 +194,14 @@ export default function PingPointsPage(){
               <div key={i} style={{display:"flex",alignItems:"center",gap:12,padding:"13px 16px",borderTop:i>0?"1px solid rgba(255,255,255,.06)":"none",opacity:e.soon?0.45:1}}>
                 <div style={{flex:1}}>
                   <p style={{fontSize:13.5,fontWeight:700,color:W}}>{e.action}</p>
-                  {e.note&&<p style={{...meta,fontSize:11,marginTop:2}}>{e.note}</p>}
-                  {e.soon&&<p style={{...meta,fontSize:10}}>bald verfügbar</p>}
+                  {e.note&&<p style={{...meta,fontSize:12.5,marginTop:2}}>{e.note}</p>}
+                  {e.soon&&<p style={{...meta,fontSize:12}}>bald verfügbar</p>}
                 </div>
                 <span style={{fontSize:15,fontWeight:900,...gt,flexShrink:0}}>{e.points}</span>
               </div>
             ))}
             <div style={{padding:"12px 16px",borderTop:"1px solid rgba(255,255,255,.06)"}}>
-              <p style={{...meta,fontSize:11,lineHeight:1.5}}>Liga- und Open-Game-Resultate zählen für ELO &amp; Rangliste — nicht für PingPoints.</p>
+              <p style={{...meta,fontSize:12.5,lineHeight:1.5}}>Liga- und Open-Game-Resultate zählen für ELO &amp; Rangliste — nicht für PingPoints.</p>
             </div>
           </div>
         )}
@@ -225,8 +225,8 @@ export default function PingPointsPage(){
                   <div style={{flex:1,minWidth:0}}>
                     <p style={{fontSize:14,fontWeight:700,color:W}}>{r.label}</p>
                     <p style={{...body,marginTop:2}}>{r.description}</p>
-                    {r.claimed&&<p style={{fontSize:11,color:G,marginTop:4}}>✓ Bereits eingelöst</p>}
-                    {!r.claimed&&r.unlocked&&!claimMsg&&<p style={{fontSize:11,color:G,marginTop:4}}>✓ Verfügbar — jetzt einlösen!</p>}
+                    {r.claimed&&<p style={{fontSize:12.5,color:G,marginTop:4}}>✓ Bereits eingelöst</p>}
+                    {!r.claimed&&r.unlocked&&!claimMsg&&<p style={{fontSize:12.5,color:G,marginTop:4}}>✓ Verfügbar — jetzt einlösen!</p>}
                     {claimMsg?.threshold===r.threshold&&(
                       <p style={{fontSize:12,color:claimMsg.msg.startsWith("✓")?G:SUB,marginTop:4}}>{claimMsg.msg}</p>
                     )}
@@ -240,7 +240,7 @@ export default function PingPointsPage(){
                     </button>
                   )}
                   {!r.unlocked&&(
-                    <div style={{fontSize:11,color:MUT,flexShrink:0,textAlign:"right"}}>
+                    <div style={{fontSize:12.5,color:MUT,flexShrink:0,textAlign:"right"}}>
                       <div>{r.threshold - balance} PP</div>
                       <div>fehlen</div>
                     </div>
@@ -248,7 +248,7 @@ export default function PingPointsPage(){
                 </div>
               </div>
             ))}
-            <p style={{...meta,fontSize:11,textAlign:"center",marginTop:8}}>
+            <p style={{...meta,fontSize:12.5,textAlign:"center",marginTop:8}}>
               Nach Einlösung meldet sich das Team per E-Mail.
             </p>
           </div>

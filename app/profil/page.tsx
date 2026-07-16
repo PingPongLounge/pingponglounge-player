@@ -170,7 +170,7 @@ export default function ProfilPage(){
           <h1 style={{...h1,fontSize:22,marginBottom:8}}>{profile.name}</h1>
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,flexWrap:"wrap"}}>
             <span style={levelBadge(profile.level)}>{profile.level}</span>
-            {profile.canton&&<span style={{fontSize:11,color:SUB,background:CELL,borderRadius:999,padding:"3px 11px"}}>{profile.canton}</span>}
+            {profile.canton&&<span style={{fontSize:12.5,color:SUB,background:CELL,borderRadius:999,padding:"3px 11px"}}>{profile.canton}</span>}
           </div>
         </div>
 
@@ -202,7 +202,7 @@ export default function ProfilPage(){
 
         {/* ELO Hero */}
         <div style={{...cardPad,padding:"20px 20px 14px",marginBottom:10,textAlign:"center"}}>
-          <p style={{fontSize:11,fontWeight:700,color:M,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:6}}>ELO Rating</p>
+          <p style={{fontSize:12.5,fontWeight:700,color:M,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:6}}>ELO Rating</p>
           <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:10}}>
             <span style={{...gt,fontSize:56,fontWeight:900,lineHeight:1,letterSpacing:"-0.02em"}}>{profile.elo??1000}</span>
             {lastDelta!==null&&(
@@ -215,7 +215,7 @@ export default function ProfilPage(){
             <EloChart history={eloHistory} current={profile.elo??1000}/>
           </div>
           {eloHistory.length>0&&(
-            <p style={{fontSize:11,color:M}}>{eloHistory.length} Datenpunkte</p>
+            <p style={{fontSize:12.5,color:M}}>{eloHistory.length} Datenpunkte</p>
           )}
         </div>
 
@@ -230,7 +230,7 @@ export default function ProfilPage(){
           ].map(({num,lbl})=>(
             <div key={lbl} style={{...cell,padding:"12px 8px",textAlign:"center"}}>
               <div style={{fontSize:20,fontWeight:900,color:W,lineHeight:1}}>{num}</div>
-              <div style={{fontSize:10,color:M,marginTop:4}}>{lbl}</div>
+              <div style={{fontSize:12,color:M,marginTop:4}}>{lbl}</div>
             </div>
           ))}
         </div>
@@ -257,11 +257,11 @@ export default function ProfilPage(){
                   </div>
                   <div style={{flex:1,minWidth:0}}>
                     <p style={{fontSize:13,fontWeight:700,color:W,marginBottom:2}}>{opponentName||"?"}</p>
-                    <p style={{fontSize:11,color:M}}>{m.season?.city} · {sets}</p>
+                    <p style={{fontSize:12.5,color:M}}>{m.season?.city} · {sets}</p>
                   </div>
                   <div style={{textAlign:"right",flexShrink:0}}>
                     <p style={{fontSize:12,fontWeight:700,color:won_?G:"#f87171"}}>{won_?"SIEG":"NIEDERLAGE"}</p>
-                    <p style={{fontSize:10,color:M}}>{timeAgo(m.confirmed_at)}</p>
+                    <p style={{fontSize:12,color:M}}>{timeAgo(m.confirmed_at)}</p>
                   </div>
                 </div>
               )
@@ -286,7 +286,7 @@ export default function ProfilPage(){
                   <div style={{width:38,height:38,borderRadius:10,background:CELL,display:"flex",alignItems:"center",justifyContent:"center",fontSize:18}}>{icon}</div>
                   <div>
                     <p style={{fontSize:13,fontWeight:700,color:W}}>{label}</p>
-                    <p style={{fontSize:11,color:M}}>{sub}</p>
+                    <p style={{fontSize:12.5,color:M}}>{sub}</p>
                   </div>
                 </div>
                 <span style={{color:G,fontWeight:700}}>→</span>

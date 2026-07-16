@@ -118,34 +118,33 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
       <div style={{maxWidth:440,width:"100%"}}>
-        <Link href={`/liga/${match.season_id}`} style={{...backLink,display:"block",marginBottom:24}}>← Liga</Link>
+        <Link href="/liga" style={{...backLink,display:"block",marginBottom:24}}>← Liga</Link>
 
-        <div style={{...eyebrow,letterSpacing:"0.16em",textTransform:"uppercase",fontWeight:700,marginBottom:8}}>Runde {match.round}</div>
-
-        {/* Players */}
-        <div style={{...cardPad,display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
-          <span style={{fontSize:18,fontWeight:900,color:match.winner_id===match.p1_id?GREEN:W}}>{match.p1_name}</span>
-          {match.status==="confirmed"?(
-            <span style={{fontSize:24,fontWeight:900,color:W,background:CELL,borderRadius:8,padding:"6px 14px"}}>{sw.p1}:{sw.p2}</span>
-          ):<span style={{...meta}}>vs</span>}
-          <span style={{fontSize:18,fontWeight:900,color:match.winner_id===match.p2_id?GREEN:W}}>{match.p2_name}</span>
+        {/* EINE Karte: Namen, Satzstand und die einzelnen Sätze zusammen. Vorher
+            stand das Ergebnis zweimal — oben "3:1" und darunter nochmal die
+            Sätze in einer eigenen "Bestätigt"-Box. */}
+        <div style={{...cardPad,marginBottom:16}}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+            <span style={{fontSize:18,fontWeight:900,color:match.winner_id===match.p1_id?GREEN:W}}>{match.p1_name}</span>
+            {match.status==="confirmed"||match.status==="p1_entered"?(
+              <span style={{fontSize:24,fontWeight:900,color:W,background:CELL,borderRadius:8,padding:"6px 14px"}}>{sw.p1}:{sw.p2}</span>
+            ):<span style={{...meta}}>vs</span>}
+            <span style={{fontSize:18,fontWeight:900,color:match.winner_id===match.p2_id?GREEN:W}}>{match.p2_name}</span>
+          </div>
+          {match.sets&&(match.status==="confirmed"||match.status==="p1_entered")&&(
+            <div style={{textAlign:"center",fontSize:13,color:MUT,marginTop:10}}>{match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ")}</div>
+          )}
+          {match.status==="confirmed"&&(
+            <div style={{textAlign:"center",fontSize:14,fontWeight:800,color:GREEN,marginTop:12}}>✓ Bestätigt</div>
+          )}
         </div>
 
-        {/* QR Code — nur wenn Match noch offen */}
-        {match.status!=="confirmed"&&!isP1&&!isP2&&(
+        {/* QR-Code — nur für einen Aussenstehenden, der ein offenes Match einträgt */}
+        {match.status!=="confirmed"&&match.status!=="p1_entered"&&!isP1&&!isP2&&(
           <div style={{...cardPad,textAlign:"center",marginBottom:16}}>
-            <div style={{...eyebrow,letterSpacing:"0.16em",textTransform:"uppercase",fontWeight:700,marginBottom:12}}>QR-Code für Spieler</div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={qrUrl} alt="Match QR" style={{width:160,height:160,borderRadius:10,display:"block",margin:"0 auto 10px"}}/>
-            <p style={{...body}}>Spieler scannen diesen Code, um das Resultat einzutragen.</p>
-          </div>
-        )}
-
-        {/* Confirmed state */}
-        {match.status==="confirmed"&&(
-          <div style={{...cardActive,padding:20,textAlign:"center"}}>
-            <p style={{fontSize:16,fontWeight:700,color:GREEN,marginBottom:8}}>✓ Bestätigt</p>
-            {match.sets&&<p style={{...meta}}>{match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ")}</p>}
+            <img src={qrUrl} alt="QR-Code" style={{width:160,height:160,borderRadius:10,display:"block",margin:"0 auto 10px"}}/>
+            <p style={{...body}}>Zum Eintragen scannen.</p>
           </div>
         )}
 
@@ -158,10 +157,10 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
               Warte auf Bestätigung von {isP1?match.p2_name:match.p1_name}.
             </p>
             <button onClick={handleNextMatch} disabled={saving} style={{...btn,marginBottom:10,opacity:saving?0.6:1,cursor:saving?"not-allowed":"pointer"}}>
-              {saving?"Erstelle Match …":"Weiteres Spiel eintragen"}
+              {saving?"…":"Noch ein Spiel eintragen"}
             </button>
             {error&&<p style={{color:DANGER,fontSize:13,marginBottom:8}}>{error}</p>}
-            <Link href={`/liga/${match.season_id}`} style={{...btnGhost,display:"block",textAlign:"center",textDecoration:"none"}}>Zurück zur Liga</Link>
+            <Link href="/liga" style={{...btnGhost,display:"block",textAlign:"center",textDecoration:"none"}}>Zurück zur Liga</Link>
           </div>
         )}
 

@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
-import { BG, CARD, W, MUT, GREEN, CITIES, card, cardPad, cardActive, cell, chip, btn, btnInCard, btnGhost, chipBtn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
+import { BG, CARD, W, MUT, GREEN, GRAD, CITIES, card, cardPad, cardActive, cell, chip, btn, btnInCard, btnGhost, chipBtn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
 import { SectionBlock, SectionStat, SectionRow, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
 import { OG_PREIS_CHF, OG_STORNO_STUNDEN } from "@/lib/opengames"
 
@@ -111,35 +111,14 @@ export default function MatchPage() {
     <main style={{ minHeight: "100vh", background: BG, padding: "0 0 100px" }}>
       <SectionTopBar section="Open Game" />
       <div style={{ maxWidth: 560, margin: "0 auto", padding: "6px 16px 0" }}>
-        {/* Derselbe Block wie in der Liga: Bild, darunter deine Lage, darunter die Handlung. */}
-        <SectionBlock
-          title="Open Game"
-          meta={`${games.length} offen · ${freiePlaetze} ${freiePlaetze === 1 ? "Platz" : "Plätze"} frei`}
-          img="/gl-tische.jpg"
-        >
-          <SectionStat
-            big={String(meineSpiele)}
-            label={meineSpiele === 1 ? "Du bist angemeldet" : "Deine Anmeldungen"}
-            sub={meineSpiele > 0 ? "Trag nach dem Spiel dein Resultat ein." : "Tritt einem Spiel bei — oder erstell dein eigenes."}
-          />
-          <SectionRow label="Eigenes Spiel erstellen" href="/match/create" />
-        </SectionBlock>
-        <SectionIntro storageKey="intro_match" title="So funktioniert's" steps={[["1", "Abend wählen", "Feste Abende in Glattbrugg und St. Gallen — je 6 Plätze pro Stärkeklasse."], ["2", "Platz sichern", `CHF ${OG_PREIS_CHF} für 4 Stunden. Absage bis ${OG_STORNO_STUNDEN} h vorher, Geld zurück.`], ["3", "Ergebnis eintragen", "Nach dem Spiel Resultat erfassen — dein Rang steigt."]]} />
+        {/* Nur das Bild und die Abende. Kein "0 Deine Anmeldungen"-Block, keine
+            Intro-Karte, kein Filter — Open Game soll in zwei Klick buchbar sein:
+            Mitspielen antippen, bezahlen, fertig. */}
+        <SectionBlock title="Open Game" meta={`Deine nächsten Abende · CHF ${OG_PREIS_CHF} · 4 Std.`} img="/gl-tische.jpg" />
 
-        {/* DIE FESTEN ABENDE — die eigentliche Sache. Vorher gab es nur die
-            Spiele, die sich jemand selbst ausdachte; jetzt stehen die Abende
-            der Lounge oben und sind direkt buchbar. */}
         {offizielle.length > 0 && (
-          <div style={{ marginTop: 22 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "0 4px 10px" }}>
-              <span style={{ fontSize: 15, fontWeight: 900, textTransform: "uppercase", color: W }}>Feste Abende</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: M, textTransform: "uppercase", letterSpacing: ".05em" }}>
-                CHF {OG_PREIS_CHF} · 4 Std.
-              </span>
-            </div>
-
-            <div style={{ background: C, borderRadius: 22, padding: "4px 16px", boxShadow: "0 1px 4px rgba(0,0,0,.14)" }}>
-              {offizielle.slice(0, 12).map((g, i) => {
+          <div style={{ marginTop: 14, background: C, borderRadius: 22, padding: "4px 16px", boxShadow: "0 1px 4px rgba(0,0,0,.14)" }}>
+              {offizielle.slice(0, 14).map((g, i) => {
                 const frei = Math.max(0, g.max_players - g.current_players)
                 const drin = g.players.some(p => p.user_id === userId)
                 const meinLevel = parseInt(myLevel || "0") || 0
@@ -148,80 +127,69 @@ export default function MatchPage() {
                 const d = g.date ? new Date(g.date) : null
 
                 return (
-                  <div key={g.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "13px 0", borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,.07)" }}>
-                    <span style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 42, flexShrink: 0 }}>
-                      <span style={{ fontSize: 16, fontWeight: 900, color: W, lineHeight: 1 }}>
+                  <div key={g.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 0", borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,.07)" }}>
+                    <span style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 44, flexShrink: 0 }}>
+                      <span style={{ fontSize: 17, fontWeight: 900, color: W, lineHeight: 1 }}>
                         {d ? d.toLocaleDateString("de-CH", { weekday: "short" }).replace(".", "") : "—"}
                       </span>
-                      <span style={{ fontSize: 10.5, fontWeight: 700, color: M, marginTop: 2 }}>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: M, marginTop: 2 }}>
                         {d ? d.toLocaleDateString("de-CH", { day: "2-digit", month: "2-digit" }) : ""}
                       </span>
                     </span>
 
                     <span style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ display: "block", fontSize: 14, fontWeight: 800, color: W, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {g.location_name} · {proAbend ? "Pro" : "Einstieg"}
+                      <span style={{ display: "block", fontSize: 15, fontWeight: 800, color: W, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                        {g.location_name}
                       </span>
-                      <span style={{ display: "block", fontSize: 11.5, color: M, marginTop: 2 }}>
-                        {String(g.start_hour ?? 19).padStart(2, "0")}:00 · Level {g.level} · {frei} von {g.max_players} frei
+                      <span style={{ display: "block", fontSize: 13, color: M, marginTop: 2 }}>
+                        {/* Welche Ligen dieser Abend abdeckt — in ihren Namen, nicht "Pro/Einstieg" */}
+                        {proAbend ? "Advanced & Elite" : "Rookie & Challenger"} · {String(g.start_hour ?? 19).padStart(2, "0")}:00 · {frei} von {g.max_players} frei
                       </span>
                     </span>
 
                     {drin ? (
-                      <Link href={`/match/${g.id}`} style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", color: G, border: `1px solid rgba(57,255,20,.35)`, borderRadius: 9, padding: "7px 0", width: 78, textAlign: "center", textDecoration: "none", flexShrink: 0 }}>
+                      <Link href={`/match/${g.id}`} style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: G, border: `1px solid rgba(57,255,20,.35)`, borderRadius: 9, padding: "8px 0", width: 96, textAlign: "center", textDecoration: "none", flexShrink: 0 }}>
                         Dabei ✓
                       </Link>
                     ) : frei === 0 ? (
-                      <span style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", color: M, width: 78, textAlign: "center", flexShrink: 0 }}>Ausgebucht</span>
+                      <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: M, width: 96, textAlign: "center", flexShrink: 0 }}>Ausgebucht</span>
                     ) : !passt ? (
-                      <span title={`Dieser Abend ist für Level ${g.level}`} style={{ fontSize: 10, fontWeight: 700, color: M, width: 78, textAlign: "center", flexShrink: 0 }}>
+                      <span title={`Für Level ${g.level}`} style={{ fontSize: 12, fontWeight: 700, color: M, width: 96, textAlign: "center", flexShrink: 0 }}>
                         Level {g.level}
                       </span>
                     ) : (
+                      // EIN Knopf: "Mitspielen" → direkt zur Kasse. Der Preis steht
+                      // im Kopf, der Knopf sagt die Handlung.
                       <button onClick={() => platzKaufen(g.id)} disabled={kaufen === g.id}
-                        style={{ fontSize: 10, fontWeight: 800, textTransform: "uppercase", color: W, border: "1px solid #353B46", borderRadius: 9, padding: "7px 0", width: 78, textAlign: "center", background: "none", cursor: kaufen === g.id ? "wait" : "pointer", fontFamily: "inherit", flexShrink: 0 }}>
-                        {kaufen === g.id ? "…" : `CHF ${OG_PREIS_CHF}`}
+                        style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "#06210F", background: GRAD, border: "none", borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", cursor: kaufen === g.id ? "wait" : "pointer", fontFamily: "inherit", flexShrink: 0 }}>
+                        {kaufen === g.id ? "…" : "Mitspielen"}
                       </button>
                     )}
                   </div>
                 )
               })}
-            </div>
-            {kaufError && <p style={{ fontSize: 12.5, color: "#FF5C5C", margin: "10px 4px 0" }}>{kaufError}</p>}
+            {kaufError && <p style={{ fontSize: 13, color: "#FF7A7A", margin: "4px 0 12px" }}>{kaufError}</p>}
           </div>
         )}
 
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "26px 0 12px" }}>
-          <span style={{ fontSize: 15, fontWeight: 900, textTransform: "uppercase", color: W }}>Spiele von Spielern</span>
-          {!myGame ? (
-            <Link href="/match/create" style={{ ...btnInCard, whiteSpace: "nowrap" }}>+ Spiel</Link>
-          ) : (
-            <button onClick={() => cancel(myGame)} style={{ ...btnGhost, display: "inline-block", padding: "10px 16px", fontSize: 12, whiteSpace: "nowrap" }}>Mein Spiel löschen</button>
-          )}
-        </div>
-
-        {/* Filter */}
-        <div style={{ display: "flex", gap: 6, marginBottom: 8, flexWrap: "wrap" }}>
-          {LEVELS.map(l => { const active = filterLevel === l; return (
-            <button key={l} onClick={() => setFilterLevel(active ? "" : l)} style={chipBtn(active)}>L{l}</button>
-          )})}
-        </div>
-        <div style={{ display: "flex", gap: 6, marginBottom: 20, flexWrap: "wrap" }}>
-          {CITIES.map(c => (
-            <button key={c} onClick={() => setFilterCity(filterCity === c ? "" : c)} style={chipBtn(filterCity === c)}>{c}</button>
-          ))}
-        </div>
+        {/* Selbst erstellte Spiele — nur wenn es welche gibt. Kein Filter mehr:
+            bei einer Handvoll Spielen ist er Ballast. */}
+        {eigene.length > 0 && (
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "26px 0 12px" }}>
+            <span style={{ fontSize: 15, fontWeight: 900, textTransform: "uppercase", color: W }}>Von Spielern</span>
+            {myGame && (
+              <button onClick={() => cancel(myGame)} style={{ ...btnGhost, display: "inline-block", padding: "10px 16px", fontSize: 12, whiteSpace: "nowrap" }}>Mein Spiel löschen</button>
+            )}
+          </div>
+        )}
 
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: M }}><div style={{ fontSize: 32, marginBottom: 12 }}>🏓</div><p style={{ ...body }}>Lädt …</p></div>
+          <div style={{ textAlign: "center", padding: "40px 0", color: M }}><div style={{ fontSize: 28, marginBottom: 10 }}>🏓</div><p style={{ ...body }}>Lädt …</p></div>
         ) : error ? (
           <div style={{ textAlign: "center", padding: "40px 0", color: M }}><p style={{ ...body, marginBottom: 16 }}>{error}</p><button onClick={load} style={{ ...btn, display: "inline-block", padding: "10px 24px" }}>Nochmals</button></div>
         ) : eigene.length === 0 ? (
-          <div style={{ ...cardPad, padding: "40px 20px", textAlign: "center" }}>
-            <p style={{ fontSize: 32, marginBottom: 12 }}>🏓</p>
-            <p style={{ fontSize: 16, fontWeight: 700, color: W, marginBottom: 8 }}>Keine offenen Spiele</p>
-            <p style={{ ...body, marginBottom: 20 }}>Erstell das erste!</p>
-            <Link href="/match/create" style={{ ...btnInCard }}>Open Game erstellen</Link>
+          <div style={{ textAlign: "center", padding: "22px 16px 6px" }}>
+            <Link href="/match/create" style={{ color: M, fontSize: 13.5, fontWeight: 600, textDecoration: "none" }}>Lieber selbst ein Spiel erstellen? →</Link>
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>

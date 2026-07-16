@@ -78,7 +78,7 @@ export default function RanglistePage() {
             <span style={{ ...gt, fontSize: 18, fontWeight: 900, minWidth: 36 }}>#{myEntry.rank}</span>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: W }}>Dein Rang</p>
-              <p style={{ ...meta, fontSize: 11 }}>{myEntry.elo} ELO · {myEntry.level}</p>
+              <p style={{ ...meta, fontSize:12.5 }}>{myEntry.elo} ELO · {myEntry.level}</p>
             </div>
             <span style={{ ...meta, fontSize: 12 }}>{myEntry.matches_played > 0 ? `${Math.round((myEntry.matches_won / myEntry.matches_played) * 100)}% WR` : "—"}</span>
           </div>
@@ -125,7 +125,7 @@ export default function RanglistePage() {
                       {/* Rank */}
                       <div style={{ textAlign: "center", minWidth: 40 }}>
                         <div style={{ fontSize: 22 }}>{emoji}</div>
-                        <div style={{ fontSize: 10, fontWeight: 700, color: rc }}># {p.rank}</div>
+                        <div style={{ fontSize:12, fontWeight: 700, color: rc }}># {p.rank}</div>
                       </div>
 
                       {/* Info */}
@@ -136,15 +136,15 @@ export default function RanglistePage() {
                         </div>
                         <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center" }}>
                           <span style={levelBadge(p.level)}>{p.level}</span>
-                          {p.canton && <span style={{ ...meta, fontSize: 10 }}>{p.canton}</span>}
-                          <span style={{ ...meta, fontSize: 10 }}>{p.matches_played} Matches · {wr}% WR</span>
+                          {p.canton && <span style={{ ...meta, fontSize:12 }}>{p.canton}</span>}
+                          <span style={{ ...meta, fontSize:12 }}>{p.matches_played} Matches · {wr}% WR</span>
                         </div>
                       </div>
 
                       {/* ELO */}
                       <div style={{ textAlign: "right", flexShrink: 0 }}>
                         <div style={{ fontSize: 22, fontWeight: 900, color: W, lineHeight: 1 }}>{p.elo}</div>
-                        <div style={{ ...meta, fontSize: 10, marginTop: 2 }}>ELO</div>
+                        <div style={{ ...meta, fontSize:12, marginTop: 2 }}>ELO</div>
                       </div>
                     </div>
                   )
@@ -175,9 +175,9 @@ export default function RanglistePage() {
                           {isMe && <span style={{ fontSize: 9, color: G, background: `${G}18`, borderRadius: 999, padding: "1px 5px", fontWeight: 700 }}>du</span>}
                         </div>
                         <div style={{ display: "flex", gap: 5, marginTop: 2 }}>
-                          <span style={{ fontSize: 10, color: lvColor(p.level) }}>{p.level}</span>
-                          {p.canton && <span style={{ ...meta, fontSize: 10 }}>· {p.canton}</span>}
-                          <span style={{ ...meta, fontSize: 10 }}>· {wr}% WR</span>
+                          <span style={{ fontSize:12, color: lvColor(p.level) }}>{p.level}</span>
+                          {p.canton && <span style={{ ...meta, fontSize:12 }}>· {p.canton}</span>}
+                          <span style={{ ...meta, fontSize:12 }}>· {wr}% WR</span>
                         </div>
                       </div>
 
