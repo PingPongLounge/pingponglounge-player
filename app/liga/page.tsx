@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useRef } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
+import PendingConfirmBanner from "@/app/components/PendingConfirmBanner"
 import { MAX_RANKED_PER_OPPONENT, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO, LIGEN, LEAGUE_CUT, ligaForRank, pairForSeason, type LigaKey } from "@/lib/rewards"
 import {
   BG, CARD, CELL, W, SUB, MUT, GREEN, LINE,
@@ -15,7 +16,7 @@ const HERO="#14171E"
 
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number}
 type Row={user_id:string,name:string,elo:number,level:string,real?:string|null,avatar?:string|null}
-type OpenMatch={id:string,status:string,iAmP1:boolean}
+type OpenMatch={id:string,status:string,iAmP1:boolean,enteredBy:string|null}
 type PlayerInfo={
   player:{id:string,name:string,real_short?:string|null,level:string,elo:number,matches_played:number,matches_won:number,lost:number,winRate:number|null,canton?:string|null},
   recent:Array<{id:string,opponent:string,won:boolean,score:string,date:string|null,ranked:boolean}>,
@@ -136,14 +137,14 @@ export default function LigaPage(){
     // Offene Matches des eingeloggten Spielers laden
     if(userId&&isReg){
       const {data:myMs}=await sb.from("league_matches")
-        .select("id,p1_id,p2_id,status")
+        .select("id,p1_id,p2_id,status,entered_by")
         .eq("season_id",sid)
         .in("status",["challenge_sent","accepted","pending","p1_entered"])
         .or(`p1_id.eq.${userId},p2_id.eq.${userId}`)
       const map:Record<string,OpenMatch>={}
       for(const m of myMs||[]){
         const oppId=m.p1_id===userId?m.p2_id:m.p1_id
-        map[oppId]={id:m.id,status:m.status,iAmP1:m.p1_id===userId}
+        map[oppId]={id:m.id,status:m.status,iAmP1:m.p1_id===userId,enteredBy:(m as {entered_by?:string|null}).entered_by??null}
       }
       setOpenMatches(map)
 
@@ -420,6 +421,8 @@ export default function LigaPage(){
       )}
 
       <div style={{maxWidth:480,margin:"0 auto"}}>
+        {/* Offene Bestätigungen zuoberst — direkt antippbar. */}
+        <div style={{padding:"14px 15px 0"}}><PendingConfirmBanner/></div>
         {/* EIN Block: Bild, Position, Monatspflicht — durch Linien getrennt statt
             durch Lücken. Vorher schwebten zwei Kästchen mit Abstand übereinander,
             obwohl sie dasselbe erzählen: deine Liga. */}
@@ -603,8 +606,10 @@ export default function LigaPage(){
                           </span>
                         )
                         if(om.status==="accepted"||om.status==="pending") return <Link href={`/liga/match/${om.id}`} style={btnBase}>Eintragen</Link>
-                        if(om.status==="p1_entered"&&!om.iAmP1) return <Link href={`/liga/match/${om.id}`} style={{...btnBase,color:GREEN,borderColor:"rgba(57,255,20,.35)"}}>Bestätigen</Link>
-                        // Ergebnis wartet auf Bestätigung → weiteres Ergebnis trotzdem erlauben
+                        // Bestätigen darf, wer NICHT eingetragen hat — egal ob p1 oder p2.
+                        if(om.status==="p1_entered"&&om.enteredBy&&om.enteredBy!==userId) return <Link href={`/liga/match/${om.id}`} style={{...btnBase,color:GREEN,borderColor:"rgba(57,255,20,.35)"}}>Bestätigen</Link>
+                        // Ich habe eingetragen → warte auf den Gegner (kein neues Fordern).
+                        if(om.status==="p1_entered"&&om.enteredBy===userId) return <span style={{fontSize:10,fontWeight:700,color:MUT,textTransform:"uppercase",whiteSpace:"nowrap",width:74,textAlign:"center",flexShrink:0}}>Wartet</span>
                         return <button onClick={()=>openForder(r)} style={btnBase}>Fordern</button>
                       })()}
                     </div>

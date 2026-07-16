@@ -1,6 +1,7 @@
 "use client"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import { useEffect, useState } from "react"
 
 const BG = "#1A1E25"
 const LINE = "rgba(255,255,255,.09)"
@@ -18,6 +19,21 @@ export default function BottomNav() {
   const path = usePathname() || "/"
   const isActive = (href: string) => path === href || path.startsWith(href + "/")
 
+  // Offene Liga-Bestätigungen → kleiner Punkt auf dem Liga-Tab, damit man's sieht.
+  const [pending, setPending] = useState(0)
+  useEffect(() => {
+    let alive = true
+    ;(async () => {
+      try {
+        const r = await fetch("/api/liga/pending")
+        if (!r.ok) return
+        const j = await r.json()
+        if (alive) setPending(j.count || 0)
+      } catch { /* still */ }
+    })()
+    return () => { alive = false }
+  }, [path])
+
   return (
     <nav style={{
       position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 100,
@@ -29,7 +45,12 @@ export default function BottomNav() {
           const active = isActive(t.href)
           return (
             <Link key={t.href} href={t.href} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 5, textDecoration: "none" }}>
-              <img src={`/icons/${t.icon}.svg`} alt="" style={{ width: 31, height: 31, opacity: active ? 1 : .5, filter: active ? "none" : "grayscale(.4)" }} />
+              <span style={{ position: "relative", display: "inline-flex" }}>
+                <img src={`/icons/${t.icon}.svg`} alt="" style={{ width: 31, height: 31, opacity: active ? 1 : .5, filter: active ? "none" : "grayscale(.4)" }} />
+                {t.href === "/liga" && pending > 0 && (
+                  <span style={{ position: "absolute", top: -4, right: -7, minWidth: 17, height: 17, borderRadius: 999, background: "linear-gradient(135deg,#39FF14,#1FD1C4)", color: "#06210F", fontSize: 10, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", boxShadow: "0 0 0 2px #1A1E25" }}>{pending > 9 ? "9+" : pending}</span>
+                )}
+              </span>
               <span style={{ fontSize: 10.5, fontWeight: 800, color: active ? W : MUT, letterSpacing: ".05em", textTransform: "uppercase" }}>{t.label}</span>
             </Link>
           )

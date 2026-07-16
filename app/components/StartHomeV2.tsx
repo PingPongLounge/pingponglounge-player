@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react"
 import Link from "next/link"
 import BottomNav from "./BottomNav"
 import StartMenu from "./StartMenu"
+import PendingConfirmBanner from "./PendingConfirmBanner"
 import { ratingLabel } from "@/app/theme"
 
 const BG = "#20242C", CARD = "#2A2F39", CELL = "#353B46", HERO = "#14171E", W = "#FFFFFF"
@@ -77,6 +78,9 @@ export default function StartHomeV2(d: StartData) {
           {/* Kein zweiter Kopf mehr: Avatar, Menü und Beta stehen jetzt oben im
               Header. "Hi, …" kostete eine Zeile und sagte nichts — der Name steht
               im Avatar, der Rang eine Zeile weiter unten. */}
+
+          {/* Offene Bestätigungen zuoberst — bevor irgendwas anderes kommt. */}
+          <div style={{ margin: "0 16px" }}><PendingConfirmBanner /></div>
 
           {/* RANG — derselbe Block wie in der Liga: Bild oben, darunter die Zeilen,
               getrennt durch Linien. Vorher eine schwarze Box ohne ein einziges Bild. */}
