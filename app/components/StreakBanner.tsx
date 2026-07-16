@@ -23,23 +23,22 @@ export default function StreakBanner() {
   }, [])
 
   if (!info) return null
-  const G = "#39FF14"
+  const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 
   return (
     <div style={{
       display: "flex", alignItems: "center", gap: 12,
-      background: "#171A20",
-      border: info.fire ? `1px solid ${G}` : "1px solid rgba(255,255,255,.1)",
+      background: "#171A20", border: "1px solid rgba(255,255,255,.1)",
       borderRadius: 16, padding: "13px 15px",
     }}>
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={info.fire ? G : "#fff"} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
         {info.fire
           ? <path d="M12 2s5 4 5 9a5 5 0 0 1-10 0c0-1.3.5-2.3 1.2-3.2C9 9 9 7.5 8.5 6.5c2 .5 3.5 2 3.5 3.5 1-1 1.2-2.5 0-4.5 0 0 .5-2-0-3.5Z" />
           : <><path d="M3 17l5-5 4 4 8-8" /><path d="M15 8h5v5" /></>}
       </svg>
       <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.35 }}>{info.text}</span>
       {info.cta && (
-        <Link href={info.cta.href} style={{ flexShrink: 0, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".04em", color: G, background: "none", border: `1px solid ${G}`, borderRadius: 9, padding: "8px 13px", textDecoration: "none" }}>
+        <Link href={info.cta.href} style={{ flexShrink: 0, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".04em", color: "#06210F", background: GRAD, borderRadius: 9, padding: "9px 13px", textDecoration: "none" }}>
           {info.cta.label}
         </Link>
       )}

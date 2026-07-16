@@ -48,7 +48,7 @@ export default function BottomNav() {
               <span style={{ position: "relative", display: "inline-flex" }}>
                 <img src={`/icons/${t.icon}.svg`} alt="" style={{ width: 31, height: 31, opacity: active ? 1 : .5, filter: active ? "none" : "grayscale(.4)" }} />
                 {t.href === "/liga" && pending > 0 && (
-                  <span style={{ position: "absolute", top: -4, right: -7, minWidth: 17, height: 17, borderRadius: 999, background: "#39FF14", color: "#06210F", fontSize: 10, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", boxShadow: "0 0 0 2px #1A1E25" }}>{pending > 9 ? "9+" : pending}</span>
+                  <span style={{ position: "absolute", top: -4, right: -7, minWidth: 17, height: 17, borderRadius: 999, background: "linear-gradient(135deg,#39FF14,#1FD1C4)", color: "#06210F", fontSize: 10, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 4px", boxShadow: "0 0 0 2px #1A1E25" }}>{pending > 9 ? "9+" : pending}</span>
                 )}
               </span>
               <span style={{ fontSize: 10.5, fontWeight: 800, color: active ? W : MUT, letterSpacing: ".05em", textTransform: "uppercase" }}>{t.label}</span>

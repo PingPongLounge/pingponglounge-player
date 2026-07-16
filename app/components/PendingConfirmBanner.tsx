@@ -25,7 +25,7 @@ export default function PendingConfirmBanner() {
   }, [])
 
   if (items.length === 0) return null
-  const G = "#39FF14"
+  const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
 
   const one = items.length === 1 ? items[0] : null
   const href = one ? `/liga/match/${one.id}` : "/liga"
@@ -38,11 +38,11 @@ export default function PendingConfirmBanner() {
       style={{
         display: "flex", alignItems: "center", gap: 12, width: "100%",
         textAlign: "left", cursor: "pointer", fontFamily: "inherit",
-        background: "#171A20", border: `1px solid ${G}`,
+        background: "#171A20", border: "1px solid rgba(255,255,255,.1)",
         borderRadius: 16, padding: "13px 15px", margin: "0 0 14px",
       }}
     >
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={G} strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
         <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" />
       </svg>
       <span style={{ flex: 1, minWidth: 0 }}>
@@ -51,7 +51,7 @@ export default function PendingConfirmBanner() {
       </span>
       <span style={{
         flexShrink: 0, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".04em",
-        color: G, background: "none", border: `1px solid ${G}`, borderRadius: 9, padding: "8px 13px",
+        color: "#06210F", background: GRAD, borderRadius: 9, padding: "9px 13px",
       }}>Bestätigen</span>
     </button>
   )
