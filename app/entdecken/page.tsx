@@ -164,7 +164,7 @@ export default async function EntdeckenPage() {
   const next = LV.find(l => l.min > elo)
   const prevMin = [...LV].reverse().find(l => l.min <= elo)?.min ?? 0
   const pct = next ? Math.min(100, Math.max(5, Math.round((elo - prevMin) / (next.min - prevMin) * 100))) : 100
-  const nextLabel = next ? `Noch ${next.min - elo} Punkte bis ${next.n}` : 'Höchste Liga erreicht 🏆'
+  const nextLabel = next ? `Noch ${next.min - elo} bis ${next.n}` : 'Höchste Liga erreicht 🏆'
 
   const season = (membershipRes.data as { league_seasons?: { id: string; city: string; skill_class: string } } | null)?.league_seasons
   const seasonId = season?.id || null

@@ -1,4 +1,5 @@
 import { STAFF_EMAILS } from "@/lib/staff"
+import { ratingLabel } from "@/lib/rewards"
 // Transaktionale E-Mails via Resend (REST, ohne SDK). Ohne RESEND_API_KEY
 // passiert nichts — die App läuft normal weiter, es wird nur nicht gemailt.
 const RESEND_URL = "https://api.resend.com/emails"
@@ -83,7 +84,7 @@ export async function sendChallengeNotice(opts: {
       <h1 style="font-size:22px;font-weight:900;margin:0 0 10px;color:#fff">Du wurdest gefordert</h1>
       <p style="color:rgba(255,255,255,.75);font-size:14px;line-height:1.55;margin:0 0 20px">
         Hallo ${opts.recipientName},<br>
-        <strong style="color:#fff">${opts.challengerName}</strong>${opts.challengerLevel ? ` (Level ${opts.challengerLevel}${opts.challengerElo ? ` · ELO ${opts.challengerElo}` : ""})` : ""} will gegen dich spielen.
+        <strong style="color:#fff">${opts.challengerName}</strong>${opts.challengerElo ? ` (Rating ${ratingLabel(opts.challengerElo)})` : ""} will gegen dich spielen.
       </p>
       ${opts.when ? `<div style="background:${CARD};border-radius:14px;padding:15px;text-align:center;margin-bottom:18px">
         <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Vorgeschlagen</div>
@@ -243,12 +244,12 @@ export async function sendResultConfirmRequest(opts: {
               <span style="font-size:52px;font-weight:900;color:${G};line-height:1">${opts.rankNow ? `#${opts.rankNow}` : "—"}</span>
             </td>
             <td style="vertical-align:middle;text-align:right">
-              <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">ELO</div>
+              <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:3px">Rating</div>
               ${gewertet ? `
-              <div style="font-size:20px;font-weight:900;color:#fff">${opts.eloNow} <span style="color:rgba(255,255,255,.35);font-weight:700">→</span> ${opts.eloAfter}</div>
-              <div style="font-size:15px;font-weight:900;color:${deltaColor};margin-top:2px">${deltaLabel}</div>
+              <div style="font-size:20px;font-weight:900;color:#fff">${ratingLabel(opts.eloNow)} <span style="color:rgba(255,255,255,.35);font-weight:700">→</span> ${ratingLabel(opts.eloAfter)}</div>
+              <div style="font-size:15px;font-weight:900;color:${deltaColor};margin-top:2px">${deltaLabel} ELO</div>
               ` : `
-              <div style="font-size:20px;font-weight:900;color:#fff">${opts.eloNow}</div>
+              <div style="font-size:20px;font-weight:900;color:#fff">${ratingLabel(opts.eloNow)}</div>
               <div style="font-size:12px;font-weight:700;color:rgba(255,255,255,.45);margin-top:2px">bleibt gleich</div>
               `}
             </td>

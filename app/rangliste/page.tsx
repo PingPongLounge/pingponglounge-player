@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import { BG, CARD, W, MUT, GRAD, gt, card, h1, meta, body, chipBtn, levelBadge, lvColor } from "@/app/theme"
+import { BG, CARD, W, MUT, GRAD, gt, card, h1, meta, body, chipBtn, levelBadge, lvColor, ratingLabel } from "@/app/theme"
 
 const G="#39FF14"
 
@@ -78,7 +78,7 @@ export default function RanglistePage() {
             <span style={{ ...gt, fontSize: 18, fontWeight: 900, minWidth: 36 }}>#{myEntry.rank}</span>
             <div style={{ flex: 1 }}>
               <p style={{ fontSize: 13, fontWeight: 700, color: W }}>Dein Rang</p>
-              <p style={{ ...meta, fontSize:12.5 }}>{myEntry.elo} ELO · {myEntry.level}</p>
+              <p style={{ ...meta, fontSize:12.5 }}>Rating {ratingLabel(myEntry.elo)} · {myEntry.level}</p>
             </div>
             <span style={{ ...meta, fontSize: 12 }}>{myEntry.matches_played > 0 ? `${Math.round((myEntry.matches_won / myEntry.matches_played) * 100)}% WR` : "—"}</span>
           </div>
@@ -143,8 +143,8 @@ export default function RanglistePage() {
 
                       {/* ELO */}
                       <div style={{ textAlign: "right", flexShrink: 0 }}>
-                        <div style={{ fontSize: 22, fontWeight: 900, color: W, lineHeight: 1 }}>{p.elo}</div>
-                        <div style={{ ...meta, fontSize:12, marginTop: 2 }}>ELO</div>
+                        <div style={{ fontSize: 22, fontWeight: 900, color: W, lineHeight: 1 }}>{ratingLabel(p.elo)}</div>
+                        <div style={{ ...meta, fontSize:12, marginTop: 2 }}>Rating</div>
                       </div>
                     </div>
                   )
@@ -182,7 +182,7 @@ export default function RanglistePage() {
                       </div>
 
                       {/* ELO */}
-                      <span style={{ fontSize: 15, fontWeight: 800, color: isMe ? G : W }}>{p.elo}</span>
+                      <span style={{ fontSize: 15, fontWeight: 800, color: isMe ? G : W }}>{ratingLabel(p.elo)}</span>
                     </div>
                   )
                 })}

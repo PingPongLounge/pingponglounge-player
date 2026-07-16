@@ -100,6 +100,11 @@ export function eloToLevel(elo: number): string {
   return '1'
 }
 
+// Rating (Playtomic-Stil, z.B. 4.2) lebt in lib/rewards.ts, damit auch der
+// Server (Mails) es nutzen kann. Hier nur re-exportiert, damit die Seiten
+// weiterhin aus @/app/theme importieren können.
+export { eloToRating, ratingLabel } from "@/lib/rewards"
+
 /* ---------- Verlauf-Text (NUR Logo + Rang) ---------- */
 export const gt: CSSProperties = {
   background: GRAD,

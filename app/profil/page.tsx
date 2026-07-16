@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import LogoutButton from "@/app/components/LogoutButton"
-import { BG, CARD, CELL, W, SUB, MUT, GREEN, GRAD, gt, card, cardPad, cell, levelBadge, btn, h1 } from "@/app/theme"
+import { BG, CARD, CELL, W, SUB, MUT, GREEN, GRAD, gt, card, cardPad, cell, levelBadge, btn, h1, ratingLabel } from "@/app/theme"
 import { createClient } from "@/lib/supabase/client"
 
 const M=MUT,G=GREEN
@@ -200,17 +200,19 @@ export default function ProfilPage(){
           </div>
         )}
 
-        {/* ELO Hero */}
+        {/* Rating-Hero — die grosse 4.2-Zahl. Darunter klein das rohe ELO, für
+            alle, die es genau wissen wollen. */}
         <div style={{...cardPad,padding:"20px 20px 14px",marginBottom:10,textAlign:"center"}}>
-          <p style={{fontSize:12.5,fontWeight:700,color:M,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:6}}>ELO Rating</p>
+          <p style={{fontSize:12.5,fontWeight:700,color:M,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:6}}>Dein Rating</p>
           <div style={{display:"flex",alignItems:"baseline",justifyContent:"center",gap:10}}>
-            <span style={{...gt,fontSize:56,fontWeight:900,lineHeight:1,letterSpacing:"-0.02em"}}>{profile.elo??1000}</span>
+            <span style={{...gt,fontSize:56,fontWeight:900,lineHeight:1,letterSpacing:"-0.02em"}}>{ratingLabel(profile.elo??1000)}</span>
             {lastDelta!==null&&(
               <span style={{fontSize:14,fontWeight:700,color:lastDelta>=0?G:"#f87171"}}>
-                {lastDelta>=0?"+":""}{lastDelta}
+                {lastDelta>=0?"+":""}{lastDelta} ELO
               </span>
             )}
           </div>
+          <p style={{fontSize:12.5,color:M,marginTop:6}}>Level {profile.level} · {profile.elo??1000} ELO</p>
           <div style={{margin:"12px 0 4px"}}>
             <EloChart history={eloHistory} current={profile.elo??1000}/>
           </div>

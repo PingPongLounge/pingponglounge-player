@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
-import { BG as DARK, CARD, CELL, W as TEXT, MUT as MUTED, GREEN as G, GRAD, lvColor, lvGrad, LEVEL_DESCS, LEVEL_ELO, eloToLevel, btn, input as inputBase } from "@/app/theme"
+import { BG as DARK, CARD, CELL, W as TEXT, MUT as MUTED, GREEN as G, GRAD, lvColor, lvGrad, LEVEL_DESCS, LEVEL_ELO, eloToLevel, ratingLabel, btn, input as inputBase } from "@/app/theme"
 
 const LEVELS = [
   { name: "1", color: lvColor("1"), grad: lvGrad("1"), desc: LEVEL_DESCS["1"], elo: LEVEL_ELO["1"] },
@@ -247,7 +247,7 @@ export default function OnboardingPage() {
         <div>
           <div style={{ fontSize: "10.5px", fontWeight: 700, color: MUTED, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: "3px" }}>Deine Einstufung</div>
           <div style={{ fontSize: "17px", fontWeight: 900, color: chosenLevel.color }}>Level {chosenLevel.name}</div>
-          <div style={{ fontSize: "11.5px", color: MUTED, marginTop: "1px" }}>Start-ELO {chosenLevel.elo}</div>
+          <div style={{ fontSize: "11.5px", color: MUTED, marginTop: "1px" }}>Start-Rating {ratingLabel(chosenLevel.elo)}</div>
         </div>
         {!pending && (
           <button type="button" onClick={() => { setStep(0); setShowAllLevels(false) }}

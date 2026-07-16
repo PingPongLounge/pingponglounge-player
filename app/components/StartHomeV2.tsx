@@ -3,6 +3,7 @@ import { useEffect, useRef } from "react"
 import Link from "next/link"
 import BottomNav from "./BottomNav"
 import StartMenu from "./StartMenu"
+import { ratingLabel } from "@/app/theme"
 
 const BG = "#20242C", CARD = "#2A2F39", CELL = "#353B46", HERO = "#14171E", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.88)", MUT = "rgba(255,255,255,.82)"
@@ -93,7 +94,7 @@ export default function StartHomeV2(d: StartData) {
               <div style={{ fontSize: 44, fontWeight: 900, lineHeight: .85, letterSpacing: "-.03em", ...gt }}>#{d.rank}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: MUT }}>Deine Position</div>
-                <div style={{ fontSize: 13.5, color: SUB, fontWeight: 400, marginTop: 3 }}>Level {d.lvl} · {d.elo} Punkte</div>
+                <div style={{ fontSize: 13.5, color: SUB, fontWeight: 400, marginTop: 3 }}>Rating {ratingLabel(d.elo)} · Level {d.lvl}</div>
               </div>
             </div>
 

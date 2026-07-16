@@ -67,6 +67,29 @@ export const LIGEN = [
 export type LigaKey = (typeof LIGEN)[number]["key"]
 export type LigaPair = "einstieg" | "pro"
 
+// Rating im Playtomic-Stil (0–7 mit einer Nachkommastelle). Hier in rewards.ts,
+// weil auch der Server (Mails) es braucht — theme.ts zieht React-Styles mit rein.
+const LEVEL_ELO_MIN: Record<number, number> = { 1: 950, 2: 1050, 3: 1150, 4: 1250, 5: 1350, 6: 1450, 7: 1600 }
+function levelVonElo(elo: number): number {
+  if (elo >= 1600) return 7
+  if (elo >= 1450) return 6
+  if (elo >= 1350) return 5
+  if (elo >= 1250) return 4
+  if (elo >= 1150) return 3
+  if (elo >= 1050) return 2
+  return 1
+}
+export function eloToRating(elo: number): number {
+  const lvl = levelVonElo(elo)
+  const start = LEVEL_ELO_MIN[lvl] ?? 950
+  const nextStart = LEVEL_ELO_MIN[lvl + 1] ?? (start + 200)
+  const frac = Math.max(0, Math.min(0.99, (elo - start) / (nextStart - start)))
+  return Math.floor((lvl + frac) * 10) / 10
+}
+export function ratingLabel(elo: number): string {
+  return eloToRating(elo).toFixed(1)
+}
+
 /** Welche Tabelle? Level 1–3 → Einstieg, 4–7 → Pro. */
 export function pairForLevel(level: string | number | null | undefined): LigaPair | null {
   const l = typeof level === "string" ? parseInt(level) : level

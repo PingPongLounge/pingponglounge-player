@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { BG, CELL, W, SUB, MUT, GREEN, lvColor, btn, cardPad } from "@/app/theme"
+import { BG, CELL, W, SUB, MUT, GREEN, lvColor, ratingLabel, btn, cardPad } from "@/app/theme"
 
 const G = GREEN
 const DARK = BG
@@ -168,8 +168,8 @@ function SpielenInner() {
           alignItems: "center", justifyContent: "center",
           boxShadow: `0 0 28px ${lvColor(level.name)}33`,
         }}>
-          <span style={{ fontSize: "11px", color: MUTED, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>ELO</span>
-          <span style={{ fontSize: "44px", fontWeight: 900, color: TEXT, lineHeight: 1 }}>{provisionalElo}</span>
+          <span style={{ fontSize: "11px", color: MUTED, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>Rating</span>
+          <span style={{ fontSize: "44px", fontWeight: 900, color: TEXT, lineHeight: 1 }}>{ratingLabel(provisionalElo)}</span>
         </div>
 
         <p style={{ fontSize: "11px", fontWeight: 700, color: lvColor(level.name), letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "4px" }}>Dein Level</p>
@@ -195,7 +195,7 @@ function SpielenInner() {
         <span style={{ color: MUTED, fontSize: "12px" }}>nach dem Sichern</span>
       </div>
       <p style={{ fontSize: "12px", color: MUTED, textAlign: "center", marginBottom: "8px", lineHeight: 1.5 }}>
-        {won ? "Sieg eingetragen — dein Start-ELO bekommt einen Bonus." : "Resultat eingetragen. Sicher dir jetzt deinen Rang."}
+        {won ? "Sieg eingetragen — dein Rating bekommt einen Bonus." : "Resultat eingetragen. Sicher dir jetzt deinen Rang."}
       </p>
 
       <button type="button" style={primaryBtn(false)} onClick={saveProfile}>Profil sichern →</button>

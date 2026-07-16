@@ -3,7 +3,7 @@ import { berechneElo, eloPreview, K, ELO_FLOOR } from "@/lib/elo"
 import {
   LIGEN, LEAGUE_CUT, ligaForRank, pairForLevel, pairForSeason,
   MAX_RANKED_PER_OPPONENT, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO,
-  PP_CONFIG, PP_REWARDS, PP_CHF,
+  PP_CONFIG, PP_REWARDS, PP_CHF, ratingLabel, eloToRating,
 } from "@/lib/rewards"
 import { monthKey, monthLabel } from "@/lib/monthly"
 
@@ -94,6 +94,27 @@ describe("Limits und Fristen", () => {
   it("der Monatsname trifft den richtigen Monat (kein Off-by-one)", () => {
     expect(monthLabel("2026-01").toLowerCase()).toContain("januar")
     expect(monthLabel("2026-12").toLowerCase()).toContain("dezember")
+  })
+})
+
+describe("Rating (Playtomic-Skala 0–7)", () => {
+  it("gerade aufgestiegen = .0, kurz vor dem nächsten Level = .9", () => {
+    expect(ratingLabel(1350)).toBe("5.0")   // Level 5 beginnt
+    expect(ratingLabel(1400)).toBe("5.5")   // Mitte
+    expect(ratingLabel(1449)).toBe("5.9")   // knapp vor Level 6
+    expect(ratingLabel(1450)).toBe("6.0")   // aufgestiegen
+  })
+
+  it("zeigt nie eine .0 des falschen Levels an (floor, nicht round)", () => {
+    // 1449 ist noch Level 5 — es darf NICHT als 6.0 erscheinen.
+    expect(eloToRating(1449)).toBeLessThan(6)
+    expect(Math.floor(eloToRating(1449))).toBe(5)
+  })
+
+  it("bleibt in der Spanne 1.0 bis 7.9", () => {
+    expect(eloToRating(100)).toBe(1)
+    expect(eloToRating(3000)).toBeLessThanOrEqual(7.9)
+    expect(eloToRating(3000)).toBeGreaterThanOrEqual(7)
   })
 })
 

@@ -6,7 +6,7 @@ import BottomNav from "@/app/components/BottomNav"
 import { MAX_RANKED_PER_OPPONENT, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO, LIGEN, LEAGUE_CUT, ligaForRank, pairForSeason, type LigaKey } from "@/lib/rewards"
 import {
   BG, CARD, CELL, W, SUB, MUT, GREEN, LINE,
-  gt, GRAD, card, levelBadge,
+  gt, GRAD, card, levelBadge, ratingLabel,
 } from "@/app/theme"
 
 const C=CARD, B=CELL, M=SUB
@@ -443,7 +443,7 @@ export default function LigaPage(){
               <div style={{fontSize:44,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{meinRang}</div>
               <div style={{flex:1,minWidth:0}}>
                 <div style={{fontSize:12,fontWeight:800,color:W}}>Deine Position</div>
-                <div style={{fontSize:13,color:SUB,fontWeight:400,marginTop:3}}>{myRow.level?`Level ${myRow.level} · `:""}{myRow.elo} Punkte</div>
+                <div style={{fontSize:13,color:SUB,fontWeight:400,marginTop:3}}>Rating {ratingLabel(myRow.elo)}{myRow.level?` · Level ${myRow.level}`:""}</div>
               </div>
             </div>
             {/* Monatspflicht — bei erfülltem Soll ein Haken. "5/4" las sich wie ein Fehler. */}
@@ -582,7 +582,7 @@ export default function LigaPage(){
                       </button>
                       {/* Level als Badge — fixe Breite, damit nichts überläuft */}
                       {r.level&&<span style={{...levelBadge(r.level),flexShrink:0}}>L{r.level}</span>}
-                      <span style={{fontSize:13,fontWeight:800,width:38,textAlign:"right",flexShrink:0,...(me?gt:{color:SUB})}}>{r.elo}</span>
+                      <span style={{fontSize:13,fontWeight:800,width:38,textAlign:"right",flexShrink:0,...(me?gt:{color:SUB})}}>{ratingLabel(r.elo)}</span>
                       {/* Eine Aktion, kurz und immer gleich breit. "SPIEL EINTRAGEN →"
                           und "ZURÜCKZIEHEN" sprengten die Zeile. */}
                       {!me&&myReg&&(()=>{
@@ -663,7 +663,7 @@ export default function LigaPage(){
                     {r.real&&<div style={{fontSize:11,color:MUT,marginTop:1}}>{r.real}</div>}
                   </div>
                   {r.level&&<span style={levelBadge(r.level)}>L{r.level}</span>}
-                  <span style={{fontSize:13,fontWeight:800,color:SUB}}>{r.elo}</span>
+                  <span style={{fontSize:13,fontWeight:800,color:SUB}}>{ratingLabel(r.elo)}</span>
                 </button>
               ))}
             </div>
@@ -684,7 +684,7 @@ export default function LigaPage(){
                   {pData.player.real_short&&<div style={{fontSize:12.5,color:MUT,marginTop:2}}>{pData.player.real_short}</div>}
                   <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8}}>
                     {pData.player.level&&<span style={levelBadge(pData.player.level)}>L{pData.player.level}</span>}
-                    <span style={{fontSize:13,fontWeight:800,...gt}}>ELO {pData.player.elo}</span>
+                    <span style={{fontSize:13,fontWeight:800,...gt}}>Rating {ratingLabel(pData.player.elo)}</span>
                   </div>
                 </div>
                 <button onClick={()=>setPOpen(null)} style={{background:"none",border:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
