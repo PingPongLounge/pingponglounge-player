@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
-import crypto from "crypto"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { PP_CONFIG } from "@/lib/rewards"
+import { sessionUuid } from "@/lib/stripe-util"
 
 // Stripe-Webhook: schreibt PingPoints NUR nach einer tatsächlich bezahlten Buchung.
 // Ohne diesen Webhook könnte man sich durch Aufruf von /buchen?paid=1 Punkte erschleichen.
@@ -14,12 +14,6 @@ function getStripe() {
   return new Stripe(key)
 }
 
-// Deterministische UUID aus der Stripe-Session-ID → macht die Gutschrift idempotent
-// (ref_id ist eine uuid-Spalte, Stripe-IDs sind es nicht).
-function sessionUuid(sessionId: string): string {
-  const h = crypto.createHash("md5").update(sessionId).digest("hex")
-  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20, 32)}`
-}
 
 export async function POST(req: NextRequest) {
   const secret = process.env.STRIPE_WEBHOOK_SECRET
@@ -79,7 +73,14 @@ export async function POST(req: NextRequest) {
             stripe_payment_intent: s.payment_intent ? String(s.payment_intent) : null,
           })
 
-          if (!insErr) {
+          if (insErr) {
+            // Der Spieler ist schon drin (Doppelzahlung, z.B. zwei Tabs): der
+            // Unique-Index (game_id,user_id) verhindert den zweiten Platz.
+            // Ohne Refund bliebe die zweite Zahlung einbehalten — also erstatten.
+            try {
+              if (s.payment_intent) await getStripe().refunds.create({ payment_intent: String(s.payment_intent) })
+            } catch (e) { console.error("Refund bei Doppelzahlung fehlgeschlagen:", e) }
+          } else {
             await admin.from("open_games").update({
               current_players: (game.current_players ?? 0) + 1,
               status: (game.current_players ?? 0) + 1 >= (game.max_players ?? 6) ? "full" : "open",

@@ -60,19 +60,24 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
     window.location.href = `mailto:info@pingponglounge.ch?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(mailBody)}`
   }
 
+  // Gültig ist jedes Ergebnis mit mindestens einem Satz und einem klaren Sieger —
+  // dieselbe Regel wie bei der Schnelleingabe auf der Liga-Seite. Vorher erzwang
+  // dieses Formular Best-of-5 (3 Gewinnsätze), die Schnelleingabe erlaubte 2:0.
+  // Zwei Eingänge zu derselben Route waren sich uneinig, was ein Ergebnis ist.
   function validateSets():{valid:boolean,winner:string|null,parsedSets:Array<{p1:number,p2:number}>}{
     if(!match) return {valid:false,winner:null,parsedSets:[]}
     const parsed=sets.map(s=>({p1:parseInt(s.p1)||0,p2:parseInt(s.p2)||0})).filter(s=>s.p1>0||s.p2>0)
-    if(parsed.length<3) return {valid:false,winner:null,parsedSets:parsed}
+    if(parsed.length<1) return {valid:false,winner:null,parsedSets:parsed}
     const p1wins=parsed.filter(s=>s.p1>s.p2).length
     const p2wins=parsed.filter(s=>s.p2>s.p1).length
+    if(p1wins===p2wins) return {valid:false,winner:null,parsedSets:parsed}   // kein Unentschieden
     const winner=p1wins>p2wins?match.p1_id:match.p2_id
-    return {valid:p1wins>=3||p2wins>=3,winner,parsedSets:parsed}
+    return {valid:true,winner,parsedSets:parsed}
   }
 
   async function handleSubmit(){
     const {valid,winner,parsedSets}=validateSets()
-    if(!valid){setError("Ungültiges Ergebnis — mindestens 3 Sätze, einer muss 3 Sätze gewonnen haben");return}
+    if(!valid){setError("Trag mindestens einen Satz ein — und kein Unentschieden.");return}
     setSaving(true);setError("")
     const res=await fetch("/api/liga/result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId,sets:parsedSets,winner_id:winner})})
     if(res.ok){setSubmitted(true);setSaving(false)}

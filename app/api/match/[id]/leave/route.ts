@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { stornoMoeglich, OG_STORNO_STUNDEN } from "@/lib/opengames"
+import { sessionUuid } from "@/lib/stripe-util"
 import Stripe from "stripe"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -38,7 +39,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   // Bezahlter Platz? Dann Geld zurück — aber nur innerhalb der Frist.
   const { data: mein } = await admin
     .from("open_game_players")
-    .select("id,paid,stripe_payment_intent,refunded_at")
+    .select("id,paid,stripe_payment_intent,stripe_session_id,refunded_at")
     .eq("game_id", id).eq("user_id", user.id).maybeSingle()
 
   if (!mein) return NextResponse.json({ error: "Du bist nicht angemeldet" }, { status: 400 })
@@ -67,6 +68,27 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     await admin.from("open_game_players")
       .update({ refunded_at: new Date().toISOString() })
       .eq("id", mein.id)
+
+    // Die bei der Buchung gutgeschriebenen +5 PingPoints wieder abziehen. Sonst
+    // liesse sich die Belohnungswährung farmen: buchen (+5), rechtzeitig absagen
+    // (Geld zurück, Punkte bleiben), wiederholen. Idempotent über die Session-ID.
+    if (mein.stripe_session_id) {
+      const refId = sessionUuid(mein.stripe_session_id)
+      const { data: gutschrift } = await admin.from("ping_points_transactions")
+        .select("id,amount").eq("player_id", user.id).eq("ref_id", refId)
+        .eq("source", "booking_paid").maybeSingle()
+      const { data: storno } = await admin.from("ping_points_transactions")
+        .select("id").eq("ref_id", refId).eq("source", "booking_refund").maybeSingle()
+      if (gutschrift && !storno) {
+        await admin.from("ping_points_transactions").insert({
+          player_id: user.id,
+          amount: -(gutschrift.amount ?? 0),
+          source: "booking_refund",
+          description: "Storniert — Open Game",
+          ref_id: refId,
+        })
+      }
+    }
   }
 
   // Teilnahme entfernen

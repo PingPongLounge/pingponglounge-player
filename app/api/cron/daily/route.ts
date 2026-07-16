@@ -36,24 +36,12 @@ async function run(req: NextRequest) {
   try { warned = await warnMonthlyOpen(admin) }
   catch (e) { console.error("Monats-Warnungen fehlgeschlagen:", e) }
 
+  // Der alte Inaktivitäts-Abzug (/api/liga/inactivity) ist ABGESCHALTET. Er zog
+  // ebenfalls −20 ELO und lief zusammen mit der Monatspflicht — ein durchgehend
+  // inaktiver Spieler hätte pro Monat bis zu 40 verloren. Die Monatspflicht
+  // (4 Matches/Monat) ist der Nachfolger; ein Abzug reicht.
 
-  // Inaktivitäts-Abzug läuft weiter in seiner eigenen Route
-  let inactivity: unknown = null
-  try {
-    const base = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
-    // POST, nicht GET: die Route exportiert nur POST — der Aufruf lief bisher
-    // in einen 405, der Inaktivitäts-Abzug hat also nie stattgefunden.
-    const r = await fetch(`${base}/api/liga/inactivity`, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${process.env.CRON_SECRET}` },
-      signal: AbortSignal.timeout(20000),
-    })
-    inactivity = await r.json().catch(() => null)
-  } catch (e) {
-    console.error("Inaktivitäts-Lauf fehlgeschlagen:", e)
-  }
-
-  return NextResponse.json({ ok: true, confirmed, reminded, expired, angelegt, penalties, warned, inactivity })
+  return NextResponse.json({ ok: true, confirmed, reminded, expired, angelegt, penalties, warned })
 }
 
 export const GET = run
