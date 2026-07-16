@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback, use } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import BottomNav from "@/app/components/BottomNav"
-import { BG, CARD, CELL, W, MUT, GREEN, DANGER, card, cardPad, cell, btn, btnGhost, btnDanger, levelBadge, h1, body, backLink } from "@/app/theme"
+import { BG, CARD, CELL, W, MUT, GREEN, DANGER, card, cardPad, cell, btn, btnGhost, btnDanger, levelBadge, ratingLabel, h1, body, backLink } from "@/app/theme"
 
 const M=MUT, C=CARD, B=CELL, G=GREEN
 
@@ -15,7 +15,7 @@ function whenLabel(date: string | null, hour: number | null, dur: number): strin
 }
 
 type Player = { user_id: string; name: string; elo: number; level: string; is_creator: boolean }
-type Game = { id: string; created_by: string; location_name: string; date: string | null; start_hour: number | null; duration_minutes: number; max_players: number; current_players: number; price_per_player: number; level: string; status: string; notes: string | null; winner_id?: string | null; entered_by?: string | null; sets?: Array<{p1:number;p2:number}> | null }
+type Game = { id: string; created_by: string; location_name: string; date: string | null; start_hour: number | null; duration_minutes: number; max_players: number; current_players: number; price_per_player: number; level: string; status: string; notes: string | null; is_official?: boolean; winner_id?: string | null; entered_by?: string | null; sets?: Array<{p1:number;p2:number}> | null }
 type Data = { game: Game; players: Player[]; userId: string | null; isCreator: boolean; isJoined: boolean }
 
 export default function MatchDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -37,6 +37,19 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
   useEffect(() => { load() }, [load])
 
   async function join() { setBusy(true); setErr(""); const r = await fetch(`/api/match/${matchId}/join`, { method: "POST" }); if (!r.ok) { const j = await r.json(); setErr(j.error || "Fehler") } await load(); setBusy(false) }
+  // Bezahlter Platz an einem festen Abend → Stripe-Kasse. Der Platz wird erst
+  // nach erfolgter Zahlung vergeben (im Webhook).
+  async function platzKaufen() {
+    setBusy(true); setErr("")
+    try {
+      const r = await fetch(`/api/match/${matchId}/checkout`, { method: "POST" })
+      if (r.status === 401) { router.push("/login"); return }
+      const j = await r.json().catch(() => ({}))
+      if (j.needsOnboarding) { router.push("/onboarding"); return }
+      if (!r.ok || !j.url) { setErr(j.error || "Bezahlung konnte nicht geöffnet werden — melde dich bei uns."); setBusy(false); return }
+      window.location.href = j.url
+    } catch { setErr("Bezahlung konnte nicht geöffnet werden"); setBusy(false) }
+  }
   async function leave() { setBusy(true); setErr(""); const r = await fetch(`/api/match/${matchId}/leave`, { method: "POST" }); if (!r.ok) { const j = await r.json(); setErr(j.error || "Fehler") } await load(); setBusy(false) }
   async function del() { setBusy(true); await fetch(`/api/match/${matchId}/cancel`, { method: "POST" }); router.push("/match") }
 
@@ -74,10 +87,10 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
         <Link href="/match" style={backLink}>← Open Game</Link>
 
         <div style={{ margin: "20px 0 20px", textAlign: "center" }}>
-          <span style={levelBadge(g.level)}>{g.level}</span>
-          <h1 style={{ ...h1, fontSize: 26, margin: "12px 0 8px" }}>Open Game</h1>
-          <p style={body}>📍 {g.location_name} · 🕐 {whenLabel(g.date, g.start_hour, g.duration_minutes)}</p>
-          <p style={{ ...body, color: g.price_per_player > 0 ? M : G, marginTop: 4 }}>{g.price_per_player > 0 ? `💰 CHF ${g.price_per_player} pro Spieler` : "Gratis"}</p>
+          <span style={levelBadge(g.level)}>{g.is_official ? (g.level === "4-7" ? "Advanced & Elite" : "Rookie & Challenger") : g.level}</span>
+          <h1 style={{ ...h1, fontSize: 26, margin: "12px 0 8px" }}>{g.is_official ? g.location_name : "Open Game"}</h1>
+          <p style={body}>🕐 {whenLabel(g.date, g.start_hour, g.duration_minutes)}{g.is_official ? "" : ` · 📍 ${g.location_name}`}</p>
+          <p style={{ ...body, color: g.price_per_player > 0 ? M : G, marginTop: 4 }}>{g.price_per_player > 0 ? `CHF ${g.price_per_player} pro Person` : "Gratis"}</p>
         </div>
 
         {cancelled ? (
@@ -98,7 +111,7 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
                       <div style={{ flex: 1 }}>
                         <span style={{ fontSize: 14, fontWeight: 700, color: W }}>{p.name}</span>
                         {p.is_creator && <span style={{ fontSize: 9, color: "rgba(255,255,255,0.7)", marginLeft: 6, border: "1px solid rgba(255,255,255,0.25)", borderRadius: 999, padding: "1px 6px" }}>Host</span>}
-                        <p style={{ fontSize: 11, color: M, fontWeight: 500 }}>Elo {p.elo} · {p.level}</p>
+                        <p style={{ fontSize: 12, color: M, fontWeight: 500 }}>Rating {ratingLabel(p.elo)} · {p.level}</p>
                       </div>
                     ) : (
                       <span style={{ flex: 1, ...body }}>Freier Platz</span>
@@ -180,9 +193,23 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
               <button onClick={() => setConfirmDelete(true)} style={{ ...btnGhost, width: "100%", padding: 13, fontSize: 13 }}>Spiel löschen</button>
             )
           ) : isJoined ? (
-            <button onClick={leave} disabled={busy} style={{ ...btnGhost, width: "100%", padding: 14 }}>{busy ? "…" : "Doch nicht · Platz freigeben"}</button>
+            <>
+              <button onClick={leave} disabled={busy} style={{ ...btnGhost, width: "100%", padding: 14 }}>{busy ? "…" : g.is_official && g.price_per_player > 0 ? "Absagen · Geld zurück" : "Doch nicht · Platz freigeben"}</button>
+              {g.is_official && g.price_per_player > 0 && (
+                <p style={{ ...body, textAlign: "center", marginTop: 8, fontSize: 12.5 }}>Absage bis 24 h vorher — Geld zurück.</p>
+              )}
+            </>
           ) : full ? (
-            <div style={{ ...cardPad, textAlign: "center" }}><p style={{ fontSize: 14, fontWeight: 700, color: M }}>Spiel ist voll</p></div>
+            <div style={{ ...cardPad, textAlign: "center" }}><p style={{ fontSize: 14, fontWeight: 700, color: M }}>Ausgebucht</p></div>
+          ) : g.is_official && g.price_per_player > 0 ? (
+            // Fester Abend → bezahlen. Kein direkter Sprung in die Kasse mehr aus
+            // der Liste; erst diese Detailseite, dann hier der Kauf (Playtomic-Weg).
+            <>
+              <button onClick={platzKaufen} disabled={busy} style={{ ...btn, width: "100%", padding: 16, fontSize: 15.5 }}>
+                {busy ? "…" : `Platz sichern · CHF ${g.price_per_player}`}
+              </button>
+              <p style={{ ...body, textAlign: "center", marginTop: 8, fontSize: 12.5 }}>4 Stunden · Absage bis 24 h vorher, Geld zurück.</p>
+            </>
           ) : (
             <button onClick={join} disabled={busy} style={{ ...btn, width: "100%", padding: 15, fontSize: 15 }}>{busy ? "Trete bei …" : "Mitspielen →"}</button>
           )}

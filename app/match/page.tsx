@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
-import { BG, CARD, W, MUT, GREEN, GRAD, CITIES, card, cardPad, cardActive, cell, chip, btn, btnInCard, btnGhost, chipBtn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
+import { BG, CARD, W, MUT, SUB, GREEN, GRAD, CITIES, card, cardPad, cardActive, cell, chip, btn, btnInCard, btnGhost, chipBtn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
 import { SectionBlock, SectionStat, SectionRow, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
 import { OG_PREIS_CHF, OG_STORNO_STUNDEN } from "@/lib/opengames"
 
@@ -36,8 +36,7 @@ export default function MatchPage() {
   const [error, setError]         = useState("")
   const [joinError, setJoinError] = useState("")
   const [myLevel, setMyLevel]     = useState<string | null>(null)
-  const [kaufen, setKaufen]       = useState<string | null>(null)
-  const [kaufError, setKaufError] = useState("")
+  const [infoOpen, setInfoOpen]   = useState(false)
 
   const load = useCallback(async () => {
     setError("")
@@ -72,22 +71,6 @@ export default function MatchPage() {
 
   async function cancel(id: string) { await fetch(`/api/match/${id}/cancel`, { method: "POST" }); load() }
 
-  // Platz an einem festen Abend kaufen → Stripe-Kasse. Der Platz wird erst
-  // vergeben, wenn die Zahlung wirklich durch ist (im Webhook).
-  async function platzKaufen(id: string) {
-    setKaufen(id); setKaufError("")
-    try {
-      const res = await fetch(`/api/match/${id}/checkout`, { method: "POST" })
-      if (res.status === 401) { router.push("/login"); return }
-      const j = await res.json().catch(() => ({}))
-      if (j.needsOnboarding) { router.push("/onboarding"); return }
-      if (!res.ok || !j.url) { setKaufError(j.error || "Kasse konnte nicht geöffnet werden"); setKaufen(null); return }
-      window.location.href = j.url
-    } catch {
-      setKaufError("Kasse konnte nicht geöffnet werden")
-      setKaufen(null)
-    }
-  }
 
   // Der Filter lief noch auf dem alten System (Rookie/Challenger/Advanced/Elite),
   // erstellt werden Open Games aber mit Level 1–7 → der Filter traf nie zu.
@@ -115,6 +98,35 @@ export default function MatchPage() {
             Intro-Karte, kein Filter — Open Game soll in zwei Klick buchbar sein:
             Mitspielen antippen, bezahlen, fertig. */}
         <SectionBlock title="Open Game" meta={`Deine nächsten Abende · CHF ${OG_PREIS_CHF} · 4 Std.`} img="/gl-tische.jpg" />
+
+        {/* Ein Satz erklärt, worum es geht — der Rest klappt auf, wer's genau
+            wissen will. Ohne das stand nur "Open Game", und niemand wusste, was das ist. */}
+        <div style={{ margin: "12px 4px 0" }}>
+          <p style={{ fontSize: 14, color: SUB, lineHeight: 1.5 }}>
+            Feste Spielabende in deiner Stärkeklasse — komm vorbei, spiel mit wer da ist, trag dein Ergebnis ein.
+          </p>
+          <button onClick={() => setInfoOpen(v => !v)}
+            style={{ marginTop: 8, background: "none", border: "none", padding: 0, color: G, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5 }}>
+            So funktioniert's <span style={{ transform: infoOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }}>▾</span>
+          </button>
+          {infoOpen && (
+            <div style={{ marginTop: 12, background: C, borderRadius: 16, padding: "6px 16px" }}>
+              {([
+                ["Abend wählen", `Feste Abende in Glattbrugg und St. Gallen, je 6 Plätze pro Stärkeklasse (Einstieg 1–3 · Pro 4–7). So spielst du gegen Leute auf deinem Niveau.`],
+                ["Platz sichern", `CHF ${OG_PREIS_CHF} für 4 Stunden. Absage bis ${OG_STORNO_STUNDEN} h vorher — Geld zurück.`],
+                ["Spielen & eintragen", "Vor Ort spielst du gegen wen du willst. Nach dem Spiel trägst du das Ergebnis ein — dein Rating steigt."],
+              ] as [string, string][]).map(([t, d], i) => (
+                <div key={t} style={{ display: "flex", gap: 13, alignItems: "flex-start", padding: "12px 0", borderTop: i === 0 ? "none" : `1px solid rgba(255,255,255,.07)` }}>
+                  <span style={{ width: 24, height: 24, borderRadius: "50%", background: GRAD, color: "#06210F", fontSize: 12, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i + 1}</span>
+                  <span>
+                    <span style={{ display: "block", fontSize: 14, fontWeight: 800, color: W }}>{t}</span>
+                    <span style={{ display: "block", fontSize: 13, color: MUT, marginTop: 2, lineHeight: 1.45 }}>{d}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {offizielle.length > 0 && (
           <div style={{ marginTop: 14, background: C, borderRadius: 22, padding: "4px 16px", boxShadow: "0 1px 4px rgba(0,0,0,.14)" }}>
@@ -158,17 +170,16 @@ export default function MatchPage() {
                         Level {g.level}
                       </span>
                     ) : (
-                      // EIN Knopf: "Mitspielen" → direkt zur Kasse. Der Preis steht
-                      // im Kopf, der Knopf sagt die Handlung.
-                      <button onClick={() => platzKaufen(g.id)} disabled={kaufen === g.id}
-                        style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "#06210F", background: GRAD, border: "none", borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", cursor: kaufen === g.id ? "wait" : "pointer", fontFamily: "inherit", flexShrink: 0 }}>
-                        {kaufen === g.id ? "…" : "Mitspielen"}
-                      </button>
+                      // "Mitspielen" fuehrt auf die Detailseite: wer kommt, freie
+                      // Plaetze, Ort, Storno — dann dort bezahlen (Playtomic-Weg).
+                      <Link href={`/match/${g.id}`}
+                        style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "#06210F", background: GRAD, borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", textDecoration: "none", flexShrink: 0 }}>
+                        Mitspielen
+                      </Link>
                     )}
                   </div>
                 )
               })}
-            {kaufError && <p style={{ fontSize: 13, color: "#FF7A7A", margin: "4px 0 12px" }}>{kaufError}</p>}
           </div>
         )}
 
