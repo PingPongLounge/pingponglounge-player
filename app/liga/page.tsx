@@ -445,8 +445,8 @@ export default function LigaPage(){
             <div style={{display:"flex",alignItems:"center",gap:16,padding:"16px 20px",borderTop:`1px solid ${LINE}`}}>
               <div style={{fontSize:44,fontWeight:900,lineHeight:.85,letterSpacing:"-.03em",...gt}}>#{meinRang}</div>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:12,fontWeight:800,color:W}}>Deine Position</div>
-                <div style={{fontSize:13,color:SUB,fontWeight:400,marginTop:3}}>Rating {ratingLabel(myRow.elo)}{myRow.level?` · Level ${myRow.level}`:""}</div>
+                <div style={{fontSize:13.5,fontWeight:800,color:W}}>Deine Position</div>
+                <div style={{fontSize:15,color:SUB,fontWeight:500,marginTop:3}}>Rating {ratingLabel(myRow.elo)}</div>
               </div>
             </div>
             {/* Monatspflicht — bei erfülltem Soll ein Haken. "5/4" las sich wie ein Fehler. */}
@@ -565,12 +565,12 @@ export default function LigaPage(){
                   const initialen=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                   return(
                     <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:9,padding:"10px 6px",borderTop:i===0?"none":`1px solid ${LINE}`,...(me?{background:"rgba(57,255,20,.07)",borderRadius:12}:{})}}>
-                      <span style={{width:20,textAlign:"center",fontSize:14,fontWeight:900,flexShrink:0,color:SUB}}>{platz}</span>
+                      <span style={{width:22,textAlign:"center",fontSize:16,fontWeight:900,flexShrink:0,color:SUB}}>{platz}</span>
                       {/* Gesicht statt Textwüste */}
-                      <div style={{width:32,height:32,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:CELL,display:"flex",alignItems:"center",justifyContent:"center"}}>
+                      <div style={{width:34,height:34,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:CELL,display:"flex",alignItems:"center",justifyContent:"center"}}>
                         {r.avatar
                           ? <img src={r.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                          : <span style={{fontSize:11,fontWeight:800,color:MUT}}>{initialen}</span>}
+                          : <span style={{fontSize:12.5,fontWeight:800,color:MUT}}>{initialen}</span>}
                       </div>
                       {/* Name antippen → Spielerprofil mit Bilanz und letzten Spielen.
                           Alles einzeilig mit Auslassungspunkten: lange Namen brachen
@@ -578,14 +578,13 @@ export default function LigaPage(){
                           "2/5 Liga-Matches" wuchs auf drei Zeilen. Dieser Zähler
                           steht jetzt im Spieler-Popup, wo Platz dafür ist. */}
                       <button onClick={()=>openPlayer(r.user_id)} style={{flex:1,minWidth:0,background:"none",border:"none",padding:0,textAlign:"left",cursor:"pointer",fontFamily:"inherit",overflow:"hidden"}}>
-                        <span style={{display:"block",fontSize:14,fontWeight:800,color:W,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
-                          {r.name}{me&&<span style={{fontSize:8,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 5px",marginLeft:6,color:SUB}}>Du</span>}
+                        <span style={{display:"block",fontSize:16,fontWeight:800,color:W,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
+                          {r.name}{me&&<span style={{fontSize:9,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 5px",marginLeft:6,color:SUB}}>Du</span>}
                         </span>
-                        {r.real&&<span style={{display:"block",fontSize:10.5,color:MUT,fontWeight:500,marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{r.real}</span>}
+                        {r.real&&<span style={{display:"block",fontSize:12,color:MUT,fontWeight:500,marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{r.real}</span>}
                       </button>
-                      {/* Level als Badge — fixe Breite, damit nichts überläuft */}
-                      {r.level&&<span style={{...levelBadge(r.level),flexShrink:0}}>L{r.level}</span>}
-                      <span style={{fontSize:13,fontWeight:800,width:38,textAlign:"right",flexShrink:0,...(me?gt:{color:SUB})}}>{ratingLabel(r.elo)}</span>
+                      {/* Nur die genaue Rating-Klasse — kein zweites Level-Badge daneben. */}
+                      <span style={{fontSize:17,fontWeight:900,width:46,textAlign:"right",flexShrink:0,...(me?gt:{color:W})}}>{ratingLabel(r.elo)}</span>
                       {/* Eine Aktion, kurz und immer gleich breit. "SPIEL EINTRAGEN →"
                           und "ZURÜCKZIEHEN" sprengten die Zeile. */}
                       {!me&&myReg&&(()=>{

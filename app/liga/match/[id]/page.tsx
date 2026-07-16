@@ -8,6 +8,7 @@ import {
   body, meta, eyebrow, backLink,
 } from "@/app/theme"
 import { MATCH_SPRUECHE } from "@/lib/rewards"
+import StreakBanner from "@/app/components/StreakBanner"
 
 type SetScore={p1:string,p2:string}
 type MatchData={id:string,season_id:string,round:number,p1_id:string,p1_name:string,p2_id:string,p2_name:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,status:string,entered_by:string|null}
@@ -225,6 +226,8 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:140,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
           <div style={{width:"100%",maxWidth:400,background:CARD,borderRadius:24,padding:"24px 20px",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
             <div style={{fontSize:11,fontWeight:800,letterSpacing:".12em",textTransform:"uppercase",color:GREEN,marginBottom:6}}>✓ Bestätigt</div>
+            {/* Ansporn direkt nach dem Spiel: Serie feiern oder aufmuntern. */}
+            <div style={{marginBottom:14}}><StreakBanner/></div>
             <div style={{fontSize:21,fontWeight:900,color:W,marginBottom:5}}>Spiel kommentieren?</div>
             <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16,lineHeight:1.5}}>
               Das Spiel steht im Liga-Chat — alle sehen es. Sag was dazu.

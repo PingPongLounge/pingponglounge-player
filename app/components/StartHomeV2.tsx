@@ -4,6 +4,7 @@ import Link from "next/link"
 import BottomNav from "./BottomNav"
 import StartMenu from "./StartMenu"
 import PendingConfirmBanner from "./PendingConfirmBanner"
+import StreakBanner from "./StreakBanner"
 import { ratingLabel } from "@/app/theme"
 
 const BG = "#20242C", CARD = "#2A2F39", CELL = "#353B46", HERO = "#14171E", W = "#FFFFFF"
@@ -98,7 +99,7 @@ export default function StartHomeV2(d: StartData) {
               <div style={{ fontSize: 44, fontWeight: 900, lineHeight: .85, letterSpacing: "-.03em", ...gt }}>#{d.rank}</div>
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: MUT }}>Deine Position</div>
-                <div style={{ fontSize: 13.5, color: SUB, fontWeight: 400, marginTop: 3 }}>Rating {ratingLabel(d.elo)} · Level {d.lvl}</div>
+                <div style={{ fontSize: 15, color: SUB, fontWeight: 500, marginTop: 3 }}>Rating {ratingLabel(d.elo)}</div>
               </div>
             </div>
 
@@ -114,6 +115,9 @@ export default function StartHomeV2(d: StartData) {
               <span style={{ fontSize: 15, fontWeight: 800, color: "#39FF14" }}>→</span>
             </Link>
           </div>
+
+          {/* Ansporn: Siegesserie feiern / nach Niederlage aufs Training zeigen */}
+          <div style={{ margin: "0 16px 18px" }}><StreakBanner /></div>
 
           {/* STATS */}
           <div className="rev" style={card}>
