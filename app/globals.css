@@ -1,4 +1,9 @@
 @import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@900;800;700;600&display=swap");
 * { box-sizing: border-box; margin: 0; padding: 0; }
+/* Kein Standard-Rahmen auf Buttons/Feldern: sonst zeichnet der Browser eine
+   weisse Umrandung um jeden Button (Namen, Tabs, Chips) — dort wo im Style
+   das explizite border:none entfernt wurde. */
+button, input, textarea, select { border: none; outline: none; }
+button { background: none; }
 :root { --green: #39FF14; --dark: #14161A; --card: #15161A; --border: #26282E; --muted: #6B6E7A; --text: #E8E6E1; }
 body { font-family: "League Spartan", system-ui, sans-serif; background: #14161A; color: #E8E6E1; -webkit-font-smoothing: antialiased; }
