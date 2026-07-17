@@ -38,10 +38,12 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
   const [err, setErr] = useState("")
   const [myS, setMyS] = useState(0)   // Ergebnis-Zähler
   const [oppS, setOppS] = useState(0)
+  const [ppBalance, setPpBalance] = useState(0)   // PingPoints-Guthaben
 
   const load = useCallback(async () => {
     const res = await fetch(`/api/match/${matchId}`)
     if (res.ok) setData(await res.json())
+    try { const pr = await fetch("/api/pingpoints"); if (pr.ok) { const pj = await pr.json(); setPpBalance(pj.balance ?? 0) } } catch { /* still */ }
     setLoading(false)
   }, [matchId])
   useEffect(() => { load() }, [load])
@@ -49,13 +51,17 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
   async function join() { setBusy(true); setErr(""); const r = await fetch(`/api/match/${matchId}/join`, { method: "POST" }); if (!r.ok) { const j = await r.json(); setErr(j.error || "Fehler") } await load(); setBusy(false) }
   // Bezahlter Platz an einem festen Abend → Stripe-Kasse. Der Platz wird erst
   // nach erfolgter Zahlung vergeben (im Webhook).
-  async function platzKaufen() {
+  async function platzKaufen(redeem = false) {
     setBusy(true); setErr("")
     try {
-      const r = await fetch(`/api/match/${matchId}/checkout`, { method: "POST" })
+      const r = await fetch(`/api/match/${matchId}/checkout`, {
+        method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ redeem }),
+      })
       if (r.status === 401) { router.push("/login"); return }
       const j = await r.json().catch(() => ({}))
       if (j.needsOnboarding) { router.push("/onboarding"); return }
+      // Mit PingPoints voll bezahlt → kein Stripe, direkt zurück ins Spiel.
+      if (j.gratis) { await load(); setBusy(false); return }
       if (!r.ok || !j.url) { setErr(j.error || "Bezahlung konnte nicht geöffnet werden — melde dich bei uns."); setBusy(false); return }
       window.location.href = j.url
     } catch { setErr("Bezahlung konnte nicht geöffnet werden"); setBusy(false) }
@@ -236,10 +242,17 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
             // Fester Abend → bezahlen. Kein direkter Sprung in die Kasse mehr aus
             // der Liste; erst diese Detailseite, dann hier der Kauf (Playtomic-Weg).
             <>
-              <button onClick={platzKaufen} disabled={busy} style={{ ...btn, width: "100%", padding: 16, fontSize: 15.5 }}>
+              <button onClick={() => platzKaufen(false)} disabled={busy} style={{ ...btn, width: "100%", padding: 16, fontSize: 15.5 }}>
                 {busy ? "…" : `Platz sichern · CHF ${g.price_per_player}`}
               </button>
-              <p style={{ ...body, textAlign: "center", marginTop: 8, fontSize: 12.5 }}>4 Stunden · Absage bis 24 h vorher, Geld zurück.</p>
+              {/* PingPoints einlösen — nur ganz (genug Punkte für den vollen Preis).
+                  1 Punkt = CHF 0.50, also braucht es Preis × 2 Punkte. */}
+              {ppBalance >= g.price_per_player * 2 && (
+                <button onClick={() => platzKaufen(true)} disabled={busy} style={{ ...btnGhost, width: "100%", padding: 14, marginTop: 8, fontSize: 14 }}>
+                  {busy ? "…" : `Mit PingPoints buchen · ${g.price_per_player * 2} Punkte`}
+                </button>
+              )}
+              <p style={{ ...body, textAlign: "center", marginTop: 8, fontSize: 12.5 }}>{(g.duration_minutes / 60).toLocaleString("de-CH")} Std · Absage bis 24 h vorher, Geld zurück.</p>
             </>
           ) : (
             <button onClick={join} disabled={busy} style={{ ...btn, width: "100%", padding: 15, fontSize: 15 }}>{busy ? "Trete bei …" : "Mitspielen →"}</button>

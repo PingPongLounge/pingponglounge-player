@@ -3,6 +3,7 @@ import Stripe from "stripe"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { OG_PREIS_CHF, gruppeFuerLevel, startZeit } from "@/lib/opengames"
+import { PP_CHF } from "@/lib/rewards"
 
 // Einen Platz in einem offiziellen Open Game kaufen.
 // Der Preis kommt NIE vom Client — er steht serverseitig in lib/opengames.ts.
@@ -19,6 +20,8 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  const body = await req.json().catch(() => ({} as Record<string, unknown>))
+  const wantRedeem = body?.redeem === true   // "PingPoints einlösen?" → Ja
 
   const sb = await createClient()
   const { data: { user } } = await sb.auth.getUser()
@@ -68,8 +71,39 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   // Preis serverseitig
   const chf = Number(game.price_per_player ?? OG_PREIS_CHF)
-  const stripe = getStripe()
+  const isTraining = game.kind === "training"
+  const titel = isTraining ? `Training ${game.location_name}` : `Open Game ${game.location_name}`
 
+  // PingPoints einlösen: GANZ oder gar nicht — keine anteilige Zahlung. Man
+  // braucht genug Punkte für den VOLLEN Preis (1 Punkt = CHF 0.50). Dann geht
+  // die Buchung gratis über Punkte, ohne Stripe.
+  if (wantRedeem) {
+    const kosten = Math.round(chf / PP_CHF)
+    const { data: tx } = await admin.from("ping_points_transactions").select("amount").eq("player_id", user.id)
+    const balance = (tx || []).reduce((s, t) => s + (t.amount || 0), 0)
+    if (balance < kosten) {
+      return NextResponse.json({ error: `Nicht genug PingPoints — du brauchst ${kosten}, du hast ${balance}.`, zuWenigPunkte: true }, { status: 400 })
+    }
+    const ref = `pp-${crypto.randomUUID()}`
+    const { error: insErr } = await admin.from("open_game_players").insert({
+      game_id: game.id, user_id: user.id, display_name: prof.name || "Spieler",
+      status: "confirmed", paid: true, amount_chf: 0, redeemed_points: kosten, redeem_ref: ref,
+    })
+    if (insErr) return NextResponse.json({ error: "Du bist schon angemeldet" }, { status: 400 })
+    await admin.from("ping_points_transactions").insert({
+      player_id: user.id, amount: -kosten, source: "booking_redeem",
+      description: `${isTraining ? "Training" : "Open Game"} — ${game.location_name}`, ref_id: ref,
+    })
+    const neu = (game.current_players ?? 0) + 1
+    await admin.from("open_games").update({
+      current_players: neu, status: neu >= (game.max_players ?? 6) ? "full" : "open",
+      updated_at: new Date().toISOString(),
+    }).eq("id", game.id)
+    return NextResponse.json({ gratis: true, redirect: `/match/${game.id}?bezahlt=1` })
+  }
+
+  // Normale Zahlung: voller Preis über Stripe.
+  const stripe = getStripe()
   const datum = new Date(game.date).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long" })
   const zeit = `${String(game.start_hour ?? 19).padStart(2, "0")}:00`
 
@@ -81,13 +115,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       price_data: {
         currency: "chf",
         unit_amount: Math.round(chf * 100),
-        product_data: {
-          name: `Open Game ${game.location_name}`,
-          description: `${datum}, ${zeit} · Level ${game.level} · 4 Stunden`,
-        },
+        product_data: { name: titel, description: `${datum}, ${zeit}` },
       },
     }],
-    // Der Webhook braucht diese Angaben, um den Platz zu vergeben.
     metadata: {
       type: "open_game",
       game_id: game.id,

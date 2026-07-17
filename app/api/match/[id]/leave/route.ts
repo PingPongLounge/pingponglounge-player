@@ -39,7 +39,7 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   // Bezahlter Platz? Dann Geld zurück — aber nur innerhalb der Frist.
   const { data: mein } = await admin
     .from("open_game_players")
-    .select("id,paid,stripe_payment_intent,stripe_session_id,refunded_at")
+    .select("id,paid,stripe_payment_intent,stripe_session_id,refunded_at,redeemed_points,redeem_ref")
     .eq("game_id", id).eq("user_id", user.id).maybeSingle()
 
   if (!mein) return NextResponse.json({ error: "Du bist nicht angemeldet" }, { status: 400 })
@@ -86,6 +86,22 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
           source: "booking_refund",
           description: "Storniert — Open Game",
           ref_id: refId,
+        })
+      }
+    }
+
+    // Mit PingPoints bezahlt? Dann die eingelösten Punkte zurückgeben
+    // (idempotent über den redeem_ref).
+    if ((mein.redeemed_points ?? 0) > 0 && mein.redeem_ref) {
+      const { data: schon } = await admin.from("ping_points_transactions")
+        .select("id").eq("ref_id", mein.redeem_ref).eq("source", "booking_redeem_refund").maybeSingle()
+      if (!schon) {
+        await admin.from("ping_points_transactions").insert({
+          player_id: user.id,
+          amount: mein.redeemed_points,
+          source: "booking_redeem_refund",
+          description: "Storniert — PingPoints zurück",
+          ref_id: mein.redeem_ref,
         })
       }
     }

@@ -66,6 +66,7 @@ export const OG_STANDORTE: OgStandort[] = [
 // Slot, deshalb je Wochentag ein eigener. Nur eingetragene Tage zeigen einen QR.
 export const OG_ENTRY_QR: Record<string, string> = {
   "Glattbrugg|4": "/og-entry-glattbrugg-do.png",  // Donnerstag (Open Game + Training)
+  "Glattbrugg|6": "/og-entry-glattbrugg-sa.png",  // Samstag (Open Game)
 }
 export function entryQrFor(locationName: string, weekday: number): string | null {
   return OG_ENTRY_QR[`${locationName}|${weekday}`] ?? null
