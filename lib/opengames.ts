@@ -18,6 +18,15 @@ export const OG_STORNO_STUNDEN = 24     // bis dahin Absage mit Rückerstattung
 export const OG_VORLAUF_TAGE = 21       // so weit im Voraus werden Termine angelegt
 export const OG_BIS_DATUM = "2026-10-31" // testweise bis Ende Oktober — danach keine neuen
 
+export const OG_TRAINING_PREIS_CHF = 29 // geführtes Training, pro Person
+
+/** Geführte Trainings (mit Trainer). Level offen, feste Platzzahl, eigener Preis. */
+export type OgTraining = { location_id: string; location_name: string; day: number; start: number; end: number; dauerMin: number; plaetze: number }
+export const OG_TRAININGS: OgTraining[] = [
+  // Glattbrugg, jeden Donnerstag 19:00–20:30, 8 Plätze, alle Level
+  { location_id: "glattbrugg", location_name: "Glattbrugg", day: 4, start: 19, end: 20, dauerMin: 90, plaetze: 8 },
+]
+
 /** Eine Gruppe an einem Abend: Stärkeklasse + eigene Platzzahl. */
 export type OgGruppeDef = { key: "einstieg" | "pro"; name: string; level: "1-3" | "4-7"; plaetze: number }
 const EINSTIEG = (plaetze: number, name = "Einstieg"): OgGruppeDef => ({ key: "einstieg", name, level: "1-3", plaetze })
@@ -53,11 +62,17 @@ export const OG_STANDORTE: OgStandort[] = [
 // Der QR gilt zeitgebunden (öffnet nur zu Open-Game-Zeiten) und wird NUR
 // bezahlten Teilnehmern gezeigt. Bild liegt unter /public.
 // Sobald der QR da ist: Datei als public/og-entry-glattbrugg.png ablegen.
+// Schlüssel: "Standort|Wochentag" (0=So … 6=Sa) — der Eversports-QR gilt pro
+// Slot, deshalb je Wochentag ein eigener. Nur eingetragene Tage zeigen einen QR.
 export const OG_ENTRY_QR: Record<string, string> = {
-  "Glattbrugg": "/og-entry-glattbrugg.png",
+  "Glattbrugg|4": "/og-entry-glattbrugg-do.png",  // Donnerstag (Open Game + Training)
 }
-export function entryQrFor(locationName: string): string | null {
-  return OG_ENTRY_QR[locationName] ?? null
+export function entryQrFor(locationName: string, weekday: number): string | null {
+  return OG_ENTRY_QR[`${locationName}|${weekday}`] ?? null
+}
+/** Wochentag (0–6) aus einem YYYY-MM-DD-Datum, ohne Zeitzonen-Verschiebung. */
+export function weekdayOf(dateStr: string): number {
+  return new Date(`${dateStr}T12:00:00`).getDay()
 }
 
 /** Passt der Spieler in diese Gruppe? */
@@ -99,6 +114,7 @@ export async function ensureOpenGames(admin: SupabaseClient): Promise<number> {
           neue.push({
             series_key: `${ort.id}-${ds}-${g.key}`,
             is_official: true,
+            kind: "open_game",
             created_by: null,
             location_id: ort.id,
             location_name: ort.name,
@@ -115,6 +131,29 @@ export async function ensureOpenGames(admin: SupabaseClient): Promise<number> {
           })
         }
       }
+    }
+
+    // Geführte Trainings — Level offen, eigener Preis, kind=training
+    for (const t of OG_TRAININGS) {
+      if (t.day !== wochentag) continue
+      neue.push({
+        series_key: `${t.location_id}-${ds}-training`,
+        is_official: true,
+        kind: "training",
+        created_by: null,
+        location_id: t.location_id,
+        location_name: t.location_name,
+        date: ds,
+        start_hour: t.start,
+        end_hour: t.end,
+        duration_minutes: t.dauerMin,
+        max_players: t.plaetze,
+        current_players: 0,
+        price_per_player: OG_TRAINING_PREIS_CHF,
+        level: "alle",
+        status: "open",
+        notes: "Geführtes Training · alle Level",
+      })
     }
   }
 

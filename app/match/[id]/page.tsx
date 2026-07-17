@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import BottomNav from "@/app/components/BottomNav"
 import { BG, CARD, CELL, W, MUT, GREEN, DANGER, card, cardPad, cell, btn, btnGhost, btnDanger, levelBadge, ratingLabel, h1, body, backLink } from "@/app/theme"
-import { entryQrFor } from "@/lib/opengames"
+import { entryQrFor, weekdayOf } from "@/lib/opengames"
 
 const M=MUT, C=CARD, B=CELL, G=GREEN
 
@@ -16,7 +16,7 @@ function whenLabel(date: string | null, hour: number | null, dur: number): strin
 }
 
 type Player = { user_id: string; name: string; elo: number; level: string; is_creator: boolean }
-type Game = { id: string; created_by: string; location_name: string; date: string | null; start_hour: number | null; duration_minutes: number; max_players: number; current_players: number; price_per_player: number; level: string; status: string; notes: string | null; is_official?: boolean; winner_id?: string | null; entered_by?: string | null; sets?: Array<{p1:number;p2:number}> | null }
+type Game = { id: string; created_by: string; location_name: string; date: string | null; start_hour: number | null; duration_minutes: number; max_players: number; current_players: number; price_per_player: number; level: string; status: string; notes: string | null; is_official?: boolean; kind?: string; winner_id?: string | null; entered_by?: string | null; sets?: Array<{p1:number;p2:number}> | null }
 type Data = { game: Game; players: Player[]; userId: string | null; isCreator: boolean; isJoined: boolean }
 
 export default function MatchDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -85,11 +85,11 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
       <div style={{ maxWidth: 480, margin: "0 auto" }}>
-        <Link href="/match" style={backLink}>← Open Game</Link>
+        <Link href={g.kind === "training" ? "/training" : "/match"} style={backLink}>← {g.kind === "training" ? "Training" : "Open Game"}</Link>
 
         <div style={{ margin: "20px 0 20px", textAlign: "center" }}>
-          <span style={levelBadge(g.level)}>{g.is_official ? (g.level === "4-7" ? "Advanced & Elite" : "Rookie & Challenger") : g.level}</span>
-          <h1 style={{ ...h1, fontSize: 26, margin: "12px 0 8px" }}>{g.is_official ? g.location_name : "Open Game"}</h1>
+          <span style={levelBadge(g.level)}>{g.kind === "training" ? "Training · alle Level" : g.is_official ? (g.level === "4-7" ? "Advanced & Elite" : "Rookie & Challenger") : g.level}</span>
+          <h1 style={{ ...h1, fontSize: 26, margin: "12px 0 8px" }}>{g.kind === "training" ? `Training ${g.location_name}` : g.is_official ? g.location_name : "Open Game"}</h1>
           <p style={body}>🕐 {whenLabel(g.date, g.start_hour, g.duration_minutes)}{g.is_official ? "" : ` · 📍 ${g.location_name}`}</p>
           <p style={{ ...body, color: g.price_per_player > 0 ? M : G, marginTop: 4 }}>{g.price_per_player > 0 ? `CHF ${g.price_per_player} pro Person` : "Gratis"}</p>
         </div>
@@ -125,12 +125,12 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
 
           {/* Zutritts-QR: nur für bezahlte Teilnehmer und nur an Standorten mit
               verschlossener Tür (Glattbrugg). Gilt zeitgebunden zur Open-Game-Zeit. */}
-          {g.is_official && isJoined && entryQrFor(g.location_name) && (
+          {g.is_official && isJoined && g.date && entryQrFor(g.location_name, weekdayOf(g.date)) && (
             <div style={{ ...cardPad, marginBottom: 12, textAlign: "center" }}>
               <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", color: G, marginBottom: 10 }}>Dein Eintritt · {g.location_name}</p>
               <div style={{ position: "relative", width: 200, height: 200, margin: "0 auto", background: "#fff", borderRadius: 16, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <span style={{ position: "absolute", color: "#0D0F13", fontSize: 13, fontWeight: 800 }}>QR folgt</span>
-                <img src={entryQrFor(g.location_name)!} alt="Zutritts-QR" style={{ position: "relative", width: "100%", height: "100%", objectFit: "contain" }} onError={e => { e.currentTarget.style.display = "none" }} />
+                <img src={entryQrFor(g.location_name, weekdayOf(g.date!))!} alt="Zutritts-QR" style={{ position: "relative", width: "100%", height: "100%", objectFit: "contain" }} onError={e => { e.currentTarget.style.display = "none" }} />
               </div>
               <p style={{ ...body, marginTop: 10 }}>An der Tür scannen — gilt nur zur Open-Game-Zeit.</p>
             </div>

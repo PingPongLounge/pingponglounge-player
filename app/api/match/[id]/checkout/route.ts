@@ -28,7 +28,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const { data: game } = await admin
     .from("open_games")
-    .select("id,is_official,status,date,start_hour,max_players,current_players,price_per_player,level,location_name")
+    .select("id,is_official,kind,status,date,start_hour,max_players,current_players,price_per_player,level,location_name")
     .eq("id", id)
     .maybeSingle()
 
@@ -54,12 +54,16 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!prof?.level) {
     return NextResponse.json({ error: "Schliess zuerst dein Profil ab", needsOnboarding: true }, { status: 400 })
   }
-  const meine = gruppeFuerLevel(prof.level)
-  const gruppeDesSpiels = game.level === "4-7" ? "pro" : "einstieg"
-  if (meine !== gruppeDesSpiels) {
-    return NextResponse.json({
-      error: `Dieser Abend ist für ${gruppeDesSpiels === "pro" ? "Level 4–7" : "Level 1–3"} — du bist Level ${prof.level}`,
-    }, { status: 400 })
+  // Training ist für ALLE Level offen — keine Gruppen-Prüfung. Nur bei Open
+  // Games muss der Spieler in die Stärkeklasse des Abends passen.
+  if (game.kind !== "training") {
+    const meine = gruppeFuerLevel(prof.level)
+    const gruppeDesSpiels = game.level === "4-7" ? "pro" : "einstieg"
+    if (meine !== gruppeDesSpiels) {
+      return NextResponse.json({
+        error: `Dieser Abend ist für ${gruppeDesSpiels === "pro" ? "Level 4–7" : "Level 1–3"} — du bist Level ${prof.level}`,
+      }, { status: 400 })
+    }
   }
 
   // Preis serverseitig

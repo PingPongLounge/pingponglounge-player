@@ -8,7 +8,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
   const { data: game } = await sb
     .from("open_games")
-    .select("id,created_by,location_name,date,start_hour,duration_minutes,max_players,current_players,price_per_player,level,status,notes,created_at,winner_id,entered_by,sets,entered_at,confirmed_at,is_official")
+    .select("id,created_by,location_name,date,start_hour,duration_minutes,max_players,current_players,price_per_player,level,status,notes,created_at,winner_id,entered_by,sets,entered_at,confirmed_at,is_official,kind")
     .eq("id", id)
     .single()
   if (!game) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 })

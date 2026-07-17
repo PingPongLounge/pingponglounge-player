@@ -1,62 +1,98 @@
 "use client"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import { SectionBlock, SectionStat, SectionRow, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
+import { SectionBlock, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
+import { ratingLabel } from "@/app/theme"
+import { OG_TRAINING_PREIS_CHF } from "@/lib/opengames"
 
-const BG = "#20242C", CARD = "#2A2F39", W = "#FFFFFF"
-const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.82)"
+const BG = "#20242C", CARD = "#2A2F39", CELL = "#353B46", W = "#FFFFFF"
+const MUT = "rgba(255,255,255,.82)", GREEN = "#39FF14"
 const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
-const EVERSPORTS_STUDIO = "https://www.eversports.ch/st/pingponglounge24"
 
-// Widget-ID aus dem Eversports Manager hier eintragen:
-// Manager → Widgets → gewünschtes Widget (Kursplan/Buchung) → Code kopieren
-// → die ID aus  data-eversports-widget-id="…"  hier einsetzen.
-const EVERSPORTS_WIDGET_ID = "2662962e-ccc2-45ef-94c6-eaf9cf3c0b30"
+type Player = { user_id: string; name: string; elo: number; level: string }
+type Training = {
+  id: string; location_name: string; date: string | null; start_hour: number | null
+  duration_minutes: number; max_players: number; current_players: number; price_per_player: number
+  players: Player[]
+}
+
+function whenLabel(date: string | null, hour: number | null): string {
+  if (!date) return hour != null ? `${String(hour).padStart(2, "0")}:00` : "Zeit offen"
+  const d = new Date(`${date}T12:00:00`)
+  const ds = d.toLocaleDateString("de-CH", { weekday: "short", day: "numeric", month: "short" })
+  return `${ds} · ${String(hour ?? 19).padStart(2, "0")}:00–20:30`
+}
 
 export default function TrainingPage() {
+  const [list, setList] = useState<Training[]>([])
+  const [loading, setLoading] = useState(true)
+
   useEffect(() => {
-    if (!EVERSPORTS_WIDGET_ID) return
-    const SRC = "https://widget-static.eversports.io/loader.js"
-    if (document.querySelector(`script[src="${SRC}"]`)) return
-    const s = document.createElement("script")
-    s.type = "module"; s.src = SRC; s.async = true; s.defer = true
-    document.body.appendChild(s)
+    ;(async () => {
+      try {
+        const r = await fetch("/api/training")
+        const j = await r.json()
+        setList(j.trainings || [])
+      } catch { /* still */ }
+      setLoading(false)
+    })()
   }, [])
 
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "0 0 100px" }}>
       <SectionTopBar section="Training" />
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "6px 16px 0" }}>
-        {/* Derselbe Block wie in der Liga: Bild, nächster Termin, Buchen-Zeile */}
-        <SectionBlock title="Training" meta="Coaching &amp; Drills · jeden Donnerstag" img="/training-hero.jpg">
-          <SectionStat big="Do" label="Nächstes Training" sub="19:30–21:00 · Einsteiger & Medium · 8 Plätze" />
-          <SectionRow label="Platz sichern" href={EVERSPORTS_STUDIO} external />
-        </SectionBlock>
-        <div style={{ textAlign: "center", marginTop: 9, fontSize: 11.5, color: MUT, fontWeight: 400 }}>Anmeldung &amp; Zahlung über Eversports</div>
+        <SectionBlock title="Training" meta={`Geführtes Coaching · CHF ${OG_TRAINING_PREIS_CHF} · alle Level`} img="/training-hero.jpg" />
 
-        <SectionIntro storageKey="intro_training" title="So funktioniert's" steps={[["1", "Kurs wählen", "Von Beginner bis Pro — wöchentlich, an wechselnden Standorten."], ["2", "Termin sichern", "Anmeldung & Bezahlung laufen direkt über Eversports."], ["3", "Besser werden", "Regelmässiges Coaching, Drills und Matchpraxis."]]} />
+        <SectionIntro storageKey="intro_training_v2" title="So funktioniert's" steps={[
+          ["1", "Termin wählen", "Jeden Donnerstag in Glattbrugg, 19:00–20:30 — 8 Plätze, alle Level."],
+          ["2", "Platz sichern", `CHF ${OG_TRAINING_PREIS_CHF} pro Person, direkt bezahlt. Absage bis 24 h vorher, Geld zurück.`],
+          ["3", "Besser werden", "Drills und Matchpraxis mit Trainer. Zutritt per QR an der Tür."],
+        ]} />
 
-        {/* Kursplan */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "26px 4px 12px" }}>
-          <span style={{ fontSize: 16, fontWeight: 900, textTransform: "uppercase", color: W }}>Kursplan</span>
-          <span style={{ fontSize: 10, fontWeight: 600, letterSpacing: ".04em", textTransform: "uppercase", color: MUT }}>Live · Eversports</span>
-        </div>
+        <div style={{ margin: "24px 4px 12px", fontSize: 16, fontWeight: 900, textTransform: "uppercase", color: W }}>Nächste Trainings</div>
 
-        {EVERSPORTS_WIDGET_ID ? (
-          <div style={{ background: CARD, borderRadius: 18, padding: 8, overflow: "hidden" }}>
-            <div data-eversports-widget-id={EVERSPORTS_WIDGET_ID} />
-          </div>
+        {loading ? (
+          <div style={{ textAlign: "center", padding: "30px 0", color: MUT, fontSize: 13 }}>Lädt …</div>
+        ) : list.length === 0 ? (
+          <div style={{ background: CARD, borderRadius: 18, padding: 22, textAlign: "center", color: MUT, fontSize: 14 }}>Aktuell keine Trainings ausgeschrieben.</div>
         ) : (
-          <div style={{ background: CARD, borderRadius: 18, padding: 22, textAlign: "center" }}>
-            <p style={{ fontSize: 15, fontWeight: 700, color: W }}>Termine & Anmeldung</p>
-            <p style={{ fontSize: 13, color: SUB, fontWeight: 300, margin: "8px 0 18px", lineHeight: 1.45 }}>
-              Alle Trainings-Termine, Preise und die Anmeldung laufen über Eversports.
-            </p>
-            <a href={EVERSPORTS_STUDIO} target="_blank" rel="noopener noreferrer"
-              style={{ display: "inline-block", borderRadius: 12, padding: "13px 26px", fontSize: 15, fontWeight: 800, color: "#06210F", textDecoration: "none", background: GRAD }}>
-              Auf Eversports ansehen →
-            </a>
+          <div style={{ background: CARD, borderRadius: 22, padding: "4px 16px" }}>
+            {list.map((t, i) => {
+              const frei = Math.max(0, t.max_players - t.current_players)
+              const d = t.date ? new Date(`${t.date}T12:00:00`) : null
+              return (
+                <div key={t.id} style={{ padding: "14px 0", borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,.07)" }}>
+                  <Link href={`/match/${t.id}`} style={{ display: "flex", alignItems: "center", gap: 12, textDecoration: "none" }}>
+                    <span style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 46, flexShrink: 0 }}>
+                      <span style={{ fontSize: 17, fontWeight: 900, color: W, lineHeight: 1 }}>{d ? d.toLocaleDateString("de-CH", { weekday: "short" }).replace(".", "") : "—"}</span>
+                      <span style={{ fontSize: 12, fontWeight: 700, color: MUT, marginTop: 2 }}>{d ? d.toLocaleDateString("de-CH", { day: "2-digit", month: "2-digit" }) : ""}</span>
+                    </span>
+                    <span style={{ flex: 1, minWidth: 0 }}>
+                      <span style={{ display: "block", fontSize: 15, fontWeight: 800, color: W }}>{whenLabel(t.date, t.start_hour)}</span>
+                      <span style={{ display: "block", fontSize: 13, color: MUT, marginTop: 2 }}>{t.location_name} · {frei} von {t.max_players} frei</span>
+                    </span>
+                    {frei === 0 ? (
+                      <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: MUT, width: 96, textAlign: "center", flexShrink: 0 }}>Ausgebucht</span>
+                    ) : (
+                      <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "#06210F", background: GRAD, borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", flexShrink: 0 }}>Mitmachen</span>
+                    )}
+                  </Link>
+
+                  {/* Wer kommt — mit Level, damit du das Niveau siehst */}
+                  {t.players.length > 0 && (
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginTop: 10, paddingLeft: 58 }}>
+                      {t.players.map(p => (
+                        <span key={p.user_id} style={{ fontSize: 12, fontWeight: 700, color: W, background: CELL, borderRadius: 999, padding: "5px 10px" }}>
+                          {p.name} <span style={{ color: GREEN, fontWeight: 800 }}>{ratingLabel(p.elo)}</span>
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            })}
           </div>
         )}
       </div>

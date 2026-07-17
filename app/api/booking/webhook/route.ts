@@ -3,6 +3,8 @@ import Stripe from "stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { PP_CONFIG } from "@/lib/rewards"
 import { sessionUuid } from "@/lib/stripe-util"
+import { sendBookingConfirm } from "@/lib/email"
+import { entryQrFor, weekdayOf } from "@/lib/opengames"
 
 // Stripe-Webhook: schreibt PingPoints NUR nach einer tatsächlich bezahlten Buchung.
 // Ohne diesen Webhook könnte man sich durch Aufruf von /buchen?paid=1 Punkte erschleichen.
@@ -42,7 +44,7 @@ export async function POST(req: NextRequest) {
       if (gameId && userId) {
         const { data: game } = await admin
           .from("open_games")
-          .select("id,max_players,current_players,status,location_name,price_per_player")
+          .select("id,max_players,current_players,status,location_name,price_per_player,date,start_hour,kind")
           .eq("id", gameId).maybeSingle()
 
         // Ausgebucht, während der Spieler an der Kasse stand? Dann Geld zurück.
@@ -99,6 +101,31 @@ export async function POST(req: NextRequest) {
                 description: `Open Game${game.location_name ? ` — ${game.location_name}` : ""}`,
                 ref_id: refId,
               })
+            }
+
+            // Bestätigungsmail mit Zutritts-QR (falls Standort/Tag einen hat).
+            // Fehler beim Mailen dürfen die Buchung nie scheitern lassen.
+            try {
+              const { data: authU } = await admin.auth.admin.getUserById(userId)
+              const email = authU?.user?.email
+              if (email) {
+                const wt = game.date ? weekdayOf(game.date) : -1
+                const qrPath = game.date ? entryQrFor(game.location_name, wt) : null
+                const d = game.date ? new Date(`${game.date}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long" }) : ""
+                const isTraining = game.kind === "training"
+                const zeit = `${String(game.start_hour ?? 19).padStart(2, "0")}:00`
+                await sendBookingConfirm({
+                  to: email,
+                  name: prof?.name || s.metadata.player_name || "Spieler",
+                  isTraining,
+                  location: game.location_name || "",
+                  whenLabel: `${d}${d ? " · " : ""}${zeit}${isTraining ? "–20:30" : ""}`,
+                  priceChf: Number(game.price_per_player ?? 0),
+                  entryQrPath: qrPath,
+                })
+              }
+            } catch (e) {
+              console.error("Bestätigungsmail (Open Game/Training) fehlgeschlagen:", e)
             }
           }
         }

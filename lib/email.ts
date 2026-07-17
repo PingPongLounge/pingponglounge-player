@@ -338,3 +338,37 @@ export async function sendRewardClaimPlayer(opts: {
     `),
   })
 }
+
+// Bestätigung nach bezahltem Open Game / Training. Enthält bei Standorten mit
+// verschlossener Tür (Glattbrugg) den Zutritts-QR direkt in der Mail.
+export async function sendBookingConfirm(opts: {
+  to: string
+  name: string
+  isTraining: boolean
+  location: string
+  whenLabel: string
+  priceChf: number
+  entryQrPath?: string | null   // z.B. "/og-entry-glattbrugg-do.png"
+}) {
+  const titel = opts.isTraining ? "Training gebucht" : "Open Game gebucht"
+  const qr = opts.entryQrPath ? `
+    <div style="text-align:center;margin-top:22px">
+      <div style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${G};margin-bottom:10px">Zutritt · ${opts.location}</div>
+      <img src="${BASE_URL}${opts.entryQrPath}" alt="Zutritts-QR" width="200" style="width:200px;max-width:200px;height:auto;border-radius:14px;background:#ffffff;padding:10px">
+      <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:10px;font-family:system-ui,sans-serif">An der Tür scannen — gilt nur zur Zeit deines Termins.</div>
+    </div>` : ""
+  const inner = `
+    <div style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${G};margin-bottom:6px">✓ Bezahlt</div>
+    <h1 style="font-size:24px;font-weight:900;color:#ffffff;margin:0 0 10px">${titel}</h1>
+    <p style="font-size:15px;color:rgba(255,255,255,.85);margin:0 0 18px;line-height:1.5">Hi ${opts.name}, dein Platz ist gesichert.</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${CARD};border-radius:16px">
+      <tr><td style="padding:16px 18px;font-family:system-ui,sans-serif">
+        <div style="font-size:16px;font-weight:800;color:#ffffff">${opts.location}</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.75);margin-top:4px">${opts.whenLabel}</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.75);margin-top:2px">CHF ${opts.priceChf} · bezahlt</div>
+      </td></tr>
+    </table>
+    ${qr}
+    <p style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:18px;line-height:1.5;font-family:system-ui,sans-serif">Absage bis 24 h vorher mit Rückerstattung — in der App unter „Absagen".</p>`
+  return sendEmail({ to: opts.to, subject: `${titel} — ${opts.location}`, html: shell(inner) })
+}
