@@ -47,8 +47,8 @@ export async function GET(req: NextRequest) {
       location: game.location_name || "Glattbrugg",
       whenLabel: `${d}${d ? " · " : ""}${zeit}${isTraining ? "–20:30" : ""}`,
       priceChf: Number(game.price_per_player ?? 0),
-      // Test: Donnerstag-Glattbrugg-QR erzwingen, damit der QR sichtbar ist
-      entryQrPath: "/og-entry-glattbrugg-do.png",
+      hatZutritt: true,
+      appUrl: `https://playerapp.ch/match/${gameId}`,
     })
     ergebnisse.push({ name: p.display_name || "Spieler", ok: res.ok, skipped: res.skipped })
   }

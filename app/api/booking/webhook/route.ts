@@ -110,7 +110,7 @@ export async function POST(req: NextRequest) {
               const email = authU?.user?.email
               if (email) {
                 const wt = game.date ? weekdayOf(game.date) : -1
-                const qrPath = game.date ? entryQrFor(game.location_name, wt) : null
+                const hatZutritt = !!(game.date && entryQrFor(game.location_name, wt))
                 const d = game.date ? new Date(`${game.date}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long" }) : ""
                 const isTraining = game.kind === "training"
                 const zeit = `${String(game.start_hour ?? 19).padStart(2, "0")}:00`
@@ -121,7 +121,8 @@ export async function POST(req: NextRequest) {
                   location: game.location_name || "",
                   whenLabel: `${d}${d ? " · " : ""}${zeit}${isTraining ? "–20:30" : ""}`,
                   priceChf: Number(game.price_per_player ?? 0),
-                  entryQrPath: qrPath,
+                  hatZutritt,
+                  appUrl: `https://playerapp.ch/match/${gameId}`,
                 })
               }
             } catch (e) {

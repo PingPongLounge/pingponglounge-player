@@ -8,6 +8,15 @@ import { entryQrFor, weekdayOf } from "@/lib/opengames"
 
 const M=MUT, C=CARD, B=CELL, G=GREEN
 
+// Zutritts-QR nur am Termin-Tag zeigen und um 22 Uhr ausblenden (und am nächsten
+// Tag ohnehin) — so kursiert kein dauerhaft gültiger Screenshot.
+function qrImFenster(dateStr: string): boolean {
+  const now = new Date()
+  const ev = new Date(`${dateStr}T00:00:00`)
+  const gleicherTag = now.getFullYear() === ev.getFullYear() && now.getMonth() === ev.getMonth() && now.getDate() === ev.getDate()
+  return gleicherTag && now.getHours() < 22
+}
+
 function whenLabel(date: string | null, hour: number | null, dur: number): string {
   const t = hour != null ? `${String(hour).padStart(2,"0")}:00` : null
   if (!date) return t ? `heute · ${t}` : "Zeit offen"
@@ -100,17 +109,24 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
           </div>
         ) : (<>
           {/* Zutritts-QR ganz oben, sobald gebucht — damit niemand scrollen muss.
-              Nur für Teilnehmer, nur an Standorten mit verschlossener Tür (Glattbrugg,
-              pro Wochentag). Verschwindet automatisch nach dem Absagen (isJoined). */}
+              Erscheint nur am Termin-Tag (bis 22 Uhr); davor ein Hinweis. Weg nach
+              dem Absagen (isJoined). Nur Standorte mit verschlossener Tür. */}
           {g.is_official && isJoined && g.date && entryQrFor(g.location_name, weekdayOf(g.date)) && (
-            <div style={{ ...cardPad, marginBottom: 12, textAlign: "center" }}>
-              <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", color: G, marginBottom: 10 }}>Dein Eintritt · {g.location_name}</p>
-              <div style={{ position: "relative", width: 200, height: 200, margin: "0 auto", background: "#fff", borderRadius: 16, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ position: "absolute", color: "#0D0F13", fontSize: 13, fontWeight: 800 }}>QR folgt</span>
-                <img src={entryQrFor(g.location_name, weekdayOf(g.date!))!} alt="Zutritts-QR" style={{ position: "relative", width: "100%", height: "100%", objectFit: "contain" }} onError={e => { e.currentTarget.style.display = "none" }} />
+            qrImFenster(g.date) ? (
+              <div style={{ ...cardPad, marginBottom: 12, textAlign: "center" }}>
+                <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", color: G, marginBottom: 10 }}>Dein Eintritt · {g.location_name}</p>
+                <div style={{ position: "relative", width: 200, height: 200, margin: "0 auto", background: "#fff", borderRadius: 16, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <span style={{ position: "absolute", color: "#0D0F13", fontSize: 13, fontWeight: 800 }}>QR folgt</span>
+                  <img src={entryQrFor(g.location_name, weekdayOf(g.date!))!} alt="Zutritts-QR" style={{ position: "relative", width: "100%", height: "100%", objectFit: "contain" }} onError={e => { e.currentTarget.style.display = "none" }} />
+                </div>
+                <p style={{ ...body, marginTop: 10 }}>An der Tür scannen — gültig bis 22 Uhr.</p>
               </div>
-              <p style={{ ...body, marginTop: 10 }}>An der Tür scannen — gilt nur zur Termin-Zeit.</p>
-            </div>
+            ) : (
+              <div style={{ ...cardPad, marginBottom: 12, textAlign: "center" }}>
+                <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", color: G, marginBottom: 6 }}>Dein Eintritt · {g.location_name}</p>
+                <p style={{ ...body }}>Dein Zutritts-QR erscheint hier <b style={{ color: W }}>am Termin-Tag</b> — gültig bis 22 Uhr.</p>
+              </div>
+            )
           )}
 
           {/* Spieler-Slots */}

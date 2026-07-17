@@ -348,15 +348,20 @@ export async function sendBookingConfirm(opts: {
   location: string
   whenLabel: string
   priceChf: number
-  entryQrPath?: string | null   // z.B. "/og-entry-glattbrugg-do.png"
+  hatZutritt?: boolean       // Standort mit verschlossener Tür (Glattbrugg)
+  appUrl?: string            // Deep-Link zur Buchungsseite in der App
 }) {
   const titel = opts.isTraining ? "Training gebucht" : "Open Game gebucht"
-  const qr = opts.entryQrPath ? `
-    <div style="text-align:center;margin-top:22px">
-      <div style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${G};margin-bottom:10px">Zutritt · ${opts.location}</div>
-      <img src="${BASE_URL}${opts.entryQrPath}" alt="Zutritts-QR" width="200" style="width:200px;max-width:200px;height:auto;border-radius:14px;background:#ffffff;padding:10px">
-      <div style="font-size:13px;color:rgba(255,255,255,.7);margin-top:10px;font-family:system-ui,sans-serif">An der Tür scannen — gilt nur zur Zeit deines Termins.</div>
-    </div>` : ""
+  // Kein QR im Mail (Screenshots kursieren sonst) — der QR liegt in der App und
+  // erscheint dort erst am Termin-Tag.
+  const zutritt = opts.hatZutritt ? `
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${CARD};border-radius:16px;margin-top:12px">
+      <tr><td style="padding:14px 18px;font-family:system-ui,sans-serif">
+        <div style="font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:${G}">Zutritt · ${opts.location}</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.8);margin-top:5px;line-height:1.5">Dein Zutritts-QR ist in der Player-App verfügbar — er erscheint am Termin-Tag auf deiner Buchungsseite.</div>
+      </td></tr>
+    </table>
+    ${opts.appUrl ? outlineButton(opts.appUrl, "QR in der App öffnen") : ""}` : ""
   const inner = `
     <div style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${G};margin-bottom:6px">✓ Bezahlt</div>
     <h1 style="font-size:24px;font-weight:900;color:#ffffff;margin:0 0 10px">${titel}</h1>
@@ -368,7 +373,7 @@ export async function sendBookingConfirm(opts: {
         <div style="font-size:14px;color:rgba(255,255,255,.75);margin-top:2px">CHF ${opts.priceChf} · bezahlt</div>
       </td></tr>
     </table>
-    ${qr}
+    ${zutritt}
     <p style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:18px;line-height:1.5;font-family:system-ui,sans-serif">Absage bis 24 h vorher mit Rückerstattung — in der App unter „Absagen".</p>`
   return sendEmail({ to: opts.to, subject: `${titel} — ${opts.location}`, html: shell(inner) })
 }
