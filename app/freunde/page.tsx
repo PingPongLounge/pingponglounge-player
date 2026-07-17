@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import { BG, W, MUT, GREEN, GRAD, gt, cardPad, h1, h2, body, meta, eyebrow, btn, btnGhost } from "@/app/theme"
+import { BG, MUT, GREEN, GRAD, gt, cardPad, h1, h2, body, meta, eyebrow, btn, btnGhost } from "@/app/theme"
 
 export default function FreundePage() {
   const [nick, setNick]       = useState("")
@@ -133,9 +133,8 @@ export default function FreundePage() {
             <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 16 }}>
               <div style={{
                 width: 28, height: 28, borderRadius: "50%",
-                border: "1.5px solid transparent",
-                background: `linear-gradient(${BG},${BG}) padding-box, ${GRAD} border-box`,
-                color: W,
+                background: GRAD,
+                color: "#06210F",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 13, fontWeight: 900, flexShrink: 0,
               }}>{i + 1}</div>

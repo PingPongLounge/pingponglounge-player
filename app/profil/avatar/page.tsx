@@ -162,7 +162,6 @@ export default function AvatarPage() {
           onDragOver={e => e.preventDefault()}
           style={{
             background: photo ? "transparent" : C,
-            border: photo ? "none" : `2px dashed rgba(255,255,255,.12)`,
             borderRadius:14, minHeight:180,
             display:"flex", alignItems:"center", justifyContent:"center",
             cursor:"pointer", marginBottom:16, overflow:"hidden", position:"relative"

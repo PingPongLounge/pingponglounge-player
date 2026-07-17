@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react"
 import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import { BG, CARD, W, MUT, GRAD, gt, card, h1, meta, body, chipBtn, levelBadge, lvColor, ratingLabel } from "@/app/theme"
+import { BG, W, MUT, gt, card, h1, meta, body, chipBtn, levelBadge, lvColor, ratingLabel } from "@/app/theme"
 
 const G="#39FF14"
 
@@ -118,7 +118,7 @@ export default function RanglistePage() {
                   return (
                     <div key={p.id} style={{
                       ...card,
-                      ...(isMe ? { border: "1.5px solid transparent", background: `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` } : {}),
+                      ...(isMe ? { background: "rgba(255,255,255,.14)" } : {}),
                       padding: "14px 16px", marginBottom: 8,
                       display: "flex", alignItems: "center", gap: 14
                     }}>

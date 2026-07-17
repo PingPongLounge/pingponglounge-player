@@ -182,10 +182,10 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
                 <input value={s.p1} onChange={e=>updateSet(i,"p1",e.target.value)} placeholder="11" style={{...input,fontSize:18,fontWeight:700,textAlign:"center"}} type="number" min="0" max="20"/>
                 <span style={{color:MUT,fontSize:16}}>:</span>
                 <input value={s.p2} onChange={e=>updateSet(i,"p2",e.target.value)} placeholder="8" style={{...input,fontSize:18,fontWeight:700,textAlign:"center"}} type="number" min="0" max="20"/>
-                {i>=3&&<button onClick={()=>removeSet(i)} style={{background:"none",border:"none",color:MUT,cursor:"pointer",fontSize:16}}>×</button>}
+                {i>=3&&<button onClick={()=>removeSet(i)} style={{background:"none",color:MUT,cursor:"pointer",fontSize:16}}>×</button>}
               </div>
             ))}
-            {sets.length<5&&<button onClick={addSet} style={{width:"100%",background:"none",border:`1px dashed ${CELL}`,borderRadius:8,padding:"10px",color:MUT,cursor:"pointer",fontSize:13,marginBottom:12}}>+ Satz hinzufügen</button>}
+            {sets.length<5&&<button onClick={addSet} style={{width:"100%",background:CELL,borderRadius:8,padding:"10px",color:MUT,cursor:"pointer",fontSize:13,marginBottom:12}}>+ Satz hinzufügen</button>}
             {error&&<p style={{color:DANGER,fontSize:13,marginBottom:8}}>{error}</p>}
             <button onClick={handleSubmit} disabled={saving} style={{...btn,width:"100%",opacity:saving?0.6:1,cursor:saving?"not-allowed":"pointer"}}>
               {saving?"Wird gespeichert …":"Ergebnis einreichen"}
@@ -236,7 +236,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
             <div style={{display:"flex",flexWrap:"wrap",gap:7,marginBottom:14}}>
               {MATCH_SPRUECHE.map(s=>(
                 <button key={s} onClick={()=>postComment(s)} disabled={saving}
-                  style={{border:"1.4px solid transparent",borderRadius:999,padding:"9px 13px",fontSize:12.5,fontWeight:700,color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:saving?"wait":"pointer",fontFamily:"inherit"}}>
+                  style={{borderRadius:999,padding:"9px 13px",fontSize:12.5,fontWeight:700,color:"#06210F",background:GRAD,cursor:saving?"wait":"pointer",fontFamily:"inherit"}}>
                   {s}
                 </button>
               ))}
@@ -246,13 +246,13 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
               <input value={comment} onChange={e=>setComment(e.target.value)}
                 onKeyDown={e=>{if(e.key==="Enter")postComment(comment)}}
                 placeholder="Oder schreib selbst …"
-                style={{flex:1,minWidth:0,background:BG,border:`1px solid ${CELL}`,borderRadius:999,padding:"11px 14px",color:W,fontSize:13,outline:"none",fontFamily:"inherit"}}/>
+                style={{flex:1,minWidth:0,background:BG,borderRadius:999,padding:"11px 14px",color:W,fontSize:13,outline:"none",fontFamily:"inherit"}}/>
               <button onClick={()=>postComment(comment)} disabled={saving||!comment.trim()}
-                style={{width:44,flexShrink:0,borderRadius:999,border:"none",background:GRAD,color:"#06210F",fontSize:16,fontWeight:900,cursor:(saving||!comment.trim())?"not-allowed":"pointer",opacity:(saving||!comment.trim())?.4:1,fontFamily:"inherit"}}>→</button>
+                style={{width:44,flexShrink:0,borderRadius:999,background:GRAD,color:"#06210F",fontSize:16,fontWeight:900,cursor:(saving||!comment.trim())?"not-allowed":"pointer",opacity:(saving||!comment.trim())?.4:1,fontFamily:"inherit"}}>→</button>
             </div>
 
             <button onClick={()=>{window.location.href=`/liga`}}
-              style={{display:"block",width:"100%",marginTop:14,background:"none",border:"none",color:MUT,fontSize:12.5,fontWeight:600,cursor:"pointer",fontFamily:"inherit",padding:6}}>
+              style={{display:"block",width:"100%",marginTop:14,background:"none",color:MUT,fontSize:12.5,fontWeight:600,cursor:"pointer",fontFamily:"inherit",padding:6}}>
               Ohne Kommentar zurück
             </button>
           </div>

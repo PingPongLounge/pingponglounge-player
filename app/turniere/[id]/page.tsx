@@ -3,9 +3,9 @@ import { useEffect, useState, useCallback, use } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
-import { BG, CARD, CELL, W, MUT, GREEN, DANGER, card, cardPad, cell, btn, btnInCard, btnGhost, chipBtn, levelBadge, h1, body, backLink } from "@/app/theme"
+import { BG, CELL, W, MUT, GREEN, DANGER, card, cardPad, cell, btn, btnInCard, btnGhost, chipBtn, levelBadge, h1, body, backLink } from "@/app/theme"
 
-const M=MUT, C=CARD, B=CELL, G=GREEN
+const M=MUT, B=CELL, G=GREEN
 
 type Profile={name:string,elo:number,level?:string}
 type TMatch={id:string,round:number,match_number:number,p1_id:string|null,p2_id:string|null,winner_id:string|null,sets:Array<{p1:number,p2:number}>|null,status:string,p1:Profile|Profile[]|null,p2:Profile|Profile[]|null}
@@ -30,7 +30,7 @@ function BracketMatch({m,userId,onResult}:{m:TMatch,userId:string|null,onResult:
   const pending=m.status==="p1_entered"&&isMe&&m.p2_id===userId
 
   return(
-    <div style={{...cell,padding:"10px 12px",minWidth:160,flex:"0 0 160px",...(confirmed?{border:`1px solid ${G}40`}:{})}}>
+    <div style={{...cell,padding:"10px 12px",minWidth:160,flex:"0 0 160px",...(confirmed?{background:"rgba(255,255,255,.14)"}:{})}}>
       <div style={{display:"flex",alignItems:"center",position:"relative",marginBottom:4}}>
         <span style={{fontSize:11,fontWeight:m.winner_id===m.p1_id?600:400,color:m.winner_id===m.p1_id?G:W,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p1}</span>
         {confirmed&&m.sets&&<span style={{fontSize:10,color:M,marginLeft:4}}>{m.sets.filter(s=>s.p1>s.p2).length}</span>}
@@ -173,7 +173,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
         {/* Sieger — wurde bisher gespeichert, aber nirgends angezeigt.
             Man gewann ein Turnier und sah es schlicht nicht. */}
         {t.status==="finished"&&t.champion_id&&(
-          <div style={{...cardPad,padding:"22px 20px",marginBottom:16,textAlign:"center",border:"1.5px solid transparent",background:`linear-gradient(${CARD},${CARD}) padding-box, linear-gradient(135deg,#39FF14,#1FD1C4) border-box`}}>
+          <div style={{...cardPad,padding:"22px 20px",marginBottom:16,textAlign:"center"}}>
             <p style={{fontSize:11,fontWeight:800,letterSpacing:".14em",textTransform:"uppercase",color:M,marginBottom:8}}>Turniersieger</p>
             <p style={{fontSize:26,fontWeight:900,color:G}}>{(registrations as Reg[]).find(r=>r.player_id===t.champion_id)?.profiles?.name||"Champion"}</p>
             <p style={{...body,marginTop:6}}>+100 PingPoints</p>
@@ -269,7 +269,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
                   <span style={{fontSize:12,color:M,minWidth:24,fontWeight:500}}>#{i+1}</span>
                   <div style={{flex:1}}>
                     <span style={{fontSize:13,fontWeight:700,color:r.player_id===userId?G:W}}>{p?.name||"?"}</span>
-                    {r.player_id===userId&&<span style={{fontSize:9,color:"rgba(255,255,255,0.85)",marginLeft:6,border:"1px solid rgba(255,255,255,0.35)",borderRadius:999,padding:"1px 6px"}}>Du</span>}
+                    {r.player_id===userId&&<span style={{fontSize:9,color:"rgba(255,255,255,0.85)",marginLeft:6,background:"rgba(255,255,255,.14)",borderRadius:999,padding:"1px 6px"}}>Du</span>}
                   </div>
                   {p?.level&&<span style={levelBadge(p.level)}>{p.level}</span>}
                   <span style={{fontSize:13,fontWeight:700,color:W}}>{p?.elo}</span>
@@ -305,9 +305,9 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
                   {[0,1,2,3,4].map(i=>(
                     <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
                       <span style={{fontSize:12,color:M,minWidth:52,fontWeight:500}}>Satz {i+1}:</span>
-                      <input type="number" min="0" max="30" value={sets[i].p1} onChange={e=>{const s=[...sets];s[i]={...s[i],p1:e.target.value};setSets(s)}} style={{width:52,background:"#20242C",border:`1px solid ${B}`,borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
+                      <input type="number" min="0" max="30" value={sets[i].p1} onChange={e=>{const s=[...sets];s[i]={...s[i],p1:e.target.value};setSets(s)}} style={{width:52,background:"#20242C",borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
                       <span style={{fontSize:16,color:M,fontWeight:600}}>:</span>
-                      <input type="number" min="0" max="30" value={sets[i].p2} onChange={e=>{const s=[...sets];s[i]={...s[i],p2:e.target.value};setSets(s)}} style={{width:52,background:"#20242C",border:`1px solid ${B}`,borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
+                      <input type="number" min="0" max="30" value={sets[i].p2} onChange={e=>{const s=[...sets];s[i]={...s[i],p2:e.target.value};setSets(s)}} style={{width:52,background:"#20242C",borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
                     </div>
                   ))}
                   {resultError&&<p style={{fontSize:12,color:DANGER,marginTop:4}}>{resultError}</p>}

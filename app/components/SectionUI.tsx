@@ -81,7 +81,7 @@ export function SectionRow({ label, href, onClick, external }: {
   </>)
   const style: React.CSSProperties = {
     display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%",
-    background: "none", border: "none", borderTop: `1px solid ${LINE}`, padding: "13px 20px",
+    background: "none", borderTop: `1px solid ${LINE}`, padding: "13px 20px",
     cursor: "pointer", fontFamily: "inherit", textAlign: "left", textDecoration: "none", color: W,
   }
   if (href && external) return <a href={href} target="_blank" rel="noopener noreferrer" style={style}>{inner}</a>
@@ -117,8 +117,8 @@ export function SectionIntro({ storageKey, title, steps, cta }: { storageKey: st
   if (!show) return null
   const dismiss = () => { try { localStorage.setItem(storageKey, "1") } catch {} ; setShow(false) }
   return (
-    <div style={{ position: "relative", marginTop: 16, borderRadius: 24, padding: 22, boxShadow: SHADOW, border: "1.5px solid transparent", background: `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` }}>
-      <button onClick={dismiss} aria-label="Ausblenden" style={{ position: "absolute", top: 14, right: 14, background: "none", border: "none", color: MUT, fontSize: 16, cursor: "pointer", lineHeight: 1 }}>✕</button>
+    <div style={{ position: "relative", marginTop: 16, borderRadius: 24, padding: 22, boxShadow: SHADOW, background: CARD }}>
+      <button onClick={dismiss} aria-label="Ausblenden" style={{ position: "absolute", top: 14, right: 14, background: "none", color: MUT, fontSize: 16, cursor: "pointer", lineHeight: 1 }}>✕</button>
       <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", ...gt }}>Neu hier?</div>
       <div style={{ fontSize: 22, fontWeight: 900, color: W, margin: "6px 0 16px", paddingRight: 20 }}>{title}</div>
       {steps.map(([n, t, d]) => (

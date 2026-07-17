@@ -30,7 +30,7 @@ function levelForElo(elo: number) {
 
 type SetScore = { you: string; opp: string }
 
-const inp: React.CSSProperties = { flex: 1, background: CELL, border: "none", borderRadius: "12px", padding: "12px", fontSize: "18px", fontWeight: 700, color: TEXT, outline: "none", textAlign: "center", boxSizing: "border-box", fontFamily: "inherit" }
+const inp: React.CSSProperties = { flex: 1, background: CELL, borderRadius: "12px", padding: "12px", fontSize: "18px", fontWeight: 700, color: TEXT, outline: "none", textAlign: "center", boxSizing: "border-box", fontFamily: "inherit" }
 const primaryBtn = (disabled = false): React.CSSProperties => ({ ...btn, width: "100%", padding: "16px", marginTop: "14px", opacity: disabled ? 0.5 : 1, cursor: disabled ? "not-allowed" : "pointer" })
 
 function SpielenInner() {
@@ -133,12 +133,12 @@ function SpielenInner() {
           <input value={s.you} onChange={e => updateSet(i, "you", e.target.value)} placeholder="11" style={inp} type="number" inputMode="numeric" min={0} max={30} />
           <span style={{ color: MUTED, fontSize: "16px" }}>:</span>
           <input value={s.opp} onChange={e => updateSet(i, "opp", e.target.value)} placeholder="8" style={inp} type="number" inputMode="numeric" min={0} max={30} />
-          {i >= 3 && <button type="button" onClick={() => removeSet(i)} style={{ background: "none", border: "none", color: MUTED, cursor: "pointer", fontSize: "18px", flexShrink: 0 }}>×</button>}
+          {i >= 3 && <button type="button" onClick={() => removeSet(i)} style={{ background: "none", color: MUTED, cursor: "pointer", fontSize: "18px", flexShrink: 0 }}>×</button>}
         </div>
       ))}
 
       {sets.length < 5 && (
-        <button type="button" onClick={addSet} style={{ width: "100%", background: "none", border: "1px dashed " + CELL, borderRadius: "12px", padding: "10px", color: MUTED, cursor: "pointer", fontSize: "13px", marginTop: "4px", fontFamily: "inherit" }}>
+        <button type="button" onClick={addSet} style={{ width: "100%", background: CELL, borderRadius: "12px", padding: "10px", color: MUTED, cursor: "pointer", fontSize: "13px", marginTop: "4px", fontFamily: "inherit" }}>
           + Satz hinzufügen
         </button>
       )}
@@ -146,7 +146,7 @@ function SpielenInner() {
       {error && <p style={{ fontSize: "13px", color: "#f87171", marginTop: "12px" }}>{error}</p>}
 
       <button type="button" style={primaryBtn(false)} onClick={goToResult}>Resultat ansehen →</button>
-      <button type="button" onClick={() => router.push("/login")} style={{ width: "100%", background: "none", border: "none", color: MUTED, fontSize: "12px", textDecoration: "underline", cursor: "pointer", marginTop: "14px", fontFamily: "inherit" }}>
+      <button type="button" onClick={() => router.push("/login")} style={{ width: "100%", background: "none", color: MUTED, fontSize: "12px", textDecoration: "underline", cursor: "pointer", marginTop: "14px", fontFamily: "inherit" }}>
         Ich will mich nur anmelden
       </button>
     </div></div>
@@ -164,7 +164,7 @@ function SpielenInner() {
       <div style={{ ...cardPad, padding: "28px 20px", textAlign: "center", marginBottom: "16px" }}>
         <div style={{
           width: 140, height: 140, margin: "0 auto 16px", borderRadius: "50%",
-          border: `4px solid ${lvColor(level.name)}`, display: "flex", flexDirection: "column",
+          background: "#353B46", display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
           boxShadow: `0 0 28px ${lvColor(level.name)}33`,
         }}>
@@ -190,7 +190,7 @@ function SpielenInner() {
       </div>
 
       {/* PingPoints Chip */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", background: CELL, border: "none", borderRadius: "12px", padding: "12px", marginBottom: "8px" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", background: CELL, borderRadius: "12px", padding: "12px", marginBottom: "8px" }}>
         <span style={{ color: "#FFD700", fontWeight: 900, fontSize: "15px" }}>+15 PingPoints</span>
         <span style={{ color: MUTED, fontSize: "12px" }}>nach dem Sichern</span>
       </div>
@@ -199,7 +199,7 @@ function SpielenInner() {
       </p>
 
       <button type="button" style={primaryBtn(false)} onClick={saveProfile}>Profil sichern →</button>
-      <button type="button" onClick={() => router.push("/login")} style={{ width: "100%", background: "none", border: "none", color: MUTED, fontSize: "12px", textDecoration: "underline", cursor: "pointer", marginTop: "14px", fontFamily: "inherit" }}>
+      <button type="button" onClick={() => router.push("/login")} style={{ width: "100%", background: "none", color: MUTED, fontSize: "12px", textDecoration: "underline", cursor: "pointer", marginTop: "14px", fontFamily: "inherit" }}>
         Später
       </button>
     </div></div>

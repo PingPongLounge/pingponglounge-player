@@ -3,9 +3,9 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import { BG, CARD, CELL, W, MUT, GREEN, DANGER, CITIES, cardPad, btn, chipBtn, h1, body, input as themeInput, backLink } from "@/app/theme"
+import { BG, CARD, W, MUT, GREEN, DANGER, CITIES, cardPad, btn, chipBtn, h1, body, input as themeInput, backLink } from "@/app/theme"
 
-const M=MUT, C=CARD, B=CELL, G=GREEN
+const M=MUT, C=CARD, G=GREEN
 const LEVELS=["alle","1","2","3","4","5","6","7"]
 const LEVEL_LABEL=(l:string)=>l==="alle"?"Alle Level":`Level ${l}`
 
@@ -91,7 +91,7 @@ export default function NeuesTurnierPage(){
         <Section n="3" title="Startgeld & Rang">
           <Label>Startgeld pro Spieler (CHF)</Label>
           <input type="number" min="0" max="999" value={fee} onChange={e=>setFee(e.target.value)} style={{...inputStyle,marginBottom:14}}/>
-          <div onClick={()=>setCounts(!counts)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"12px",background:"#20242C",border:`1px solid ${counts?G+"40":B}`,borderRadius:10}}>
+          <div onClick={()=>setCounts(!counts)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"12px",background:"#20242C",borderRadius:10}}>
             <div>
               <p style={{fontSize:13,fontWeight:700,color:W}}>Zählt für den Rang</p>
               <p style={{...body,marginTop:2}}>{counts?"Resultate beeinflussen Elo & Rangliste":"Nur zum Spass — kein Elo"}</p>

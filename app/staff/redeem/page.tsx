@@ -53,7 +53,6 @@ export default function StaffRedeemPage() {
             style={{
               width: "100%",
               background: C,
-              border: `2px solid ${code.length === 6 ? G : B}`,
               borderRadius: 12,
               padding: "18px 20px",
               fontSize: 28,
@@ -76,7 +75,6 @@ export default function StaffRedeemPage() {
               width: "100%",
               background: code.length === 6 ? "#fff" : B,
               color: code.length === 6 ? "#20242C" : M,
-              border: "none",
               borderRadius: 10,
               padding: "16px",
               fontSize: 14,
@@ -94,7 +92,6 @@ export default function StaffRedeemPage() {
         {error && (
           <div style={{
             background: "#FF444420",
-            border: "1px solid #FF444444",
             borderRadius: 12,
             padding: "16px",
             marginTop: 16,
@@ -107,7 +104,6 @@ export default function StaffRedeemPage() {
         {result && (
           <div style={{
             background: `${G}15`,
-            border: `1px solid ${G}44`,
             borderRadius: 12,
             padding: "20px",
             marginTop: 16,

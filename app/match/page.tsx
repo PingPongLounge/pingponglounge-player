@@ -106,7 +106,7 @@ export default function MatchPage() {
             Feste Spielabende in deiner Stärkeklasse — komm vorbei, spiel mit wer da ist, trag dein Ergebnis ein.
           </p>
           <button onClick={() => setInfoOpen(v => !v)}
-            style={{ marginTop: 8, background: "none", border: "none", padding: 0, color: G, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5 }}>
+            style={{ marginTop: 8, background: "none", padding: 0, color: G, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5 }}>
             So funktioniert's <span style={{ transform: infoOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }}>▾</span>
           </button>
           {infoOpen && (
@@ -160,7 +160,7 @@ export default function MatchPage() {
                     </span>
 
                     {drin ? (
-                      <Link href={`/match/${g.id}`} style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: G, border: `1px solid rgba(57,255,20,.35)`, borderRadius: 9, padding: "8px 0", width: 96, textAlign: "center", textDecoration: "none", flexShrink: 0 }}>
+                      <Link href={`/match/${g.id}`} style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "#06210F", background: GRAD, borderRadius: 9, padding: "8px 0", width: 96, textAlign: "center", textDecoration: "none", flexShrink: 0 }}>
                         Dabei ✓
                       </Link>
                     ) : frei === 0 ? (

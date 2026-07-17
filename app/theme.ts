@@ -7,7 +7,8 @@
 //  • Überschriften/Titel extra fett (900), GROSSBUCHSTABEN, weiss.
 //  • Fliesstext leicht (300) aber weiss (~.85–.9) — Kontrast über Gewicht.
 //  • Karten randlos (kein Border), Füllung + dezenter Schatten.
-//  • Buttons IMMER nur Verlauf-Outline + weisse Schrift (kein Voll-Fill).
+//  • Buttons IMMER gefüllt: primär = Verlauf-Fill (dunkle Schrift), sekundär = grau.
+//  • Keine vollflächigen Rahmen/Outlines irgendwo (nur Trennlinien borderTop/Bottom).
 //  • Elite-Level = Cyan. Kein Pink irgendwo.
 //  • Korrektes Deutsch (Nomen/Satzanfang gross), Sektions-Titel GROSS.
 //
@@ -143,10 +144,10 @@ export const meta: CSSProperties = { fontSize: 13, color: SUB, fontWeight: 300 }
 
 /* ---------- Karten (DER verbindliche Kästchen-Standard, app-weit gleich) ----------
    Regel: Fläche CARD, borderRadius 18, KEIN Border, flach (kein Shadow).
-   Aktiver/ausgewählter Zustand: Verlauf-Outline via cardActive. */
-export const card: CSSProperties = { background: CARD, borderRadius: 18, border: 'none', overflow: 'hidden' }
+   Aktiver/ausgewählter Zustand: etwas hellerer Hintergrund via cardActive. */
+export const card: CSSProperties = { background: CARD, borderRadius: 18, overflow: 'hidden' }
 export const cardPad: CSSProperties = { ...card, padding: 18 }
-export const cardActive: CSSProperties = { borderRadius: 18, border: '1.5px solid transparent', background: `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` }
+export const cardActive: CSSProperties = { borderRadius: 18, background: 'rgba(255,255,255,.14)' }
 
 /* ---------- Zellen-Raster (Wann/Wo/Levels/Preis) ---------- */
 export const grid2: CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 15 }
@@ -156,52 +157,48 @@ export const cellVal: CSSProperties = { fontSize: 13, fontWeight: 500, color: W 
 
 /* ---------- Chips ---------- */
 export const chip: CSSProperties = { fontSize: 10.5, fontWeight: 500, color: SUB, background: CELL, borderRadius: 8, padding: '4px 9px' }
-// Auswahl-Chip (Filter/Toggle) — aktiv = Verlauf-Outline + weiss
+// Auswahl-Chip (Filter/Toggle) — aktiv = etwas hellerer Hintergrund + weiss
 export const chipBtn = (active: boolean): CSSProperties => ({
   padding: '7px 13px', borderRadius: 999, fontSize: 12, cursor: 'pointer',
   fontWeight: active ? 700 : 500, color: W,
-  background: active
-    ? `linear-gradient(${BG},${BG}) padding-box, ${GRAD} border-box`
-    : CELL,
-  border: active ? '1.5px solid transparent' : `1.5px solid ${CELL}`,
+  background: active ? 'rgba(255,255,255,.14)' : CELL,
 })
 
 /* ---------- Trennzeile / Listenzeile ---------- */
 export const rowTop: CSSProperties = { borderTop: `1px solid ${LINE}` }
 export const listRow: CSSProperties = { display: 'flex', alignItems: 'center', gap: 12, padding: '16px', borderTop: `1px solid ${LINE}`, textDecoration: 'none' }
 
-/* ---------- Buttons (IMMER Verlauf-Outline + weisse Schrift) ---------- */
-// Auf der Seite (Hintergrund = BG)
+/* ---------- Buttons (IMMER gefüllt) ---------- */
+// Primär: Verlauf-Fill + dunkle Schrift (Hintergrund egal)
 export const btn: CSSProperties = {
-  display: 'block', textAlign: 'center', border: '1.5px solid transparent', borderRadius: 12,
-  padding: '13px', fontSize: 15, fontWeight: 700, color: W, textDecoration: 'none', cursor: 'pointer',
-  background: `linear-gradient(${BG},${BG}) padding-box, ${GRAD} border-box`,
+  display: 'block', textAlign: 'center', borderRadius: 12,
+  padding: '13px', fontSize: 15, fontWeight: 700, color: '#06210F', textDecoration: 'none', cursor: 'pointer',
+  background: GRAD,
 }
-// In einer Karte (Hintergrund = CARD)
+// Primär in einer Karte
 export const btnInCard: CSSProperties = {
-  display: 'inline-block', border: '1.5px solid transparent', borderRadius: 11,
-  padding: '9px 18px', fontSize: 14, fontWeight: 700, color: W, textDecoration: 'none', cursor: 'pointer',
-  background: `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,
+  display: 'inline-block', borderRadius: 11,
+  padding: '9px 18px', fontSize: 14, fontWeight: 700, color: '#06210F', textDecoration: 'none', cursor: 'pointer',
+  background: GRAD,
 }
-// Neutraler/sekundärer Button (z.B. Abbrechen) — dezenter Rahmen, kein Verlauf
+// Neutraler/sekundärer Button (z.B. Abbrechen) — gefüllt grau
 export const btnGhost: CSSProperties = {
-  display: 'block', textAlign: 'center', background: 'transparent', color: SUB,
-  border: `1px solid ${CELL}`, borderRadius: 12, padding: '13px', fontSize: 14, fontWeight: 500, cursor: 'pointer',
+  display: 'block', textAlign: 'center', background: CELL, color: SUB,
+  borderRadius: 12, padding: '13px', fontSize: 14, fontWeight: 500, cursor: 'pointer',
 }
 // Gefährlicher Button (Löschen bestätigen)
 export const btnDanger: CSSProperties = {
   display: 'block', textAlign: 'center', background: DANGER, color: '#fff',
-  border: 'none', borderRadius: 12, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer',
+  borderRadius: 12, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer',
 }
-// Button-Hintergrund-Helper für beliebige Flächenfarbe (z.B. innerhalb CELL)
-export const gradOutlineOn = (bg: string): CSSProperties => ({
-  border: '1.5px solid transparent',
-  background: `linear-gradient(${bg},${bg}) padding-box, ${GRAD} border-box`,
+// Verlauf-Fill-Helper (früher Verlauf-Outline auf beliebiger Fläche)
+export const gradOutlineOn = (_bg?: string): CSSProperties => ({
+  background: GRAD, color: '#06210F',
 })
 
 /* ---------- Formular ---------- */
 export const label: CSSProperties = { fontSize: 11, fontWeight: 500, color: MUT, letterSpacing: '.04em', display: 'block', marginBottom: 8 }
-export const input: CSSProperties = { width: '100%', background: INPUTBG, border: `1px solid ${CELL}`, borderRadius: 10, padding: '12px 14px', fontSize: 14, color: W, outline: 'none', fontFamily: 'inherit' }
+export const input: CSSProperties = { width: '100%', background: INPUTBG, borderRadius: 10, padding: '12px 14px', fontSize: 14, color: W, outline: 'none', fontFamily: 'inherit' }
 
 /* ---------- Badges ---------- */
 // Level-Pille: gefüllter Pastell-Metall-Verlauf + dunkle Schrift (Bronze/Silber/Gold lesbar)
@@ -209,9 +206,9 @@ export const input: CSSProperties = { width: '100%', background: INPUTBG, border
 // Farbverlauf (gelb, blau, grau) — in einer Rangliste ergab das einen bunten
 // Flickenteppich, der den Blick von Platz und Punkten wegzog.
 export const levelBadge = (_level?: string | null): CSSProperties => ({
-  fontSize: 10, fontWeight: 800, color: SUB, background: 'none',
-  border: `1px solid ${CELL}`, borderRadius: 999, padding: '3px 8px',
+  fontSize: 10, fontWeight: 800, color: SUB, background: CELL,
+  borderRadius: 999, padding: '3px 8px',
   display: 'inline-block', letterSpacing: '.02em', whiteSpace: 'nowrap',
 })
 // Neutrale Status-Pill (offen/läuft/beendet)
-export const statusPill: CSSProperties = { fontSize: 10, fontWeight: 500, color: SUB, border: `1px solid ${SUB}`, borderRadius: 999, padding: '3px 10px', display: 'inline-block' }
+export const statusPill: CSSProperties = { fontSize: 10, fontWeight: 500, color: SUB, background: CELL, borderRadius: 999, padding: '3px 10px', display: 'inline-block' }

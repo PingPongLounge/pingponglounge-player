@@ -105,12 +105,12 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
               {slots.map((_, i) => {
                 const p = players[i]
                 return (
-                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", ...cell, border: p ? "none" : "1px dashed #3A3D48" }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: p ? "#222630" : "transparent", border: p ? "1px solid #353B46" : "1px dashed #3A3D48", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: M }}>{p ? "🏓" : "+"}</div>
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", ...cell }}>
+                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: p ? "#222630" : "#353B46", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 16, color: M }}>{p ? "🏓" : "+"}</div>
                     {p ? (
                       <div style={{ flex: 1 }}>
                         <span style={{ fontSize: 14, fontWeight: 700, color: W }}>{p.name}</span>
-                        {p.is_creator && <span style={{ fontSize: 9, color: "rgba(255,255,255,0.7)", marginLeft: 6, border: "1px solid rgba(255,255,255,0.25)", borderRadius: 999, padding: "1px 6px" }}>Host</span>}
+                        {p.is_creator && <span style={{ fontSize: 9, color: "rgba(255,255,255,0.7)", marginLeft: 6, background: "rgba(255,255,255,.14)", borderRadius: 999, padding: "1px 6px" }}>Host</span>}
                         <p style={{ fontSize: 12, color: M, fontWeight: 500 }}>Rating {ratingLabel(p.elo)} · {p.level}</p>
                       </div>
                     ) : (
@@ -163,9 +163,9 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
                       <div style={{ textAlign: "center" }}>
                         <div style={{ fontSize: 10.5, color: M, fontWeight: 700, textTransform: "uppercase", marginBottom: 8, maxWidth: 100, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{lab}</div>
                         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                          <button onClick={() => set(Math.max(0, val - 1))} style={{ width: 32, height: 32, borderRadius: "50%", background: B, border: "none", color: W, fontSize: 19, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>−</button>
+                          <button onClick={() => set(Math.max(0, val - 1))} style={{ width: 32, height: 32, borderRadius: "50%", background: B, color: W, fontSize: 19, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>−</button>
                           <span style={{ fontSize: 32, fontWeight: 900, width: 30, textAlign: "center", color: G }}>{val}</span>
-                          <button onClick={() => set(Math.min(7, val + 1))} style={{ width: 32, height: 32, borderRadius: "50%", background: B, border: "none", color: W, fontSize: 19, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>+</button>
+                          <button onClick={() => set(Math.min(7, val + 1))} style={{ width: 32, height: 32, borderRadius: "50%", background: B, color: W, fontSize: 19, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>+</button>
                         </div>
                       </div>
                     </div>

@@ -63,7 +63,7 @@ function CreditCard({ c }: { c: Credit }) {
           )}
         </div>
         <div style={{ textAlign: "right" }}>
-          <div style={{ ...statusPill, color: statusColor, borderColor: statusColor, marginBottom: 6 }}>{status}</div>
+          <div style={{ ...statusPill, color: statusColor, marginBottom: 6 }}>{status}</div>
           <div style={{ fontSize: 28, fontWeight: 900, color: redeemed ? MUT : GREEN, lineHeight: 1 }}>{c.hours}h</div>
         </div>
       </div>

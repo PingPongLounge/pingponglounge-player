@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import LogoutButton from "@/app/components/LogoutButton"
-import { BG, CARD, CELL, W, SUB, MUT, GREEN, GRAD, gt, card, cardPad, cell, levelBadge, btn, h1, ratingLabel } from "@/app/theme"
+import { BG, CELL, W, SUB, MUT, GREEN, gt, card, cardPad, cell, levelBadge, btn, h1, ratingLabel } from "@/app/theme"
 import { createClient } from "@/lib/supabase/client"
 
 const M=MUT,G=GREEN
@@ -165,7 +165,7 @@ export default function ProfilPage(){
                 ? <img src={profile.avatar_url} alt="Avatar" style={{width:"100%",height:"200%",objectFit:"cover",objectPosition:"top center"}}/>
                 : "🏓"}
             </div>
-            <div style={{position:"absolute",bottom:0,right:0,width:22,height:22,borderRadius:"50%",background:CELL,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,border:`2px solid ${BG}`}}>✏️</div>
+            <div style={{position:"absolute",bottom:0,right:0,width:22,height:22,borderRadius:"50%",background:CELL,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12}}>✏️</div>
           </Link>
           <h1 style={{...h1,fontSize:22,marginBottom:8}}>{profile.name}</h1>
           <div style={{display:"flex",alignItems:"center",justifyContent:"center",gap:8,flexWrap:"wrap"}}>
@@ -177,18 +177,18 @@ export default function ProfilPage(){
         {/* Profil vervollständigen — echter Name + Kanton werden hier nachgetragen,
             nicht mehr im Onboarding (das hat zu viele Leute vertrieben). */}
         {(!profile.real_name || !profile.canton) && !completeDone && (
-          <div style={{...cardPad,padding:"18px 18px",marginBottom:10,border:"1.5px solid transparent",background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`}}>
+          <div style={{...cardPad,padding:"18px 18px",marginBottom:10}}>
             <p style={{fontSize:14,fontWeight:800,color:W,marginBottom:4}}>Profil vervollständigen</p>
             <p style={{fontSize:12.5,color:M,lineHeight:1.5,marginBottom:14}}>
               Dein Name erscheint für andere nur als „Vorname N." unter deinem Spielernamen. Der Kanton hilft, dich der richtigen Liga zuzuordnen.
             </p>
             {!profile.real_name&&(
               <input value={cName} onChange={e=>setCName(e.target.value)} placeholder="Vor- und Nachname"
-                style={{width:"100%",boxSizing:"border-box",background:BG,border:`1px solid ${CELL}`,borderRadius:10,padding:"12px 14px",color:W,fontSize:14,marginBottom:10,fontFamily:"inherit",outline:"none"}}/>
+                style={{width:"100%",boxSizing:"border-box",background:BG,borderRadius:10,padding:"12px 14px",color:W,fontSize:14,marginBottom:10,fontFamily:"inherit",outline:"none"}}/>
             )}
             {!profile.canton&&(
               <select value={cCanton} onChange={e=>setCCanton(e.target.value)}
-                style={{width:"100%",boxSizing:"border-box",background:BG,border:`1px solid ${CELL}`,borderRadius:10,padding:"12px 14px",color:W,fontSize:14,marginBottom:10,fontFamily:"inherit",outline:"none"}}>
+                style={{width:"100%",boxSizing:"border-box",background:BG,borderRadius:10,padding:"12px 14px",color:W,fontSize:14,marginBottom:10,fontFamily:"inherit",outline:"none"}}>
                 <option value="">Kanton wählen…</option>
                 {CANTONS.map(c=><option key={c} value={c}>{c}</option>)}
               </select>

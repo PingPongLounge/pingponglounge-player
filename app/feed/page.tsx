@@ -194,7 +194,6 @@ export default function FeedPage() {
                           style={{
                             display: "flex", alignItems: "center", gap: 5,
                             background: active ? `${G}18` : CELL,
-                            border: `1px solid ${active ? G + "40" : CELL}`,
                             borderRadius: 999, padding: "5px 12px",
                             fontSize: 13, color: active ? G : MUT,
                             cursor: userId ? "pointer" : "default",

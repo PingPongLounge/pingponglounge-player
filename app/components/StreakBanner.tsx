@@ -28,7 +28,7 @@ export default function StreakBanner() {
   return (
     <div style={{
       display: "flex", alignItems: "center", gap: 12,
-      background: "#171A20", border: "1px solid rgba(255,255,255,.1)",
+      background: "#171A20",
       borderRadius: 16, padding: "13px 15px",
     }}>
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>

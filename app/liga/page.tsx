@@ -398,8 +398,8 @@ export default function LigaPage(){
           <span style={{fontSize:12.5,fontWeight:900,letterSpacing:".20em",color:W}}>PLAYER</span>
         </Link>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <button onClick={()=>setShowCity(v=>!v)} style={{background:"none",border:`1px solid ${CELL}`,color:SUB,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 10px",fontFamily:"inherit"}}>{city||"Stadt"} ▾</button>
-          <button onClick={()=>setChatOpen(true)} style={{position:"relative",display:"flex",alignItems:"center",gap:5,borderRadius:10,background:"none",border:`1px solid ${CELL}`,padding:"7px 10px",cursor:"pointer",fontFamily:"inherit"}}>
+          <button onClick={()=>setShowCity(v=>!v)} style={{background:CELL,color:SUB,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 10px",fontFamily:"inherit"}}>{city||"Stadt"} ▾</button>
+          <button onClick={()=>setChatOpen(true)} style={{position:"relative",display:"flex",alignItems:"center",gap:5,borderRadius:10,background:CELL,padding:"7px 10px",cursor:"pointer",fontFamily:"inherit"}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={SUB} strokeWidth="2"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
             <span style={{fontSize:12,fontWeight:700,color:SUB}}>Chat</span>
             {ungelesen>0&&(
@@ -412,7 +412,7 @@ export default function LigaPage(){
       {/* Stadt-Dropdown */}
       {showCity&&(
         <div onClick={()=>setShowCity(false)} style={{position:"fixed",inset:0,zIndex:20}}>
-          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:54,right:14,background:"#14171C",border:`1px solid ${B}`,borderRadius:14,padding:6,minWidth:160}}>
+          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:54,right:14,background:"#14171C",borderRadius:14,padding:6,minWidth:160}}>
             {cities.map(ci=>(
               <div key={ci} onClick={()=>{const proLvl=(parseInt(myLevel||"0")||0)>=4;const fs=seasons.find(s=>s.city===ci&&isPro(s)===proLvl)||seasons.find(s=>s.city===ci);setCity(ci);if(fs)setSeasonId(fs.id);setShowCity(false)}} style={{padding:"11px 12px",borderRadius:9,fontSize:14,fontWeight:ci===city?600:400,color:ci===city?GREEN:W,cursor:"pointer"}}>{ci}</div>
             ))}
@@ -452,7 +452,7 @@ export default function LigaPage(){
             {/* Monatspflicht — bei erfülltem Soll ein Haken. "5/4" las sich wie ein Fehler. */}
             <div style={{display:"flex",alignItems:"center",gap:12,padding:"13px 20px 15px",borderTop:`1px solid ${LINE}`}}>
               {monatOk?(
-                <div style={{width:24,height:24,borderRadius:"50%",border:`1.5px solid ${GREEN}`,color:GREEN,display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:900,flexShrink:0}}>✓</div>
+                <div style={{width:24,height:24,borderRadius:"50%",background:GRAD,color:"#06210F",display:"flex",alignItems:"center",justifyContent:"center",fontSize:12,fontWeight:900,flexShrink:0}}>✓</div>
               ):(
                 <div style={{fontSize:20,fontWeight:900,lineHeight:1,flexShrink:0,color:W}}>
                   {monatCount}<span style={{fontSize:12,color:MUT,fontWeight:800}}>/{MIN_MATCHES_PER_MONTH}</span>
@@ -478,7 +478,7 @@ export default function LigaPage(){
                 eine Zeile, kein Werbeplakat. */}
             {rows.length>1&&(
               <button onClick={()=>setPickOpen(true)}
-                style={{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",background:"none",border:"none",borderTop:`1px solid ${LINE}`,padding:"13px 20px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
+                style={{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",background:"none",borderTop:`1px solid ${LINE}`,padding:"13px 20px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
                 <span style={{fontSize:12.5,fontWeight:800,color:W}}>Ergebnis eintragen</span>
                 <span style={{fontSize:15,fontWeight:800,color:GREEN}}>→</span>
               </button>
@@ -486,7 +486,7 @@ export default function LigaPage(){
             {/* Liga-Chat als eigene Zeile — mit der letzten Nachricht als Köder.
                 Ein Symbol oben rechts findet niemand. */}
             <button onClick={()=>setChatOpen(true)}
-              style={{display:"flex",alignItems:"center",gap:11,width:"100%",background:"none",border:"none",borderTop:`1px solid ${LINE}`,padding:"12px 20px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
+              style={{display:"flex",alignItems:"center",gap:11,width:"100%",background:"none",borderTop:`1px solid ${LINE}`,padding:"12px 20px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
               <span style={{width:30,height:30,borderRadius:9,flexShrink:0,background:CELL,display:"flex",alignItems:"center",justifyContent:"center"}}>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2.2"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
               </span>
@@ -511,7 +511,7 @@ export default function LigaPage(){
           {/* Neu hier? — Erklärung (nur Nicht-Mitglieder) */}
           {!myReg&&(
             <div style={{padding:"4px 14px 0"}}>
-              <div style={{borderRadius:24,padding:22,boxShadow:SHADOW,border:"1.5px solid transparent",background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`}}>
+              <div style={{borderRadius:24,padding:22,boxShadow:SHADOW,background:CARD}}>
                 <div style={{fontSize:11,fontWeight:800,letterSpacing:".1em",textTransform:"uppercase",...gt}}>Neu hier?</div>
                 <div style={{fontSize:22,fontWeight:900,color:W,margin:"6px 0 16px"}}>So funktioniert die Liga</div>
                 {([
@@ -524,7 +524,7 @@ export default function LigaPage(){
                     <div><div style={{fontSize:14.5,fontWeight:800,color:W}}>{t}</div><div style={{fontSize:12.5,color:MUT,marginTop:2,lineHeight:1.4}}>{d}</div></div>
                   </div>
                 ))}
-                <button onClick={join} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:6,background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":"Liga beitreten"}</button>
+                <button onClick={join} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:6,background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":"Liga beitreten"}</button>
               </div>
             </div>
           )}
@@ -539,7 +539,7 @@ export default function LigaPage(){
                   const meins=meineLiga?.key===l.key
                   return(
                     <button key={l.key} onClick={()=>setLigaTab(l.key)}
-                      style={{flex:1,position:"relative",border:"none",borderRadius:11,padding:"9px 3px",background:on?W:"none",color:on?"#14171E":MUT,fontFamily:"inherit",fontSize:11.5,fontWeight:800,cursor:"pointer"}}>
+                      style={{flex:1,position:"relative",borderRadius:11,padding:"9px 3px",background:on?W:"none",color:on?"#14171E":MUT,fontFamily:"inherit",fontSize:11.5,fontWeight:800,cursor:"pointer"}}>
                       {l.name}
                       {meins&&<span style={{position:"absolute",top:5,right:6,width:5,height:5,borderRadius:"50%",background:on?"#14171E":GREEN}}/>}
                     </button>
@@ -577,9 +577,9 @@ export default function LigaPage(){
                           um, das Level-Badge rutschte über den Namen, und
                           "2/5 Liga-Matches" wuchs auf drei Zeilen. Dieser Zähler
                           steht jetzt im Spieler-Popup, wo Platz dafür ist. */}
-                      <button onClick={()=>openPlayer(r.user_id)} style={{flex:1,minWidth:0,background:"none",border:"none",padding:0,textAlign:"left",cursor:"pointer",fontFamily:"inherit",overflow:"hidden"}}>
+                      <button onClick={()=>openPlayer(r.user_id)} style={{flex:1,minWidth:0,background:"none",padding:0,textAlign:"left",cursor:"pointer",fontFamily:"inherit",overflow:"hidden"}}>
                         <span style={{display:"block",fontSize:17.5,fontWeight:800,color:W,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
-                          {r.name}{me&&<span style={{fontSize:9.5,border:`1px solid ${MUT}`,borderRadius:999,padding:"1px 5px",marginLeft:6,color:SUB}}>Du</span>}
+                          {r.name}{me&&<span style={{fontSize:9.5,background:CELL,borderRadius:999,padding:"1px 5px",marginLeft:6,color:SUB}}>Du</span>}
                         </span>
                         {r.real&&<span style={{display:"block",fontSize:13,color:MUT,fontWeight:500,marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{r.real}</span>}
                       </button>
@@ -589,12 +589,12 @@ export default function LigaPage(){
                           und "ZURÜCKZIEHEN" sprengten die Zeile. */}
                       {!me&&myReg&&(()=>{
                         const om=openMatches[r.user_id]
-                        const btnBase:React.CSSProperties={border:`1px solid ${CELL}`,borderRadius:9,padding:"7px 0",width:74,textAlign:"center",fontSize:10,fontWeight:800,textTransform:"uppercase",letterSpacing:".02em",color:SUB,background:"none",cursor:"pointer",whiteSpace:"nowrap",fontFamily:"inherit",flexShrink:0,display:"inline-block",textDecoration:"none"}
-                        const iconBtn:React.CSSProperties={background:"none",border:`1px solid ${CELL}`,borderRadius:9,width:30,height:30,fontSize:12,fontWeight:800,color:MUT,cursor:"pointer",fontFamily:"inherit",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}
-                        if(!om) return <button onClick={()=>openForder(r)} style={{...btnBase,background:GRAD,color:"#06210F",border:"none"}}>Fordern</button>
+                        const btnBase:React.CSSProperties={borderRadius:9,padding:"7px 0",width:74,textAlign:"center",fontSize:10,fontWeight:800,textTransform:"uppercase",letterSpacing:".02em",color:SUB,background:CELL,cursor:"pointer",whiteSpace:"nowrap",fontFamily:"inherit",flexShrink:0,display:"inline-block",textDecoration:"none"}
+                        const iconBtn:React.CSSProperties={background:CELL,borderRadius:9,width:30,height:30,fontSize:12,fontWeight:800,color:MUT,cursor:"pointer",fontFamily:"inherit",flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center"}
+                        if(!om) return <button onClick={()=>openForder(r)} style={{...btnBase,background:GRAD,color:"#06210F"}}>Fordern</button>
                         if(om.status==="challenge_sent"&&!om.iAmP1) return (
                           <span style={{display:"flex",gap:5,flexShrink:0}}>
-                            <button onClick={()=>acceptChallenge(om.id)} style={{...btnBase,width:64,background:GRAD,color:"#06210F",border:"none"}}>Annehmen</button>
+                            <button onClick={()=>acceptChallenge(om.id)} style={{...btnBase,width:64,background:GRAD,color:"#06210F"}}>Annehmen</button>
                             <button onClick={()=>declineChallenge(om.id)} title="Ablehnen" style={iconBtn}>✕</button>
                           </span>
                         )
@@ -606,10 +606,10 @@ export default function LigaPage(){
                         )
                         if(om.status==="accepted"||om.status==="pending") return <Link href={`/liga/match/${om.id}`} style={btnBase}>Eintragen</Link>
                         // Bestätigen darf, wer NICHT eingetragen hat — egal ob p1 oder p2.
-                        if(om.status==="p1_entered"&&om.enteredBy&&om.enteredBy!==userId) return <Link href={`/liga/match/${om.id}`} style={{...btnBase,background:GRAD,color:"#06210F",border:"none"}}>Bestätigen</Link>
+                        if(om.status==="p1_entered"&&om.enteredBy&&om.enteredBy!==userId) return <Link href={`/liga/match/${om.id}`} style={{...btnBase,background:GRAD,color:"#06210F"}}>Bestätigen</Link>
                         // Ich habe eingetragen → warte auf den Gegner (kein neues Fordern).
                         if(om.status==="p1_entered"&&om.enteredBy===userId) return <span style={{fontSize:10,fontWeight:700,color:MUT,textTransform:"uppercase",whiteSpace:"nowrap",width:74,textAlign:"center",flexShrink:0}}>Wartet</span>
-                        return <button onClick={()=>openForder(r)} style={{...btnBase,background:GRAD,color:"#06210F",border:"none"}}>Fordern</button>
+                        return <button onClick={()=>openForder(r)} style={{...btnBase,background:GRAD,color:"#06210F"}}>Fordern</button>
                       })()}
                     </div>
                   )
@@ -631,15 +631,15 @@ export default function LigaPage(){
               <div style={{background:CARD,borderRadius:18,padding:"16px 16px",boxShadow:SHADOW,textAlign:"left"}}>
                 <div style={{fontSize:13.5,fontWeight:800,color:W,marginBottom:10}}>In welcher Stadt fehlt dir eine Liga?</div>
                 <input value={reqCity} onChange={e=>setReqCity(e.target.value)} placeholder="z.B. Winterthur" autoFocus
-                  style={{width:"100%",boxSizing:"border-box",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:10}}/>
+                  style={{width:"100%",boxSizing:"border-box",background:"#20242C",borderRadius:12,padding:"12px 14px",color:W,fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:10}}/>
                 <button onClick={sendLigaAnfrage} disabled={busy||!reqCity.trim()}
-                  style={{display:"block",width:"100%",textAlign:"center",border:"1.5px solid transparent",borderRadius:12,padding:12,fontSize:13,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:W,background:`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`,cursor:(busy||!reqCity.trim())?"not-allowed":"pointer",opacity:(busy||!reqCity.trim())?.5:1,fontFamily:"inherit"}}>
+                  style={{display:"block",width:"100%",textAlign:"center",borderRadius:12,padding:12,fontSize:13,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:"#06210F",background:GRAD,cursor:(busy||!reqCity.trim())?"not-allowed":"pointer",opacity:(busy||!reqCity.trim())?.5:1,fontFamily:"inherit"}}>
                   {busy?"…":"Anfrage senden"}
                 </button>
               </div>
             ) : (
               <button onClick={()=>setReqOpen(true)}
-                style={{background:"none",border:"none",color:MUT,fontSize:12.5,fontWeight:600,cursor:"pointer",fontFamily:"inherit",padding:6}}>
+                style={{background:"none",color:MUT,fontSize:12.5,fontWeight:600,cursor:"pointer",fontFamily:"inherit",padding:6}}>
                 Keine Liga in deiner Stadt? Anfragen →
               </button>
             )}
@@ -653,7 +653,7 @@ export default function LigaPage(){
           <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"84vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
               <div style={{fontSize:20,fontWeight:900,color:W}}>Gegen wen hast du gespielt?</div>
-              <button onClick={()=>setPickOpen(false)} style={{background:"none",border:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
+              <button onClick={()=>setPickOpen(false)} style={{background:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
             </div>
             <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Wähl deinen Gegner — danach trägst du das Resultat ein.</div>
             <div style={{background:CELL,borderRadius:14,overflow:"hidden"}}>
@@ -661,7 +661,7 @@ export default function LigaPage(){
                   gewertetes Ergebnis gegen einen Elite-Spieler ein. */}
               {rows.filter(r=>r.user_id!==userId&&imPaar(r)).map((r,i)=>(
                 <button key={r.user_id} onClick={()=>{setPickOpen(false); openForder(r,"result")}}
-                  style={{display:"flex",alignItems:"center",gap:11,width:"100%",padding:"13px 14px",background:"none",border:"none",borderTop:i===0?"none":`1px solid ${LINE}`,cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
+                  style={{display:"flex",alignItems:"center",gap:11,width:"100%",padding:"13px 14px",background:"none",borderTop:i===0?"none":`1px solid ${LINE}`,cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
                   <div style={{flex:1,minWidth:0}}>
                     <div style={{fontSize:14.5,fontWeight:800,color:W}}>{r.name}</div>
                     {r.real&&<div style={{fontSize:11,color:MUT,marginTop:1}}>{r.real}</div>}
@@ -689,7 +689,7 @@ export default function LigaPage(){
                     <span style={{fontSize:14,fontWeight:800,...gt}}>Rating {ratingLabel(pData.player.elo)}</span>
                   </div>
                 </div>
-                <button onClick={()=>setPOpen(null)} style={{background:"none",border:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
+                <button onClick={()=>setPOpen(null)} style={{background:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
               </div>
 
               {/* Bilanz */}
@@ -749,7 +749,7 @@ export default function LigaPage(){
               {/* Direkt fordern — auch hier nur im eigenen Paar */}
               {pOpen!==userId&&myReg&&(()=>{const row=rows.find(r=>r.user_id===pOpen); return !!row&&imPaar(row)})()&&(
                 <button onClick={()=>{const row=rows.find(r=>r.user_id===pOpen); setPOpen(null); if(row) openForder(row)}}
-                  style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:"pointer",fontFamily:"inherit"}}>
+                  style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit"}}>
                   Fordern
                 </button>
               )}
@@ -764,13 +764,13 @@ export default function LigaPage(){
           <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <div style={{fontSize:20,fontWeight:900,color:W}}>vs {fTarget.name}</div>
-              <button onClick={()=>setFTarget(null)} style={{background:"none",border:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
+              <button onClick={()=>setFTarget(null)} style={{background:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
             </div>
 
             <div style={{display:"flex",gap:8,margin:"16px 0 18px"}}>
               {(["challenge","result"] as const).map(t=>{
                 const on=fTab===t
-                return <button key={t} onClick={()=>setFTab(t)} style={{flex:1,borderRadius:12,padding:"11px 8px",fontSize:12.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",color:W,border:"1.5px solid transparent",background:on?`linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`:CELL}}>{t==="challenge"?"Herausfordern":"Ergebnis eintragen"}</button>
+                return <button key={t} onClick={()=>setFTab(t)} style={{flex:1,borderRadius:12,padding:"11px 8px",fontSize:12.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",color:on?"#06210F":W,background:on?GRAD:CELL}}>{t==="challenge"?"Herausfordern":"Ergebnis eintragen"}</button>
               })}
             </div>
 
@@ -780,14 +780,14 @@ export default function LigaPage(){
                 <div style={{display:"flex",gap:12}}>
                   <div style={{flex:1}}>
                     <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Datum</div>
-                    <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} style={{width:"100%",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                    <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} style={{width:"100%",background:"#20242C",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                   </div>
                   <div style={{flex:1}}>
                     <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Zeit</div>
-                    <input type="time" value={fTime} onChange={e=>setFTime(e.target.value)} style={{width:"100%",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                    <input type="time" value={fTime} onChange={e=>setFTime(e.target.value)} style={{width:"100%",background:"#20242C",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                   </div>
                 </div>
-                <button onClick={sendChallenge} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:22,background:GRAD,color:"#06210F",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":"Anfrage senden"}</button>
+                <button onClick={sendChallenge} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:22,background:GRAD,color:"#06210F",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":"Anfrage senden"}</button>
               </>
             ):(
               <>
@@ -795,7 +795,7 @@ export default function LigaPage(){
 
                 <div style={{marginBottom:18}}>
                   <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Wann gespielt?</div>
-                  <input type="date" max={today()} value={fRDate} onChange={e=>setFRDate(e.target.value)} style={{width:"100%",background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                  <input type="date" max={today()} value={fRDate} onChange={e=>setFRDate(e.target.value)} style={{width:"100%",background:"#20242C",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                 </div>
 
                 {!fDetail?(
@@ -806,9 +806,9 @@ export default function LigaPage(){
                         <div key={idx} style={{textAlign:"center"}}>
                           <div style={{fontSize:11,color:MUT,fontWeight:700,textTransform:"uppercase",marginBottom:9,maxWidth:110,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lab}</div>
                           <div style={{display:"flex",alignItems:"center",gap:9}}>
-                            <button onClick={()=>set(Math.max(0,val-1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,border:"none",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>−</button>
+                            <button onClick={()=>set(Math.max(0,val-1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>−</button>
                             <span style={{fontSize:36,fontWeight:900,width:34,textAlign:"center",...gt}}>{val}</span>
-                            <button onClick={()=>set(Math.min(7,val+1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,border:"none",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>+</button>
+                            <button onClick={()=>set(Math.min(7,val+1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>+</button>
                           </div>
                         </div>
                       </>
@@ -828,20 +828,20 @@ export default function LigaPage(){
                         <input type="number" inputMode="numeric" min={0} max={30} value={s.p1}
                           onChange={e=>setFSets(v=>v.map((x,j)=>j===i?{...x,p1:e.target.value}:x))}
                           placeholder="11"
-                          style={{flex:1,minWidth:0,background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
+                          style={{flex:1,minWidth:0,background:"#20242C",borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
                         <span style={{width:10,textAlign:"center",color:MUT,fontWeight:800}}>:</span>
                         <input type="number" inputMode="numeric" min={0} max={30} value={s.p2}
                           onChange={e=>setFSets(v=>v.map((x,j)=>j===i?{...x,p2:e.target.value}:x))}
                           placeholder="7"
-                          style={{flex:1,minWidth:0,background:"#20242C",border:`1px solid ${CELL}`,borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
+                          style={{flex:1,minWidth:0,background:"#20242C",borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
                         {i>=3&&(
-                          <button onClick={()=>setFSets(v=>v.filter((_,j)=>j!==i))} style={{background:"none",border:"none",color:MUT,fontSize:16,cursor:"pointer",flexShrink:0}}>×</button>
+                          <button onClick={()=>setFSets(v=>v.filter((_,j)=>j!==i))} style={{background:"none",color:MUT,fontSize:16,cursor:"pointer",flexShrink:0}}>×</button>
                         )}
                       </div>
                     ))}
                     {fSets.length<7&&(
                       <button onClick={()=>setFSets(v=>[...v,{p1:"",p2:""}])}
-                        style={{width:"100%",background:"none",border:`1px dashed ${CELL}`,borderRadius:12,padding:10,color:MUT,fontSize:12.5,cursor:"pointer",fontFamily:"inherit"}}>+ Satz</button>
+                        style={{width:"100%",background:CELL,borderRadius:12,padding:10,color:MUT,fontSize:12.5,cursor:"pointer",fontFamily:"inherit"}}>+ Satz</button>
                     )}
                     <div style={{textAlign:"center",fontSize:13,fontWeight:800,marginTop:11,...gt}}>
                       {satzBilanz().my} : {satzBilanz().opp} Sätze
@@ -851,12 +851,12 @@ export default function LigaPage(){
 
                 {/* Umschalter: schnell zählen oder genau eintragen */}
                 <button onClick={()=>setFDetail(v=>!v)}
-                  style={{display:"block",width:"100%",marginTop:14,background:"none",border:"none",color:MUT,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",padding:6,textDecoration:"underline"}}>
+                  style={{display:"block",width:"100%",marginTop:14,background:"none",color:MUT,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",padding:6,textDecoration:"underline"}}>
                   {fDetail?"Nur Sätze zählen":"Satzergebnisse genau eintragen"}
                 </button>
                 {/* Freundschaftsspiel: Ergebnis wird gespeichert und im Chat gezeigt, zählt aber nicht */}
-                <button onClick={()=>setFFriendly(v=>!v)} style={{display:"flex",alignItems:"center",gap:11,width:"100%",marginTop:20,background:CELL,border:"none",borderRadius:14,padding:"13px 14px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
-                  <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:fFriendly?GRAD:"transparent",border:fFriendly?"none":`1.5px solid ${MUT}`,color:"#06210F",fontSize:13,fontWeight:900}}>{fFriendly?"✓":""}</span>
+                <button onClick={()=>setFFriendly(v=>!v)} style={{display:"flex",alignItems:"center",gap:11,width:"100%",marginTop:20,background:CELL,borderRadius:14,padding:"13px 14px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
+                  <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:fFriendly?GRAD:CELL,color:"#06210F",fontSize:13,fontWeight:900}}>{fFriendly?"✓":""}</span>
                   <span style={{flex:1}}>
                     <span style={{display:"block",fontSize:13.5,fontWeight:700,color:W}}>Freundschaftsspiel</span>
                     <span style={{display:"block",fontSize:11.5,color:MUT,marginTop:1}}>Zählt nicht für ELO und Rang — erscheint nur im Verlauf.</span>
@@ -867,7 +867,7 @@ export default function LigaPage(){
                   <div style={{marginTop:12,background:CELL,borderRadius:12,padding:"11px 13px",fontSize:12,color:SUB,lineHeight:1.5}}>{fNoteRanked}</div>
                 )}
 
-                <button onClick={sendResult} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:GRAD,color:"#06210F",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",border:"none",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":fDone.length?"Weiteres Ergebnis absenden":"Ergebnis absenden"}</button>
+                <button onClick={sendResult} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:GRAD,color:"#06210F",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":fDone.length?"Weiteres Ergebnis absenden":"Ergebnis absenden"}</button>
 
                 {fDone.length>0&&(
                   <div style={{marginTop:16,background:CELL,borderRadius:14,padding:"13px 14px"}}>
@@ -878,7 +878,7 @@ export default function LigaPage(){
                       ))}
                     </div>
                     <div style={{fontSize:11.5,color:SUB,fontWeight:300,marginTop:9,lineHeight:1.5}}>{fTarget.name} bekommt eine E-Mail und hat 24 Std. Zeit zu bestätigen — danach zählt das Ergebnis automatisch. Du kannst gleich den nächsten Match eintragen.</div>
-                    <button onClick={()=>setFTarget(null)} style={{display:"block",width:"100%",textAlign:"center",marginTop:11,background:"none",border:`1px solid ${MUT}`,borderRadius:12,padding:11,fontSize:13,fontWeight:800,color:W,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit"}}>Fertig</button>
+                    <button onClick={()=>setFTarget(null)} style={{display:"block",width:"100%",textAlign:"center",marginTop:11,background:CELL,borderRadius:12,padding:11,fontSize:13,fontWeight:800,color:W,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit"}}>Fertig</button>
                   </div>
                 )}
               </>
@@ -894,7 +894,7 @@ export default function LigaPage(){
           <div onClick={e=>e.stopPropagation()} style={{background:BG,borderLeft:`1px solid ${B}`,height:"100%",width:"83%",maxWidth:380,display:"flex",flexDirection:"column",boxShadow:"-22px 0 50px rgba(0,0,0,.55)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"15px 16px",borderBottom:`1px solid ${B}`}}>
               <span style={{fontSize:15,fontWeight:600,color:W}}>Liga-Chat · {sel?isPro(sel)?"Pro":"Einstieg":""}</span>
-              <button onClick={()=>setChatOpen(false)} style={{background:"none",border:"none",color:M,fontSize:18,cursor:"pointer"}}>✕</button>
+              <button onClick={()=>setChatOpen(false)} style={{background:"none",color:M,fontSize:18,cursor:"pointer"}}>✕</button>
             </div>
             <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:10}}>
               {msgs.length===0?<p style={{textAlign:"center",color:MUT,fontSize:13,marginTop:20}}>Noch keine Nachrichten — schreib die erste 👋</p>:msgs.filter(m=>!m.parent_id).map(m=>{
@@ -905,7 +905,7 @@ export default function LigaPage(){
                   const r=m.reactions
                   return(
                     <div key={m.id} style={{alignSelf:"stretch"}}>
-                      <div style={{background:C,border:`1px solid ${LINE}`,borderRadius:14,padding:"11px 14px"}}>
+                      <div style={{background:C,borderRadius:14,padding:"11px 14px"}}>
                         <div style={{fontSize:10,fontWeight:700,color:d?.pending?MUT:d?.ranked===false?MUT:"rgba(57,255,20,.7)",letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>
                           {d?.pending?"Neues Ergebnis · wartet auf Bestätigung":d?.ranked===false?"Match · zählt nicht":"Match bestätigt"}
                         </div>
@@ -922,7 +922,7 @@ export default function LigaPage(){
                             const cnt=r[type]
                             const active=r.myReacts.includes(type)
                             return(
-                              <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:"rgba(255,255,255,.06)",border:active?"1px solid rgba(255,255,255,.4)":"1px solid rgba(255,255,255,.08)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:W,fontFamily:"inherit"}}>
+                              <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:active?"rgba(255,255,255,.14)":"rgba(255,255,255,.06)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:W,fontFamily:"inherit"}}>
                                 <span>{emoji}</span>
                                 {cnt>0&&<span style={{fontSize:11,fontWeight:700,color:active?"#39FF14":MUT}}>{cnt}</span>}
                               </button>
@@ -930,7 +930,7 @@ export default function LigaPage(){
                           })}
                           {/* Kommentieren — das Spiel selbst ist der Gesprächsanlass */}
                           <button onClick={()=>setCmtOpen(o=>({...o,[m.id]:!o[m.id]}))}
-                            style={{display:"flex",alignItems:"center",gap:5,marginLeft:"auto",background:"rgba(255,255,255,.06)",border:"1px solid rgba(255,255,255,.08)",borderRadius:99,padding:"4px 10px",fontSize:11,fontWeight:700,color:kommentare.length?W:MUT,cursor:"pointer",fontFamily:"inherit"}}>
+                            style={{display:"flex",alignItems:"center",gap:5,marginLeft:"auto",background:"rgba(255,255,255,.06)",borderRadius:99,padding:"4px 10px",fontSize:11,fontWeight:700,color:kommentare.length?W:MUT,cursor:"pointer",fontFamily:"inherit"}}>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
                             {kommentare.length>0?kommentare.length:"Kommentieren"}
                           </button>
@@ -952,9 +952,9 @@ export default function LigaPage(){
                                   onChange={e=>setCmt(c=>({...c,[m.id]:e.target.value}))}
                                   onKeyDown={e=>{if(e.key==="Enter")sendComment(m.id)}}
                                   placeholder="Kommentar zum Spiel …"
-                                  style={{flex:1,minWidth:0,background:"rgba(0,0,0,.25)",border:`1px solid ${B}`,borderRadius:999,padding:"9px 12px",color:W,fontSize:12.5,outline:"none",fontFamily:"inherit"}}/>
+                                  style={{flex:1,minWidth:0,background:"rgba(0,0,0,.25)",borderRadius:999,padding:"9px 12px",color:W,fontSize:12.5,outline:"none",fontFamily:"inherit"}}/>
                                 <button onClick={()=>sendComment(m.id)} aria-label="Kommentar senden"
-                                  style={{width:36,flexShrink:0,borderRadius:999,border:"none",background:GRAD,color:"#06210F",fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>→</button>
+                                  style={{width:36,flexShrink:0,borderRadius:999,background:GRAD,color:"#06210F",fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>→</button>
                               </div>
                             )}
                           </div>
@@ -967,15 +967,15 @@ export default function LigaPage(){
                 return(
                   <div key={m.id} style={{maxWidth:"80%",alignSelf:mine?"flex-end":"flex-start"}}>
                     {!mine&&<div style={{fontSize:10,color:MUT,margin:"0 0 3px 4px"}}>{m.name}</div>}
-                    <div style={{background:C,border:"none",borderRadius:14,padding:"9px 12px",fontSize:13,fontWeight:500,color:W}}>{m.text}</div>
+                    <div style={{background:C,borderRadius:14,padding:"9px 12px",fontSize:13,fontWeight:500,color:W}}>{m.text}</div>
                   </div>
                 )
               })}
             </div>
             {myReg?(
               <div style={{display:"flex",gap:8,padding:"12px 14px",borderTop:`1px solid ${B}`}}>
-                <input value={msg} onChange={e=>setMsg(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")send()}} placeholder="Nachricht an die Liga …" style={{flex:1,background:C,border:`1px solid ${B}`,borderRadius:999,padding:"11px 14px",color:W,fontSize:13,outline:"none"}}/>
-                <button onClick={send} style={{width:42,borderRadius:999,border:"none",background:GRAD,color:"#06210F",fontWeight:800,cursor:"pointer"}}>→</button>
+                <input value={msg} onChange={e=>setMsg(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")send()}} placeholder="Nachricht an die Liga …" style={{flex:1,background:C,borderRadius:999,padding:"11px 14px",color:W,fontSize:13,outline:"none"}}/>
+                <button onClick={send} style={{width:42,borderRadius:999,background:GRAD,color:"#06210F",fontWeight:800,cursor:"pointer"}}>→</button>
               </div>
             ):(
               <p style={{padding:"14px",textAlign:"center",color:M,fontSize:12}}>Tritt der Liga bei, um mitzuschreiben.</p>
@@ -984,7 +984,7 @@ export default function LigaPage(){
         </div>
       )}
 
-      {toast&&<div style={{position:"fixed",bottom:84,left:0,right:0,display:"flex",justifyContent:"center",zIndex:120}}><div style={{background:CARD,border:"none",color:W,borderRadius:999,padding:"10px 18px",fontSize:13}}>{toast}</div></div>}
+      {toast&&<div style={{position:"fixed",bottom:84,left:0,right:0,display:"flex",justifyContent:"center",zIndex:120}}><div style={{background:CARD,color:W,borderRadius:999,padding:"10px 18px",fontSize:13}}>{toast}</div></div>}
       <BottomNav />
     </main>
   )

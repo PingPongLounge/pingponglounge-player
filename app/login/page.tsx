@@ -18,7 +18,6 @@ const ghostBtn = {
 
 const linkBtn = {
   background: "none",
-  border: "none",
   cursor: "pointer",
   color: MUTED,
   fontSize: "12px",
@@ -123,14 +122,11 @@ export default function LoginPage() {
             {(["login","register","magic"] as const).map(t => (
               <button key={t} onClick={() => { setTab(t); setError(""); setSent(false); setMsg("") }} style={{
                 flex: 1,
-                border: tab === t ? "1.5px solid transparent" : "1.5px solid transparent",
                 borderRadius: "7px", padding: "9px 4px",
                 fontSize: "11px", fontWeight: tab === t ? 700 : 500, cursor: "pointer",
                 color: tab === t ? TEXT : MUTED,
                 letterSpacing: "0.02em",
-                background: tab === t
-                  ? `linear-gradient(${CARD},${CARD}) padding-box, ${G} border-box`
-                  : "transparent",
+                background: tab === t ? "rgba(255,255,255,.14)" : "transparent",
               }}>
                 {t === "login" ? "Login" : t === "register" ? "Neu" : "Link"}
               </button>

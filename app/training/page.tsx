@@ -54,7 +54,7 @@ export default function TrainingPage() {
               Alle Trainings-Termine, Preise und die Anmeldung laufen über Eversports.
             </p>
             <a href={EVERSPORTS_STUDIO} target="_blank" rel="noopener noreferrer"
-              style={{ display: "inline-block", border: "1.5px solid transparent", borderRadius: 12, padding: "13px 26px", fontSize: 15, fontWeight: 800, color: W, textDecoration: "none", background: `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` }}>
+              style={{ display: "inline-block", borderRadius: 12, padding: "13px 26px", fontSize: 15, fontWeight: 800, color: "#06210F", textDecoration: "none", background: GRAD }}>
               Auf Eversports ansehen →
             </a>
           </div>

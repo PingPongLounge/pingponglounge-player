@@ -69,7 +69,7 @@ type PendingResult = { elo: number; won?: boolean; sets?: unknown; ort?: string;
 
 const inp: React.CSSProperties = { ...inputBase, padding: "14px 16px", fontSize: "15px", boxSizing: "border-box" }
 const primaryBtn = (disabled = false): React.CSSProperties => ({ ...btn, width: "100%", marginTop: "10px", opacity: disabled ? 0.5 : 1, cursor: disabled ? "not-allowed" : "pointer" })
-const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: TEXT, cursor: "pointer", textAlign: "left", marginBottom: "8px", fontWeight: sel ? 700 : 400, fontFamily: "inherit", display: "block", border: sel ? "1.5px solid transparent" : "1.5px solid transparent", background: sel ? `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` : CELL })
+const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: TEXT, cursor: "pointer", textAlign: "left", marginBottom: "8px", fontWeight: sel ? 700 : 400, fontFamily: "inherit", display: "block", background: sel ? "rgba(255,255,255,.14)" : CELL })
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -198,11 +198,11 @@ export default function OnboardingPage() {
       {/* Beide Wege bleiben freiwillig — niemand muss das Quiz machen */}
       <div style={{ display: "flex", gap: "10px", marginTop: "14px" }}>
         <button type="button" onClick={() => setShowAllLevels(v => !v)}
-          style={{ flex: 1, background: "none", border: "1px solid " + CELL, borderRadius: "10px", padding: "12px", fontSize: "12.5px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>
+          style={{ flex: 1, background: CELL, borderRadius: "10px", padding: "12px", fontSize: "12.5px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>
           {showAllLevels ? "Weniger anzeigen" : "Genauer einstufen"}
         </button>
         <button type="button" onClick={() => { setMode("quiz"); setQuizIdx(0); setQuizScores([]); setStep(1) }}
-          style={{ flex: 1, background: "none", border: "1px solid " + CELL, borderRadius: "10px", padding: "12px", fontSize: "12.5px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>
+          style={{ flex: 1, background: CELL, borderRadius: "10px", padding: "12px", fontSize: "12.5px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>
           Nicht sicher? 3 Fragen
         </button>
       </div>
@@ -217,7 +217,7 @@ export default function OnboardingPage() {
         <div style={{ marginBottom: "28px" }}>
           <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px" }}>
             <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>frage {quizIdx + 1} / {QUIZ.length}</span>
-            <button type="button" onClick={() => setStep(0)} style={{ background: "none", border: "none", fontSize: "11px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Zurück</button>
+            <button type="button" onClick={() => setStep(0)} style={{ background: "none", fontSize: "11px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.1em" }}>Zurück</button>
           </div>
           <div style={{ background: CELL, borderRadius: "4px", height: "3px" }}>
             <div style={{ background: GRAD, height: "3px", borderRadius: "4px", width: `${(quizIdx / QUIZ.length) * 100}%`, transition: "width 0.3s" }} />
@@ -251,7 +251,7 @@ export default function OnboardingPage() {
         </div>
         {!pending && (
           <button type="button" onClick={() => { setStep(0); setShowAllLevels(false) }}
-            style={{ background: "none", border: "1px solid " + CELL, borderRadius: "8px", padding: "8px 12px", fontSize: "11.5px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Ändern</button>
+            style={{ background: CELL, borderRadius: "8px", padding: "8px 12px", fontSize: "11.5px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>Ändern</button>
         )}
       </div>
 
@@ -259,13 +259,13 @@ export default function OnboardingPage() {
       <p style={{ fontSize: "14px", color: MUTED, marginBottom: "20px" }}>So sehen dich die anderen in der Rangliste.</p>
 
       <input style={inp} placeholder="Spielername" value={name} onChange={e => setName(e.target.value)} autoFocus />
-      <button type="button" onClick={genNicknames} style={{ background: "none", border: "1px solid " + CELL, borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: MUTED, cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em", fontFamily: "inherit" }}>
+      <button type="button" onClick={genNicknames} style={{ background: CELL, borderRadius: "8px", padding: "7px 14px", fontSize: "12px", color: MUTED, cursor: "pointer", marginBottom: "10px", letterSpacing: "0.04em", fontFamily: "inherit" }}>
         {loadingNicks ? "..." : "Vorschläge generieren"}
       </button>
       {nicks.length > 0 && (
         <div style={{ display: "flex", gap: "8px", marginBottom: "8px", flexWrap: "wrap" }}>
           {nicks.map(n => (
-            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` : CELL, border: "1.5px solid transparent", borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: TEXT, cursor: "pointer", fontWeight: name === n ? 700 : 400, fontFamily: "inherit" }}>
+            <button key={n} type="button" onClick={() => setName(n)} style={{ background: name === n ? "rgba(255,255,255,.14)" : CELL, borderRadius: "8px", padding: "8px 14px", fontSize: "13px", color: TEXT, cursor: "pointer", fontWeight: name === n ? 700 : 400, fontFamily: "inherit" }}>
               {n}
             </button>
           ))}

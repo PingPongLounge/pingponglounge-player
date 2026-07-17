@@ -18,7 +18,7 @@ export default function ShopPage() {
           </svg>
           <div style={{ fontSize: 28, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '-.01em', marginTop: 16, ...{ background: GRAD, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' } }}>Shop</div>
           <div style={{ fontSize: 15, color: SUB, fontWeight: 300, marginTop: 12, lineHeight: 1.5 }}>Schläger, Bälle, Apparel & PingPoints-Prämien — bald direkt hier buchbar.</div>
-          <a href="https://www.pingponglounge.ch" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 24, border: '1.5px solid transparent', borderRadius: 15, padding: '14px 28px', fontSize: 15, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: W, textDecoration: 'none', background: `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box` }}>Zur Webseite</a>
+          <a href="https://www.pingponglounge.ch" target="_blank" rel="noopener noreferrer" style={{ display: 'inline-block', marginTop: 24, borderRadius: 15, padding: '14px 28px', fontSize: 15, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: '#06210F', textDecoration: 'none', background: GRAD }}>Zur Webseite</a>
         </div>
       </div>
       <BottomNav />

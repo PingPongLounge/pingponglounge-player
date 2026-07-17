@@ -38,7 +38,7 @@ export default function PendingConfirmBanner() {
       style={{
         display: "flex", alignItems: "center", gap: 12, width: "100%",
         textAlign: "left", cursor: "pointer", fontFamily: "inherit",
-        background: "#171A20", border: "1px solid rgba(255,255,255,.1)",
+        background: "#171A20",
         borderRadius: 16, padding: "13px 15px", margin: "0 0 14px",
       }}
     >

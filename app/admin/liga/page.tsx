@@ -82,24 +82,24 @@ export default function AdminLigaPage(){
         <h1 style={{fontSize:28,fontWeight:900,fontFamily:"'League Spartan', system-ui, sans-serif",textTransform:"uppercase",letterSpacing:".1em",margin:"16px 0 24px",background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>liga admin</h1>
 
         {/* Create form */}
-        <div style={{background:C,border:`1px solid ${B}`,borderRadius:14,padding:"20px",marginBottom:24}}>
+        <div style={{background:C,borderRadius:14,padding:"20px",marginBottom:24}}>
           <p style={{fontSize:12,fontWeight:700,color:M,textTransform:"uppercase",letterSpacing:"0.1em",marginBottom:16}}>neue saison erstellen</p>
-          <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Name (z.B. PPL Zürich Frühling 2026)" style={{width:"100%",background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none",marginBottom:8,boxSizing:"border-box"}}/>
+          <input value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder="Name (z.B. PPL Zürich Frühling 2026)" style={{width:"100%",background:BG,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none",marginBottom:8,boxSizing:"border-box"}}/>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
-            <select value={form.city} onChange={e=>setForm(f=>({...f,city:e.target.value}))} style={{background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none"}}>
+            <select value={form.city} onChange={e=>setForm(f=>({...f,city:e.target.value}))} style={{background:BG,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none"}}>
               {CITIES.map(c=><option key={c} value={c}>{c}</option>)}
             </select>
-            <select value={form.skill_class} onChange={e=>setForm(f=>({...f,skill_class:e.target.value}))} style={{background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none"}}>
+            <select value={form.skill_class} onChange={e=>setForm(f=>({...f,skill_class:e.target.value}))} style={{background:BG,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none"}}>
               {LEVELS.map(l=><option key={l.v} value={l.v}>{l.l}</option>)}
             </select>
           </div>
           <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:8}}>
-            <input type="number" value={form.max_players} onChange={e=>setForm(f=>({...f,max_players:+e.target.value}))} placeholder="Max Spieler" style={{background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none"}}/>
-            <input type="date" value={form.start_date} onChange={e=>setForm(f=>({...f,start_date:e.target.value}))} style={{background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none"}}/>
+            <input type="number" value={form.max_players} onChange={e=>setForm(f=>({...f,max_players:+e.target.value}))} placeholder="Max Spieler" style={{background:BG,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none"}}/>
+            <input type="date" value={form.start_date} onChange={e=>setForm(f=>({...f,start_date:e.target.value}))} style={{background:BG,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none"}}/>
           </div>
-          <input value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="Beschreibung (optional)" style={{width:"100%",background:BG,border:`1px solid ${B}`,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none",marginBottom:12,boxSizing:"border-box"}}/>
+          <input value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="Beschreibung (optional)" style={{width:"100%",background:BG,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none",marginBottom:12,boxSizing:"border-box"}}/>
           {msg&&<p style={{fontSize:13,color:msg.startsWith("✓")?G:"#FF6666",marginBottom:8}}>{msg}</p>}
-          <button onClick={createSeason} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#20242C",border:"none",borderRadius:8,padding:"14px",fontSize:13,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
+          <button onClick={createSeason} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#20242C",borderRadius:8,padding:"14px",fontSize:13,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
             {saving?"erstellen...":"saison erstellen"}
           </button>
         </div>
@@ -109,7 +109,7 @@ export default function AdminLigaPage(){
         {seasons.map(s=>{
           const count=(s.league_registrations as {count:number}[])?.[0]?.count||0
           return(
-            <div key={s.id as string} style={{background:C,border:`1px solid ${B}`,borderRadius:12,padding:"14px 16px",marginBottom:8}}>
+            <div key={s.id as string} style={{background:C,borderRadius:12,padding:"14px 16px",marginBottom:8}}>
               <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",marginBottom:8}}>
                 <div>
                   <p style={{fontSize:14,fontWeight:700,color:W,margin:"0 0 2px"}}>{s.name as string}</p>
@@ -118,10 +118,10 @@ export default function AdminLigaPage(){
                 <span style={{fontSize:10,fontWeight:700,color:G,background:`${G}18`,borderRadius:999,padding:"2px 8px",textTransform:"uppercase"}}>{s.status as string}</span>
               </div>
               <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                <Link href="/liga" style={{fontSize:11,color:M,background:BG,border:`1px solid ${B}`,borderRadius:6,padding:"6px 10px",textDecoration:"none",fontWeight:700}}>Liga öffnen</Link>
-                {s.status==="open"&&<button onClick={()=>generateMatches(s.id as string)} disabled={generating===s.id} style={{fontSize:11,color:"#20242C",background:G,border:"none",borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>{generating===s.id?"...":"Matches generieren"}</button>}
-                {s.status==="open"&&<button onClick={()=>updateStatus(s.id as string,"running")} style={{fontSize:11,color:W,background:B,border:"none",borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>→ Running</button>}
-                {s.status==="running"&&<button onClick={()=>updateStatus(s.id as string,"finished")} style={{fontSize:11,color:W,background:B,border:"none",borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>→ Finished</button>}
+                <Link href="/liga" style={{fontSize:11,color:M,background:"#353B46",borderRadius:6,padding:"6px 10px",textDecoration:"none",fontWeight:700}}>Liga öffnen</Link>
+                {s.status==="open"&&<button onClick={()=>generateMatches(s.id as string)} disabled={generating===s.id} style={{fontSize:11,color:"#20242C",background:G,borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>{generating===s.id?"...":"Matches generieren"}</button>}
+                {s.status==="open"&&<button onClick={()=>updateStatus(s.id as string,"running")} style={{fontSize:11,color:W,background:B,borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>→ Running</button>}
+                {s.status==="running"&&<button onClick={()=>updateStatus(s.id as string,"finished")} style={{fontSize:11,color:W,background:B,borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>→ Finished</button>}
               </div>
             </div>
           )
@@ -136,7 +136,7 @@ export default function AdminLigaPage(){
           (kein Level). Jeder bekommt sie nur einmal.
         </p>
         <button onClick={sendReminders} disabled={reminding}
-          style={{fontSize:12,color:"#20242C",background:G,border:"none",borderRadius:8,padding:"9px 14px",cursor:reminding?"wait":"pointer",fontWeight:800,opacity:reminding?.6:1}}>
+          style={{fontSize:12,color:"#20242C",background:G,borderRadius:8,padding:"9px 14px",cursor:reminding?"wait":"pointer",fontWeight:800,opacity:reminding?.6:1}}>
           {reminding?"Wird gesendet…":"Erinnerungen jetzt senden"}
         </button>
         {reminderMsg&&<p style={{fontSize:12,color:M,marginTop:10}}>{reminderMsg}</p>}

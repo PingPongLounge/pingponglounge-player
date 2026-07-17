@@ -73,9 +73,9 @@ export default function LigaChatHome({
           <input
             value={text} onChange={e => setText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") send() }}
             placeholder="Nachricht an die Liga…"
-            style={{ flex: 1, background: "#20242C", border: `1px solid ${LINE}`, borderRadius: 12, padding: "11px 14px", color: W, fontSize: 13, outline: "none", fontFamily: "inherit" }}
+            style={{ flex: 1, background: "#20242C", borderRadius: 12, padding: "11px 14px", color: W, fontSize: 13, outline: "none", fontFamily: "inherit" }}
           />
-          <button onClick={send} disabled={sending} style={{ width: 44, border: "none", borderRadius: 12, background: GRAD, color: "#08120a", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>→</button>
+          <button onClick={send} disabled={sending} style={{ width: 44, borderRadius: 12, background: GRAD, color: "#08120a", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>→</button>
         </div>
       ) : (
         <div style={{ padding: "12px 16px", borderTop: `1px solid ${LINE}`, textAlign: "center", fontSize: 12, color: MUT, fontWeight: 500 }}>

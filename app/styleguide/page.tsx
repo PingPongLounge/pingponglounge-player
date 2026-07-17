@@ -9,7 +9,7 @@ import {
 const sec: React.CSSProperties = { margin: '28px 0 10px', fontSize: 13, fontWeight: 800, letterSpacing: '.2em', textTransform: 'uppercase', color: MUT }
 const swatch = (c: string, name: string) => (
   <div style={{ textAlign: 'center' }}>
-    <div style={{ width: '100%', height: 54, borderRadius: 12, background: c, border: '1px solid rgba(255,255,255,.08)' }} />
+    <div style={{ width: '100%', height: 54, borderRadius: 12, background: c }} />
     <div style={{ fontSize: 11, color: SUB, marginTop: 6, fontWeight: 600 }}>{name}</div>
     <div style={{ fontSize: 10, color: MUT }}>{c}</div>
   </div>
