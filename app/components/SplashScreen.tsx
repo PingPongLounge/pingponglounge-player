@@ -32,11 +32,12 @@ export default function SplashScreen() {
       setTimeout(() => setPhase("done"), 700)
     }
 
-    // Der Splash hielt die App 2,2 Sekunden künstlich fest — auch wenn längst
-    // alles geladen war. Das fühlte sich an, als würde die Seite ewig laden.
-    // Ist die Seite schon fertig, verschwindet er praktisch sofort.
+    // Das Logo soll man bewusst sehen: die ganze Sequenz (Paddle zeichnen →
+    // Ball → Buchstaben) läuft ~1,1 s, danach hält es kurz und "atmet". Der
+    // Splash bleibt daher mindestens ~2,4 s stehen, auch wenn schon geladen.
+    const MIN_MS = 2400
     if (document.readyState === "complete") {
-      const minTimer = setTimeout(dismiss, 350)
+      const minTimer = setTimeout(dismiss, MIN_MS)
       return () => { clearTimeout(t1); clearTimeout(minTimer); letterTimers.forEach(clearTimeout) }
     }
 
@@ -46,7 +47,7 @@ export default function SplashScreen() {
 
     const onLoad = () => { loaded = true; tryDismiss() }
     window.addEventListener("load", onLoad)
-    const minTimer = setTimeout(() => { minDone = true; tryDismiss() }, 900)
+    const minTimer = setTimeout(() => { minDone = true; tryDismiss() }, MIN_MS)
 
     return () => {
       clearTimeout(t1); clearTimeout(minTimer)
@@ -74,8 +75,8 @@ export default function SplashScreen() {
         pointerEvents: "none",
       }}
     >
-      {/* Logo SVG */}
-      <div style={{ position: "relative", width: 200, height: 200 }}>
+      {/* Logo SVG — nach dem Aufbau ein sanftes, langsames "Atmen" */}
+      <div style={{ position: "relative", width: 200, height: 200, animation: "logoBreathe 2.6s ease-in-out 1s infinite" }}>
         <svg
           width="200"
           height="200"
@@ -158,6 +159,10 @@ export default function SplashScreen() {
           75%  { transform: translateY(-10px); }
           90%  { transform: translateY(3px); }
           100% { transform: translateY(0); }
+        }
+        @keyframes logoBreathe {
+          0%, 100% { transform: scale(1); }
+          50%      { transform: scale(1.05); }
         }
       `}</style>
     </div>
