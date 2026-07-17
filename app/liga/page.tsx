@@ -581,7 +581,6 @@ export default function LigaPage(){
                         <span style={{display:"block",fontSize:17.5,fontWeight:800,color:W,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>
                           {r.name}{me&&<span style={{fontSize:9.5,background:CELL,borderRadius:999,padding:"1px 5px",marginLeft:6,color:SUB}}>Du</span>}
                         </span>
-                        {r.real&&<span style={{display:"block",fontSize:13,color:MUT,fontWeight:500,marginTop:1,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{r.real}</span>}
                       </button>
                       {/* Nur die genaue Rating-Klasse — kein zweites Level-Badge daneben. */}
                       <span style={{fontSize:20,fontWeight:900,width:52,textAlign:"right",flexShrink:0,...(me?gt:{color:W})}}>{ratingLabel(r.elo)}</span>
@@ -664,7 +663,6 @@ export default function LigaPage(){
                   style={{display:"flex",alignItems:"center",gap:11,width:"100%",padding:"13px 14px",background:"none",borderTop:i===0?"none":`1px solid ${LINE}`,cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
                   <div style={{flex:1,minWidth:0}}>
                     <div style={{fontSize:14.5,fontWeight:800,color:W}}>{r.name}</div>
-                    {r.real&&<div style={{fontSize:11,color:MUT,marginTop:1}}>{r.real}</div>}
                   </div>
                   <span style={{fontSize:14,fontWeight:800,color:SUB}}>{ratingLabel(r.elo)}</span>
                 </button>
