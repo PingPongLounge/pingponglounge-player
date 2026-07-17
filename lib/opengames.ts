@@ -39,6 +39,18 @@ export const OG_STANDORTE: OgStandort[] = [
   { id: "stgallen",   name: "St. Gallen", tage: [1, 3, 5, 6], start: 19 }, // Mo, Mi, Fr, Sa
 ]
 
+// ZUTRITTS-QR pro Standort. Nur Glattbrugg hat eine verschlossene Tür, die den
+// Eversports-QR liest — die anderen Standorte brauchen keinen Code (nur Stripe).
+// Der QR gilt zeitgebunden (öffnet nur zu Open-Game-Zeiten) und wird NUR
+// bezahlten Teilnehmern gezeigt. Bild liegt unter /public.
+// Sobald der QR da ist: Datei als public/og-entry-glattbrugg.png ablegen.
+export const OG_ENTRY_QR: Record<string, string> = {
+  "Glattbrugg": "/og-entry-glattbrugg.png",
+}
+export function entryQrFor(locationName: string): string | null {
+  return OG_ENTRY_QR[locationName] ?? null
+}
+
 /** Passt der Spieler in diese Gruppe? */
 export function gruppeFuerLevel(level: string | number | null | undefined): "einstieg" | "pro" | null {
   const l = typeof level === "string" ? parseInt(level) : level

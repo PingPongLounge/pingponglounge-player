@@ -649,7 +649,7 @@ export default function LigaPage(){
 
       {/* Gegner-Auswahl: "Gegen wen hast du gespielt?" → direkt ins Ergebnis-Formular */}
       {pickOpen&&(
-        <div onClick={()=>setPickOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:60,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+        <div onClick={()=>setPickOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
           <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"84vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
               <div style={{fontSize:20,fontWeight:900,color:W}}>Gegen wen hast du gespielt?</div>
@@ -676,7 +676,7 @@ export default function LigaPage(){
 
       {/* Spieler-Popup: Bilanz, Siegquote, letzte Spiele, direkter Vergleich */}
       {pOpen&&(
-        <div onClick={()=>setPOpen(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:60,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+        <div onClick={()=>setPOpen(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
           <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
             {pLoading&&<div style={{textAlign:"center",color:MUT,fontSize:13,padding:"30px 0"}}>lädt…</div>}
 
@@ -760,7 +760,7 @@ export default function LigaPage(){
 
       {/* Fordern-Popup */}
       {fTarget&&(
-        <div onClick={()=>setFTarget(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:60,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
+        <div onClick={()=>setFTarget(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
           <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <div style={{fontSize:20,fontWeight:900,color:W}}>vs {fTarget.name}</div>

@@ -29,22 +29,41 @@ export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string)
   // Ergebnis wird gespeichert und im Chat gezeigt, aber ELO/Statistik bleiben unberührt.
   const ranked = m.ranked !== false
 
-  const { data: w } = ranked ? await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", m.winner_id).single() : { data: null }
-  const { data: l } = ranked ? await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", loserId).single() : { data: null }
-  if (ranked && w && l) {
-    // Eine ELO-Rechnung für alles — berechneElo aus lib/elo.ts. Vorher stand die
-    // Formel hier inline (eigenes K=32), mit dem Risiko, dass Liga, Open Game und
-    // Turnier auseinanderlaufen. Genau das sollte die Zentralisierung verhindern.
-    const wElo = w.elo ?? 1000, lElo = l.elo ?? 1000
-    const { neuW: newW, neuL: newL } = berechneElo(wElo, lElo)
-    await admin.from("profiles").update({ elo: newW, matches_played: (w.matches_played ?? 0) + 1, matches_won: (w.matches_won ?? 0) + 1 }).eq("id", m.winner_id)
-    await admin.from("profiles").update({ elo: newL, matches_played: (l.matches_played ?? 0) + 1 }).eq("id", loserId)
-    await admin.from("elo_history").insert([
-      { player_id: m.winner_id, elo: newW, delta: newW - wElo, match_id: matchId, note: "liga" },
-      { player_id: loserId, elo: newL, delta: newL - lElo, match_id: matchId, note: "liga" },
-    ])
-    // Keine PingPoints für Liga-Matches — PingPoints gibt es nur für
-    // Turnier-Podest (1–3) und bezahlte Buchungen. Siehe PP_CONFIG in lib/rewards.ts.
+  // Firmen-Ligen sind privat und werden ISOLIERT gewertet: nur Spiele innerhalb
+  // dieser Liga zählen für ihre Tabelle (Season-ELO in league_registrations),
+  // das öffentliche Rating (profiles.elo) bleibt unberührt.
+  const { data: season } = await admin.from("league_seasons").select("is_private").eq("id", m.season_id).single()
+  const isPrivate = season?.is_private === true
+
+  if (ranked && isPrivate) {
+    // Season-eigene Wertung — dieselbe ELO-Formel, aber pro Liga gespeichert.
+    const { data: rw } = await admin.from("league_registrations").select("elo,wins,played").eq("season_id", m.season_id).eq("player_id", m.winner_id).single()
+    const { data: rl } = await admin.from("league_registrations").select("elo,wins,played").eq("season_id", m.season_id).eq("player_id", loserId).single()
+    if (rw && rl) {
+      const wElo = rw.elo ?? 1000, lElo = rl.elo ?? 1000
+      const { neuW, neuL } = berechneElo(wElo, lElo)
+      await admin.from("league_registrations").update({ elo: neuW, wins: (rw.wins ?? 0) + 1, played: (rw.played ?? 0) + 1 }).eq("season_id", m.season_id).eq("player_id", m.winner_id)
+      await admin.from("league_registrations").update({ elo: neuL, played: (rl.played ?? 0) + 1 }).eq("season_id", m.season_id).eq("player_id", loserId)
+    }
+  } else if (ranked) {
+    // Öffentliche Liga: globales Rating wie bisher.
+    const { data: w } = await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", m.winner_id).single()
+    const { data: l } = await admin.from("profiles").select("elo,matches_played,matches_won").eq("id", loserId).single()
+    if (w && l) {
+      // Eine ELO-Rechnung für alles — berechneElo aus lib/elo.ts. Vorher stand die
+      // Formel hier inline (eigenes K=32), mit dem Risiko, dass Liga, Open Game und
+      // Turnier auseinanderlaufen. Genau das sollte die Zentralisierung verhindern.
+      const wElo = w.elo ?? 1000, lElo = l.elo ?? 1000
+      const { neuW: newW, neuL: newL } = berechneElo(wElo, lElo)
+      await admin.from("profiles").update({ elo: newW, matches_played: (w.matches_played ?? 0) + 1, matches_won: (w.matches_won ?? 0) + 1 }).eq("id", m.winner_id)
+      await admin.from("profiles").update({ elo: newL, matches_played: (l.matches_played ?? 0) + 1 }).eq("id", loserId)
+      await admin.from("elo_history").insert([
+        { player_id: m.winner_id, elo: newW, delta: newW - wElo, match_id: matchId, note: "liga" },
+        { player_id: loserId, elo: newL, delta: newL - lElo, match_id: matchId, note: "liga" },
+      ])
+      // Keine PingPoints für Liga-Matches — PingPoints gibt es nur für
+      // Turnier-Podest (1–3) und bezahlte Buchungen. Siehe PP_CONFIG in lib/rewards.ts.
+    }
   }
 
   // Chat-Feed: Match-Ergebnis automatisch als strukturierter Post

@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import BottomNav from "@/app/components/BottomNav"
 import { BG, CARD, CELL, W, MUT, GREEN, DANGER, card, cardPad, cell, btn, btnGhost, btnDanger, levelBadge, ratingLabel, h1, body, backLink } from "@/app/theme"
+import { entryQrFor } from "@/lib/opengames"
 
 const M=MUT, C=CARD, B=CELL, G=GREEN
 
@@ -121,6 +122,19 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
               })}
             </div>
           </div>
+
+          {/* Zutritts-QR: nur für bezahlte Teilnehmer und nur an Standorten mit
+              verschlossener Tür (Glattbrugg). Gilt zeitgebunden zur Open-Game-Zeit. */}
+          {g.is_official && isJoined && entryQrFor(g.location_name) && (
+            <div style={{ ...cardPad, marginBottom: 12, textAlign: "center" }}>
+              <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", color: G, marginBottom: 10 }}>Dein Eintritt · {g.location_name}</p>
+              <div style={{ position: "relative", width: 200, height: 200, margin: "0 auto", background: "#fff", borderRadius: 16, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ position: "absolute", color: "#0D0F13", fontSize: 13, fontWeight: 800 }}>QR folgt</span>
+                <img src={entryQrFor(g.location_name)!} alt="Zutritts-QR" style={{ position: "relative", width: "100%", height: "100%", objectFit: "contain" }} onError={e => { e.currentTarget.style.display = "none" }} />
+              </div>
+              <p style={{ ...body, marginTop: 10 }}>An der Tür scannen — gilt nur zur Open-Game-Zeit.</p>
+            </div>
+          )}
 
           {g.notes && <div style={{ ...cardPad, padding: "12px 16px", marginBottom: 12 }}><p style={{ ...body, fontStyle: "italic" }}>&quot;{g.notes}&quot;</p></div>}
 
