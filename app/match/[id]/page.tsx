@@ -99,6 +99,20 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
             <p style={{ fontSize: 14, fontWeight: 700, color: DANGER }}>Dieses Spiel wurde abgesagt</p>
           </div>
         ) : (<>
+          {/* Zutritts-QR ganz oben, sobald gebucht — damit niemand scrollen muss.
+              Nur für Teilnehmer, nur an Standorten mit verschlossener Tür (Glattbrugg,
+              pro Wochentag). Verschwindet automatisch nach dem Absagen (isJoined). */}
+          {g.is_official && isJoined && g.date && entryQrFor(g.location_name, weekdayOf(g.date)) && (
+            <div style={{ ...cardPad, marginBottom: 12, textAlign: "center" }}>
+              <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", color: G, marginBottom: 10 }}>Dein Eintritt · {g.location_name}</p>
+              <div style={{ position: "relative", width: 200, height: 200, margin: "0 auto", background: "#fff", borderRadius: 16, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <span style={{ position: "absolute", color: "#0D0F13", fontSize: 13, fontWeight: 800 }}>QR folgt</span>
+                <img src={entryQrFor(g.location_name, weekdayOf(g.date!))!} alt="Zutritts-QR" style={{ position: "relative", width: "100%", height: "100%", objectFit: "contain" }} onError={e => { e.currentTarget.style.display = "none" }} />
+              </div>
+              <p style={{ ...body, marginTop: 10 }}>An der Tür scannen — gilt nur zur Termin-Zeit.</p>
+            </div>
+          )}
+
           {/* Spieler-Slots */}
           <div style={{ ...cardPad, marginBottom: 12 }}>
             <p style={{ ...body, marginBottom: 12 }}>{g.current_players}/{g.max_players} Spieler dabei</p>
@@ -122,19 +136,6 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
               })}
             </div>
           </div>
-
-          {/* Zutritts-QR: nur für bezahlte Teilnehmer und nur an Standorten mit
-              verschlossener Tür (Glattbrugg). Gilt zeitgebunden zur Open-Game-Zeit. */}
-          {g.is_official && isJoined && g.date && entryQrFor(g.location_name, weekdayOf(g.date)) && (
-            <div style={{ ...cardPad, marginBottom: 12, textAlign: "center" }}>
-              <p style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", color: G, marginBottom: 10 }}>Dein Eintritt · {g.location_name}</p>
-              <div style={{ position: "relative", width: 200, height: 200, margin: "0 auto", background: "#fff", borderRadius: 16, overflow: "hidden", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <span style={{ position: "absolute", color: "#0D0F13", fontSize: 13, fontWeight: 800 }}>QR folgt</span>
-                <img src={entryQrFor(g.location_name, weekdayOf(g.date!))!} alt="Zutritts-QR" style={{ position: "relative", width: "100%", height: "100%", objectFit: "contain" }} onError={e => { e.currentTarget.style.display = "none" }} />
-              </div>
-              <p style={{ ...body, marginTop: 10 }}>An der Tür scannen — gilt nur zur Open-Game-Zeit.</p>
-            </div>
-          )}
 
           {g.notes && <div style={{ ...cardPad, padding: "12px 16px", marginBottom: 12 }}><p style={{ ...body, fontStyle: "italic" }}>&quot;{g.notes}&quot;</p></div>}
 
