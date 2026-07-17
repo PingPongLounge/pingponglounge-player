@@ -4,39 +4,48 @@ import type { SupabaseClient } from "@supabase/supabase-js"
  * DIE OFFIZIELLEN OPEN GAMES DER LOUNGE
  *
  * Hier drin steht alles, was sich ändern kann: Standorte, Wochentage, Uhrzeit,
- * Preis, Gruppengrösse. Wer etwas anpassen will, ändert diese Datei — nicht den
- * Code drumherum.
+ * Preis, Gruppen und Plätze. Wer etwas anpassen will, ändert diese Datei — nicht
+ * den Code drumherum.
  *
- * Jeder Abend hat ZWEI Gruppen à 6 Plätzen, an getrennten Tischen:
- * Einstieg (Level 1–3) und Pro (Level 4–7). So bleibt es für beide spannend —
- * ein Anfänger gegen Level 7 macht keinem Spass.
+ * NEU: Jeder Abend ist einzeln konfigurierbar (Slot je Wochentag) — verschiedene
+ * Zeiten, Gruppen und Platzzahlen pro Tag. Die Zahl der zu sperrenden Tische ist
+ * eine Betriebs-Aufgabe (physisch/Eversports): 2 Spieler pro Tisch, d.h. 8 Plätze
+ * = 4 Tische, 12 Plätze = 6 Tische.
  */
 
 export const OG_PREIS_CHF = 10          // pro Person
-export const OG_DAUER_MIN = 240         // 4 Stunden
-export const OG_PLAETZE_PRO_GRUPPE = 6
 export const OG_STORNO_STUNDEN = 24     // bis dahin Absage mit Rückerstattung
 export const OG_VORLAUF_TAGE = 21       // so weit im Voraus werden Termine angelegt
+export const OG_BIS_DATUM = "2026-10-31" // testweise bis Ende Oktober — danach keine neuen
 
-export type OgGruppe = { key: "einstieg" | "pro"; name: string; level: string }
+/** Eine Gruppe an einem Abend: Stärkeklasse + eigene Platzzahl. */
+export type OgGruppeDef = { key: "einstieg" | "pro"; name: string; level: "1-3" | "4-7"; plaetze: number }
+const EINSTIEG = (plaetze: number, name = "Einstieg"): OgGruppeDef => ({ key: "einstieg", name, level: "1-3", plaetze })
+const PRO = (plaetze: number, name = "Pro"): OgGruppeDef => ({ key: "pro", name, level: "4-7", plaetze })
 
-export const OG_GRUPPEN: OgGruppe[] = [
-  { key: "einstieg", name: "Einstieg", level: "1-3" },
-  { key: "pro",      name: "Pro",      level: "4-7" },
-]
-
-export type OgStandort = {
-  id: string
-  name: string
-  /** Wochentage: 0 = Sonntag, 1 = Montag … 6 = Samstag */
-  tage: number[]
-  /** Startzeit in Stunden (19 = 19:00). Ende ergibt sich aus OG_DAUER_MIN. */
-  start: number
-}
+/** Ein Abend: Wochentag, Start-/Endzeit (Stunden) und seine Gruppen. */
+export type OgSlot = { day: number; start: number; end: number; gruppen: OgGruppeDef[] }
+export type OgStandort = { id: string; name: string; slots: OgSlot[] }
 
 export const OG_STANDORTE: OgStandort[] = [
-  { id: "glattbrugg", name: "Glattbrugg", tage: [4, 5, 6],    start: 19 }, // Do, Fr, Sa
-  { id: "stgallen",   name: "St. Gallen", tage: [1, 3, 5, 6], start: 19 }, // Mo, Mi, Fr, Sa
+  {
+    id: "glattbrugg", name: "Glattbrugg", slots: [
+      // Do 18–24: eine Gruppe Fortgeschritten & Pro (Level 4–7), 8 Plätze (4 Tische)
+      { day: 4, start: 18, end: 24, gruppen: [PRO(8, "Fortgeschritten & Pro")] },
+      // Sa 18–24: alle Level, je 6 (12 Plätze, 6 Tische)
+      { day: 6, start: 18, end: 24, gruppen: [EINSTIEG(6), PRO(6)] },
+    ],
+  },
+  {
+    id: "stgallen", name: "St. Gallen", slots: [
+      // Mo 18–22: Einsteiger, 6
+      { day: 1, start: 18, end: 22, gruppen: [EINSTIEG(6)] },
+      // Mi 18–22: Fortgeschritten (4–7), 6
+      { day: 3, start: 18, end: 22, gruppen: [PRO(6, "Fortgeschritten")] },
+      // Fr 18–22: Fortgeschritten (4–7), 6
+      { day: 5, start: 18, end: 22, gruppen: [PRO(6, "Fortgeschritten")] },
+    ],
+  },
 ]
 
 // ZUTRITTS-QR pro Standort. Nur Glattbrugg hat eine verschlossene Tür, die den
@@ -78,29 +87,33 @@ export async function ensureOpenGames(admin: SupabaseClient): Promise<number> {
   for (let i = 0; i < OG_VORLAUF_TAGE; i++) {
     const tag = new Date(heute)
     tag.setDate(heute.getDate() + i)
+    const ds = iso(tag)
+    if (ds > OG_BIS_DATUM) continue      // testweise bis Ende Oktober
     const wochentag = tag.getDay()
 
     for (const ort of OG_STANDORTE) {
-      if (!ort.tage.includes(wochentag)) continue
-
-      for (const g of OG_GRUPPEN) {
-        neue.push({
-          series_key: `${ort.id}-${iso(tag)}-${g.key}`,
-          is_official: true,
-          created_by: null,
-          location_id: ort.id,
-          location_name: ort.name,
-          date: iso(tag),
-          start_hour: ort.start,
-          end_hour: ort.start + Math.round(OG_DAUER_MIN / 60),
-          duration_minutes: OG_DAUER_MIN,
-          max_players: OG_PLAETZE_PRO_GRUPPE,
-          current_players: 0,
-          price_per_player: OG_PREIS_CHF,
-          level: g.level,
-          status: "open",
-          notes: `${g.name} · Level ${g.level}`,
-        })
+      for (const slot of ort.slots) {
+        if (slot.day !== wochentag) continue
+        const dauer = (slot.end - slot.start) * 60
+        for (const g of slot.gruppen) {
+          neue.push({
+            series_key: `${ort.id}-${ds}-${g.key}`,
+            is_official: true,
+            created_by: null,
+            location_id: ort.id,
+            location_name: ort.name,
+            date: ds,
+            start_hour: slot.start,
+            end_hour: slot.end,
+            duration_minutes: dauer,
+            max_players: g.plaetze,
+            current_players: 0,
+            price_per_player: OG_PREIS_CHF,
+            level: g.level,
+            status: "open",
+            notes: `${g.name} · Level ${g.level}`,
+          })
+        }
       }
     }
   }
