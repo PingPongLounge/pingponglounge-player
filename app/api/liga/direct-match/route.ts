@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 import { MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
+import { istGewertet } from "@/lib/liga"
 
 // Erstellt ein neues Match direkt im Status "accepted" zwischen dem eingeloggten
 // Spieler und einem Gegner innerhalb derselben Liga-Saison.
@@ -56,20 +57,14 @@ export async function POST(req: NextRequest) {
 
   const round = season?.current_round ?? 1
 
-  // Limit: max. MAX_RANKED_PER_OPPONENT gewertete Spiele gegen denselben Gegner.
-  // Darüber hinaus darf man weiterspielen und eintragen — es zählt dann nur
-  // nicht mehr für ELO und Rang. Verhindert, dass jemand von einem Kumpel
-  // durch wiederholtes Absichtsverlieren nach oben geschoben wird.
-  const { count: rankedCount } = await admin
-    .from("league_matches")
-    .select("id", { count: "exact", head: true })
-    .eq("season_id", season_id)
-    .eq("ranked", true)
-    .in("status", ["p1_entered", "confirmed"])
-    .or(`and(p1_id.eq.${user.id},p2_id.eq.${opponent_id}),and(p1_id.eq.${opponent_id},p2_id.eq.${user.id})`)
-
-  const limitReached = (rankedCount ?? 0) >= MAX_RANKED_PER_OPPONENT
-  const ranked = friendly === true ? false : !limitReached
+  // Limit: max. MAX_RANKED_PER_OPPONENT gewertete Spiele gegen denselben Gegner
+  // im ROLLIERENDEN Fenster der letzten 12 Monate. Darüber hinaus darf man
+  // weiterspielen und eintragen — es zählt dann nur nicht mehr für ELO und Rang,
+  // bis die älteste Begegnung aus dem Fenster fällt. Verhindert, dass jemand von
+  // einem Kumpel durch wiederholtes Absichtsverlieren nach oben geschoben wird.
+  const { ranked: imLimit, bisher: rankedCount } = await istGewertet(admin, user.id, opponent_id)
+  const limitReached = !imLimit
+  const ranked = friendly === true ? false : imLimit
 
   // Match direkt in "accepted" erstellen (beide haben bereits gespielt → kein Challenge-Flow nötig)
   const { data: match, error } = await admin
@@ -87,5 +82,5 @@ export async function POST(req: NextRequest) {
 
   if (error || !match) return NextResponse.json({ error: error?.message || "Fehler beim Erstellen" }, { status: 400 })
 
-  return NextResponse.json({ id: match.id, ranked, limitReached, rankedCount: rankedCount ?? 0 })
+  return NextResponse.json({ id: match.id, ranked, limitReached, rankedCount, limit: MAX_RANKED_PER_OPPONENT })
 }

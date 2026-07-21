@@ -140,6 +140,8 @@ export default function OnboardingPage() {
     // Pending-Resultat aus dem /spielen Hook-Flow ist übernommen → aufräumen.
     if (pending) { try { localStorage.removeItem("ppl_pending_result") } catch { /* ignore */ } }
     try { await fetch("/api/credits/signup", { method: "POST" }) } catch { /* ignore */ }
+    // Ab jetzt ist jeder automatisch in der Liga — es gibt kein Beitreten mehr.
+    try { await fetch("/api/liga/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }) } catch { /* ignore */ }
     router.push("/entdecken")
   }
 

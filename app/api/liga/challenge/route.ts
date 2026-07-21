@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { sendChallengeNotice } from "@/lib/email"
 import { MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
+import { istGewertet } from "@/lib/liga"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
@@ -39,12 +40,9 @@ export async function POST(req: NextRequest) {
   // Das Limit gegen denselben Gegner galt bisher NUR beim direkten Eintragen.
   // Über "Fordern" liess es sich beliebig oft umgehen — genau das, was
   // MAX_RANKED_PER_OPPONENT verhindern soll.
-  const { count: gewertet } = await admin.from("league_matches")
-    .select("id", { count: "exact", head: true })
-    .eq("season_id", season_id).eq("ranked", true)
-    .in("status", ["p1_entered", "confirmed"])
-    .or(`and(p1_id.eq.${user.id},p2_id.eq.${challenged_id}),and(p1_id.eq.${challenged_id},p2_id.eq.${user.id})`)
-  const ranked = (gewertet ?? 0) < MAX_RANKED_PER_OPPONENT
+  // Gezählt wird über ALLE Spiele der letzten 12 Monate (rollierend), nicht mehr
+  // pro Saison: es gibt nur noch eine Liga, die nie endet.
+  const { ranked, bisher: gewertet } = await istGewertet(admin, user.id, challenged_id)
 
   const { data, error } = await admin.from("league_matches").insert({
     season_id, p1_id: user.id, p2_id: challenged_id,
@@ -76,5 +74,6 @@ export async function POST(req: NextRequest) {
     console.error("Forderungs-Mail fehlgeschlagen:", e)
   }
 
-  return NextResponse.json({ id: data.id })
+  // ranked mitgeben: die App sagt VOR dem Spiel, ob es für die ELO zählt.
+  return NextResponse.json({ id: data.id, ranked, bisher: gewertet, limit: MAX_RANKED_PER_OPPONENT })
 }

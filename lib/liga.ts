@@ -1,5 +1,67 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { berechneElo } from "@/lib/elo"
+import { MAX_RANKED_PER_OPPONENT, RANKED_WINDOW_MONTHS } from "@/lib/rewards"
+
+// ─── DIE EINE LIGA ───────────────────────────────────────────────────────────
+// Es gibt genau eine öffentliche Liga (league_seasons.is_global = true). Keine
+// Trennung nach Stadt, Stärkeklasse oder Saison: eine Elo, eine Platzierung.
+// Die Filter (Europa / Land / Region / Stadt / Freunde) berechnen nur den Rang
+// innerhalb der gefilterten Auswahl — sie erzeugen keine eigene Wertung.
+// Private Firmen-Ligen sind die bewusste Ausnahme (is_private = true).
+
+let cachedGlobalId: string | null = null
+
+/** ID der einen öffentlichen Liga. Wird pro Prozess einmal geladen. */
+export async function globalLeagueId(admin: SupabaseClient): Promise<string | null> {
+  if (cachedGlobalId) return cachedGlobalId
+  const { data } = await admin.from("league_seasons").select("id").eq("is_global", true).maybeSingle()
+  cachedGlobalId = data?.id ?? null
+  return cachedGlobalId
+}
+
+/**
+ * Stellt sicher, dass der Spieler in der einen Liga steht.
+ * Es gibt kein "Liga beitreten" mehr: wer ein fertiges Profil hat, ist dabei.
+ * Idempotent — der Unique-Index (season_id, player_id) verhindert Doppel.
+ */
+export async function ensureMembership(admin: SupabaseClient, playerId: string): Promise<string | null> {
+  const seasonId = await globalLeagueId(admin)
+  if (!seasonId) return null
+  const { data: prof } = await admin.from("profiles").select("name,level").eq("id", playerId).maybeSingle()
+  if (!prof?.name || !prof?.level) return seasonId   // Onboarding noch offen
+  await admin.from("league_registrations")
+    .upsert({ season_id: seasonId, player_id: playerId }, { onConflict: "season_id,player_id", ignoreDuplicates: true })
+  return seasonId
+}
+
+/** Beginn des rollierenden Fensters als ISO-Zeitpunkt (heute minus 12 Monate). */
+export function rankedWindowStart(): string {
+  const d = new Date()
+  d.setMonth(d.getMonth() - RANKED_WINDOW_MONTHS)
+  return d.toISOString()
+}
+
+/**
+ * Zählt die gewerteten Spiele zwischen zwei Spielern im ROLLIERENDEN Fenster
+ * der letzten 12 Monate — bewusst nicht "pro Saison": es gibt keine Saisons
+ * mehr, und ein Kalenderjahr würde am 1. Januar künstlich zurückspringen.
+ * Alte Begegnungen fallen hinten aus dem Fenster und geben wieder frei.
+ */
+export async function rankedGegenGegner(admin: SupabaseClient, a: string, b: string): Promise<number> {
+  const { count } = await admin.from("league_matches")
+    .select("id", { count: "exact", head: true })
+    .eq("ranked", true)
+    .in("status", ["p1_entered", "confirmed"])
+    .gte("created_at", rankedWindowStart())
+    .or(`and(p1_id.eq.${a},p2_id.eq.${b}),and(p1_id.eq.${b},p2_id.eq.${a})`)
+  return count ?? 0
+}
+
+/** Zählt dieses Spiel für die ELO? Wird VOR der Partie angezeigt. */
+export async function istGewertet(admin: SupabaseClient, a: string, b: string): Promise<{ ranked: boolean; bisher: number; limit: number }> {
+  const bisher = await rankedGegenGegner(admin, a, b)
+  return { ranked: bisher < MAX_RANKED_PER_OPPONENT, bisher, limit: MAX_RANKED_PER_OPPONENT }
+}
 
 // Bestätigt ein Liga-Match (von p1_entered -> confirmed): ELO, Statistik,
 // PingPoints und Chat-Feed. Wird von der manuellen Bestätigung UND der

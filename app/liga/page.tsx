@@ -14,7 +14,7 @@ const C=CARD, B=CELL, M=SUB
 const SHADOW="0 1px 4px rgba(0,0,0,.14)"
 const HERO="#14171E"
 
-type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number}
+type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number,is_global?:boolean,is_private?:boolean}
 type Row={user_id:string,name:string,elo:number,level:string,real?:string|null,avatar?:string|null}
 type OpenMatch={id:string,status:string,iAmP1:boolean,enteredBy:string|null}
 type PlayerInfo={
@@ -58,6 +58,9 @@ export default function LigaPage(){
   const [fRDate,setFRDate]=useState("")        // Wann wurde gespielt?
   const [fDone,setFDone]=useState<string[]>([]) // in dieser Session eingetragene Ergebnisse
   const [fFriendly,setFFriendly]=useState(false) // Freundschaftsspiel: ohne Liga-Punkte
+  // Zählt das nächste Spiel gegen diesen Gegner für die ELO? Wird beim Öffnen
+  // des Popups geladen und VOR der Partie angezeigt.
+  const [fWertung,setFWertung]=useState<{ranked:boolean,bisher:number,limit:number}|null>(null)
   const [fDetail,setFDetail]=useState(false)     // Sätze genau eintragen statt nur zählen
   const [fSets,setFSets]=useState<Array<{p1:string,p2:string}>>([{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""}])
   const [fNoteRanked,setFNoteRanked]=useState<string|null>(null) // Hinweis, wenn das Gegner-Limit greift
@@ -99,27 +102,32 @@ export default function LigaPage(){
   const flash=(t:string)=>{setToast(t);setTimeout(()=>setToast(""),2500)}
   const monatOk=monatCount>=MIN_MATCHES_PER_MONTH
 
-  // Saisons laden — getUser + Seasons parallel
+  // DIE EINE LIGA laden. Keine Auswahl nach Stadt oder Stärkeklasse mehr:
+  // es gibt genau eine öffentliche Liga (is_global) — dazu ggf. private
+  // Firmen-Ligen, in denen der Spieler Mitglied ist.
   useEffect(()=>{(async()=>{
     const sb=createClient()
     const [{data:{user}},{data}]=await Promise.all([
       sb.auth.getUser(),
-      sb.from("league_seasons").select("id,name,city,skill_class,status,max_players").in("status",["open","running"]).order("city").order("skill_class"),
+      sb.from("league_seasons").select("id,name,city,skill_class,status,max_players,is_global,is_private").in("status",["open","running"]),
     ])
-    const ss=(data||[]) as Season[]
+    const alle=(data||[]) as Season[]
     setUserId(user?.id||null)
-    setSeasons(ss)
-    let lvl:string|null=null
-    if(user){ const {data:pf}=await sb.from("profiles").select("level").eq("id",user.id).maybeSingle(); lvl=pf?.level||null; setMyLevel(lvl) }
-    const proLvl=(parseInt(lvl||"0")||0)>=4
-    let defCity=ss[0]?.city||""
-    let defSeason=(ss.find(s=>s.city===defCity&&/5|6|7|pro/i.test(s.skill_class)===proLvl)||ss[0])?.id||""
+    if(user){ const {data:pf}=await sb.from("profiles").select("level").eq("id",user.id).maybeSingle(); setMyLevel(pf?.level||null) }
+
+    const global=alle.find(s=>s.is_global)
+    let meine:string[]=[]
     if(user){
+      // Kein Beitreten mehr: wer ein fertiges Profil hat, wird automatisch
+      // eingetragen. Der Aufruf ist idempotent.
+      await fetch("/api/liga/register",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"}).catch(()=>{})
       const {data:myRegs}=await sb.from("league_registrations").select("season_id").eq("player_id",user.id)
-      const mySeason=ss.find(s=>(myRegs||[]).some(r=>r.season_id===s.id))
-      if(mySeason){defCity=mySeason.city;defSeason=mySeason.id}
+      meine=(myRegs||[]).map(r=>r.season_id)
     }
-    setCity(defCity); setSeasonId(defSeason); setLoading(false)
+    // Private Ligen nur zeigen, wenn man drin ist — sonst sind sie unsichtbar.
+    const sichtbar=alle.filter(s=>s.is_global||(s.is_private&&meine.includes(s.id)))
+    setSeasons(sichtbar)
+    setCity(global?.city||""); setSeasonId(global?.id||sichtbar[0]?.id||""); setLoading(false)
   })()},[])
 
   const loadStandings=useCallback(async(sid:string)=>{
@@ -227,9 +235,23 @@ export default function LigaPage(){
     if(new URLSearchParams(window.location.search).get("chat")==="1") setChatOpen(true)
   },[])
 
+  // Wertungs-Status laden, sobald ein Gegner gewählt ist.
+  useEffect(()=>{
+    if(!fTarget){setFWertung(null);return}
+    let weg=false
+    ;(async()=>{
+      try{
+        const r=await fetch(`/api/liga/gewertet?opponent=${fTarget.id}`)
+        if(r.ok&&!weg) setFWertung(await r.json())
+      }catch{ /* Anzeige ist optional */ }
+    })()
+    return()=>{weg=true}
+  },[fTarget])
+
   async function join(){
     setBusy(true)
-    const r=await fetch("/api/liga/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId})})
+    // season_id wird serverseitig gesetzt — es gibt nur eine öffentliche Liga.
+    const r=await fetch("/api/liga/register",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"})
     const j=await r.json().catch(()=>({}))
     if(r.ok){flash("✓ Du bist dabei!");loadStandings(seasonId)} else flash(j.error||"Fehler")
     setBusy(false)
@@ -342,10 +364,9 @@ export default function LigaPage(){
     loadChat(seasonId)
   }
 
-  const cities=[...new Set(seasons.map(s=>s.city))]
-  const citySeasons=seasons.filter(s=>s.city===city)
+  // Keine Stadt-/Klassen-Auswahl mehr (cities/citySeasons/isPro sind entfallen):
+  // es gibt genau eine öffentliche Liga. `sel` ist die gerade gezeigte.
   const sel=seasons.find(s=>s.id===seasonId)
-  const isPro=(s:Season)=>/5|6|7|pro/i.test(s.skill_class)
   const myIndex=rows.findIndex(r=>r.user_id===userId)
   const myRow=myIndex>=0?rows[myIndex]:null
 
@@ -391,7 +412,12 @@ export default function LigaPage(){
           <span style={{fontSize:12.5,fontWeight:900,letterSpacing:".20em",color:W}}>PLAYER</span>
         </Link>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <button onClick={()=>setShowCity(v=>!v)} style={{background:CELL,color:SUB,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 10px",fontFamily:"inherit"}}>{city||"Stadt"} ▾</button>
+          {/* Umschalter nur, wenn es überhaupt etwas umzuschalten gibt — also
+              wenn der Spieler zusätzlich in einer privaten Firmen-Liga ist.
+              Die öffentliche Liga braucht keine Auswahl: es gibt nur eine. */}
+          {seasons.length>1&&(
+            <button onClick={()=>setShowCity(v=>!v)} style={{background:CELL,color:SUB,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 10px",fontFamily:"inherit"}}>{sel?.name||"Liga"} ▾</button>
+          )}
           <button onClick={()=>setChatOpen(true)} style={{position:"relative",display:"flex",alignItems:"center",gap:5,borderRadius:10,background:CELL,padding:"7px 10px",cursor:"pointer",fontFamily:"inherit"}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={SUB} strokeWidth="2"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
             <span style={{fontSize:12,fontWeight:700,color:SUB}}>Chat</span>
@@ -402,12 +428,14 @@ export default function LigaPage(){
         </div>
       </div>
 
-      {/* Stadt-Dropdown */}
+      {/* Liga-Umschalter: öffentliche Liga ↔ private Firmen-Ligen */}
       {showCity&&(
         <div onClick={()=>setShowCity(false)} style={{position:"fixed",inset:0,zIndex:20}}>
-          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:54,right:14,background:"#14171C",borderRadius:14,padding:6,minWidth:160}}>
-            {cities.map(ci=>(
-              <div key={ci} onClick={()=>{const proLvl=(parseInt(myLevel||"0")||0)>=4;const fs=seasons.find(s=>s.city===ci&&isPro(s)===proLvl)||seasons.find(s=>s.city===ci);setCity(ci);if(fs)setSeasonId(fs.id);setShowCity(false)}} style={{padding:"11px 12px",borderRadius:9,fontSize:14,fontWeight:ci===city?600:400,color:ci===city?GREEN:W,cursor:"pointer"}}>{ci}</div>
+          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:54,right:14,background:"#14171C",borderRadius:14,padding:6,minWidth:180}}>
+            {seasons.map(s=>(
+              <div key={s.id} onClick={()=>{setSeasonId(s.id);setCity(s.city);setShowCity(false)}} style={{padding:"11px 12px",borderRadius:9,fontSize:14,fontWeight:s.id===seasonId?600:400,color:s.id===seasonId?GREEN:W,cursor:"pointer"}}>
+                {s.name}{s.is_private?" · privat":""}
+              </div>
             ))}
           </div>
         </div>
@@ -508,16 +536,16 @@ export default function LigaPage(){
                 <div style={{fontSize:11,fontWeight:800,letterSpacing:".1em",textTransform:"uppercase",...gt}}>Neu hier?</div>
                 <div style={{fontSize:22,fontWeight:900,color:W,margin:"6px 0 16px"}}>So funktioniert die Liga</div>
                 {([
-                  ["1","Beitreten","Wähle Einstieg (Level 1–3) oder Pro (Level 4–7) — passend zu deinem Niveau."],
-                  ["2","Spielen & fordern","Fordere andere aus deiner Klasse — jedes Resultat zählt."],
-                  ["3","Aufsteigen","Gewinnst du, steigst du in der Rangliste und kletterst in deiner Klasse."],
+                  ["1","Du bist automatisch dabei","Eine Liga für alle — kein Beitreten, keine Klassen. Deine Stufe kommt aus deiner Elo."],
+                  ["2","Spielen & fordern","Fordere jeden — auch den Tabellenersten. Jedes bestätigte Resultat zählt."],
+                  ["3","Aufsteigen","Gewinnst du, steigst du. Filtere die Rangliste nach Stadt, Land oder Freunden."],
                 ] as [string,string,string][]).map(([n,t,d])=>(
                   <div key={n} style={{display:"flex",gap:13,alignItems:"flex-start",marginBottom:14}}>
                     <span style={{width:27,height:27,borderRadius:"50%",background:GRAD,color:"#06210F",fontSize:13,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{n}</span>
                     <div><div style={{fontSize:14.5,fontWeight:800,color:W}}>{t}</div><div style={{fontSize:12.5,color:MUT,marginTop:2,lineHeight:1.4}}>{d}</div></div>
                   </div>
                 ))}
-                <button onClick={join} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:6,background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":"Liga beitreten"}</button>
+                <button onClick={join} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:6,background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":"Los geht's"}</button>
               </div>
             </div>
           )}
@@ -754,6 +782,16 @@ export default function LigaPage(){
               <button onClick={()=>setFTarget(null)} style={{background:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
             </div>
 
+            {/* Zählt dieses Spiel? Steht VOR der Partie da — nicht erst danach.
+                Sonst wirkt ein nicht gewertetes Spiel wie ein Fehler der App. */}
+            {fWertung&&(
+              <div style={{marginTop:10,fontSize:12.5,fontWeight:600,color:fWertung.ranked?SUB:MUT,lineHeight:1.5}}>
+                {fWertung.ranked
+                  ? `Zählt für ELO & Rang · ${fWertung.bisher} von ${fWertung.limit} gewerteten Spielen gegen ${fTarget.name} in den letzten 12 Monaten`
+                  : `Freundschaftsspiel — ${fWertung.limit} gewertete Spiele gegen ${fTarget.name} in den letzten 12 Monaten erreicht. Das Ergebnis wird gespeichert, ändert aber ELO und Rang nicht.`}
+              </div>
+            )}
+
             <div style={{display:"flex",gap:8,margin:"16px 0 18px"}}>
               {(["challenge","result"] as const).map(t=>{
                 const on=fTab===t
@@ -880,7 +918,7 @@ export default function LigaPage(){
         <div onClick={()=>setChatOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.4)",zIndex:130,display:"flex",justifyContent:"flex-end"}}>
           <div onClick={e=>e.stopPropagation()} style={{background:BG,borderLeft:`1px solid ${B}`,height:"100%",width:"83%",maxWidth:380,display:"flex",flexDirection:"column",boxShadow:"-22px 0 50px rgba(0,0,0,.55)"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"15px 16px",borderBottom:`1px solid ${B}`}}>
-              <span style={{fontSize:15,fontWeight:600,color:W}}>Liga-Chat · {sel?isPro(sel)?"Pro":"Einstieg":""}</span>
+              <span style={{fontSize:15,fontWeight:600,color:W}}>Liga-Chat</span>
               <button onClick={()=>setChatOpen(false)} style={{background:"none",color:M,fontSize:18,cursor:"pointer"}}>✕</button>
             </div>
             <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:10}}>
