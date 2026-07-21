@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import PendingConfirmBanner from "@/app/components/PendingConfirmBanner"
-import { MAX_RANKED_PER_OPPONENT, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO, LIGEN, LEAGUE_CUT, ligaForRank, pairForSeason, type LigaKey } from "@/lib/rewards"
+import { MAX_RANKED_PER_OPPONENT, RANKED_WINDOW_MONTHS, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO, TIERS, tierForElo, tierRangeLabel, type TierKey } from "@/lib/rewards"
 import {
   BG, CARD, CELL, W, SUB, MUT, GREEN, LINE,
   gt, GRAD, card, ratingLabel,
@@ -39,7 +39,7 @@ export default function LigaPage(){
   const [busy,setBusy]=useState(false)
   const [toast,setToast]=useState("")
   const [showCity,setShowCity]=useState(false)
-  const [ligaTab,setLigaTab]=useState<LigaKey|null>(null)   // welche der vier Ligen wird gezeigt?
+  const [ligaTab,setLigaTab]=useState<TierKey|null>(null)   // welche der vier Ligen wird gezeigt?
   const [openMatches,setOpenMatches]=useState<Record<string,OpenMatch>>({})
   // chat
   const [chatOpen,setChatOpen]=useState(false)
@@ -289,7 +289,7 @@ export default function LigaPage(){
     const matchId=dm.ok?dj.id:dj.existing_id
     if(!matchId){ flash(dj.error||"Fehler beim Anlegen"); setBusy(false); return }
     // Limit gewerteter Spiele gegen denselben Gegner erreicht → zählt nicht mehr
-    if(dm.ok&&dj.limitReached&&!fFriendly) setFNoteRanked(`Ihr habt schon ${MAX_RANKED_PER_OPPONENT} gewertete Spiele diese Saison — dieses zählt nicht für ELO und Rang.`)
+    if(dm.ok&&dj.limitReached&&!fFriendly) setFNoteRanked(`Ihr habt schon ${MAX_RANKED_PER_OPPONENT} gewertete Spiele in den letzten 12 Monaten — dieses zählt nicht für ELO und Rang.`)
     // Genaue Sätze, wenn eingetragen. Sonst Platzhalter aus der Satzzahl —
     // fürs ELO gleichwertig, in der Historie steht dann aber 11:7.
     const sets=fDetail
@@ -350,23 +350,16 @@ export default function LigaPage(){
   const myRow=myIndex>=0?rows[myIndex]:null
 
   // Die Liga ist ein PLATZ in der Tabelle, kein Level-Etikett:
-  // Platz 1–24 = obere Liga (Challenger bzw. Elite), ab 25 = untere.
-  // rows ist bereits nach Punkten sortiert → Index + 1 ist der Platz.
-  const paar=pairForSeason(sel?.skill_class)
+  // Stufen kommen aus der ELO, NICHT mehr aus dem Tabellenplatz. Damit hat ein
+  // Spieler überall dieselbe Stufe — egal wie viele Leute gerade angezeigt
+  // werden oder wie gefiltert wird. Die Stufe ist ein Etikett, keine Liga.
   const meinRang=myIndex>=0?myIndex+1:0
-  const meineLiga=meinRang?ligaForRank(paar,meinRang):null
-  const aktiveLiga=ligaTab??meineLiga?.key??(paar==="pro"?"elite":"challenger")
-  const aktivDef=LIGEN.find(l=>l.key===aktiveLiga)!
-  // Zeilen dieser Liga: alle aus DIESER Tabelle, deren Platz in den Bereich fällt.
-  const ligaRows=aktivDef.pair===paar
-    ? rows.filter((_,i)=>ligaForRank(paar,i+1).key===aktiveLiga)
-    : []
-  const ersterPlatz=rows.findIndex((_,i)=>ligaForRank(paar,i+1).key===aktiveLiga)+1
-  const zaehlen=(k:LigaKey)=>{
-    const def=LIGEN.find(l=>l.key===k)!
-    if(def.pair!==paar) return 0
-    return rows.filter((_,i)=>ligaForRank(paar,i+1).key===k).length
-  }
+  const meineStufe=myRow?tierForElo(myRow.elo):null
+  const aktiveLiga=ligaTab??meineStufe?.key??"challenger"
+  // Der Platz bleibt die Position in der GESAMTEN Rangliste — die Stufe filtert
+  // nur, welche Zeilen man sieht. Eine Wertung, eine Platzierung.
+  const ligaRows=rows.map((r,i)=>({...r,platz:i+1})).filter(r=>tierForElo(r.elo).key===aktiveLiga)
+  const zaehlen=(k:TierKey)=>rows.filter(r=>tierForElo(r.elo).key===k).length
   // Gefordert wird innerhalb der Tabelle — also gegen jeden in dieser Saison.
   const imPaar=(_r:Row)=>true
 
@@ -434,7 +427,7 @@ export default function LigaPage(){
             <div style={{position:"absolute",left:20,right:20,bottom:13}}>
               <div style={{fontSize:34,fontWeight:900,lineHeight:.9,textTransform:"uppercase",letterSpacing:"-.02em",color:W}}>Liga</div>
               <div style={{fontSize:12,color:SUB,fontWeight:400,marginTop:5}}>
-                {meineLiga?.name||(paar==="pro"?"Pro":"Einstieg")}{city?` · ${city}`:""}{count?` · ${count} Spieler`:""}
+                {meineStufe?.name||"Ohne Stufe"}{city?` · ${city}`:""}{count?` · ${count} Spieler`:""}
               </div>
             </div>
           </div>
@@ -534,9 +527,9 @@ export default function LigaPage(){
             <div style={{...card,borderRadius:24,padding:"16px 12px"}}>
               {/* Aktiver Tab weiss, nicht grün — das Grün ist für die eine Zahl reserviert */}
               <div style={{display:"flex",gap:4,background:CELL,borderRadius:14,padding:4}}>
-                {LIGEN.map(l=>{
+                {TIERS.map(l=>{
                   const on=l.key===aktiveLiga
-                  const meins=meineLiga?.key===l.key
+                  const meins=meineStufe?.key===l.key
                   return(
                     <button key={l.key} onClick={()=>setLigaTab(l.key)}
                       style={{flex:1,position:"relative",borderRadius:11,padding:"9px 3px",background:on?W:"none",color:on?"#14171E":MUT,fontFamily:"inherit",fontSize:11.5,fontWeight:800,cursor:"pointer"}}>
@@ -547,21 +540,17 @@ export default function LigaPage(){
                 })}
               </div>
               <div style={{textAlign:"center",fontSize:10.5,color:MUT,margin:"9px 0 10px"}}>
-                {aktivDef.pair!==paar
-                  ? "Andere Tabelle — hier spielst du nicht"
-                  : <>Platz {aktivDef.oben?`1–${LEAGUE_CUT}`:`ab ${LEAGUE_CUT+1}`} · {zaehlen(aktiveLiga)} Spieler{meineLiga?.key===aktiveLiga?" · deine Liga":""}</>}
+                Rating {tierRangeLabel(aktiveLiga)} · {zaehlen(aktiveLiga)} Spieler{meineStufe?.key===aktiveLiga?" · deine Stufe":""}
               </div>
               <div>
                 {ligaRows.length===0&&(
                   <div style={{textAlign:"center",fontSize:12.5,color:MUT,padding:"26px 16px",lineHeight:1.6}}>
-                    {aktivDef.pair!==paar
-                      ? <>Diese Liga gehört zur anderen Tabelle.<br/>Du spielst in {paar==="pro"?"Advanced/Elite":"Rookie/Challenger"}.</>
-                      : <>Noch niemand hier.<br/>Diese Liga füllt sich ab {LEAGUE_CUT+1} Spielern.</>}
+                    Noch niemand auf dieser Stufe.
                   </div>
                 )}
                 {ligaRows.map((r,i)=>{
                   const me=r.user_id===userId
-                  const platz=ersterPlatz+i   // echter Tabellenplatz, nicht die Zeilennummer
+                  const platz=r.platz   // Position in der Gesamtrangliste
                   const initialen=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                   return(
                     <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:9,padding:"11px 6px",borderTop:i===0?"none":`1px solid ${LINE}`,...(me?{background:"rgba(255,255,255,.06)",borderRadius:12}:{})}}>

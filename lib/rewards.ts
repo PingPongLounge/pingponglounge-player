@@ -33,39 +33,57 @@ export const PP_REWARDS: Reward[] = [
 // also das Vierfache — derselbe Punkt hatte je nach Bildschirm einen anderen Preis.
 export const PP_CHF = 0.5
 
-// Wie oft darf ein Spiel gegen DENSELBEN Gegner pro Saison für ELO/Rang zählen?
-// Darüber hinaus kann weitergespielt und eingetragen werden — das Ergebnis
-// erscheint in Historie und Chat, zählt aber nicht mehr. Schützt die Rangliste
-// davor, dass jemand von einem Kumpel nach oben geschoben wird.
+// ─── GEGNER-LIMIT ────────────────────────────────────────────────────────────
+// Max. gewertete Spiele gegen DENSELBEN Gegner in einem ROLLIERENDEN Fenster
+// von 12 Monaten. Bewusst rollierend statt pro Kalenderjahr: sonst würde die
+// Regel am 1. Januar künstlich zurückspringen. Danach darf weitergespielt
+// werden — die Partie zählt aber nicht mehr für die ELO, bis die älteste
+// Begegnung aus dem Fenster fällt. Schützt die Rangliste davor, dass sich zwei
+// Spieler gegenseitig hochschaukeln.
 export const MAX_RANKED_PER_OPPONENT = 5
+export const RANKED_WINDOW_MONTHS = 12
 
-// Aktivitätspflicht statt Gegner-Zuteilung: Wer im Monat zu wenig spielt,
-// verliert Punkte. Keine Vorschriften, gegen WEN — nur, DASS gespielt wird.
-// Open Games sind das Gefäss dafür.
-export const MIN_MATCHES_PER_MONTH = 4   // gewertete Liga-Matches
+// ─── AKTIVITÄTSREGEL ─────────────────────────────────────────────────────────
+// Wer im Kalendermonat zu wenig gewertete Spiele hat, verliert Punkte. Keine
+// Vorschrift, gegen WEN — nur, DASS gespielt wird. Der Kalendermonat bleibt der
+// Zeitraum (verständlich und passend zu monatlichen Standortturnieren).
+export const MIN_MATCHES_PER_MONTH = 5   // gewertete Spiele pro Kalendermonat
 export const MONTHLY_PENALTY_ELO = 20    // Abzug, wenn nicht erreicht
+// Erster Monat, der bewertet wird — davor wird NICHT rückwirkend bestraft.
+export const ACTIVITY_RULE_START = "2026-08"   // Format YYYY-MM
 
-// Die vier Ligen. Gespielt wird paarweise (Rookie+Challenger in einer Tabelle,
-// Advanced+Elite in der anderen) — die Liga selbst ist aber echt und hat ihre
-// eigene Rangliste. Wer im Level aufsteigt, wechselt die Liga.
-// Die Liga ist ein PLATZ, kein Etikett. Zwei Tabellen — Einstieg (Level 1–3) und
-// Pro (Level 4–7). Innerhalb einer Tabelle gilt: Platz 1–24 ist die obere Liga,
-// ab Platz 25 die untere. Wer über die Linie klettert, steigt auf; wer darunter
-// fällt, ab. Kein Saisonende nötig, keine Zuteilung von Hand.
-//
-// Solange eine Tabelle weniger als 24 Spieler hat, stehen alle in der oberen
-// Liga — das ist gewollt: die untere füllt sich, sobald genug Leute da sind.
-export const LEAGUE_CUT = 24
-
-export const LIGEN = [
-  { key: "rookie",     name: "Rookie",     pair: "einstieg", oben: false },
-  { key: "challenger", name: "Challenger", pair: "einstieg", oben: true  },
-  { key: "advanced",   name: "Advanced",   pair: "pro",      oben: false },
-  { key: "elite",      name: "Elite",      pair: "pro",      oben: true  },
+// ─── LEVEL: Rookie / Challenger / Advanced / Elite ───────────────────────────
+// Rein visuelle, motivierende Stufen — automatisch aus der ELO abgeleitet.
+// KEINE eigene Liga, KEINE eigene Wertung, KEINE Tabellenplätze mehr:
+// Früher hing die Stufe am Platz (1–24 vs. ab 25). Das wurde unlogisch, sobald
+// die Spielerzahl schwankt oder regional gefiltert wird — derselbe Spieler wäre
+// in Zürich "Elite" und in Europa "Advanced" gewesen.
+// Jetzt feste ELO-Bereiche: ein Spieler hat ÜBERALL dieselbe Stufe, egal ob er
+// Europa, Land, Region, Stadt oder Freunde filtert.
+// Die Grenzen stehen NUR hier (konfigurierbar) — nicht im Frontend verstreut.
+export const TIERS = [
+  { key: "rookie",     name: "Rookie",     minElo: 0    },
+  { key: "challenger", name: "Challenger", minElo: 1150 },
+  { key: "advanced",   name: "Advanced",   minElo: 1350 },
+  { key: "elite",      name: "Elite",      minElo: 1600 },
 ] as const
 
-export type LigaKey = (typeof LIGEN)[number]["key"]
-export type LigaPair = "einstieg" | "pro"
+export type TierKey = (typeof TIERS)[number]["key"]
+export type Tier = (typeof TIERS)[number]
+
+/** Die Stufe zu einer ELO. Immer eindeutig, überall gleich. */
+export function tierForElo(elo: number): Tier {
+  let treffer: Tier = TIERS[0]
+  for (const t of TIERS) if (elo >= t.minElo) treffer = t
+  return treffer
+}
+
+/** ELO-Spanne einer Stufe als Text, z.B. "1150–1349" / "ab 1600". */
+export function tierRangeLabel(key: TierKey): string {
+  const i = TIERS.findIndex(t => t.key === key)
+  const t = TIERS[i], next = TIERS[i + 1]
+  return next ? `${t.minElo}–${next.minElo - 1}` : `ab ${t.minElo}`
+}
 
 // Rating im Playtomic-Stil (0–7 mit einer Nachkommastelle). Hier in rewards.ts,
 // weil auch der Server (Mails) es braucht — theme.ts zieht React-Styles mit rein.
@@ -90,23 +108,9 @@ export function ratingLabel(elo: number): string {
   return eloToRating(elo).toFixed(1)
 }
 
-/** Welche Tabelle? Level 1–3 → Einstieg, 4–7 → Pro. */
-export function pairForLevel(level: string | number | null | undefined): LigaPair | null {
-  const l = typeof level === "string" ? parseInt(level) : level
-  if (!l || l < 1 || l > 7) return null
-  return l >= 4 ? "pro" : "einstieg"
-}
-
-/** Welche Tabelle gehört zu dieser Saison? ("1-3" / "4-7") */
-export function pairForSeason(skillClass: string | null | undefined): LigaPair {
-  return /5|6|7|pro/i.test(skillClass || "") ? "pro" : "einstieg"
-}
-
-/** Aus Tabelle + Platz wird die Liga. Platz 1 ist der beste. */
-export function ligaForRank(pair: LigaPair, rank: number) {
-  const oben = rank <= LEAGUE_CUT
-  return LIGEN.find(l => l.pair === pair && l.oben === oben)!
-}
+// pairForLevel / pairForSeason / ligaForRank sind entfallen: Es gibt keine
+// getrennten Tabellen (Einstieg/Pro) und keine Platz-Grenze mehr. Die Stufe
+// kommt aus tierForElo(), die Rangposition aus der jeweils gefilterten Ansicht.
 
 // Fertige Sprüche nach dem Bestätigen — Kommentieren muss ein Tipp sein,
 // kein Aufsatz. Freitext geht trotzdem.

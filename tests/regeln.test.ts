@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest"
 import { berechneElo, eloPreview, K, ELO_FLOOR } from "@/lib/elo"
 import {
-  LIGEN, LEAGUE_CUT, ligaForRank, pairForLevel, pairForSeason,
+  TIERS, tierForElo, RANKED_WINDOW_MONTHS,
   MAX_RANKED_PER_OPPONENT, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO,
   PP_CONFIG, PP_REWARDS, PP_CHF, ratingLabel, eloToRating,
 } from "@/lib/rewards"
@@ -45,44 +45,41 @@ describe("ELO", () => {
   })
 })
 
-describe("Die vier Ligen", () => {
-  it("Platz 1 bis 24 ist die obere Liga, ab 25 die untere", () => {
-    expect(ligaForRank("pro", 1).key).toBe("elite")
-    expect(ligaForRank("pro", LEAGUE_CUT).key).toBe("elite")
-    expect(ligaForRank("pro", LEAGUE_CUT + 1).key).toBe("advanced")
-    expect(ligaForRank("einstieg", 1).key).toBe("challenger")
-    expect(ligaForRank("einstieg", LEAGUE_CUT + 1).key).toBe("rookie")
+describe("Stufen (Rookie/Challenger/Advanced/Elite)", () => {
+  it("kommen aus der ELO, nicht aus dem Tabellenplatz", () => {
+    expect(tierForElo(900).key).toBe("rookie")
+    expect(tierForElo(1149).key).toBe("rookie")
+    expect(tierForElo(1150).key).toBe("challenger")
+    expect(tierForElo(1349).key).toBe("challenger")
+    expect(tierForElo(1350).key).toBe("advanced")
+    expect(tierForElo(1599).key).toBe("advanced")
+    expect(tierForElo(1600).key).toBe("elite")
+    expect(tierForElo(9999).key).toBe("elite")
   })
 
-  it("jede Liga gehört zu genau einer Tabelle", () => {
-    expect(LIGEN.filter(l => l.pair === "pro")).toHaveLength(2)
-    expect(LIGEN.filter(l => l.pair === "einstieg")).toHaveLength(2)
+  it("sind lückenlos und überschneidungsfrei aufsteigend", () => {
+    for (let i = 1; i < TIERS.length; i++) {
+      expect(TIERS[i].minElo).toBeGreaterThan(TIERS[i - 1].minElo)
+    }
   })
 
-  it("Level 1–3 spielen Einstieg, Level 4–7 Pro", () => {
-    expect(pairForLevel(1)).toBe("einstieg")
-    expect(pairForLevel(3)).toBe("einstieg")
-    expect(pairForLevel(4)).toBe("pro")
-    expect(pairForLevel(7)).toBe("pro")
-    expect(pairForLevel(null)).toBeNull()
-    expect(pairForLevel(9)).toBeNull()      // ausserhalb 1–7 → keine Tabelle
-  })
-
-  it("die Saison-Klasse führt in dieselbe Tabelle wie das Level", () => {
-    // Sonst sitzt ein Spieler in der Pro-Saison, gehört aber ins Einstieg-Paar
-    // und kann niemanden fordern. Genau das war mal der Fall.
-    expect(pairForSeason("4-7")).toBe(pairForLevel(5))
-    expect(pairForSeason("1-3")).toBe(pairForLevel(2))
+  it("derselbe Spieler hat überall dieselbe Stufe — egal wie gefiltert wird", () => {
+    // Das war der Grund für die Umstellung: früher hing die Stufe am Platz,
+    // also war derselbe Spieler in Zürich "Elite" und in Europa "Advanced".
+    const elo = 1400
+    expect(tierForElo(elo).key).toBe(tierForElo(elo).key)
+    expect(tierForElo(elo).key).toBe("advanced")
   })
 })
 
 describe("Limits und Fristen", () => {
-  it("höchstens 5 gewertete Spiele gegen denselben Gegner", () => {
+  it("höchstens 5 gewertete Spiele gegen denselben Gegner — rollierend 12 Monate", () => {
     expect(MAX_RANKED_PER_OPPONENT).toBe(5)
+    expect(RANKED_WINDOW_MONTHS).toBe(12)
   })
 
-  it("4 Liga-Matches im Monat, sonst 20 Punkte Abzug", () => {
-    expect(MIN_MATCHES_PER_MONTH).toBe(4)
+  it("5 gewertete Spiele im Monat, sonst 20 Punkte Abzug", () => {
+    expect(MIN_MATCHES_PER_MONTH).toBe(5)
     expect(MONTHLY_PENALTY_ELO).toBe(20)
   })
 
