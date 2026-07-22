@@ -31,8 +31,35 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Ungültige Signatur" }, { status: 400 })
   }
 
+  // TURNIER: Reservierung läuft ab, ohne dass bezahlt wurde → Platz freigeben,
+  // damit er nicht dauerhaft blockiert bleibt.
+  if (event.type === "checkout.session.expired") {
+    const s = event.data.object as Stripe.Checkout.Session
+    if (s.metadata?.type === "tournament" && s.metadata.registration_id) {
+      const admin = createAdminClient()
+      // Nur freigeben, wenn noch nicht bezahlt (Race mit completed vermeiden).
+      const { data: reg } = await admin.from("tournament_registrations")
+        .select("payment_status").eq("id", s.metadata.registration_id).maybeSingle()
+      if (reg && !["paid", "free"].includes(reg.payment_status)) {
+        await admin.from("tournament_registrations")
+          .update({ payment_status: "none", reserved_until: null, stripe_session_id: null })
+          .eq("id", s.metadata.registration_id)
+      }
+    }
+    return NextResponse.json({ received: true })
+  }
+
   if (event.type === "checkout.session.completed") {
     const s = event.data.object as Stripe.Checkout.Session
+
+    // TURNIER: Zahlung eingegangen → Platz endgültig bestätigt.
+    if (s.payment_status === "paid" && s.metadata?.type === "tournament" && s.metadata.registration_id) {
+      const admin = createAdminClient()
+      await admin.from("tournament_registrations")
+        .update({ payment_status: "paid", reserved_until: null })
+        .eq("id", s.metadata.registration_id)
+      return NextResponse.json({ received: true })
+    }
 
     // OPEN GAME: Der Platz wird ERST HIER vergeben — nach tatsächlich erfolgter
     // Zahlung. Wer die Kasse abbricht, hat nie einen Platz belegt.

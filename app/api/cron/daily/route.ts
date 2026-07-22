@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { autoConfirmOverdue, remindStuckOnboarding, expireOldChallenges } from "@/lib/cron-tasks"
 import { ensureOpenGames } from "@/lib/opengames"
+import { releaseStaleReservations } from "@/lib/tournaments"
 import { applyMonthlyPenalties, warnMonthlyOpen } from "@/lib/monthly"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -36,12 +37,17 @@ async function run(req: NextRequest) {
   try { warned = await warnMonthlyOpen(admin) }
   catch (e) { console.error("Monats-Warnungen fehlgeschlagen:", e) }
 
+  // Abgelaufene Turnier-Reservierungen aufräumen (Hygiene).
+  let freigegeben = 0
+  try { freigegeben = await releaseStaleReservations(admin) }
+  catch (e) { console.error("Turnier-Reservierungen freigeben fehlgeschlagen:", e) }
+
   // Der alte Inaktivitäts-Abzug (/api/liga/inactivity) ist ABGESCHALTET. Er zog
   // ebenfalls −20 ELO und lief zusammen mit der Monatspflicht — ein durchgehend
   // inaktiver Spieler hätte pro Monat bis zu 40 verloren. Die Monatspflicht
   // (4 Matches/Monat) ist der Nachfolger; ein Abzug reicht.
 
-  return NextResponse.json({ ok: true, confirmed, reminded, expired, angelegt, penalties, warned })
+  return NextResponse.json({ ok: true, confirmed, reminded, expired, angelegt, penalties, warned, freigegeben })
 }
 
 export const GET = run

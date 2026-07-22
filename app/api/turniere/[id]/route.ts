@@ -1,4 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
+import { belegung, anzeigeStatus } from "@/lib/tournaments"
+import { getRechte, darfStandort } from "@/lib/roles"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -12,6 +15,17 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     .eq("id", id)
     .single()
   if (!t) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 })
+
+  // Belegung/Status für die Anzeige auf beiden Plattformen — eine Quelle.
+  const admin = createAdminClient()
+  const b = await belegung(admin, id, t.max_players)
+  const anzeige = anzeigeStatus(t, b)
+  // Darf der eingeloggte Nutzer dieses Turnier verwalten?
+  let canManage = false
+  if (user) {
+    const rechte = await getRechte(admin, user.id, user.email)
+    canManage = darfStandort(rechte, t.location_id)
+  }
 
   const { data: regsRaw } = await sb
     .from("tournament_registrations")
@@ -57,5 +71,5 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     (m.p1_id === user.id || m.p2_id === user.id) && m.status === "p1_entered"
   ) : null
 
-  return NextResponse.json({ tournament: t, registrations, matches, isRegistered, myMatch, userId: user?.id })
+  return NextResponse.json({ tournament: t, registrations, matches, isRegistered, myMatch, userId: user?.id, capacity: b, displayStatus: anzeige, canManage })
 }
