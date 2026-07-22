@@ -16,6 +16,8 @@ const HERO="#14171E"
 
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number,is_global?:boolean,is_private?:boolean}
 type Row={user_id:string,name:string,elo:number,level:string,real?:string|null,avatar?:string|null}
+// Zeile aus /api/rangliste (gefiltert): trägt Rang + Geo/Stil mit.
+type RankRow={user_id:string,name:string,elo:number,level:string,avatar?:string|null,tier:string,rank_global:number,rank_filtered:number,city?:string|null,canton?:string|null}
 type OpenMatch={id:string,status:string,iAmP1:boolean,enteredBy:string|null}
 type PlayerInfo={
   player:{id:string,name:string,real_short?:string|null,level:string,elo:number,matches_played:number,matches_won:number,lost:number,winRate:number|null,canton?:string|null},
@@ -39,8 +41,14 @@ export default function LigaPage(){
   const [busy,setBusy]=useState(false)
   const [toast,setToast]=useState("")
   const [showCity,setShowCity]=useState(false)
-  const [ligaTab,setLigaTab]=useState<TierKey|null>(null)   // welche der vier Ligen wird gezeigt?
+  const [ligaTab,setLigaTab]=useState<TierKey|null>(null)   // welche Stufe ist im Tab angesteuert (Sprung, nicht Filter)
   const [openMatches,setOpenMatches]=useState<Record<string,OpenMatch>>({})
+  // ─── FILTER (das Herzstück) ───────────────────────────────────────────────
+  // scope: Reichweite · plus Freunde / Kategorie / Spielstil. Alle kombinierbar.
+  const [filter,setFilter]=useState<{scope:string,canton:string,city:string,friends:boolean,category:string,hand:string,pips:string,anti:boolean}>({scope:"world",canton:"",city:"",friends:false,category:"",hand:"",pips:"",anti:false})
+  const [filterOpen,setFilterOpen]=useState(false)
+  const [apiRows,setApiRows]=useState<RankRow[]|null>(null)   // null = kein Filter aktiv → lokale rows
+  const tierRefs=useRef<Record<string,HTMLDivElement|null>>({})
   // chat
   const [chatOpen,setChatOpen]=useState(false)
   const [msgs,setMsgs]=useState<Msg[]>([])
@@ -263,7 +271,7 @@ export default function LigaPage(){
     else flash(j.error||"Fehler")
   }
   function today(){ const d=new Date(); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}` }
-  function openForder(r:Row,tab:"challenge"|"result"="challenge"){ setFTarget({id:r.user_id,name:r.name}); setFTab(tab); setFDate(""); setFTime(""); setFMy(0); setFOpp(0); setFRDate(today()); setFDone([]); setFFriendly(false); setFNoteRanked(null); setFDetail(false); setFSets([{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""}]) }
+  function openForder(r:{user_id:string,name:string},tab:"challenge"|"result"="challenge"){ setFTarget({id:r.user_id,name:r.name}); setFTab(tab); setFDate(""); setFTime(""); setFMy(0); setFOpp(0); setFRDate(today()); setFDone([]); setFFriendly(false); setFNoteRanked(null); setFDetail(false); setFSets([{p1:"",p2:""},{p1:"",p2:""},{p1:"",p2:""}]) }
 
   // Genaue Sätze → gewonnene Sätze je Seite. Leere Zeilen zählen nicht.
   function satzBilanz(){
@@ -376,11 +384,60 @@ export default function LigaPage(){
   // werden oder wie gefiltert wird. Die Stufe ist ein Etikett, keine Liga.
   const meinRang=myIndex>=0?myIndex+1:0
   const meineStufe=myRow?tierForElo(myRow.elo):null
-  const aktiveLiga=ligaTab??meineStufe?.key??"challenger"
-  // Der Platz bleibt die Position in der GESAMTEN Rangliste — die Stufe filtert
-  // nur, welche Zeilen man sieht. Eine Wertung, eine Platzierung.
-  const ligaRows=rows.map((r,i)=>({...r,platz:i+1})).filter(r=>tierForElo(r.elo).key===aktiveLiga)
-  const zaehlen=(k:TierKey)=>rows.filter(r=>tierForElo(r.elo).key===k).length
+
+  // Ist irgendein Filter aktiv? (world ohne Zusätze = kein Filter)
+  const filterAktiv=filter.scope!=="world"||filter.friends||!!filter.category||!!filter.hand||!!filter.pips||filter.anti
+  // Filter serverseitig auswerten (Rang gilt innerhalb der Auswahl).
+  useEffect(()=>{
+    if(!filterAktiv){setApiRows(null);return}
+    const q=new URLSearchParams()
+    q.set("scope",filter.scope)
+    if(filter.scope==="country") q.set("country","CH")
+    if(filter.scope==="canton"&&filter.canton) q.set("canton",filter.canton)
+    if(filter.scope==="city"&&filter.city) q.set("city",filter.city)
+    if(filter.friends) q.set("friends","1")
+    if(filter.category) q.set("category",filter.category)
+    if(filter.hand) q.set("hand",filter.hand)
+    if(filter.pips) q.set("pips",filter.pips)
+    if(filter.anti) q.set("anti","1")
+    let weg=false
+    ;(async()=>{ try{ const r=await fetch(`/api/rangliste?${q}`); if(r.ok&&!weg){const j=await r.json(); setApiRows(j.players||[])} }catch{ /* Anzeige optional */ } })()
+    return()=>{weg=true}
+  },[filterAktiv,filter])
+
+  // Anzeigezeilen normalisieren: entweder gefilterte API-Daten oder lokale rows.
+  type Disp={user_id:string,name:string,elo:number,avatar?:string|null,platz:number}
+  const displayRows:Disp[]=filterAktiv&&apiRows
+    ? apiRows.map(r=>({user_id:r.user_id,name:r.name,elo:r.elo,avatar:r.avatar,platz:r.rank_filtered}))
+    : rows.map((r,i)=>({user_id:r.user_id,name:r.name,elo:r.elo,avatar:r.avatar,platz:i+1}))
+
+  // Nach Stufe in Bänder gruppieren, stärkste zuerst (Elite → Rookie).
+  const bands=[...TIERS].reverse().map(t=>({
+    tier:t,
+    rows:displayRows.filter(r=>tierForElo(r.elo).key===t.key),
+  })).filter(b=>b.rows.length>0)
+
+  // Zusammenfassung der aktiven Filter für die Leiste.
+  const filterLabel=(()=>{
+    const teile:string[]=[]
+    if(filter.scope==="europe") teile.push("Europa")
+    else if(filter.scope==="country") teile.push("Schweiz")
+    else if(filter.scope==="canton") teile.push(filter.canton?`Kanton ${filter.canton}`:"Kanton")
+    else if(filter.scope==="city") teile.push(filter.city||"Stadt")
+    else teile.push("Weltweit")
+    if(filter.friends) teile.push("Freunde")
+    if(filter.category==="parkinson") teile.push("Parkinson")
+    if(filter.hand) teile.push(filter.hand==="left"?"Links":"Rechts")
+    if(filter.pips==="short") teile.push("Kurze Noppen")
+    if(filter.pips==="long") teile.push("Lange Noppen")
+    if(filter.anti) teile.push("Anti")
+    return teile.join(" · ")
+  })()
+
+  function springZu(key:string){
+    setLigaTab(key as TierKey)
+    tierRefs.current[key]?.scrollIntoView({behavior:"smooth",block:"start"})
+  }
   // Gefordert wird innerhalb der Tabelle — also gegen jeden in dieser Saison.
   const imPaar=(_r:Row)=>true
 
@@ -553,17 +610,28 @@ export default function LigaPage(){
             </div>
           )}
 
-          {/* Rangliste — mit den vier Ligen als Tabs darüber */}
+          {/* Rangliste — EINE Liste, alle sichtbar, in Klassen-Bänder unterteilt.
+              Die Tabs oben FILTERN NICHT, sie SPRINGEN zum Band. Darüber die
+              Filterleiste (Geo · Freunde · Kategorie · Stil) — das Herzstück. */}
           <div style={{padding:"14px 14px 0"}}>
             <div style={{...card,borderRadius:24,padding:"16px 12px"}}>
-              {/* Aktiver Tab weiss, nicht grün — das Grün ist für die eine Zahl reserviert */}
+              {/* Filter-Knopf + aktive Zusammenfassung */}
+              <button onClick={()=>setFilterOpen(true)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",background:CELL,borderRadius:12,padding:"11px 13px",cursor:"pointer",fontFamily:"inherit",marginBottom:10}}>
+                <span style={{display:"flex",alignItems:"center",gap:8,minWidth:0}}>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={filterAktiv?GREEN:SUB} strokeWidth="2"><path d="M4 5h16M7 12h10M10 19h4"/></svg>
+                  <span style={{fontSize:13,fontWeight:700,color:filterAktiv?W:SUB,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{filterAktiv?filterLabel:"Rangliste filtern"}</span>
+                </span>
+                <span style={{fontSize:11,color:MUT,flexShrink:0}}>{filterAktiv?"ändern":"▾"}</span>
+              </button>
+              {/* Sprung-Tabs: tippen scrollt zum Band, blendet nichts aus */}
               <div style={{display:"flex",gap:4,background:CELL,borderRadius:14,padding:4}}>
                 {TIERS.map(l=>{
-                  const on=l.key===aktiveLiga
+                  const on=l.key===ligaTab
                   const meins=meineStufe?.key===l.key
+                  const leer=!bands.some(b=>b.tier.key===l.key)
                   return(
-                    <button key={l.key} onClick={()=>setLigaTab(l.key)}
-                      style={{flex:1,position:"relative",borderRadius:11,padding:"9px 3px",background:on?W:"none",color:on?"#14171E":MUT,fontFamily:"inherit",fontSize:11.5,fontWeight:800,cursor:"pointer"}}>
+                    <button key={l.key} onClick={()=>!leer&&springZu(l.key)} disabled={leer}
+                      style={{flex:1,position:"relative",borderRadius:11,padding:"9px 3px",background:on?W:"none",color:leer?MUT:on?"#14171E":SUB,opacity:leer?.4:1,fontFamily:"inherit",fontSize:11.5,fontWeight:800,cursor:leer?"default":"pointer"}}>
                       {l.name}
                       {meins&&<span style={{position:"absolute",top:5,right:6,width:5,height:5,borderRadius:"50%",background:on?"#14171E":GREEN}}/>}
                     </button>
@@ -571,17 +639,25 @@ export default function LigaPage(){
                 })}
               </div>
               <div style={{textAlign:"center",fontSize:10.5,color:MUT,margin:"9px 0 10px"}}>
-                Rating {tierRangeLabel(aktiveLiga)} · {zaehlen(aktiveLiga)} Spieler{meineStufe?.key===aktiveLiga?" · deine Stufe":""}
+                Tippen springt zur Klasse{filterAktiv?" · Rang gilt im Filter":""}
               </div>
               <div>
-                {ligaRows.length===0&&(
+                {bands.length===0&&(
                   <div style={{textAlign:"center",fontSize:12.5,color:MUT,padding:"26px 16px",lineHeight:1.6}}>
-                    Noch niemand auf dieser Stufe.
+                    {filterAktiv?"Niemand passt zu diesem Filter.":"Noch niemand in der Rangliste."}
                   </div>
                 )}
-                {ligaRows.map((r,i)=>{
+                {bands.map(b=>(
+                <div key={b.tier.key} ref={el=>{tierRefs.current[b.tier.key]=el}}>
+                  {/* Klassen-Kopf */}
+                  <div style={{display:"flex",alignItems:"center",gap:7,margin:"12px 2px 4px"}}>
+                    <span style={{fontSize:10.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:b.tier.key===meineStufe?.key?GREEN:SUB}}>{b.tier.name}</span>
+                    <span style={{fontSize:10.5,color:MUT}}>{tierRangeLabel(b.tier.key)} · {b.rows.length}{b.tier.key===meineStufe?.key?" · deine Stufe":""}</span>
+                    <div style={{flex:1,height:1,background:b.tier.key===meineStufe?.key?"linear-gradient(90deg,rgba(57,255,20,.4),transparent)":LINE}}/>
+                  </div>
+                  {b.rows.map((r,i)=>{
                   const me=r.user_id===userId
-                  const platz=r.platz   // Position in der Gesamtrangliste
+                  const platz=r.platz   // Position in der (ggf. gefilterten) Rangliste
                   const initialen=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                   return(
                     <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:9,padding:"11px 6px",borderTop:i===0?"none":`1px solid ${LINE}`,...(me?{background:"rgba(255,255,255,.06)",borderRadius:12}:{})}}>
@@ -632,7 +708,9 @@ export default function LigaPage(){
                       })()}
                     </div>
                   )
-                })}
+                  })}
+                </div>
+                ))}
               </div>
             </div>
           </div>
@@ -777,6 +855,69 @@ export default function LigaPage(){
       )}
 
       {/* Fordern-Popup */}
+      {/* ─── FILTER-SHEET ─────────────────────────────────────────────────── */}
+      {filterOpen&&(
+        <div onClick={()=>setFilterOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:480,background:CARD,borderTopLeftRadius:24,borderTopRightRadius:24,padding:"20px 18px 28px",maxHeight:"88vh",overflowY:"auto"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
+              <div style={{fontSize:19,fontWeight:900,color:W}}>Rangliste filtern</div>
+              <button onClick={()=>setFilter({scope:"world",canton:"",city:"",friends:false,category:"",hand:"",pips:"",anti:false})} style={{background:"none",color:GREEN,fontSize:12.5,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Zurücksetzen</button>
+            </div>
+
+            {/* Reichweite */}
+            <div style={{fontSize:10.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"4px 2px 8px"}}>Reichweite</div>
+            <div style={{display:"flex",flexWrap:"wrap",gap:7,marginBottom:6}}>
+              {[["world","Weltweit"],["europe","Europa"],["country","Schweiz"],["canton","Kanton"],["city","Stadt"]].map(([k,l])=>(
+                <button key={k} onClick={()=>setFilter(f=>({...f,scope:k}))} style={{fontSize:12.5,fontWeight:700,padding:"8px 13px",borderRadius:999,cursor:"pointer",fontFamily:"inherit",...(filter.scope===k?{background:GRAD,color:"#06210F"}:{background:CELL,color:SUB})}}>{l}</button>
+              ))}
+            </div>
+            {filter.scope==="canton"&&(
+              <select value={filter.canton} onChange={e=>setFilter(f=>({...f,canton:e.target.value}))} style={{width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",color:W,fontSize:14,fontFamily:"inherit",marginTop:6}}>
+                <option value="">Alle Kantone</option>
+                {["ZH","SG","BS","LU","BE","AG"].map(c=><option key={c} value={c}>{c}</option>)}
+              </select>
+            )}
+            {filter.scope==="city"&&(
+              <select value={filter.city} onChange={e=>setFilter(f=>({...f,city:e.target.value}))} style={{width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",color:W,fontSize:14,fontFamily:"inherit",marginTop:6}}>
+                <option value="">Alle Städte</option>
+                {["Glattbrugg","Zürich","St. Gallen","Basel","Luzern"].map(c=><option key={c} value={c}>{c}</option>)}
+              </select>
+            )}
+
+            {/* Freunde + Kategorie */}
+            <div style={{fontSize:10.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"16px 2px 8px"}}>Gruppen</div>
+            <button onClick={()=>setFilter(f=>({...f,friends:!f.friends}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit",marginBottom:8}}>
+              <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.friends?{background:GRAD,color:"#06210F"}:{background:"#20242C",color:"transparent"})}}>✓</span>
+              <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Nur Freunde</span>
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={SUB} strokeWidth="2"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M17 8v5M14.5 10.5h5"/></svg>
+            </button>
+            <button onClick={()=>setFilter(f=>({...f,category:f.category==="parkinson"?"":"parkinson"}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit"}}>
+              <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.category==="parkinson"?{background:GRAD,color:"#06210F"}:{background:"#20242C",color:"transparent"})}}>✓</span>
+              <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Parkinson-Liga</span>
+            </button>
+
+            {/* Spielstil */}
+            <div style={{fontSize:10.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"16px 2px 8px"}}>Spielstil</div>
+            <div style={{display:"flex",gap:7,marginBottom:8}}>
+              {[["","Egal"],["left","Links"],["right","Rechts"]].map(([k,l])=>(
+                <button key={k} onClick={()=>setFilter(f=>({...f,hand:k}))} style={{flex:1,fontSize:12.5,fontWeight:700,padding:"9px 4px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",...(filter.hand===k?{background:W,color:"#14171E"}:{background:CELL,color:SUB})}}>{l}</button>
+              ))}
+            </div>
+            <div style={{display:"flex",gap:7,marginBottom:8}}>
+              {[["","Alle Beläge"],["none","Ohne Noppen"],["short","Kurze Noppen"],["long","Lange Noppen"]].map(([k,l])=>(
+                <button key={k} onClick={()=>setFilter(f=>({...f,pips:k}))} style={{flex:1,fontSize:11,fontWeight:700,padding:"9px 3px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",...(filter.pips===k?{background:W,color:"#14171E"}:{background:CELL,color:SUB})}}>{l}</button>
+              ))}
+            </div>
+            <button onClick={()=>setFilter(f=>({...f,anti:!f.anti}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit"}}>
+              <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.anti?{background:GRAD,color:"#06210F"}:{background:"#20242C",color:"transparent"})}}>✓</span>
+              <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Nur Anti-Spieler</span>
+            </button>
+
+            <button onClick={()=>setFilterOpen(false)} style={{width:"100%",background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",marginTop:18}}>Anzeigen</button>
+          </div>
+        </div>
+      )}
+
       {fTarget&&(
         <div onClick={()=>setFTarget(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
           <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
