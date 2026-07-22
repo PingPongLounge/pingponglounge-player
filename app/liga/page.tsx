@@ -453,9 +453,12 @@ export default function LigaPage(){
             <img src="/liga-hero.jpg" alt="" style={{width:"100%",height:132,objectFit:"cover",display:"block"}}/>
             <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(20,23,30,.1) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.92) 100%)"}}/>
             <div style={{position:"absolute",left:20,right:20,bottom:13}}>
-              <div style={{fontSize:34,fontWeight:900,lineHeight:.9,textTransform:"uppercase",letterSpacing:"-.02em",color:W}}>Liga</div>
+              <div style={{fontSize:34,fontWeight:900,lineHeight:.9,textTransform:"uppercase",letterSpacing:"-.02em",color:W}}>{sel?.is_private?sel.name:"Rangliste"}</div>
+              {/* Öffentliche Liga = "Rangliste" (eine Liga, eine Rangliste — kein
+                  Stadt-Zusatz mehr, "Weltweit" war verwirrend). Private Firmen-Liga
+                  zeigt ihren eigenen Namen. Stufe + Spielerzahl als Untertitel. */}
               <div style={{fontSize:12,color:SUB,fontWeight:400,marginTop:5}}>
-                {meineStufe?.name||"Ohne Stufe"}{city?` · ${city}`:""}{count?` · ${count} Spieler`:""}
+                {meineStufe?.name||"Ohne Stufe"}{count?` · ${count} Spieler`:""}
               </div>
             </div>
           </div>
