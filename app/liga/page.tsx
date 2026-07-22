@@ -864,11 +864,12 @@ export default function LigaPage(){
               <button onClick={()=>setFilter({scope:"world",canton:"",city:"",friends:false,category:"",hand:"",pips:"",anti:false})} style={{background:"none",color:GREEN,fontSize:12.5,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Zurücksetzen</button>
             </div>
 
-            {/* Reichweite */}
+            {/* Reichweite — Land / Kanton / Stadt. "Weltweit" bewusst weggelassen
+                (kommt später, wenn gebraucht). Nochmal Tippen schaltet wieder ab. */}
             <div style={{fontSize:10.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"4px 2px 8px"}}>Reichweite</div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:7,marginBottom:6}}>
-              {[["world","Weltweit"],["europe","Europa"],["country","Schweiz"],["canton","Kanton"],["city","Stadt"]].map(([k,l])=>(
-                <button key={k} onClick={()=>setFilter(f=>({...f,scope:k}))} style={{fontSize:12.5,fontWeight:700,padding:"8px 13px",borderRadius:999,cursor:"pointer",fontFamily:"inherit",...(filter.scope===k?{background:GRAD,color:"#06210F"}:{background:CELL,color:SUB})}}>{l}</button>
+            <div style={{display:"flex",gap:7,marginBottom:6}}>
+              {[["country","Land"],["canton","Kanton"],["city","Stadt"]].map(([k,l])=>(
+                <button key={k} onClick={()=>setFilter(f=>({...f,scope:f.scope===k?"world":k}))} style={{flex:1,fontSize:12.5,fontWeight:700,padding:"9px 4px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",...(filter.scope===k?{background:GRAD,color:"#06210F"}:{background:CELL,color:SUB})}}>{l}</button>
               ))}
             </div>
             {filter.scope==="canton"&&(
@@ -896,22 +897,28 @@ export default function LigaPage(){
               <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Parkinson-Liga</span>
             </button>
 
-            {/* Spielstil */}
+            {/* Spielstil — kleine gleich große Ja/Nein-Haken. "Beläge" entfällt;
+                Hand und Noppen sind je für sich exklusiv, Anti ist unabhängig. */}
             <div style={{fontSize:10.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"16px 2px 8px"}}>Spielstil</div>
-            <div style={{display:"flex",gap:7,marginBottom:8}}>
-              {[["","Egal"],["left","Links"],["right","Rechts"]].map(([k,l])=>(
-                <button key={k} onClick={()=>setFilter(f=>({...f,hand:k}))} style={{flex:1,fontSize:12.5,fontWeight:700,padding:"9px 4px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",...(filter.hand===k?{background:W,color:"#14171E"}:{background:CELL,color:SUB})}}>{l}</button>
-              ))}
+            <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
+              {([
+                ["hand","left","Links"],["hand","right","Rechts"],
+                ["pips","short","Kurze Noppen"],["pips","long","Lange Noppen"],
+                ["anti","1","Anti"],
+              ] as [("hand"|"pips"|"anti"),string,string][]).map(([feld,wert,label])=>{
+                const on = feld==="anti" ? filter.anti : filter[feld]===wert
+                const toggle=()=>setFilter(f=>{
+                  if(feld==="anti") return {...f,anti:!f.anti}
+                  return {...f,[feld]:f[feld]===wert?"":wert}
+                })
+                return (
+                  <button key={label} onClick={toggle} style={{flex:"1 1 45%",display:"flex",alignItems:"center",gap:8,background:CELL,borderRadius:10,padding:"10px 11px",cursor:"pointer",fontFamily:"inherit"}}>
+                    <span style={{width:17,height:17,borderRadius:5,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:900,...(on?{background:GRAD,color:"#06210F"}:{background:"#20242C",color:"transparent"})}}>✓</span>
+                    <span style={{fontSize:12.5,fontWeight:600,color:on?W:SUB}}>{label}</span>
+                  </button>
+                )
+              })}
             </div>
-            <div style={{display:"flex",gap:7,marginBottom:8}}>
-              {[["","Alle Beläge"],["none","Ohne Noppen"],["short","Kurze Noppen"],["long","Lange Noppen"]].map(([k,l])=>(
-                <button key={k} onClick={()=>setFilter(f=>({...f,pips:k}))} style={{flex:1,fontSize:11,fontWeight:700,padding:"9px 3px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",...(filter.pips===k?{background:W,color:"#14171E"}:{background:CELL,color:SUB})}}>{l}</button>
-              ))}
-            </div>
-            <button onClick={()=>setFilter(f=>({...f,anti:!f.anti}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit"}}>
-              <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.anti?{background:GRAD,color:"#06210F"}:{background:"#20242C",color:"transparent"})}}>✓</span>
-              <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Nur Anti-Spieler</span>
-            </button>
 
             <button onClick={()=>setFilterOpen(false)} style={{width:"100%",background:GRAD,color:"#06210F",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",marginTop:18}}>Anzeigen</button>
           </div>
