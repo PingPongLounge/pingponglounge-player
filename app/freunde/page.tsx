@@ -46,7 +46,7 @@ export default function FreundePage() {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: "Player — next level table tennis",
+          title: "Player — Pingpong Next Level",
           text: "Spiel mit mir auf Player! Wir bekommen je 2 Gratisstunden in der Ping Pong Lounge.",
           url: referralLink,
         })

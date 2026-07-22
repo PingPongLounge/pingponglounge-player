@@ -120,7 +120,7 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
             textAlign: "justify" as const,
             textAlignLast: "justify" as const,
           }}>
-            Next Level Table Tennis
+            Pingpong Next Level
           </span>
         )}
       </div>

@@ -47,7 +47,7 @@ function shell(inner: string): string {
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:520px;margin:0 auto">
           <tr>
             <td style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#ffffff">
-              <img src="${BASE_URL}/logo-mail.png" alt="Player — Next Level Table Tennis" width="180" style="display:block;width:180px;max-width:180px;height:auto;margin:0 auto 28px;border:0">
+              <img src="${BASE_URL}/logo-mail.png" alt="Player — Pingpong Next Level" width="180" style="display:block;width:180px;max-width:180px;height:auto;margin:0 auto 28px;border:0">
               ${inner}
               <p style="color:rgba(255,255,255,.45);font-size:11px;margin-top:28px;border-top:1px solid rgba(255,255,255,.1);padding-top:14px;text-align:center">Player · playerapp.ch</p>
             </td>

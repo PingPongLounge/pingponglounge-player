@@ -70,7 +70,7 @@ export default async function EntdeckenPage() {
                 </svg>
                 <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'stretch', marginTop: 8 }}>
                   <div style={{ fontSize: 30, fontWeight: 900, letterSpacing: '.24em', lineHeight: 1, paddingLeft: '.24em', ...gt }}>PLAYER</div>
-                  <div style={{ fontSize: 9.5, fontWeight: 700, color: SUB, textTransform: 'uppercase', marginTop: 7, textAlign: 'justify', textAlignLast: 'justify' }}>Next Level Table Tennis</div>
+                  <div style={{ fontSize: 9.5, fontWeight: 700, color: SUB, textTransform: 'uppercase', marginTop: 7, textAlign: 'justify', textAlignLast: 'justify' }}>Pingpong Next Level</div>
                 </div>
                 <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#06210F', background: GRAD, borderRadius: 999, padding: '3px 8px', marginTop: 12 }}>Beta</span>
               </div>

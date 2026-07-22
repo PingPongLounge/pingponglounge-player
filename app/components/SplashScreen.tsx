@@ -18,7 +18,7 @@ export default function SplashScreen() {
 
   useEffect(() => {
     // Sequenz: Paddle zeichnen → Ball → Buchstaben. Keine Tagline —
-    // "Next Level Table Tennis" steht auf der Startseite, hier braucht es sie nicht.
+    // "Pingpong Next Level" steht auf der Startseite, hier braucht es sie nicht.
     const t1 = setTimeout(() => setShowBall(true), 260)
 
     // Buchstaben nach und nach einblenden

@@ -18,7 +18,7 @@ const LEVELS = [
 // Spin erkennen) korrelieren so stark mit diesen, dass sie kaum Information
 // bringen und nur Zeit kosten. ELO korrigiert die Einstufung ohnehin nach wenigen Spielen.
 const QUIZ = [
-  { q: "Wie lange spielst du schon Tischtennis?",
+  { q: "Wie lange spielst du schon Pingpong?",
     opts: [{ l: "Unter 6 Monate", p: 0 },{ l: "6 Monate – 2 Jahre", p: 2 },{ l: "2 – 5 Jahre", p: 4 },{ l: "Mehr als 5 Jahre", p: 6 }] },
   { q: "Kannst du Topspin Vorhand spielen?",
     opts: [{ l: "Ja, sicher", p: 4 },{ l: "Manchmal", p: 2 },{ l: "Nein", p: 0 }] },

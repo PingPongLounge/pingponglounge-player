@@ -9,7 +9,7 @@ const BASE = "https://playerapp.ch"
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
-  title: "Player — Next Level Table Tennis",
+  title: "Player — Pingpong Next Level",
   description: "Liga, Open Games und Turniere — vom Anfänger bis zum Profi. Spiel, trag dein Resultat ein, steig auf.",
   // Safari (Favoriten, Home-Bildschirm) und Android zeigen KEIN SVG-Favicon —
   // ohne PNG/ICO kam die graue Kachel mit dem Anfangsbuchstaben.
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     siteName: "Player",
     title: "Player — Spiel. Trag ein. Steig auf.",
     description: "Liga, Open Games und Turniere — vom Anfänger bis zum Profi.",
-    images: [{ url: "/share-card.jpg", width: 1200, height: 630, alt: "Player — Next Level Table Tennis" }],
+    images: [{ url: "/share-card.jpg", width: 1200, height: 630, alt: "Player — Pingpong Next Level" }],
   },
   twitter: {
     card: "summary_large_image",
