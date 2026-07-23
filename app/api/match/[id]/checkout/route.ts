@@ -3,7 +3,7 @@ import Stripe from "stripe"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { OG_PREIS_CHF, gruppeFuerLevel, startZeit } from "@/lib/opengames"
-import { PP_CHF } from "@/lib/rewards"
+import { PP_CHF, PP_CONFIG, SIGNUP_BONUS_LOCKED_UNTIL_FIRST_PAYMENT } from "@/lib/rewards"
 
 // Einen Platz in einem offiziellen Open Game kaufen.
 // Der Preis kommt NIE vom Client — er steht serverseitig in lib/opengames.ts.
@@ -75,14 +75,25 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const titel = isTraining ? `Training ${game.location_name}` : `Open Game ${game.location_name}`
 
   // PingPoints einlösen: GANZ oder gar nicht — keine anteilige Zahlung. Man
-  // braucht genug Punkte für den VOLLEN Preis (1 Punkt = CHF 0.50). Dann geht
+  // braucht genug Punkte für den VOLLEN Preis (1 Punkt = CHF 1). Dann geht
   // die Buchung gratis über Punkte, ohne Stripe.
   if (wantRedeem) {
     const kosten = Math.round(chf / PP_CHF)
-    const { data: tx } = await admin.from("ping_points_transactions").select("amount").eq("player_id", user.id)
+    const { data: tx } = await admin.from("ping_points_transactions").select("amount,source").eq("player_id", user.id)
     const balance = (tx || []).reduce((s, t) => s + (t.amount || 0), 0)
-    if (balance < kosten) {
-      return NextResponse.json({ error: `Nicht genug PingPoints — du brauchst ${kosten}, du hast ${balance}.`, zuWenigPunkte: true }, { status: 400 })
+    // Willkommensbonus erst nach der ersten bezahlten Aktivität einlösbar —
+    // sonst holt sich ein frisches Konto sofort ein gratis Training. Solange
+    // noch keine echte Zahlung/Podest-Gutschrift vorliegt, zählt der Bonus nicht
+    // zum einlösbaren Guthaben.
+    const hatBezahlt = (tx || []).some(t => (t.amount || 0) > 0 && t.source !== "welcome")
+    const einloesbar = SIGNUP_BONUS_LOCKED_UNTIL_FIRST_PAYMENT && !hatBezahlt
+      ? balance - PP_CONFIG.signupBonus
+      : balance
+    if (einloesbar < kosten) {
+      const grund = SIGNUP_BONUS_LOCKED_UNTIL_FIRST_PAYMENT && !hatBezahlt
+        ? `Dein Willkommensbonus (${PP_CONFIG.signupBonus}) wird erst nach deiner ersten bezahlten Buchung einlösbar.`
+        : `Nicht genug PingPoints — du brauchst ${kosten}, einlösbar sind ${einloesbar}.`
+      return NextResponse.json({ error: grund, zuWenigPunkte: true }, { status: 400 })
     }
     const ref = `pp-${crypto.randomUUID()}`
     const { error: insErr } = await admin.from("open_game_players").insert({

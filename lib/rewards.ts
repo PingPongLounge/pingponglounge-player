@@ -14,24 +14,31 @@ export interface Reward {
 //   3. den einmaligen Willkommens-Bonus bei der Registrierung
 // KEINE PingPoints für Liga-Matches oder einzelne Turnier-Matches.
 //
-// Verhältnis: 10 bezahlte Buchungen = 1 Stunde Tisch gratis (5 PP × 10 = 50 PP).
+// EIN Punkt = EIN Franken (PP_CHF). Eingelöst wird zum vollen Preis:
+// gratis Tischstunde ≈ 25 Punkte, gratis Training = 29 Punkte (Preis in Punkten).
 export const PP_CONFIG = {
-  perPaidBooking: 5,               // pro bezahlter Buchung
+  perPaidBooking: 0.5,             // pro bezahlter Buchung (0.5 CHF Rückvergütung)
   tournamentPodium: [100, 50, 25], // Platz 1 / 2 / 3
-  signupBonus: 15,                 // einmalig bei der Registrierung
+  signupBonus: 10,                 // einmalig bei der Registrierung
 }
 
+// Willkommensbonus ist erst NACH der ersten bezahlten Aktivität einlösbar —
+// sonst könnte man mit einem frischen Konto sofort ein gratis Training abgreifen.
+export const SIGNUP_BONUS_LOCKED_UNTIL_FIRST_PAYMENT = true
+
+// Der Katalog ist eine Anzeige-/Marketingliste. Der tatsächliche Einlöse-Preis
+// beim Buchen ergibt sich aus dem CHF-Preis × 1 Punkt/CHF (siehe Checkout).
 export const PP_REWARDS: Reward[] = [
-  { threshold: 50,  type: "play",                          label: "1 Stunde Tisch gratis", description: "Eine Stunde Tisch gratis — einlösbar in deiner Lounge" },
-  { threshold: 100, type: "discount", discountPercent: 10, label: "10% Rabatt",           description: "10% Rabattcode gültig im PPL Online-Shop" },
-  { threshold: 300, type: "discount", discountPercent: 15, label: "15% Rabatt",           description: "15% Rabattcode gültig im PPL Online-Shop" },
-  { threshold: 500, type: "product",                       label: "Gratis Schlägerhülle", description: "PPL Branded Schlägerhülle — abholbar in deiner Lounge" },
+  { threshold: 25, type: "play",                          label: "1 Stunde Tisch gratis", description: "Eine Stunde Tisch gratis — einlösbar in deiner Lounge" },
+  { threshold: 29, type: "play",                          label: "Gratis Training",       description: "Ein geführtes Training gratis — mit deinen PingPoints" },
+  { threshold: 100, type: "discount", discountPercent: 10, label: "10% Rabatt",           description: "10% Rabattcode gültig im Ping Pong Lounge Online-Shop" },
+  { threshold: 300, type: "discount", discountPercent: 15, label: "15% Rabatt",           description: "15% Rabattcode gültig im Ping Pong Lounge Online-Shop" },
+  { threshold: 500, type: "product",                       label: "Gratis Schlägerhülle", description: "Branded Schlägerhülle — abholbar in deiner Lounge" },
 ]
 
-// Was ein PingPoint wert ist. EINE Zahl für alles: 50 Punkte = 1 Stunde Tisch
-// (≈ CHF 25) → 1 Punkt = CHF 0.50. Beim Buchen war ein Punkt vorher CHF 2 wert,
-// also das Vierfache — derselbe Punkt hatte je nach Bildschirm einen anderen Preis.
-export const PP_CHF = 0.5
+// Was ein PingPoint wert ist. EINE Zahl für alles: 1 Punkt = CHF 1.
+// Beim Einlösen kostet eine Buchung also genau ihren CHF-Preis in Punkten.
+export const PP_CHF = 1
 
 // ─── GEGNER-LIMIT ────────────────────────────────────────────────────────────
 // Max. gewertete Spiele gegen DENSELBEN Gegner in einem ROLLIERENDEN Fenster

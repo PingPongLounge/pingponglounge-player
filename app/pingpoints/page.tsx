@@ -16,11 +16,11 @@ const sourceIcon: Record<string,string> = {
 // PingPoints gibt es nur fürs Turnier-Podest und für bezahlte Buchungen.
 // Liga- und Open-Game-Resultate zählen für ELO & Rang — nicht für PingPoints.
 const EARN: Array<{ action: string; points: string; note?: string; soon?: boolean }> = [
-  { action: "Buchung bezahlen",  points: "+5",   note: "Tisch, Training oder Open Game — 10 Buchungen = 1 Stunde gratis" },
+  { action: "Buchung bezahlen",  points: "+0.5", note: "Tisch, Training oder Open Game — 1 Punkt = CHF 1" },
   { action: "Turnier — Platz 1", points: "+100", note: "Turniersieg" },
   { action: "Turnier — Platz 2", points: "+50" },
   { action: "Turnier — Platz 3", points: "+25" },
-  { action: "Registrierung",     points: "+15", note: "einmaliger Willkommens-Bonus" },
+  { action: "Registrierung",     points: "+10", note: "Willkommens-Bonus — einlösbar nach der 1. Zahlung" },
 ]
 
 type Transaction = { id:string; amount:number; source:string; description:string; created_at:string }
@@ -105,9 +105,9 @@ export default function PingPointsPage(){
           <p style={{...meta,marginTop:8}}>PingPoints</p>
           {/* Was ist ein Punkt wert? Ohne diese Zeile ist die Zahl bedeutungslos. */}
           <p style={{fontSize:12.5,color:SUB,marginTop:6}}>
-            {balance>=50
-              ? `Reicht für ${Math.floor(balance/50)}× 1 Stunde Tisch gratis`
-              : `Noch ${50-balance} Punkte bis zur ersten Gratis-Stunde`}
+            {balance>=25
+              ? `Reicht für ${Math.floor(balance/25)}× 1 Stunde Tisch gratis (25 Punkte) · 1 Punkt = CHF 1`
+              : `Noch ${25-balance} Punkte bis zur ersten Gratis-Stunde (25 Punkte)`}
           </p>
         </div>
 

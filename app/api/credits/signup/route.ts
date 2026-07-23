@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { rateLimited, clientIp } from "@/lib/ratelimit"
+import { PP_CONFIG } from "@/lib/rewards"
 import { NextRequest, NextResponse } from "next/server"
 
 function genCode(len = 6) {
@@ -44,11 +45,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  // Willkommens-PingPoints (+15) — macht das "+15 PingPoints"-Versprechen aus dem
-  // /spielen-Hook echt. Läuft nur einmal pro User (zusammen mit dem Signup-Credit).
+  // Willkommens-PingPoints — Betrag aus der zentralen Config (PP_CONFIG.signupBonus).
+  // Läuft nur einmal pro User (zusammen mit dem Signup-Credit). Einlösbar erst
+  // nach der ersten bezahlten Aktivität (siehe Checkout, Bonus-Sperre).
   await supabase.from("ping_points_transactions").insert({
     player_id: user.id,
-    amount: 15,
+    amount: PP_CONFIG.signupBonus,
     source: "welcome",
     description: "Willkommen bei Player",
   })

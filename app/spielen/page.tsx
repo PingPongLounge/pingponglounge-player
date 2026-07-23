@@ -191,7 +191,7 @@ function SpielenInner() {
 
       {/* PingPoints Chip */}
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", background: CELL, borderRadius: "12px", padding: "12px", marginBottom: "8px" }}>
-        <span style={{ color: "#FFD700", fontWeight: 900, fontSize: "15px" }}>+15 PingPoints</span>
+        <span style={{ color: "#FFD700", fontWeight: 900, fontSize: "15px" }}>+10 PingPoints</span>
         <span style={{ color: MUTED, fontSize: "12px" }}>nach dem Sichern</span>
       </div>
       <p style={{ fontSize: "12px", color: MUTED, textAlign: "center", marginBottom: "8px", lineHeight: 1.5 }}>

@@ -120,19 +120,22 @@ describe("PingPoints", () => {
     expect(PP_CONFIG.tournamentPodium).toEqual([100, 50, 25])
   })
 
-  it("10 bezahlte Buchungen ergeben genau eine Gratisstunde", () => {
-    // Das steht so auf der PingPoints-Seite. Ändert jemand perPaidBooking,
-    // muss dieser Test brechen — sonst stimmt das Versprechen nicht mehr.
-    const gratisStunde = PP_REWARDS.find(r => r.type === "play")!
-    expect(PP_CONFIG.perPaidBooking * 10).toBe(gratisStunde.threshold)
+  it("ein Punkt ist genau einen Franken wert", () => {
+    // 1 Punkt = CHF 1. Damit kostet eine Buchung beim Einlösen genau ihren
+    // CHF-Preis in Punkten (gratis Tisch ≈ 25, gratis Training = 29).
+    expect(PP_CHF).toBe(1)
   })
 
-  it("ein Punkt ist überall gleich viel wert", () => {
-    // 50 Punkte = 1 Stunde Tisch (ca. CHF 25) → 1 Punkt = CHF 0.50.
-    // Beim Buchen war ein Punkt früher CHF 2 wert — derselbe Punkt hatte je
-    // nach Bildschirm einen anderen Preis.
-    const gratisStunde = PP_REWARDS.find(r => r.type === "play")!
-    expect(gratisStunde.threshold * PP_CHF).toBe(25)
+  it("die erste Gratis-Prämie ist die Tischstunde zu 25 Punkten", () => {
+    // Die günstigste play-Prämie = 1 Stunde Tisch = 25 Punkte (≈ CHF 25).
+    const guenstigste = PP_REWARDS.filter(r => r.type === "play").sort((a, b) => a.threshold - b.threshold)[0]
+    expect(guenstigste.threshold).toBe(25)
+    expect(guenstigste.threshold * PP_CHF).toBe(25)
+  })
+
+  it("pro Buchung gibt es 0.5 Punkte, Willkommensbonus 10", () => {
+    expect(PP_CONFIG.perPaidBooking).toBe(0.5)
+    expect(PP_CONFIG.signupBonus).toBe(10)
   })
 
   it("die Prämien-Schwellen steigen", () => {
