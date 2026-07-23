@@ -143,7 +143,7 @@ export default async function EntdeckenPage() {
   ])
 
   const rank = (higherRes.count ?? 0) + 1
-  const ppBalance = (ppRes.data || []).reduce((s, t) => s + (t.amount || 0), 0)
+  const ppBalance = (ppRes.data || []).reduce((s, t) => s + Number(t.amount || 0), 0)
 
   const games: Game[] = (gamesRes.data || []).map(g => {
     const max = g.max_players || 2

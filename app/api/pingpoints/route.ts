@@ -22,7 +22,7 @@ export async function GET() {
     .select("amount")
     .eq("player_id", user.id)
 
-  const balance = (alle || []).reduce((sum, t) => sum + t.amount, 0)
+  const balance = (alle || []).reduce((sum, t) => sum + Number(t.amount), 0)
 
   return NextResponse.json({ balance, transactions: transactions || [] })
 }

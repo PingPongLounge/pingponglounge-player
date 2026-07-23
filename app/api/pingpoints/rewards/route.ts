@@ -11,7 +11,7 @@ export async function GET() {
 
   const admin = createAdminClient()
   const { data: tx } = await admin.from("ping_points_transactions").select("amount").eq("player_id", user.id)
-  const total = (tx || []).reduce((s: number, t: { amount: number }) => s + t.amount, 0)
+  const total = (tx || []).reduce((s: number, t: { amount: number }) => s + Number(t.amount), 0)
 
   const { data: claims } = await admin.from("reward_claims")
     .select("reward_threshold, status").eq("player_id", user.id)
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient()
   const { data: tx } = await admin.from("ping_points_transactions").select("amount").eq("player_id", user.id)
-  const total = (tx || []).reduce((s: number, t: { amount: number }) => s + t.amount, 0)
+  const total = (tx || []).reduce((s: number, t: { amount: number }) => s + Number(t.amount), 0)
   if (total < threshold) return NextResponse.json({ error: "Zu wenig PingPoints" }, { status: 400 })
 
   const { data: existing } = await admin.from("reward_claims")

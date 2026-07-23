@@ -80,12 +80,14 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (wantRedeem) {
     const kosten = Math.round(chf / PP_CHF)
     const { data: tx } = await admin.from("ping_points_transactions").select("amount,source").eq("player_id", user.id)
-    const balance = (tx || []).reduce((s, t) => s + (t.amount || 0), 0)
+    // numerische Spalte kommt als String zurück → in Zahl wandeln, sonst
+    // ergäbe "0" + "0.5" den String "00.5".
+    const balance = (tx || []).reduce((s, t) => s + Number(t.amount || 0), 0)
     // Willkommensbonus erst nach der ersten bezahlten Aktivität einlösbar —
     // sonst holt sich ein frisches Konto sofort ein gratis Training. Solange
     // noch keine echte Zahlung/Podest-Gutschrift vorliegt, zählt der Bonus nicht
     // zum einlösbaren Guthaben.
-    const hatBezahlt = (tx || []).some(t => (t.amount || 0) > 0 && t.source !== "welcome")
+    const hatBezahlt = (tx || []).some(t => Number(t.amount || 0) > 0 && t.source !== "welcome")
     const einloesbar = SIGNUP_BONUS_LOCKED_UNTIL_FIRST_PAYMENT && !hatBezahlt
       ? balance - PP_CONFIG.signupBonus
       : balance
