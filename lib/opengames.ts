@@ -23,8 +23,8 @@ export const OG_TRAINING_PREIS_CHF = 29 // geführtes Training, pro Person
 /** Geführte Trainings (mit Trainer). Level offen, feste Platzzahl, eigener Preis. */
 export type OgTraining = { location_id: string; location_name: string; day: number; start: number; end: number; dauerMin: number; plaetze: number }
 export const OG_TRAININGS: OgTraining[] = [
-  // Glattbrugg, jeden Donnerstag 19:00–20:30, 8 Plätze, alle Level
-  { location_id: "glattbrugg", location_name: "Glattbrugg", day: 4, start: 19, end: 20, dauerMin: 90, plaetze: 8 },
+  // Glattbrugg, jeden Donnerstag 19:00–20:30, 10 Plätze, alle Level
+  { location_id: "glattbrugg", location_name: "Glattbrugg", day: 4, start: 19, end: 20, dauerMin: 90, plaetze: 10 },
 ]
 
 /** Eine Gruppe an einem Abend: Stärkeklasse + eigene Platzzahl. */
