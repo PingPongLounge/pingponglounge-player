@@ -97,6 +97,45 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
   const mySets = sets.filter(s => (g.entered_by === userId ? s.p1 > s.p2 : s.p2 > s.p1)).length
   const oppSets = sets.length - mySets
 
+  // Der Aktions-Block (Buchen / Beitreten / Absagen / Löschen) — steht jetzt OBEN,
+  // direkt nach dem Titel, damit man zum Anmelden nicht scrollen muss.
+  const aktionBlock = isCreator ? (
+    confirmDelete ? (
+      <div style={{ ...cardPad, padding: "14px 16px" }}>
+        <p style={{ fontSize: 13, color: DANGER, fontWeight: 700, marginBottom: 10 }}>Spiel wirklich löschen?</p>
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => setConfirmDelete(false)} style={{ ...btnGhost, flex: 1, padding: 10, fontSize: 13 }}>Abbrechen</button>
+          <button onClick={del} disabled={busy} style={{ ...btnDanger, flex: 1, padding: 10, fontSize: 13 }}>{busy ? "…" : "Ja, löschen"}</button>
+        </div>
+      </div>
+    ) : (
+      <button onClick={() => setConfirmDelete(true)} style={{ ...btnGhost, width: "100%", padding: 13, fontSize: 13 }}>Spiel löschen</button>
+    )
+  ) : isJoined ? (
+    <>
+      <button onClick={leave} disabled={busy} style={{ ...btnGhost, width: "100%", padding: 14 }}>{busy ? "…" : g.is_official && g.price_per_player > 0 ? "Absagen · Geld zurück" : "Doch nicht · Platz freigeben"}</button>
+      {g.is_official && g.price_per_player > 0 && (
+        <p style={{ ...body, textAlign: "center", marginTop: 8, fontSize: 12.5 }}>Absage bis 24 h vorher — Geld zurück.</p>
+      )}
+    </>
+  ) : full ? (
+    <div style={{ ...cardPad, textAlign: "center" }}><p style={{ fontSize: 14, fontWeight: 700, color: M }}>Ausgebucht</p></div>
+  ) : g.is_official && g.price_per_player > 0 ? (
+    <>
+      <button onClick={() => platzKaufen(false)} disabled={busy} style={{ ...btn, width: "100%", padding: 16, fontSize: 15.5 }}>
+        {busy ? "…" : `Platz sichern · CHF ${g.price_per_player}`}
+      </button>
+      {ppBalance >= g.price_per_player && (
+        <button onClick={() => platzKaufen(true)} disabled={busy} style={{ ...btnGhost, width: "100%", padding: 14, marginTop: 8, fontSize: 14 }}>
+          {busy ? "…" : `Mit PingPoints buchen · ${g.price_per_player} Punkte`}
+        </button>
+      )}
+      <p style={{ ...body, textAlign: "center", marginTop: 8, fontSize: 12.5 }}>{(g.duration_minutes / 60).toLocaleString("de-CH")} Std · Absage bis 24 h vorher, Geld zurück.</p>
+    </>
+  ) : (
+    <button onClick={join} disabled={busy} style={{ ...btn, width: "100%", padding: 15, fontSize: 15 }}>{busy ? "Trete bei …" : "Mitspielen →"}</button>
+  )
+
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
       <div style={{ maxWidth: 480, margin: "0 auto" }}>
@@ -114,6 +153,10 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
             <p style={{ fontSize: 14, fontWeight: 700, color: DANGER }}>Dieses Spiel wurde abgesagt</p>
           </div>
         ) : (<>
+          {/* Aktion GANZ OBEN — direkt buchen/beitreten ohne Scrollen. Bei
+              gebuchten/QR-Terminen zeigt der Block das Absagen; der QR steht direkt darunter. */}
+          <div style={{ marginBottom: 12 }}>{aktionBlock}</div>
+
           {/* Zutritts-QR ganz oben, sobald gebucht — damit niemand scrollen muss.
               Erscheint nur am Termin-Tag (bis 22 Uhr); davor ein Hinweis. Weg nach
               dem Absagen (isJoined). Nur Standorte mit verschlossener Tür. */}
@@ -216,47 +259,7 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
             )}
           </>)}
 
-          {/* Aktion */}
-          {isCreator ? (
-            confirmDelete ? (
-              <div style={{ ...cardPad, padding: "14px 16px" }}>
-                <p style={{ fontSize: 13, color: DANGER, fontWeight: 700, marginBottom: 10 }}>Spiel wirklich löschen?</p>
-                <div style={{ display: "flex", gap: 8 }}>
-                  <button onClick={() => setConfirmDelete(false)} style={{ ...btnGhost, flex: 1, padding: 10, fontSize: 13 }}>Abbrechen</button>
-                  <button onClick={del} disabled={busy} style={{ ...btnDanger, flex: 1, padding: 10, fontSize: 13 }}>{busy ? "…" : "Ja, löschen"}</button>
-                </div>
-              </div>
-            ) : (
-              <button onClick={() => setConfirmDelete(true)} style={{ ...btnGhost, width: "100%", padding: 13, fontSize: 13 }}>Spiel löschen</button>
-            )
-          ) : isJoined ? (
-            <>
-              <button onClick={leave} disabled={busy} style={{ ...btnGhost, width: "100%", padding: 14 }}>{busy ? "…" : g.is_official && g.price_per_player > 0 ? "Absagen · Geld zurück" : "Doch nicht · Platz freigeben"}</button>
-              {g.is_official && g.price_per_player > 0 && (
-                <p style={{ ...body, textAlign: "center", marginTop: 8, fontSize: 12.5 }}>Absage bis 24 h vorher — Geld zurück.</p>
-              )}
-            </>
-          ) : full ? (
-            <div style={{ ...cardPad, textAlign: "center" }}><p style={{ fontSize: 14, fontWeight: 700, color: M }}>Ausgebucht</p></div>
-          ) : g.is_official && g.price_per_player > 0 ? (
-            // Fester Abend → bezahlen. Kein direkter Sprung in die Kasse mehr aus
-            // der Liste; erst diese Detailseite, dann hier der Kauf (Playtomic-Weg).
-            <>
-              <button onClick={() => platzKaufen(false)} disabled={busy} style={{ ...btn, width: "100%", padding: 16, fontSize: 15.5 }}>
-                {busy ? "…" : `Platz sichern · CHF ${g.price_per_player}`}
-              </button>
-              {/* PingPoints einlösen — nur ganz (genug Punkte für den vollen Preis).
-                  1 Punkt = CHF 0.50, also braucht es Preis × 2 Punkte. */}
-              {ppBalance >= g.price_per_player * 2 && (
-                <button onClick={() => platzKaufen(true)} disabled={busy} style={{ ...btnGhost, width: "100%", padding: 14, marginTop: 8, fontSize: 14 }}>
-                  {busy ? "…" : `Mit PingPoints buchen · ${g.price_per_player * 2} Punkte`}
-                </button>
-              )}
-              <p style={{ ...body, textAlign: "center", marginTop: 8, fontSize: 12.5 }}>{(g.duration_minutes / 60).toLocaleString("de-CH")} Std · Absage bis 24 h vorher, Geld zurück.</p>
-            </>
-          ) : (
-            <button onClick={join} disabled={busy} style={{ ...btn, width: "100%", padding: 15, fontSize: 15 }}>{busy ? "Trete bei …" : "Mitspielen →"}</button>
-          )}
+          {/* Aktion steht jetzt oben, direkt nach dem Titel (siehe aktionBlock). */}
         </>)}
       </div>
       <BottomNav />
