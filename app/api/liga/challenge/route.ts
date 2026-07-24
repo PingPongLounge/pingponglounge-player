@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { sendChallengeNotice } from "@/lib/email"
 import { MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
 import { istGewertet } from "@/lib/liga"
+import { notify } from "@/lib/notify"
 import { NextRequest, NextResponse } from "next/server"
 
 export async function POST(req: NextRequest) {
@@ -70,6 +71,11 @@ export async function POST(req: NextRequest) {
         when: typeof when === "string" && when.trim() ? when.trim().slice(0, 60) : null,
       })
     }
+    // In-App-Benachrichtigung an den Geforderten.
+    await notify(admin, challenged_id, "challenge", `${me?.name || "Ein Spieler"} fordert dich heraus`, {
+      body: when ? `Vorschlag: ${String(when).slice(0, 60)}` : "Nimm die Herausforderung an.",
+      link: "/liga",
+    })
   } catch (e) {
     console.error("Forderungs-Mail fehlgeschlagen:", e)
   }

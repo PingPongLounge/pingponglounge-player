@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 import { sendResultConfirmRequest } from "@/lib/email"
 import { signAction } from "@/lib/token"
+import { notify } from "@/lib/notify"
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://pingponglounge-player.vercel.app"
 
@@ -58,6 +59,15 @@ export async function POST(req: NextRequest) {
   }).eq("id", match_id)
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+
+  // Den Gegner in der Nachrichtenzentrale bitten, das Resultat zu bestätigen.
+  try {
+    const gegnerId = match.p1_id === user.id ? match.p2_id : match.p1_id
+    const { data: meProf } = await admin.from("public_profiles").select("name").eq("id", user.id).maybeSingle()
+    await notify(admin, gegnerId, "result_confirm", `${meProf?.name || "Dein Gegner"} hat ein Resultat eingetragen`, {
+      body: "Bestätige das Ergebnis, dann zählt es für die Rangliste.", link: "/liga",
+    })
+  } catch (e) { console.error("Notify (Resultat bestätigen) fehlgeschlagen:", e) }
 
   // SOFORT in die Nachrichtenzentrale — nicht erst nach der Bestätigung.
   // Vorher tauchte ein Spiel im Chat erst auf, wenn der Gegner reagiert hatte;

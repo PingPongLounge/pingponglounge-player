@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { getRechte, darfStandort } from "@/lib/roles"
 import { nachruecken } from "@/lib/tournaments"
+import { notify } from "@/lib/notify"
 import { NextRequest, NextResponse } from "next/server"
 
 // TEILNEHMER VERWALTEN (nur Veranstalter)
@@ -73,7 +74,12 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     .update({ status: "withdrawn", waitlist: false, waitlist_pos: null }).eq("id", regId)
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
 
-  // Platz frei → Warteliste nachrücken lassen.
+  // Platz frei → Warteliste nachrücken lassen + den Nachrücker benachrichtigen.
   const rueck = await nachruecken(admin, tid, max)
+  if (rueck?.player_id) {
+    await notify(admin, rueck.player_id, "waitlist_promoted", "Du bist nachgerückt!", {
+      body: "Ein Platz ist frei geworden — du bist jetzt dabei.", link: `/turniere/${tid}`,
+    })
+  }
   return NextResponse.json({ ok: true, nachgerueckt: rueck?.id ?? null })
 }

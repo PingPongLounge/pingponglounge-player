@@ -1,6 +1,12 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { notify } from "@/lib/notify"
 import { NextRequest, NextResponse } from "next/server"
+
+async function meinName(admin: ReturnType<typeof createAdminClient>, id: string): Promise<string> {
+  const { data } = await admin.from("public_profiles").select("name").eq("id", id).maybeSingle()
+  return data?.name || "Ein Spieler"
+}
 
 // FREUNDE — Anfrage, Annahme, Entfernen. Gegenseitig: erst wenn der andere
 // annimmt, gelten sie als Freunde und erscheinen im Freunde-Filter.
@@ -50,13 +56,18 @@ export async function POST(req: NextRequest) {
     const { data: gegen } = await admin.from("friendships")
       .select("id,status").eq("requester", user_id).eq("addressee", user.id).maybeSingle()
     if (gegen) {
-      if (gegen.status === "pending")
+      if (gegen.status === "pending") {
         await admin.from("friendships").update({ status: "accepted", accepted_at: new Date().toISOString() }).eq("id", gegen.id)
+        await notify(admin, user_id, "friend_accepted", `${await meinName(admin, user.id)} ist jetzt dein Freund`, { link: "/liga" })
+      }
       return NextResponse.json({ ok: true, accepted: true })
     }
     const { error } = await admin.from("friendships")
       .upsert({ requester: user.id, addressee: user_id, status: "pending" }, { onConflict: "requester,addressee", ignoreDuplicates: true })
     if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    await notify(admin, user_id, "friend_request", `${await meinName(admin, user.id)} möchte dein Freund sein`, {
+      body: "Nimm die Anfrage an, dann seht ihr euch im Freunde-Filter.", link: "/liga",
+    })
     return NextResponse.json({ ok: true })
   }
 
@@ -66,6 +77,8 @@ export async function POST(req: NextRequest) {
       .update({ status: "accepted", accepted_at: new Date().toISOString() })
       .eq("addressee", user.id).eq("requester", user_id).eq("status", "pending")
     if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+    // Den Anfragenden benachrichtigen, dass angenommen wurde.
+    await notify(admin, user_id, "friend_accepted", `${await meinName(admin, user.id)} hat deine Freundschaftsanfrage angenommen`, { link: "/liga" })
     return NextResponse.json({ ok: true })
   }
 

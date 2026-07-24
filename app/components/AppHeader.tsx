@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import StartMenu from "./StartMenu"
+import NotificationBell from "./NotificationBell"
 
 // Nur bei Auth/Onboarding-Flows verstecken
 // Sektionsseiten haben ihren eigenen "PLAYER LIGA/TURNIER/…"-Header → globalen ausblenden
@@ -47,6 +48,7 @@ export default function AppHeader() {
         {/* Avatar direkt neben dem Menü. Vorher stand er in einer ZWEITEN Kopfzeile
             darunter — mit Warenkorb und "Hi, …". Zwei Kopfzeilen sind eine zu viel. */}
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+          {initialen && <NotificationBell />}
           {initialen && (
             <Link href="/profil" aria-label="Profil" style={{ width: 38, height: 38, borderRadius: "50%", background: GRAD, color: "#06210F", fontSize: 13.5, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", flexShrink: 0 }}>
               {initialen}

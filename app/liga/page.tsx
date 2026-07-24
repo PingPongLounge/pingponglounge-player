@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import PendingConfirmBanner from "@/app/components/PendingConfirmBanner"
+import NotificationBell from "@/app/components/NotificationBell"
 import { MAX_RANKED_PER_OPPONENT, RANKED_WINDOW_MONTHS, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO, TIERS, tierForElo, tierRangeLabel, type TierKey } from "@/lib/rewards"
 import {
   BG, CARD, CELL, W, SUB, MUT, GREEN, LINE,
@@ -482,6 +483,7 @@ export default function LigaPage(){
               <span style={{position:"absolute",top:-5,right:-5,minWidth:17,height:17,borderRadius:999,background:GRAD,color:"#06210F",fontSize:10,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 4px"}}>{ungelesen>9?"9+":ungelesen}</span>
             )}
           </button>
+          <NotificationBell/>
         </div>
       </div>
 

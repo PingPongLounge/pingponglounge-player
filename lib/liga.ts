@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { berechneElo } from "@/lib/elo"
 import { MAX_RANKED_PER_OPPONENT, RANKED_WINDOW_MONTHS } from "@/lib/rewards"
+import { notify } from "@/lib/notify"
 
 // ─── DIE EINE LIGA ───────────────────────────────────────────────────────────
 // Es gibt genau eine öffentliche Liga (league_seasons.is_global = true). Keine
@@ -172,6 +173,18 @@ export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string)
       .eq("status", "open")
       .or(`and(p1_id.eq.${m.p1_id},p2_id.eq.${m.p2_id}),and(p1_id.eq.${m.p2_id},p2_id.eq.${m.p1_id})`)
   }
+
+  // Beide Spieler benachrichtigen: Resultat bestätigt (bei gewerteten Spielen
+  // mit Elo-Hinweis). nameOf/wSets/lSets stammen aus dem Chat-Payload oben.
+  const sieger = nameOf(m.winner_id), verlierer = nameOf(loserId)
+  await notify(admin, m.winner_id, "result_confirmed", `Sieg bestätigt gegen ${verlierer}`, {
+    body: ranked ? `${wSets}:${lSets} · dein Rating wurde aktualisiert.` : `${wSets}:${lSets} · Freundschaftsspiel.`,
+    link: "/liga",
+  })
+  await notify(admin, loserId, "result_confirmed", `Resultat bestätigt gegen ${sieger}`, {
+    body: ranked ? `${lSets}:${wSets} · dein Rating wurde aktualisiert.` : `${lSets}:${wSets} · Freundschaftsspiel.`,
+    link: "/liga",
+  })
 
   return { ok: true }
 }

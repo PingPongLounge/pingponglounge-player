@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import StartMenu from "./StartMenu"
+import NotificationBell from "./NotificationBell"
 
 const CARD = "#2A2F39", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.88)", MUT = "rgba(255,255,255,.82)"
@@ -26,7 +27,10 @@ export function SectionTopBar({ section: _section }: { section: string }) {
           </svg>
           <span style={{ fontSize: 12.5, fontWeight: 900, letterSpacing: ".20em", color: W }}>PLAYER</span>
         </Link>
-        <StartMenu inline />
+        <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+          <NotificationBell />
+          <StartMenu inline />
+        </div>
       </div>
     </div>
   )
