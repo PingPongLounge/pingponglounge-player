@@ -45,6 +45,25 @@ export default function TrainingPage() {
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "6px 16px 0" }}>
         <SectionBlock title="Training" meta={`Geführtes Coaching · CHF ${OG_TRAINING_PREIS_CHF} · alle Level`} img="/training-hero.jpg" />
 
+        {/* ─── TRAININGSCAMP-BANNER (Aktion) ──────────────────────────────────
+            Externer Link auf ppl24.ch/trainingscamp — Buchung läuft aktuell noch
+            über Eversports. Ganze Karte ist klickbar. */}
+        <a href="https://ppl24.ch/trainingscamp" target="_blank" rel="noopener noreferrer"
+          style={{ display: "block", textDecoration: "none", margin: "16px 0 8px", borderRadius: 22, overflow: "hidden", background: CARD, boxShadow: "0 4px 18px rgba(0,0,0,.4)" }}>
+          <div style={{ background: GRAD, padding: "18px 18px 16px" }}>
+            <div style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: ".14em", color: "#06210F", textTransform: "uppercase" }}>Trainingscamp · 13.–16. August</div>
+            <div style={{ fontSize: 27, fontWeight: 900, color: "#06210F", lineHeight: 1, marginTop: 4, textTransform: "uppercase", letterSpacing: "-.01em" }}>4 Tage mit Profis</div>
+          </div>
+          <div style={{ padding: "14px 18px 16px" }}>
+            <div style={{ fontSize: 14, fontWeight: 800, color: W }}>Elias Schmid <span style={{ color: MUT, fontWeight: 500 }}>· Schweizer Nr. 1</span></div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: W, marginTop: 2 }}>Simon Berglund <span style={{ color: MUT, fontWeight: 500 }}>· Ex-Bundesliga</span></div>
+            <div style={{ fontSize: 13, color: MUT, marginTop: 8, lineHeight: 1.5 }}>PPL24 Glattbrugg · für alle Levels · Halbtag CHF 75 · Ganztag CHF 150</div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 14, background: GRAD, color: "#06210F", borderRadius: 12, padding: "11px 16px", fontSize: 13.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em" }}>
+              Jetzt anmelden →
+            </div>
+          </div>
+        </a>
+
         <SectionIntro storageKey="intro_training_v2" title="So funktioniert's" steps={[
           ["1", "Termin wählen", "Jeden Donnerstag in Glattbrugg, 19:00–20:30 — 8 Plätze, alle Level."],
           ["2", "Platz sichern", `CHF ${OG_TRAINING_PREIS_CHF} pro Person, direkt bezahlt. Absage bis 24 h vorher, Geld zurück.`],
