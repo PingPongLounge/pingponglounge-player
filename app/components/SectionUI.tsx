@@ -6,7 +6,7 @@ import NotificationBell from "./NotificationBell"
 
 const CARD = "#2A2F39", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.88)", MUT = "rgba(255,255,255,.82)"
-const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
+const GRAD = "linear-gradient(135deg,#57CF79,#38BEB2)"
 const SHADOW = "0 1px 4px rgba(0,0,0,.14)"
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
 
@@ -21,7 +21,7 @@ export function SectionTopBar({ section: _section }: { section: string }) {
       <div style={{ maxWidth: 480, margin: "0 auto", padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/entdecken" aria-label="Zur Startseite" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
           <svg width="21" height="21" viewBox="0 0 80 80" fill="none" aria-hidden>
-            <defs><linearGradient id="stbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14" /><stop offset="1" stopColor="#1FD1C4" /></linearGradient></defs>
+            <defs><linearGradient id="stbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#57CF79" /><stop offset="1" stopColor="#1FD1C4" /></linearGradient></defs>
             <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#stbg)" strokeWidth="3.6" strokeLinejoin="round" />
             <circle cx="63" cy="58" r="6.5" fill="url(#stbg)" />
           </svg>
@@ -36,7 +36,7 @@ export function SectionTopBar({ section: _section }: { section: string }) {
   )
 }
 
-const HERO = "#14171E", LINE = "rgba(255,255,255,.07)", GREEN = "#39FF14"
+const HERO = "#1C212B", LINE = "rgba(255,255,255,.07)", GREEN = "#57CF79"
 
 /**
  * DAS MUSTER — ein Block für jede Sektion, wie in der Liga:

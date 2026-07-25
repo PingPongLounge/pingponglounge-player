@@ -5,7 +5,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { BG, W, MUT, gt, card, h1, meta, body, chipBtn, levelBadge, lvColor, ratingLabel } from "@/app/theme"
 
-const G="#39FF14"
+const G="#57CF79"
 
 const CANTONS = [
   "AG","AI","AR","BE","BL","BS","FR","GE","GL","GR",

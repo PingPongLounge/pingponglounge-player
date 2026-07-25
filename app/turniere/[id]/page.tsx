@@ -305,9 +305,9 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
                   {[0,1,2,3,4].map(i=>(
                     <div key={i} style={{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
                       <span style={{fontSize:12,color:M,minWidth:52,fontWeight:500}}>Satz {i+1}:</span>
-                      <input type="number" min="0" max="30" value={sets[i].p1} onChange={e=>{const s=[...sets];s[i]={...s[i],p1:e.target.value};setSets(s)}} style={{width:52,background:"#20242C",borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
+                      <input type="number" min="0" max="30" value={sets[i].p1} onChange={e=>{const s=[...sets];s[i]={...s[i],p1:e.target.value};setSets(s)}} style={{width:52,background:"#12151A",borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
                       <span style={{fontSize:16,color:M,fontWeight:600}}>:</span>
-                      <input type="number" min="0" max="30" value={sets[i].p2} onChange={e=>{const s=[...sets];s[i]={...s[i],p2:e.target.value};setSets(s)}} style={{width:52,background:"#20242C",borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
+                      <input type="number" min="0" max="30" value={sets[i].p2} onChange={e=>{const s=[...sets];s[i]={...s[i],p2:e.target.value};setSets(s)}} style={{width:52,background:"#12151A",borderRadius:8,padding:"8px",fontSize:15,fontWeight:600,color:W,outline:"none",textAlign:"center"}}/>
                     </div>
                   ))}
                   {resultError&&<p style={{fontSize:12,color:DANGER,marginTop:4}}>{resultError}</p>}

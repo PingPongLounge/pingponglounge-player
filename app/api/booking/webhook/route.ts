@@ -5,6 +5,8 @@ import { PP_CONFIG } from "@/lib/rewards"
 import { sessionUuid } from "@/lib/stripe-util"
 import { sendBookingConfirm } from "@/lib/email"
 import { entryQrFor, weekdayOf } from "@/lib/opengames"
+import { CAMP_MAX_PER_SESSION } from "@/lib/camp"
+import { campBelegung } from "@/lib/camp-server"
 
 // Stripe-Webhook: schreibt PingPoints NUR nach einer tatsächlich bezahlten Buchung.
 // Ohne diesen Webhook könnte man sich durch Aufruf von /buchen?paid=1 Punkte erschleichen.
@@ -46,11 +48,54 @@ export async function POST(req: NextRequest) {
           .eq("id", s.metadata.registration_id)
       }
     }
+    // CAMP: Reservierung abgelaufen ohne Zahlung → freigeben.
+    if (s.metadata?.type === "camp" && s.metadata.booking_id) {
+      const admin = createAdminClient()
+      await admin.from("camp_bookings")
+        .update({ payment_status: "cancelled", reserved_until: null })
+        .eq("id", s.metadata.booking_id).eq("payment_status", "reserved")
+    }
     return NextResponse.json({ received: true })
   }
 
   if (event.type === "checkout.session.completed") {
     const s = event.data.object as Stripe.Checkout.Session
+
+    // CAMP: Zahlung eingegangen → Plätze endgültig. Überbuchungs-Recheck
+    // (Schutz gegen Race), sonst Sicherheits-Refund. PingPoints idempotent.
+    if (s.payment_status === "paid" && s.metadata?.type === "camp" && s.metadata.booking_id) {
+      const admin = createAdminClient()
+      const bid = s.metadata.booking_id
+      const { data: b } = await admin.from("camp_bookings").select("*").eq("id", bid).maybeSingle()
+      if (b && b.payment_status !== "paid" && b.payment_status !== "cancelled") {
+        const counts = await campBelegung(admin)
+        // eigene (noch reservierte) Buchung aus der Zählung nehmen
+        for (const sid of (b.session_ids || [])) counts[sid] = Math.max(0, (counts[sid] || 1) - 1)
+        const voll = (b.session_ids || []).filter((sid: string) => (counts[sid] || 0) >= CAMP_MAX_PER_SESSION)
+        if (voll.length > 0) {
+          try { if (s.payment_intent) await getStripe().refunds.create({ payment_intent: String(s.payment_intent) }) }
+          catch (e) { console.error("Camp-Refund (Überbuchung) fehlgeschlagen:", e) }
+          await admin.from("camp_bookings").update({
+            payment_status: "cancelled", reserved_until: null,
+            stripe_payment_intent: s.payment_intent ? String(s.payment_intent) : null,
+          }).eq("id", bid)
+        } else {
+          const { data: upd } = await admin.from("camp_bookings").update({
+            payment_status: "paid", reserved_until: null,
+            stripe_payment_intent: s.payment_intent ? String(s.payment_intent) : null,
+          }).eq("id", bid).neq("payment_status", "paid").select("id").maybeSingle()
+          if (upd && b.user_id) {
+            try {
+              await admin.from("ping_points_transactions").insert({
+                player_id: b.user_id, amount: PP_CONFIG.perPaidBooking, source: "booking_paid",
+                description: "Trainingscamp", ref_id: sessionUuid(s.id),
+              })
+            } catch { /* Unique-Index verhindert Doppelgutschrift */ }
+          }
+        }
+      }
+      return NextResponse.json({ received: true })
+    }
 
     // TURNIER: Zahlung eingegangen → Platz endgültig bestätigt.
     if (s.payment_status === "paid" && s.metadata?.type === "tournament" && s.metadata.registration_id) {

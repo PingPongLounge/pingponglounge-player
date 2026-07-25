@@ -8,6 +8,7 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 
 export type NotifType =
   | "challenge" | "challenge_accepted" | "result_confirm" | "result_confirmed"
+  | "result_declined"
   | "waitlist_promoted" | "friend_request" | "friend_accepted" | "reminder"
 
 export async function notify(

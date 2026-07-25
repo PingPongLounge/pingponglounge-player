@@ -1,7 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 
-const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
+const GRAD = "linear-gradient(135deg,#57CF79,#38BEB2)"
 const gt: React.CSSProperties = {
   background: GRAD,
   WebkitBackgroundClip: "text",
@@ -85,7 +85,7 @@ export default function SplashScreen() {
         >
           <defs>
             <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#39FF14" />
+              <stop offset="0%" stopColor="#57CF79" />
               <stop offset="100%" stopColor="#1FD1C4" />
             </linearGradient>
           </defs>

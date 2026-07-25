@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 // NACHRICHTENZENTRALE — Glocke mit ungelesen-Zähler + Panel mit den Ereignissen.
 // Holt /api/notifications, pollt alle 30s. Beim Öffnen werden alle als gelesen
 // markiert. Antippen einer Nachricht springt zum Ziel (link).
-const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
+const GRAD = "linear-gradient(135deg,#57CF79,#38BEB2)"
 const CARD = "#1A1E25"
 const CELL = "#20232A"
 const W = "#fff"
@@ -46,7 +46,7 @@ export default function NotificationBell({ dark = false }: { dark?: boolean }) {
     }
   }
 
-  const iconColor = dark ? "#14171E" : SUB
+  const iconColor = dark ? "#1C212B" : SUB
 
   return (
     <>
@@ -74,7 +74,7 @@ export default function NotificationBell({ dark = false }: { dark?: boolean }) {
               ) : list.map(n => (
                 <button key={n.id} onClick={() => { setOpen(false); if (n.link) router.push(n.link) }} style={{ display: "block", width: "100%", textAlign: "left", padding: "13px 18px", background: n.read_at ? "none" : "rgba(57,255,20,.06)", borderTop: "1px solid rgba(255,255,255,.06)", cursor: "pointer", fontFamily: "inherit" }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    {!n.read_at && <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#39FF14", flexShrink: 0 }} />}
+                    {!n.read_at && <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#57CF79", flexShrink: 0 }} />}
                     <span style={{ fontSize: 14, fontWeight: 700, color: W, flex: 1 }}>{n.title}</span>
                     <span style={{ fontSize: 11, color: MUT, flexShrink: 0 }}>{seit(n.created_at)}</span>
                   </div>

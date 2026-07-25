@@ -5,7 +5,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { BG, CELL, W, MUT, card, h1, meta, body, eyebrow, levelBadge } from "@/app/theme"
 
-const G="#39FF14"
+const G="#57CF79"
 
 function timeAgo(d: string): string {
   const diff = Date.now() - new Date(d).getTime()

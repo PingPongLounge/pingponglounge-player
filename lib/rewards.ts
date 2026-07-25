@@ -22,6 +22,11 @@ export const PP_CONFIG = {
   signupBonus: 10,                 // einmalig bei der Registrierung
 }
 
+// Liga-Aktivitätsbonus: für je X gewertete (bestätigte) Liga-Spiele gibt es
+// Y PingPoints — belohnt aktives Liga-Spielen. Wiederholt sich (10, 20, 30 …).
+export const LIGA_MILESTONE_EVERY = 10
+export const LIGA_MILESTONE_POINTS = 5
+
 // Willkommensbonus ist erst NACH der ersten bezahlten Aktivität einlösbar —
 // sonst könnte man mit einem frischen Konto sofort ein gratis Training abgreifen.
 export const SIGNUP_BONUS_LOCKED_UNTIL_FIRST_PAYMENT = true

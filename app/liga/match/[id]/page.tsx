@@ -53,6 +53,15 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
   function removeSet(i:number){setSets(s=>s.filter((_,j)=>j!==i))}
   function updateSet(i:number,side:"p1"|"p2",val:string){setSets(s=>s.map((x,j)=>j===i?{...x,[side]:val}:x))}
 
+  async function handleDecline(){
+    if(!match) return
+    if(!confirm("Ergebnis ablehnen? Es wird verworfen und nicht gewertet. Ihr könnt danach das korrekte Ergebnis neu eintragen.")) return
+    setSaving(true)
+    const res=await fetch("/api/liga/decline",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId})})
+    if(res.ok){ window.location.href="/liga" }
+    else{const d=await res.json().catch(()=>({}));setError(d.error||"Ablehnen fehlgeschlagen");setSaving(false)}
+  }
+
   function handleDispute(){
     if(!match) return
     const scoreStr = match.sets ? match.sets.map(s=>`${s.p1}:${s.p2}`).join(" · ") : "—"
@@ -206,7 +215,8 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
             <button onClick={handleConfirm} disabled={saving} style={{...btn,width:"100%",marginBottom:8,opacity:saving?0.6:1,cursor:saving?"not-allowed":"pointer"}}>
               {saving?"…":"✓ Ergebnis bestätigen"}
             </button>
-            <button onClick={handleDispute} style={{...btnGhost,width:"100%"}}>Ergebnis anfechten</button>
+            <button onClick={handleDecline} disabled={saving} style={{...btnGhost,width:"100%",marginBottom:10,opacity:saving?0.6:1,cursor:saving?"not-allowed":"pointer"}}>Ablehnen</button>
+            <button onClick={handleDispute} style={{background:"none",border:"none",color:MUT,fontSize:12,cursor:"pointer",width:"100%",textAlign:"center"}}>Stattdessen per E-Mail anfechten</button>
           </div>
         )}
 

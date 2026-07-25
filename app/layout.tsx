@@ -41,12 +41,12 @@ export const metadata: Metadata = {
 }
 
 // themeColor gehört seit Next 14 in den viewport-Export, nicht in metadata.
-export const viewport = { themeColor: "#20242C" }
+export const viewport = { themeColor: "#12151A" }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de">
-      <body style={{ margin: 0, background: "#20242C", color: "#E8E6E1", fontFamily: "system-ui, sans-serif", minHeight: "100vh" }}>
+      <body style={{ margin: 0, background: "#12151A", color: "#E8E6E1", fontFamily: "system-ui, sans-serif", minHeight: "100vh" }}>
         <SplashScreen />
         <AppHeader />
         {children}

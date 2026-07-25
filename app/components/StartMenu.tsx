@@ -33,12 +33,12 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
   return (
     <>
       {avatar ? (
-        <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#39FF14,#1FD1C4)", color: "#06210F", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+        <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#57CF79,#38BEB2)", color: "#06210F", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           {avatar}
         </button>
       ) : (
         <button onClick={() => setOpen(true)} aria-label="Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), background: C, borderRadius: 11, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#1FD1C4"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#57CF79"/><stop offset="1" stopColor="#1FD1C4"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
       )}
 
@@ -53,14 +53,14 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
             </div>
 
             <Link href="/profil" onClick={() => setOpen(false)} style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 14px", background: C, borderRadius: 16, textDecoration: "none" }}>
-              <span style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#39FF14,#1FD1C4)", padding: 2, flexShrink: 0, display: "block" }}>
+              <span style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#57CF79,#38BEB2)", padding: 2, flexShrink: 0, display: "block" }}>
                 <span style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#13161B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}>🏓</span>
               </span>
               <span style={{ flex: 1 }}>
                 <span style={{ display: "block", fontSize: 16, fontWeight: 500, color: W }}>{name}</span>
                 <span style={{ display: "block", fontSize: 11, color: M, marginTop: 2 }}>{sub || "profil ansehen"}</span>
               </span>
-              <span style={{ color: "#39FF14", fontSize: 18 }}>›</span>
+              <span style={{ color: "#57CF79", fontSize: 18 }}>›</span>
             </Link>
 
             {/* "einstellungen" zeigte auf dasselbe Ziel wie "profil" — es gibt gar

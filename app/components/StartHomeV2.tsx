@@ -7,10 +7,10 @@ import PendingConfirmBanner from "./PendingConfirmBanner"
 import StreakBanner from "./StreakBanner"
 import { ratingLabel } from "@/app/theme"
 
-const BG = "#20242C", CARD = "#2A2F39", CELL = "#353B46", HERO = "#14171E", W = "#FFFFFF"
+const BG = "#12151A", CARD = "#2A2F39", CELL = "#353B46", HERO = "#1C212B", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.88)", MUT = "rgba(255,255,255,.82)"
 const LINE = "rgba(255,255,255,.09)"
-const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
+const GRAD = "linear-gradient(135deg,#57CF79,#38BEB2)"
 const SHADOW = "0 1px 4px rgba(0,0,0,.14)"
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
 
@@ -31,8 +31,9 @@ const ctitle: React.CSSProperties = { fontSize: 30, fontWeight: 900, letterSpaci
 const csub: React.CSSProperties = { fontSize: 14, color: SUB, fontWeight: 300, marginTop: 8, textAlign: "center" }
 const thead: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 6 }
 const ehead: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }
-const cta: React.CSSProperties = { display: "block", textAlign: "center", marginTop: 20, background: GRAD, color: "#06210F", borderRadius: 15, padding: 16, fontSize: 16, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }
-const ghost: React.CSSProperties = { display: "block", textAlign: "center", marginTop: 18, borderRadius: 15, padding: 15, fontSize: 15, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", color: "#06210F", textDecoration: "none", background: GRAD }
+const OUTLINE = `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`
+const cta: React.CSSProperties = { display: "block", textAlign: "center", marginTop: 20, background: OUTLINE, border: "1.5px solid transparent", color: "#FFF9F3", borderRadius: 15, padding: 16, fontSize: 16, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }
+const ghost: React.CSSProperties = { display: "block", textAlign: "center", marginTop: 18, borderRadius: 15, padding: 15, fontSize: 15, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", color: "#FFF9F3", textDecoration: "none", background: OUTLINE, border: "1.5px solid transparent" }
 const fact: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 0", borderTop: `1px solid ${LINE}` }
 const factK: React.CSSProperties = { fontSize: 12, fontWeight: 700, letterSpacing: ".04em", textTransform: "uppercase", color: MUT }
 const factV: React.CSSProperties = { fontSize: 15, fontWeight: 700, color: W }
@@ -112,8 +113,27 @@ export default function StartHomeV2(d: StartData) {
 
             <Link href="/match" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "13px 20px", borderTop: `1px solid ${LINE}`, textDecoration: "none" }}>
               <span style={{ fontSize: 13, fontWeight: 800, letterSpacing: ".02em", ...gt }}>Jetzt spielen</span>
-              <span style={{ fontSize: 15, fontWeight: 800, color: "#39FF14" }}>→</span>
+              <span style={{ fontSize: 15, fontWeight: 800, color: "#57CF79" }}>→</span>
             </Link>
+          </div>
+
+          {/* Quick-Actions: Kreise mit Verlauf-Umrandung. Tisch-Buchung ist KEIN
+              eigener Knopf — sie läuft in den jeweiligen Flows (Open Game/Turnier)
+              unterschwellig über Planyo. */}
+          <div className="rev" style={{ display: "flex", justifyContent: "space-between", gap: 8, margin: "0 16px 18px" }}>
+            {[
+              { href: "/liga", icon: "liga", a: "Liga", b: "fordern" },
+              { href: "/match", icon: "open-game", a: "Game", b: "suchen" },
+              { href: "/turniere", icon: "turnier", a: "Event", b: "machen" },
+              { href: "/training", icon: "paddles", a: "Lernen", b: "" },
+            ].map(q => (
+              <Link key={q.href} href={q.href} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 8, textDecoration: "none" }}>
+                <span style={{ width: 60, height: 60, borderRadius: "50%", background: `linear-gradient(${BG},${BG}) padding-box, ${GRAD} border-box`, border: "1.5px solid transparent", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <img src={`/icons/${q.icon}.svg`} alt="" style={{ width: 25, height: 25 }} />
+                </span>
+                <span style={{ fontSize: 10.5, fontWeight: 700, color: SUB, textAlign: "center", lineHeight: 1.2 }}>{q.a}{q.b && <><br />{q.b}</>}</span>
+              </Link>
+            ))}
           </div>
 
           {/* Ansporn: Siegesserie feiern / nach Niederlage aufs Training zeigen */}
@@ -131,8 +151,9 @@ export default function StartHomeV2(d: StartData) {
 
           {/* OPEN GAME */}
           <div className="rev" style={card}>
-            <div style={thead}><img src="/icons/open-game.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Open Game</span></div>
-            <div style={{ marginTop: 18, display: "flex", flexDirection: "column", maxHeight: 216, overflowY: "auto" }}>
+            <div style={thead}><img src="/icons/open-game.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Open Games</span></div>
+            <div style={csub}>Freundschaftliche Matches finden.</div>
+            <div style={{ marginTop: 12, display: "flex", flexDirection: "column", maxHeight: 216, overflowY: "auto" }}>
               {d.games.length === 0 && (
                 <div style={{ textAlign: "center", color: MUT, fontSize: 13, fontWeight: 500, padding: "18px 0" }}>Aktuell keine offenen Spiele — erstelle das erste.</div>
               )}
@@ -159,6 +180,7 @@ export default function StartHomeV2(d: StartData) {
           {/* LIGA */}
           <div className="rev" style={card}>
             <div style={thead}><img src="/icons/liga.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Liga</span></div>
+            <div style={csub}>Fordere heraus und steig auf.</div>
             <div style={{ marginTop: 16 }}>
               {d.season.has ? (
                 <>
@@ -176,7 +198,7 @@ export default function StartHomeV2(d: StartData) {
           {/* TURNIER */}
           <div className="rev" style={card}>
             <div style={thead}><img src="/icons/turnier.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>{d.tour ? d.tour.name : "Turniere"}</span></div>
-            {!d.tour && <div style={csub}>Bald geht das nächste los.</div>}
+            <div style={csub}>Melde dich an oder erstelle selber eines.</div>
             {d.tour && (
               <div style={{ marginTop: 16 }}>
                 <div style={fact}><span style={factK}>Wann</span><span style={factV}>{d.tour.dateLabel}</span></div>
@@ -197,7 +219,7 @@ export default function StartHomeV2(d: StartData) {
               zum Klicken steht dabei: hier werden die Punkte zu etwas. */}
           <Link href="/shop" className="rev" style={{ display: "flex", alignItems: "center", gap: 13, background: CARD, borderRadius: 22, padding: "15px 18px", boxShadow: SHADOW, margin: "0 16px 18px", textDecoration: "none" }}>
             <span style={{ width: 38, height: 38, borderRadius: 11, background: CELL, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#39FF14" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" /><path d="M2.5 3h2l2.2 12.2a1.5 1.5 0 0 0 1.5 1.3h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6" /></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#57CF79" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round"><circle cx="9" cy="20" r="1.4" /><circle cx="18" cy="20" r="1.4" /><path d="M2.5 3h2l2.2 12.2a1.5 1.5 0 0 0 1.5 1.3h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6" /></svg>
             </span>
             <span style={{ flex: 1, minWidth: 0 }}>
               <span style={{ display: "block", fontSize: 13.5, fontWeight: 800, color: W }}>Shop</span>

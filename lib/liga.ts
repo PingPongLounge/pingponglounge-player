@@ -1,6 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 import { berechneElo } from "@/lib/elo"
-import { MAX_RANKED_PER_OPPONENT, RANKED_WINDOW_MONTHS } from "@/lib/rewards"
+import { MAX_RANKED_PER_OPPONENT, RANKED_WINDOW_MONTHS, LIGA_MILESTONE_EVERY, LIGA_MILESTONE_POINTS } from "@/lib/rewards"
 import { notify } from "@/lib/notify"
 
 // ─── DIE EINE LIGA ───────────────────────────────────────────────────────────
@@ -68,6 +68,28 @@ export async function istGewertet(admin: SupabaseClient, a: string, b: string): 
 // PingPoints und Chat-Feed. Wird von der manuellen Bestätigung UND der
 // 48h-Auto-Bestätigung genutzt, damit die Logik nur einmal existiert.
 // `admin` muss ein Service-Role-Client sein (umgeht RLS).
+// Belohnt aktives Liga-Spielen: bei jedem LIGA_MILESTONE_EVERY-ten bestätigten,
+// gewerteten Liga-Match gibt es LIGA_MILESTONE_POINTS PingPoints. Idempotent über
+// ref_id (Unique-Index ping_points_transactions(player_id, ref_id, source)).
+async function awardLigaMilestone(admin: SupabaseClient, playerId: string): Promise<void> {
+  const { count } = await admin
+    .from("league_matches")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "confirmed")
+    .neq("ranked", false)
+    .or(`p1_id.eq.${playerId},p2_id.eq.${playerId}`)   // playerId ist eine DB-UUID, kein User-Input
+  if (!count || count % LIGA_MILESTONE_EVERY !== 0) return
+  try {
+    await admin.from("ping_points_transactions").insert({
+      player_id: playerId,
+      amount: LIGA_MILESTONE_POINTS,
+      source: "liga_milestone",
+      description: `${count} Liga-Spiele — Aktivitätsbonus`,
+      ref_id: `liga-milestone-${playerId}-${count}`,
+    })
+  } catch { /* Unique-Index verhindert Doppelgutschrift */ }
+}
+
 export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string): Promise<{ ok: boolean; reason?: string }> {
   const { data: m } = await admin
     .from("league_matches")
@@ -135,6 +157,12 @@ export async function applyLeagueConfirm(admin: SupabaseClient, matchId: string)
   const p2w = sets.filter(s => s.p2 > s.p1).length
   const wSets = m.winner_id === m.p1_id ? p1w : p2w
   const lSets = m.winner_id === m.p1_id ? p2w : p1w
+  // Liga-Aktivitätsbonus für beide Spieler (nur gewertete Matches).
+  if (ranked) {
+    await awardLigaMilestone(admin, m.winner_id)
+    await awardLigaMilestone(admin, loserId)
+  }
+
   const detail = sets.map(s => `${s.p1}:${s.p2}`).join(" · ")
   const { data: names } = await admin.from("public_profiles").select("id,name").in("id", [m.winner_id, loserId])
   const nameOf = (id: string) => (names || []).find(n => n.id === id)?.name || "Spieler"

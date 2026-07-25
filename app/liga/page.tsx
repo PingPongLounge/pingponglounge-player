@@ -13,7 +13,7 @@ import {
 
 const C=CARD, B=CELL, M=SUB
 const SHADOW="0 1px 4px rgba(0,0,0,.14)"
-const HERO="#14171E"
+const HERO="#1C212B"
 
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number,is_global?:boolean,is_private?:boolean}
 type Row={user_id:string,name:string,elo:number,level:string,real?:string|null,avatar?:string|null}
@@ -463,7 +463,7 @@ export default function LigaPage(){
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 15px",background:"#1A1E25",borderBottom:`1px solid ${LINE}`,position:"sticky",top:0,zIndex:10}}>
         <Link href="/entdecken" style={{display:"flex",alignItems:"center",gap:8,textDecoration:"none"}}>
           <svg width="21" height="21" viewBox="0 0 80 80" fill="none">
-            <defs><linearGradient id="plg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#1FD1C4"/></linearGradient></defs>
+            <defs><linearGradient id="plg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#57CF79"/><stop offset="1" stopColor="#1FD1C4"/></linearGradient></defs>
             <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#plg)" strokeWidth="3.6" strokeLinejoin="round"/>
             <circle cx="63" cy="58" r="6.5" fill="url(#plg)"/>
           </svg>
@@ -633,9 +633,9 @@ export default function LigaPage(){
                   const leer=!bands.some(b=>b.tier.key===l.key)
                   return(
                     <button key={l.key} onClick={()=>!leer&&springZu(l.key)} disabled={leer}
-                      style={{flex:1,position:"relative",borderRadius:11,padding:"9px 3px",background:on?W:"none",color:leer?MUT:on?"#14171E":SUB,opacity:leer?.4:1,fontFamily:"inherit",fontSize:11.5,fontWeight:800,cursor:leer?"default":"pointer"}}>
+                      style={{flex:1,position:"relative",borderRadius:11,padding:"9px 3px",background:on?W:"none",color:leer?MUT:on?"#1C212B":SUB,opacity:leer?.4:1,fontFamily:"inherit",fontSize:11.5,fontWeight:800,cursor:leer?"default":"pointer"}}>
                       {l.name}
-                      {meins&&<span style={{position:"absolute",top:5,right:6,width:5,height:5,borderRadius:"50%",background:on?"#14171E":GREEN}}/>}
+                      {meins&&<span style={{position:"absolute",top:5,right:6,width:5,height:5,borderRadius:"50%",background:on?"#1C212B":GREEN}}/>}
                     </button>
                   )
                 })}
@@ -730,7 +730,7 @@ export default function LigaPage(){
               <div style={{background:CARD,borderRadius:18,padding:"16px 16px",boxShadow:SHADOW,textAlign:"left"}}>
                 <div style={{fontSize:13.5,fontWeight:800,color:W,marginBottom:10}}>In welcher Stadt fehlt dir eine Liga?</div>
                 <input value={reqCity} onChange={e=>setReqCity(e.target.value)} placeholder="z.B. Winterthur" autoFocus
-                  style={{width:"100%",boxSizing:"border-box",background:"#20242C",borderRadius:12,padding:"12px 14px",color:W,fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:10}}/>
+                  style={{width:"100%",boxSizing:"border-box",background:"#12151A",borderRadius:12,padding:"12px 14px",color:W,fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:10}}/>
                 <button onClick={sendLigaAnfrage} disabled={busy||!reqCity.trim()}
                   style={{display:"block",width:"100%",textAlign:"center",borderRadius:12,padding:12,fontSize:13,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:"#06210F",background:GRAD,cursor:(busy||!reqCity.trim())?"not-allowed":"pointer",opacity:(busy||!reqCity.trim())?.5:1,fontFamily:"inherit"}}>
                   {busy?"…":"Anfrage senden"}
@@ -831,7 +831,7 @@ export default function LigaPage(){
                 : <div style={{background:CELL,borderRadius:14,overflow:"hidden"}}>
                     {pData.recent.map((m,i)=>(
                       <div key={m.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 14px",borderTop:i===0?"none":`1px solid ${LINE}`}}>
-                        <span style={{width:22,height:22,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:900,background:m.won?GRAD:"#20242C",color:m.won?"#06210F":MUT}}>{m.won?"S":"N"}</span>
+                        <span style={{width:22,height:22,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:900,background:m.won?GRAD:"#12151A",color:m.won?"#06210F":MUT}}>{m.won?"S":"N"}</span>
                         <div style={{flex:1,minWidth:0}}>
                           <div style={{fontSize:13,fontWeight:700,color:W,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.opponent}</div>
                           {(m.date||!m.ranked)&&<div style={{fontSize:10.5,color:MUT,marginTop:1}}>
@@ -890,12 +890,12 @@ export default function LigaPage(){
             {/* Freunde + Kategorie */}
             <div style={{fontSize:10.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"16px 2px 8px"}}>Gruppen</div>
             <button onClick={()=>setFilter(f=>({...f,friends:!f.friends}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit",marginBottom:8}}>
-              <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.friends?{background:GRAD,color:"#06210F"}:{background:"#20242C",color:"transparent"})}}>✓</span>
+              <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.friends?{background:GRAD,color:"#06210F"}:{background:"#12151A",color:"transparent"})}}>✓</span>
               <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Nur Freunde</span>
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={SUB} strokeWidth="2"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M17 8v5M14.5 10.5h5"/></svg>
             </button>
             <button onClick={()=>setFilter(f=>({...f,category:f.category==="parkinson"?"":"parkinson"}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit"}}>
-              <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.category==="parkinson"?{background:GRAD,color:"#06210F"}:{background:"#20242C",color:"transparent"})}}>✓</span>
+              <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.category==="parkinson"?{background:GRAD,color:"#06210F"}:{background:"#12151A",color:"transparent"})}}>✓</span>
               <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Parkinson-Liga</span>
             </button>
 
@@ -915,7 +915,7 @@ export default function LigaPage(){
                 })
                 return (
                   <button key={label} onClick={toggle} style={{flex:"1 1 45%",display:"flex",alignItems:"center",gap:8,background:CELL,borderRadius:10,padding:"10px 11px",cursor:"pointer",fontFamily:"inherit"}}>
-                    <span style={{width:17,height:17,borderRadius:5,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:900,...(on?{background:GRAD,color:"#06210F"}:{background:"#20242C",color:"transparent"})}}>✓</span>
+                    <span style={{width:17,height:17,borderRadius:5,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:900,...(on?{background:GRAD,color:"#06210F"}:{background:"#12151A",color:"transparent"})}}>✓</span>
                     <span style={{fontSize:12.5,fontWeight:600,color:on?W:SUB}}>{label}</span>
                   </button>
                 )
@@ -958,11 +958,11 @@ export default function LigaPage(){
                 <div style={{display:"flex",gap:12}}>
                   <div style={{flex:1}}>
                     <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Datum</div>
-                    <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} style={{width:"100%",background:"#20242C",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                    <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} style={{width:"100%",background:"#12151A",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                   </div>
                   <div style={{flex:1}}>
                     <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Zeit</div>
-                    <input type="time" value={fTime} onChange={e=>setFTime(e.target.value)} style={{width:"100%",background:"#20242C",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                    <input type="time" value={fTime} onChange={e=>setFTime(e.target.value)} style={{width:"100%",background:"#12151A",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                   </div>
                 </div>
                 <button onClick={sendChallenge} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:22,background:GRAD,color:"#06210F",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":"Anfrage senden"}</button>
@@ -973,7 +973,7 @@ export default function LigaPage(){
 
                 <div style={{marginBottom:18}}>
                   <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Wann gespielt?</div>
-                  <input type="date" max={today()} value={fRDate} onChange={e=>setFRDate(e.target.value)} style={{width:"100%",background:"#20242C",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                  <input type="date" max={today()} value={fRDate} onChange={e=>setFRDate(e.target.value)} style={{width:"100%",background:"#12151A",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                 </div>
 
                 {!fDetail?(
@@ -1006,12 +1006,12 @@ export default function LigaPage(){
                         <input type="number" inputMode="numeric" min={0} max={30} value={s.p1}
                           onChange={e=>setFSets(v=>v.map((x,j)=>j===i?{...x,p1:e.target.value}:x))}
                           placeholder="11"
-                          style={{flex:1,minWidth:0,background:"#20242C",borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
+                          style={{flex:1,minWidth:0,background:"#12151A",borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
                         <span style={{width:10,textAlign:"center",color:MUT,fontWeight:800}}>:</span>
                         <input type="number" inputMode="numeric" min={0} max={30} value={s.p2}
                           onChange={e=>setFSets(v=>v.map((x,j)=>j===i?{...x,p2:e.target.value}:x))}
                           placeholder="7"
-                          style={{flex:1,minWidth:0,background:"#20242C",borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
+                          style={{flex:1,minWidth:0,background:"#12151A",borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
                         {i>=3&&(
                           <button onClick={()=>setFSets(v=>v.filter((_,j)=>j!==i))} style={{background:"none",color:MUT,fontSize:16,cursor:"pointer",flexShrink:0}}>×</button>
                         )}
@@ -1052,7 +1052,7 @@ export default function LigaPage(){
                     <div style={{fontSize:11,fontWeight:700,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:8}}>Eingetragen ({fDone.length})</div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
                       {fDone.map((s,i)=>(
-                        <span key={i} style={{fontSize:13,fontWeight:800,color:W,background:"#20242C",borderRadius:8,padding:"5px 10px"}}>{s}</span>
+                        <span key={i} style={{fontSize:13,fontWeight:800,color:W,background:"#12151A",borderRadius:8,padding:"5px 10px"}}>{s}</span>
                       ))}
                     </div>
                     <div style={{fontSize:11.5,color:SUB,fontWeight:300,marginTop:9,lineHeight:1.5}}>{fTarget.name} bekommt eine E-Mail und hat 24 Std. Zeit zu bestätigen — danach zählt das Ergebnis automatisch. Du kannst gleich den nächsten Match eintragen.</div>
@@ -1102,7 +1102,7 @@ export default function LigaPage(){
                             return(
                               <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:active?"rgba(255,255,255,.14)":"rgba(255,255,255,.06)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:W,fontFamily:"inherit"}}>
                                 <span>{emoji}</span>
-                                {cnt>0&&<span style={{fontSize:11,fontWeight:700,color:active?"#39FF14":MUT}}>{cnt}</span>}
+                                {cnt>0&&<span style={{fontSize:11,fontWeight:700,color:active?"#57CF79":MUT}}>{cnt}</span>}
                               </button>
                             )
                           })}

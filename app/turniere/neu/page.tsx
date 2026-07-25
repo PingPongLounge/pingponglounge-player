@@ -91,7 +91,7 @@ export default function NeuesTurnierPage(){
         <Section n="3" title="Startgeld & Rang">
           <Label>Startgeld pro Spieler (CHF)</Label>
           <input type="number" min="0" max="999" value={fee} onChange={e=>setFee(e.target.value)} style={{...inputStyle,marginBottom:14}}/>
-          <div onClick={()=>setCounts(!counts)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"12px",background:"#20242C",borderRadius:10}}>
+          <div onClick={()=>setCounts(!counts)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",cursor:"pointer",padding:"12px",background:"#12151A",borderRadius:10}}>
             <div>
               <p style={{fontSize:13,fontWeight:700,color:W}}>Zählt für den Rang</p>
               <p style={{...body,marginTop:2}}>{counts?"Resultate beeinflussen Elo & Rangliste":"Nur zum Spass — kein Elo"}</p>

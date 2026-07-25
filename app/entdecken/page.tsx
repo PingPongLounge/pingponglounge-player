@@ -4,9 +4,9 @@ import Link from 'next/link'
 import BottomNav from '@/app/components/BottomNav'
 import StartHomeV2, { Game } from '@/app/components/StartHomeV2'
 
-const BG = '#20242C', W = '#FFFFFF'
+const BG = '#12151A', W = '#FFFFFF'
 const SUB = 'rgba(255,255,255,.9)', MUT = 'rgba(255,255,255,.85)'
-const GRAD = 'linear-gradient(135deg,#39FF14,#1FD1C4)'
+const GRAD = 'linear-gradient(135deg,#57CF79,#38BEB2)'
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }
 
 const LV = [
@@ -17,7 +17,7 @@ const LV = [
 function Logo() {
   return (
     <svg width={56} height={56} viewBox="0 0 80 80" fill="none" style={{ display: 'block' }}>
-      <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#39FF14" /><stop offset="100%" stopColor="#1FD1C4" /></linearGradient></defs>
+      <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#57CF79" /><stop offset="100%" stopColor="#1FD1C4" /></linearGradient></defs>
       {/* P immer nur Outline; um -2 verschoben, damit das P selbst mittig sitzt (Ball hängt raus) */}
       <g transform="translate(-2,0)">
         <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="2.5" strokeLinejoin="round" />
@@ -64,7 +64,7 @@ export default async function EntdeckenPage() {
                   Wortmarkenbreite. Das P bleibt Outline, der Ball sitzt rechts unten. */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
                 <svg width="72" height="72" viewBox="0 0 80 80" fill="none" aria-hidden>
-                  <defs><linearGradient id="hlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14" /><stop offset="1" stopColor="#1FD1C4" /></linearGradient></defs>
+                  <defs><linearGradient id="hlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#57CF79" /><stop offset="1" stopColor="#1FD1C4" /></linearGradient></defs>
                   <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#hlg)" strokeWidth="3.6" strokeLinejoin="round" />
                   <circle cx="63" cy="58" r="6.5" fill="url(#hlg)" />
                 </svg>
@@ -83,13 +83,13 @@ export default async function EntdeckenPage() {
                 {spielerCount ? ` ${spielerCount} Spieler sind dabei.` : ''}
               </p>
 
-              <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 15, padding: 17, fontSize: 16, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: '#06210F', background: GRAD, textDecoration: 'none' }}>Login / Registrieren</Link>
+              <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 15, padding: 17, fontSize: 16, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: '#FFF9F3', background: `linear-gradient(${BG},${BG}) padding-box, ${GRAD} border-box`, border: '1.5px solid transparent', textDecoration: 'none' }}>Login / Registrieren</Link>
               <Link href="/spielen" style={{ display: 'block', textAlign: 'center', marginTop: 14, color: SUB, fontSize: 13.5, fontWeight: 500, textDecoration: 'none' }}>Schon gespielt? Resultat eintragen →</Link>
             </div>
           </div>
 
           {/* EIN Block statt vier Karten — drei Zeilen sagen, was einen erwartet. */}
-          <div style={{ margin: '4px 14px 0', background: '#14171E', borderRadius: 22, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,.14)' }}>
+          <div style={{ margin: '4px 14px 0', background: '#1C212B', borderRadius: 22, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,.14)' }}>
             <div style={{ padding: '15px 18px 3px', fontSize: 11, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: MUT }}>Was dich erwartet</div>
 
             <div style={{ ...ROW, borderTop: 'none', paddingTop: 12 }}>

@@ -3,7 +3,7 @@
 // =====================================================================
 // Finale Regeln (von Oliver bestätigt, Referenz: Startseite /entdecken)
 //
-//  • Verlauf (#39FF14 → #1FD1C4) NUR für Logo + Rang-Zahl. Sonst nie.
+//  • Verlauf (#57CF79 → #1FD1C4) NUR für Logo + Rang-Zahl. Sonst nie.
 //  • Überschriften/Titel extra fett (900), GROSSBUCHSTABEN, weiss.
 //  • Fliesstext leicht (300) aber weiss (~.85–.9) — Kontrast über Gewicht.
 //  • Karten randlos (kein Border), Füllung + dezenter Schatten.
@@ -18,19 +18,19 @@
 import type { CSSProperties } from 'react'
 
 /* ---------- Farben ---------- */
-export const BG     = '#20242C'                 // Screen-Hintergrund (Startseiten-Referenz)
+export const BG     = '#12151A'                 // Screen-Hintergrund (Startseiten-Referenz)
 export const CARD   = '#2A2F39'                 // Karten-Fläche (DAS Standard-Kästchen)
 export const CELL   = '#353B46'                 // Zellen / Chips innerhalb Karten
-export const INPUTBG= '#20242C'                 // Eingabefelder (etwas dunkler)
+export const INPUTBG= '#12151A'                 // Eingabefelder (etwas dunkler)
 export const W      = '#FFFFFF'                  // Primärtext
 export const SUB    = 'rgba(255,255,255,.9)'   // Sekundärtext (gut lesbar)
 export const MUT    = 'rgba(255,255,255,.82)'    // Labels / gedämpft (Minimum für Text)
 export const LINE   = 'rgba(255,255,255,.06)'   // ultra-dezente Trennlinie
 export const DANGER = '#E5484D'                 // Fehler / Löschen (klares, ruhiges Rot)
 
-export const GREEN  = '#39FF14'
+export const GREEN  = '#57CF79'
 export const CYAN   = '#1FD1C4'
-export const GRAD   = 'linear-gradient(135deg,#39FF14,#1FD1C4)'   // DAS eine Leuchten (Logo + Rang)
+export const GRAD   = 'linear-gradient(135deg,#57CF79,#38BEB2)'   // DAS eine Leuchten (Logo + Rang)
 export const SHADOW = '0 4px 14px rgba(0,0,0,.35)'
 
 /* ---------- Level-System: 1–7 (Mint → Teal → Bronze → Amber → Silber → Platin → Gold) ----------
@@ -168,18 +168,20 @@ export const chipBtn = (active: boolean): CSSProperties => ({
 export const rowTop: CSSProperties = { borderTop: `1px solid ${LINE}` }
 export const listRow: CSSProperties = { display: 'flex', alignItems: 'center', gap: 12, padding: '16px', borderTop: `1px solid ${LINE}`, textDecoration: 'none' }
 
-/* ---------- Buttons (IMMER gefüllt) ---------- */
-// Primär: Verlauf-Fill + dunkle Schrift (Hintergrund egal)
+/* ---------- Buttons (NUR Verlauf-Umrandung, nicht gefüllt) ----------
+   Transparenter Inhalt (Karten-/BG-Ton via padding-box) + Verlauf-Rand
+   via border-box. Schrift Creme/weiss — nie dunkel. */
+export const GRAD_OUTLINE = `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`
 export const btn: CSSProperties = {
   display: 'block', textAlign: 'center', borderRadius: 12,
-  padding: '13px', fontSize: 15, fontWeight: 700, color: '#06210F', textDecoration: 'none', cursor: 'pointer',
-  background: GRAD,
+  padding: '12px', fontSize: 15, fontWeight: 800, color: W, textDecoration: 'none', cursor: 'pointer',
+  background: GRAD_OUTLINE, border: '1.5px solid transparent',
 }
 // Primär in einer Karte
 export const btnInCard: CSSProperties = {
   display: 'inline-block', borderRadius: 11,
-  padding: '9px 18px', fontSize: 14, fontWeight: 700, color: '#06210F', textDecoration: 'none', cursor: 'pointer',
-  background: GRAD,
+  padding: '8px 18px', fontSize: 14, fontWeight: 800, color: W, textDecoration: 'none', cursor: 'pointer',
+  background: GRAD_OUTLINE, border: '1.5px solid transparent',
 }
 // Neutraler/sekundärer Button (z.B. Abbrechen) — gefüllt grau
 export const btnGhost: CSSProperties = {
@@ -192,8 +194,9 @@ export const btnDanger: CSSProperties = {
   borderRadius: 12, padding: '13px', fontSize: 14, fontWeight: 700, cursor: 'pointer',
 }
 // Verlauf-Fill-Helper (früher Verlauf-Outline auf beliebiger Fläche)
-export const gradOutlineOn = (_bg?: string): CSSProperties => ({
-  background: GRAD, color: '#06210F',
+export const gradOutlineOn = (bg: string = CARD): CSSProperties => ({
+  background: `linear-gradient(${bg},${bg}) padding-box, ${GRAD} border-box`,
+  border: '1.5px solid transparent', color: W,
 })
 
 /* ---------- Formular ---------- */

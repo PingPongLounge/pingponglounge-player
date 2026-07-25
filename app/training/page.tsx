@@ -6,9 +6,9 @@ import { SectionBlock, SectionIntro, SectionTopBar } from "@/app/components/Sect
 import { ratingLabel } from "@/app/theme"
 import { OG_TRAINING_PREIS_CHF } from "@/lib/opengames"
 
-const BG = "#20242C", CARD = "#2A2F39", CELL = "#353B46", W = "#FFFFFF"
-const MUT = "rgba(255,255,255,.82)", GREEN = "#39FF14"
-const GRAD = "linear-gradient(135deg,#39FF14,#1FD1C4)"
+const BG = "#12151A", CARD = "#2A2F39", CELL = "#353B46", W = "#FFFFFF"
+const MUT = "rgba(255,255,255,.82)", GREEN = "#57CF79"
+const GRAD = "linear-gradient(135deg,#57CF79,#38BEB2)"
 
 type Player = { user_id: string; name: string; elo: number; level: string }
 type Training = {
@@ -60,7 +60,7 @@ export default function TrainingPage() {
         {/* ─── TRAININGSCAMP-BANNER (Aktion) ──────────────────────────────────
             Externer Link auf ppl24.ch/trainingscamp — Buchung läuft aktuell noch
             über Eversports. Ganze Karte ist klickbar. */}
-        <a href="https://ppl24.ch/trainingscamp" target="_blank" rel="noopener noreferrer"
+        <a href="/trainingscamp"
           style={{ display: "block", textDecoration: "none", margin: "16px 0 8px", borderRadius: 22, overflow: "hidden", background: CARD, boxShadow: "0 4px 18px rgba(0,0,0,.4)" }}>
           <div style={{ background: GRAD, padding: "18px 18px 16px" }}>
             <div style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: ".14em", color: "#06210F", textTransform: "uppercase" }}>Trainingscamp · 13.–16. August</div>
@@ -68,7 +68,7 @@ export default function TrainingPage() {
           </div>
           <div style={{ padding: "14px 18px 16px" }}>
             <div style={{ fontSize: 14, fontWeight: 800, color: W }}>Elias Schmid <span style={{ color: MUT, fontWeight: 500 }}>· Schweizer Nr. 1</span></div>
-            <div style={{ fontSize: 14, fontWeight: 800, color: W, marginTop: 2 }}>Simon Berglund <span style={{ color: MUT, fontWeight: 500 }}>· Ex-Bundesliga</span></div>
+            <div style={{ fontSize: 14, fontWeight: 800, color: W, marginTop: 2 }}>Simon Berglund <span style={{ color: MUT, fontWeight: 500 }}>· Schwedens Nr. 3</span></div>
             <div style={{ fontSize: 13, color: MUT, marginTop: 8, lineHeight: 1.5 }}>PPL24 Glattbrugg · für alle Levels · Halbtag CHF 75 · Ganztag CHF 150</div>
             <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 14, background: GRAD, color: "#06210F", borderRadius: 12, padding: "11px 16px", fontSize: 13.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em" }}>
               Jetzt anmelden →
@@ -138,9 +138,9 @@ export default function TrainingPage() {
             </div>
             <div style={{ padding: "16px 20px 20px" }}>
               <div style={{ fontSize: 14.5, fontWeight: 800, color: W }}>Elias Schmid <span style={{ color: MUT, fontWeight: 500 }}>· Schweizer Nr. 1</span></div>
-              <div style={{ fontSize: 14.5, fontWeight: 800, color: W, marginTop: 3 }}>Simon Berglund <span style={{ color: MUT, fontWeight: 500 }}>· Ex-Bundesliga</span></div>
+              <div style={{ fontSize: 14.5, fontWeight: 800, color: W, marginTop: 3 }}>Simon Berglund <span style={{ color: MUT, fontWeight: 500 }}>· Schwedens Nr. 3</span></div>
               <div style={{ fontSize: 13, color: MUT, marginTop: 10, lineHeight: 1.5 }}>PPL24 Glattbrugg · für alle Levels · Halbtag CHF 75 · Ganztag CHF 150</div>
-              <a href="https://ppl24.ch/trainingscamp" target="_blank" rel="noopener noreferrer" onClick={campSchliessen} style={{ display: "block", textAlign: "center", marginTop: 16, background: GRAD, color: "#06210F", borderRadius: 14, padding: 15, fontSize: 15, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }}>Zum Trainingscamp →</a>
+              <a href="/trainingscamp" onClick={campSchliessen} style={{ display: "block", textAlign: "center", marginTop: 16, background: `linear-gradient(#2A2F39,#2A2F39) padding-box, ${GRAD} border-box`, border: "1.5px solid transparent", color: "#FFF9F3", borderRadius: 14, padding: 15, fontSize: 15, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }}>Zum Trainingscamp →</a>
               <button onClick={campSchliessen} style={{ display: "block", width: "100%", textAlign: "center", marginTop: 8, background: "none", color: MUT, fontSize: 13, fontWeight: 600, padding: 8, cursor: "pointer", fontFamily: "inherit" }}>Später</button>
             </div>
           </div>
