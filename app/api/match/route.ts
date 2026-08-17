@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
+import { planyoBookingUrl } from "@/lib/planyo"
 
 type PubProfile = { id: string; name: string; elo: number; level: string }
 
@@ -81,6 +82,10 @@ export async function POST(req: NextRequest) {
     ? Math.max(0, Math.min(23, Number(body.start_hour))) : null
   const duration_minutes = [30, 60, 90, 120].includes(Number(body.duration_minutes)) ? Number(body.duration_minutes) : 60
   const notes = body.notes ? String(body.notes).slice(0, 300) : null
+  // Ortsart: "ppl" → Tisch muss erst gebucht werden → unveröffentlicht (booking_pending).
+  // "custom" (Anderer Ort) → sofort veröffentlicht, Gastgeber organisiert den Tisch selbst.
+  const location_type = body.location_type === "ppl" ? "ppl" : "custom"
+  const startStatus = location_type === "ppl" ? "booking_pending" : "open"
 
   const admin = createAdminClient()
 
@@ -93,7 +98,7 @@ export async function POST(req: NextRequest) {
     .from("open_games")
     .select("id")
     .eq("created_by", user.id)
-    .in("status", ["open", "full"])
+    .in("status", ["open", "full", "booking_pending"])
     .gte("date", heuteStr)
     .limit(1)
   if ((existingList || []).length > 0) {
@@ -104,14 +109,14 @@ export async function POST(req: NextRequest) {
   await admin.from("open_games")
     .update({ status: "expired", updated_at: new Date().toISOString() })
     .eq("created_by", user.id)
-    .in("status", ["open", "full"])
+    .in("status", ["open", "full", "booking_pending"])
     .lt("date", heuteStr)
 
   const { data: game, error } = await admin
     .from("open_games")
     .insert({
       created_by: user.id, location_name, date, start_hour, duration_minutes,
-      max_players, current_players: 1, price_per_player, level, notes, status: "open",
+      max_players, current_players: 1, price_per_player, level, notes, status: startStatus,
     })
     .select("id")
     .single()
@@ -120,5 +125,9 @@ export async function POST(req: NextRequest) {
   // Ersteller als erster Spieler
   await admin.from("open_game_players").insert({ game_id: game.id, user_id: user.id, status: "joined" })
 
-  return NextResponse.json({ id: game.id })
+  // PPL-Standort: Gastgeber bucht zuerst den Tisch in Planyo, dann veröffentlichen.
+  if (location_type === "ppl") {
+    return NextResponse.json({ id: game.id, status: startStatus, needsBooking: true, bookingUrl: planyoBookingUrl(location_name) })
+  }
+  return NextResponse.json({ id: game.id, status: startStatus })
 }

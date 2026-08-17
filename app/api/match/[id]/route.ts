@@ -12,6 +12,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     .eq("id", id)
     .single()
   if (!game) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 })
+  // Noch nicht veröffentlichte Games (Tischbuchung ausstehend) sieht nur der Ersteller.
+  if (game.status === "booking_pending" && game.created_by !== user?.id) {
+    return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 })
+  }
 
   const { data: gp } = await sb
     .from("open_game_players")

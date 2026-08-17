@@ -48,6 +48,8 @@ export default function CreateMatchPage() {
   const [myLevel, setMyLevel] = useState<string>("")
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState("")
+  // PPL: nach dem Erstellen wartet das Game auf die Tischbuchung in Planyo.
+  const [created, setCreated] = useState<{ id: string; bookingUrl: string } | null>(null)
 
   useEffect(() => {
     (async () => {
@@ -80,6 +82,7 @@ export default function CreateMatchPage() {
       body: JSON.stringify({
         level: levelValue,
         location_name: ortsart === "ppl" ? city : customName.trim(),
+        location_type: ortsart,
         date, start_hour: hour, duration_minutes: duration,
         max_players: maxPlayers,
         price_per_player: 0, // Spieler teilen die Tischkosten selbst
@@ -88,7 +91,23 @@ export default function CreateMatchPage() {
     })
     const json = await res.json().catch(() => ({}))
     if (!res.ok) { setError(json.error || "Fehler"); setLoading(false); return }
+    // PPL: erst Tisch in Planyo buchen, dann veröffentlichen.
+    if (ortsart === "ppl" && json.needsBooking && json.bookingUrl) {
+      setCreated({ id: json.id, bookingUrl: json.bookingUrl })
+      setLoading(false)
+      window.open(json.bookingUrl, "_blank", "noopener")
+      return
+    }
     router.push(`/match/${json.id}`)
+  }
+
+  async function publish() {
+    if (!created) return
+    setLoading(true); setError("")
+    const r = await fetch(`/api/match/${created.id}/publish`, { method: "POST" })
+    const j = await r.json().catch(() => ({}))
+    if (!r.ok) { setError(j.error || "Fehler"); setLoading(false); return }
+    router.push(`/match/${created.id}`)
   }
 
   const pageStyle: React.CSSProperties = { minHeight: "100vh", background: BG, padding: "16px 16px 40px", display: "flex", flexDirection: "column" }
@@ -238,7 +257,7 @@ export default function CreateMatchPage() {
         )}
 
         {/* ---------- SCHRITT 3 · Übersicht ---------- */}
-        {step === 3 && (
+        {step === 3 && !created && (
           <>
             <h1 style={bigTitle}>Alles bereit?</h1>
             <div style={{ background: CARD, border: `1px solid ${LINE}`, borderRadius: 18, overflow: "hidden", marginBottom: 18 }}>
@@ -260,6 +279,31 @@ export default function CreateMatchPage() {
               {loading ? "Wird erstellt …" : ortsart === "ppl" ? "Buchen & veröffentlichen" : "Veröffentlichen"}
             </button>
             <button onClick={() => setStep(1)} style={{ ...btnOutline, border: "none", color: MUT, fontWeight: 500, marginTop: 8, background: "transparent" }}>Angaben bearbeiten</button>
+          </>
+        )}
+
+        {/* ---------- SCHRITT 3b · Tischbuchung (Planyo) ---------- */}
+        {step === 3 && created && (
+          <>
+            <h1 style={bigTitle}>Fast fertig!</h1>
+            <p style={{ color: SUB, fontSize: 15, lineHeight: 1.5, marginBottom: 20 }}>
+              Buche jetzt den Tisch in der Ping Pong Lounge. Sobald der Tisch gebucht ist, veröffentlichst du dein Open Game — dann sehen es die anderen.
+            </p>
+            <div style={{ background: CARD, border: `1px solid ${LINE}`, borderRadius: 18, overflow: "hidden", marginBottom: 18 }}>
+              <SumRow text={ortText} />
+              <SumRow text={`${dateLabel(date)} · ${hour === "" ? "" : String(hour).padStart(2, "0")}:00`} border />
+              <SumRow text={`${levelText} · ${maxPlayers} Personen`} border />
+            </div>
+            <div style={{ display: "flex", alignItems: "flex-start", gap: 10, color: MUT, fontSize: 13, margin: "2px 2px 18px", lineHeight: 1.4 }}>
+              <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke={MUT} strokeWidth={1.6} style={{ flex: "0 0 18px", marginTop: 1 }}><circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" /></svg>
+              Noch nicht veröffentlicht — erst nach der Tischbuchung sichtbar.
+            </div>
+            {error && <p style={{ color: DANGER, fontSize: 13, marginBottom: 12 }}>{error}</p>}
+            <div style={{ flex: 1 }} />
+            <button onClick={() => window.open(created.bookingUrl, "_blank", "noopener")} style={btnOutline}>Tisch in Planyo buchen</button>
+            <button onClick={publish} disabled={loading} style={{ ...btn, marginTop: 10, opacity: loading ? .6 : 1 }}>
+              {loading ? "…" : "Tisch gebucht — veröffentlichen"}
+            </button>
           </>
         )}
       </div>
