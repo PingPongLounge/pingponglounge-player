@@ -145,6 +145,24 @@ export default async function EntdeckenPage() {
   const rank = (higherRes.count ?? 0) + 1
   const ppBalance = (ppRes.data || []).reduce((s, t) => s + Number(t.amount || 0), 0)
 
+  // Dein nächstes Spiel: die früheste bevorstehende Buchung des Users (nur wenn vorhanden).
+  const heuteStr = new Date().toISOString().slice(0, 10)
+  let nextGame: { href: string; when: string; location: string } | null = null
+  const { data: myPlays } = await sb.from('open_game_players').select('game_id').eq('user_id', user.id).neq('status', 'left')
+  const myIds = (myPlays || []).map(r => r.game_id)
+  if (myIds.length > 0) {
+    const { data: ng } = await sb.from('open_games')
+      .select('id,location_name,date,start_hour')
+      .in('id', myIds).in('status', ['open', 'full', 'p1_entered']).gte('date', heuteStr)
+      .order('date', { ascending: true }).order('start_hour', { ascending: true, nullsFirst: false })
+      .limit(1).maybeSingle()
+    if (ng) {
+      const wd = ng.date ? new Date(`${ng.date}T12:00:00`).toLocaleDateString('de-CH', { weekday: 'long', day: 'numeric', month: 'long' }) : ''
+      const t = ng.start_hour != null ? ` · ${String(ng.start_hour).padStart(2, '0')}:00` : ''
+      nextGame = { href: `/match/${ng.id}`, when: `${wd}${t}`, location: ng.location_name || 'Ping Pong Lounge' }
+    }
+  }
+
   const games: Game[] = (gamesRes.data || []).map(g => {
     const max = g.max_players || 2
     const cur = g.current_players || 1
@@ -200,6 +218,7 @@ export default async function EntdeckenPage() {
       games={games}
       season={{ has: !!season, label: seasonLabel, city: season?.city || '', leagueRank }}
       tour={tour}
+      nextGame={nextGame}
     />
   )
 }
