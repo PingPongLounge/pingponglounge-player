@@ -3,7 +3,7 @@ import Stripe from "stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { PP_CONFIG } from "@/lib/rewards"
 import { sessionUuid } from "@/lib/stripe-util"
-import { sendBookingConfirm } from "@/lib/email"
+import { sendBookingConfirm, sendEmail } from "@/lib/email"
 import { entryQrFor, weekdayOf } from "@/lib/opengames"
 import { CAMP_MAX_PER_SESSION } from "@/lib/camp"
 import { campBelegung } from "@/lib/camp-server"
@@ -84,13 +84,39 @@ export async function POST(req: NextRequest) {
             payment_status: "paid", reserved_until: null,
             stripe_payment_intent: s.payment_intent ? String(s.payment_intent) : null,
           }).eq("id", bid).neq("payment_status", "paid").select("id").maybeSingle()
-          if (upd && b.user_id) {
+          if (upd) {
+            // Bestätigungsmail mit Storno-Link — für Gäste (Token) UND Eingeloggte.
             try {
-              await admin.from("ping_points_transactions").insert({
-                player_id: b.user_id, amount: PP_CONFIG.perPaidBooking, source: "booking_paid",
-                description: "Trainingscamp", ref_id: sessionUuid(s.id),
-              })
-            } catch { /* Unique-Index verhindert Doppelgutschrift */ }
+              let to: string | null = b.guest_email || null
+              if (!to && b.user_id) {
+                const { data: authU } = await admin.auth.admin.getUserById(b.user_id)
+                to = authU?.user?.email || null
+              }
+              if (to) {
+                const base = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
+                const stornoLink = b.cancel_token ? `${base}/trainingscamp/storno?token=${b.cancel_token}` : `${base}/trainingscamp`
+                const anzahl = (b.session_ids || []).length
+                await sendEmail({
+                  to,
+                  subject: "Trainingscamp — Buchung bestätigt",
+                  html: `<div style="font-family:system-ui,sans-serif;color:#111">
+                    <h2>Buchung bestätigt 🏓</h2>
+                    <p>Danke für deine Anmeldung zum Trainingscamp — <b>${anzahl} Einheit${anzahl > 1 ? "en" : ""}</b>, CHF ${b.amount_chf}.</p>
+                    <p>Wir freuen uns auf dich!</p>
+                    <p style="margin-top:20px;font-size:14px;color:#555">Verhindert? Du kannst bis 7 Tage vor der ersten Einheit gratis stornieren:<br>
+                    <a href="${stornoLink}">Buchung stornieren</a></p>
+                  </div>`,
+                })
+              }
+            } catch (e) { console.error("Camp-Bestätigungsmail fehlgeschlagen:", e) }
+            if (b.user_id) {
+              try {
+                await admin.from("ping_points_transactions").insert({
+                  player_id: b.user_id, amount: PP_CONFIG.perPaidBooking, source: "booking_paid",
+                  description: "Trainingscamp", ref_id: sessionUuid(s.id),
+                })
+              } catch { /* Unique-Index verhindert Doppelgutschrift */ }
+            }
           }
         }
       }

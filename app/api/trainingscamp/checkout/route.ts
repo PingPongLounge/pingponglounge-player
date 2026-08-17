@@ -89,7 +89,10 @@ export async function POST(req: NextRequest) {
   if (price.total <= 0) return NextResponse.json({ error: "Preis ungültig" }, { status: 400 })
 
   // Reservierung anlegen (Platz wird erst im Webhook nach Zahlung fest).
+  // cancel_token: erlaubt Gästen (ohne Login) das Stornieren über den Link in der
+  // Bestätigungsmail. Eingeloggte stornieren zusätzlich als Eigentümer.
   const reservedUntil = new Date(Date.now() + RESERVE_MINUTES * 60_000)
+  const cancelToken = crypto.randomUUID()
   const { data: booking, error: insErr } = await admin.from("camp_bookings").insert({
     user_id: user?.id ?? null,
     guest_name: user ? null : payerName,
@@ -100,6 +103,7 @@ export async function POST(req: NextRequest) {
     amount_chf: price.total,
     payment_status: "reserved",
     reserved_until: reservedUntil.toISOString(),
+    cancel_token: cancelToken,
   }).select("id").single()
   if (insErr || !booking) return NextResponse.json({ error: "Buchung konnte nicht angelegt werden" }, { status: 500 })
 
