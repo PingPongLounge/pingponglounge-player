@@ -24,7 +24,7 @@ const OPTIONS: Opt[] = [
     icon: <g><path d="M4 19V7a2 2 0 0 1 2-2h9l5 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" /><path d="M8 12h6M8 16h4" /></g>,
   },
   {
-    href: "/match", title: "Single Night", sub: "Spielen & kennenlernen", color: PINK,
+    href: "/single-night", title: "Single Night", sub: "Spielen & kennenlernen", color: PINK,
     icon: <g><circle cx="8.5" cy="8" r="3" /><circle cx="16" cy="9" r="2.6" /><path d="M3 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5M14 20c0-2.4 1.6-4 4-4s4 1.6 4 4" /></g>,
   },
 ]

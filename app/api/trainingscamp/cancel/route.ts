@@ -12,13 +12,14 @@ export const runtime = "nodejs"
 
 export async function POST(req: NextRequest) {
   const { booking_id, token } = await req.json().catch(() => ({}))
-  if (!booking_id) return NextResponse.json({ error: "booking_id fehlt" }, { status: 400 })
+  if (!booking_id && !token) return NextResponse.json({ error: "booking_id oder token fehlt" }, { status: 400 })
 
   const admin = createAdminClient()
-  const { data: b } = await admin
-    .from("camp_bookings")
-    .select("id,user_id,session_ids,payment_status,cancel_token")
-    .eq("id", booking_id).maybeSingle()
+  // Per Token (Gast, aus der Mail) ODER per id (eingeloggt) finden.
+  const q = admin.from("camp_bookings").select("id,user_id,session_ids,payment_status,cancel_token")
+  const { data: b } = booking_id
+    ? await q.eq("id", booking_id).maybeSingle()
+    : await q.eq("cancel_token", token).maybeSingle()
   if (!b) return NextResponse.json({ error: "Buchung nicht gefunden" }, { status: 404 })
 
   // Berechtigung: Token (Gast) ODER eingeloggter Besitzer.

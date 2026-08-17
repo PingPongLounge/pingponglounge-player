@@ -4,7 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { PP_CONFIG } from "@/lib/rewards"
 import { sessionUuid } from "@/lib/stripe-util"
 import { sendBookingConfirm, sendEmail } from "@/lib/email"
-import { entryQrFor, weekdayOf } from "@/lib/opengames"
+import { entryQrFor, weekdayOf, SINGLE_NIGHT_PLAETZE } from "@/lib/opengames"
 import { CAMP_MAX_PER_SESSION } from "@/lib/camp"
 import { campBelegung } from "@/lib/camp-server"
 
@@ -52,6 +52,13 @@ export async function POST(req: NextRequest) {
     if (s.metadata?.type === "camp" && s.metadata.booking_id) {
       const admin = createAdminClient()
       await admin.from("camp_bookings")
+        .update({ payment_status: "cancelled", reserved_until: null })
+        .eq("id", s.metadata.booking_id).eq("payment_status", "reserved")
+    }
+    // SINGLE NIGHT: Reservierung abgelaufen ohne Zahlung → freigeben.
+    if (s.metadata?.type === "single_night" && s.metadata.booking_id) {
+      const admin = createAdminClient()
+      await admin.from("single_night_bookings")
         .update({ payment_status: "cancelled", reserved_until: null })
         .eq("id", s.metadata.booking_id).eq("payment_status", "reserved")
     }
@@ -225,6 +232,69 @@ export async function POST(req: NextRequest) {
               }
             } catch (e) {
               console.error("Bestätigungsmail (Open Game/Training) fehlgeschlagen:", e)
+            }
+          }
+        }
+      }
+      return NextResponse.json({ received: true })
+    }
+
+    // SINGLE NIGHT: Zahlung eingegangen → Ticket fest. Überkapazitäts-Recheck,
+    // sonst Sicherheits-Refund. Bestätigungsmail mit Storno-Link. PP idempotent.
+    if (s.payment_status === "paid" && s.metadata?.type === "single_night" && s.metadata.booking_id) {
+      const admin = createAdminClient()
+      const bid = s.metadata.booking_id
+      const { data: b } = await admin.from("single_night_bookings").select("*").eq("id", bid).maybeSingle()
+      if (b && b.payment_status !== "paid" && b.payment_status !== "cancelled") {
+        const nowIso = new Date().toISOString()
+        const { data: ev } = await admin.from("open_games").select("max_players").eq("id", b.event_id).maybeSingle()
+        const { data: others } = await admin.from("single_night_bookings").select("id,persons,payment_status,reserved_until").eq("event_id", b.event_id)
+        let used = 0
+        for (const o of others || []) {
+          if (o.id === bid) continue
+          const active = o.payment_status === "paid" || (o.payment_status === "reserved" && o.reserved_until && o.reserved_until > nowIso)
+          if (active) used += Number(o.persons || 1)
+        }
+        const kap = Number(ev?.max_players ?? SINGLE_NIGHT_PLAETZE)
+        if (used + Number(b.persons || 1) > kap) {
+          try { if (s.payment_intent) await getStripe().refunds.create({ payment_intent: String(s.payment_intent) }) }
+          catch (e) { console.error("Single-Night-Refund (Überbuchung) fehlgeschlagen:", e) }
+          await admin.from("single_night_bookings").update({
+            payment_status: "cancelled", reserved_until: null,
+            stripe_payment_intent: s.payment_intent ? String(s.payment_intent) : null,
+          }).eq("id", bid)
+        } else {
+          const { data: upd } = await admin.from("single_night_bookings").update({
+            payment_status: "paid", reserved_until: null,
+            stripe_payment_intent: s.payment_intent ? String(s.payment_intent) : null,
+          }).eq("id", bid).neq("payment_status", "paid").select("id").maybeSingle()
+          if (upd) {
+            try {
+              let to: string | null = b.guest_email || null
+              if (!to && b.user_id) { const { data: authU } = await admin.auth.admin.getUserById(b.user_id); to = authU?.user?.email || null }
+              if (to) {
+                const base = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
+                const stornoLink = b.cancel_token ? `${base}/single-night/storno?token=${b.cancel_token}` : `${base}/single-night`
+                await sendEmail({
+                  to,
+                  subject: "Single Night — Ticket bestätigt",
+                  html: `<div style="font-family:system-ui,sans-serif;color:#111">
+                    <h2>Ticket bestätigt 🏓</h2>
+                    <p>Dein Single-Night-Ticket (${b.persons > 1 ? "2 Personen" : "1 Person"}) ist gesichert. CHF ${b.amount_chf}.</p>
+                    <p>Los geht's um 19:00 — Ticket an der Bar zeigen, Welcome Drink ist inklusive.</p>
+                    <p style="margin-top:20px;font-size:14px;color:#555">Verhindert? Absage bis 24 h vorher — Geld zurück:<br>
+                    <a href="${stornoLink}">Ticket stornieren</a></p>
+                  </div>`,
+                })
+              }
+            } catch (e) { console.error("Single-Night-Bestätigungsmail fehlgeschlagen:", e) }
+            if (b.user_id) {
+              try {
+                await admin.from("ping_points_transactions").insert({
+                  player_id: b.user_id, amount: PP_CONFIG.perPaidBooking, source: "booking_paid",
+                  description: "Single Night", ref_id: sessionUuid(s.id),
+                })
+              } catch { /* Unique-Index verhindert Doppelgutschrift */ }
             }
           }
         }

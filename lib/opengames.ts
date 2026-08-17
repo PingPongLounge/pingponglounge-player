@@ -27,6 +27,51 @@ export const OG_TRAININGS: OgTraining[] = [
   { location_id: "glattbrugg", location_name: "Glattbrugg", day: 4, start: 19, end: 20, dauerMin: 90, plaetze: 10 },
 ]
 
+// =====================================================================
+// SINGLE NIGHT — geselliger Ticket-Abend (Rundlauf · Doppel · Speeddating)
+// =====================================================================
+// PPL-offiziell, bezahltes Ticket, feste Termine (von PPL gepflegt).
+export const SINGLE_NIGHT_PLAETZE = 32          // Gesamtkapazität (Personen)
+export const SINGLE_NIGHT_MIN = 16              // Durchführung erst ab so vielen Personen
+export const SINGLE_NIGHT_STORNO_STUNDEN = 24   // Gratis-Storno bis 24 h vorher → Geld zurück
+export const SINGLE_NIGHT_LOCATION = { id: "glattbrugg", name: "Glattbrugg" }
+export const SINGLE_NIGHT_START = 19            // 19:00
+export const SINGLE_NIGHT_END = 22
+
+// Termine (YYYY-MM-DD) — hier pflegt PPL die nächsten Single Nights.
+export const SINGLE_NIGHT_DATES: string[] = ["2026-08-26"]
+
+// Ticket-Typen. persons = wie viele Personen ein Ticket einlässt.
+export type SnTicket = { key: string; label: string; price: number; persons: number; hint?: string }
+export const SINGLE_NIGHT_TICKETS: SnTicket[] = [
+  { key: "herren", label: "Herren", price: 29, persons: 1 },
+  { key: "damen2for1", label: "Damen · 2 für 1", price: 29, persons: 2, hint: "Ein Ticket für zwei" },
+]
+export function snTicket(key: string): SnTicket | undefined {
+  return SINGLE_NIGHT_TICKETS.find(t => t.key === key)
+}
+
+// Ablauf (für die Anzeige auf /single-night).
+export const SINGLE_NIGHT_ABLAUF: string[] = [
+  "19:00 · Einlass & Ticket-Check an der Bar, Garderobe",
+  "Welcome Drink inklusive (Prosecco, Bier oder Soft)",
+  "Begrüssung durch den Host · Bändchen (Grün / Blau / Rot)",
+  "3 Stationen à 30 Min — im Wechsel",
+  "Danach: DJ & offener Ausklang",
+]
+// Rahmenbedingungen (Anzeige + Storno-Logik).
+export const SINGLE_NIGHT_INFO = {
+  minHinweis: "Durchführung ab 16 Personen.",
+  stornoHinweis: "Absage bis 24 h vorher — Geld zurück.",
+}
+// Rotation der Bändchen-Farben durch die drei Stationen.
+export const SINGLE_NIGHT_STATIONS = ["Rundlauf", "Doppelturnier (Partnerwechsel)", "Speeddating"]
+export const SINGLE_NIGHT_ROTATION: Array<{ farbe: string; hex: string; plan: string[] }> = [
+  { farbe: "Grün", hex: "#24E07C", plan: ["Rundlauf", "Doppel", "Speeddating"] },
+  { farbe: "Blau", hex: "#38BEB2", plan: ["Doppel", "Speeddating", "Rundlauf"] },
+  { farbe: "Rot", hex: "#FF5A5A", plan: ["Speeddating", "Rundlauf", "Doppel"] },
+]
+
 /** Eine Gruppe an einem Abend: Stärkeklasse + eigene Platzzahl. */
 export type OgGruppeDef = { key: "einstieg" | "pro"; name: string; level: "1-3" | "4-7"; plaetze: number }
 const EINSTIEG = (plaetze: number, name = "Einstieg"): OgGruppeDef => ({ key: "einstieg", name, level: "1-3", plaetze })
@@ -164,6 +209,31 @@ export async function ensureOpenGames(admin: SupabaseClient): Promise<number> {
         notes: "Geführtes Training · alle Level",
       })
     }
+  }
+
+  // Single Nights (feste Termine) — offizielle Ticket-Events, kind=single_night.
+  // Preis pro Person = 0, weil die Preise ticketbasiert im Checkout berechnet werden.
+  const heuteIso = iso(heute)
+  for (const ds of SINGLE_NIGHT_DATES) {
+    if (ds < heuteIso || ds > OG_BIS_DATUM) continue
+    neue.push({
+      series_key: `singlenight-${ds}`,
+      is_official: true,
+      kind: "single_night",
+      created_by: null,
+      location_id: SINGLE_NIGHT_LOCATION.id,
+      location_name: SINGLE_NIGHT_LOCATION.name,
+      date: ds,
+      start_hour: SINGLE_NIGHT_START,
+      end_hour: SINGLE_NIGHT_END,
+      duration_minutes: (SINGLE_NIGHT_END - SINGLE_NIGHT_START) * 60,
+      max_players: SINGLE_NIGHT_PLAETZE,
+      current_players: 0,
+      price_per_player: 0,
+      level: "alle",
+      status: "open",
+      notes: "Single Night",
+    })
   }
 
   if (neue.length === 0) return 0
