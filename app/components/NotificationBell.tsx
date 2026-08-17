@@ -82,6 +82,9 @@ export default function NotificationBell({ dark = false }: { dark?: boolean }) {
                 </button>
               ))}
             </div>
+            <button onClick={() => { setOpen(false); router.push("/benachrichtigungen") }} style={{ display: "block", width: "100%", textAlign: "center", padding: "13px 18px", borderTop: "1px solid rgba(255,255,255,.06)", background: "none", color: "#24E07C", fontSize: 13.5, fontWeight: 700, cursor: "pointer", fontFamily: "inherit" }}>
+              Alle ansehen
+            </button>
           </div>
         </div>
       )}
