@@ -59,8 +59,8 @@ export const RANKED_WINDOW_MONTHS = 12
 // Wer im Kalendermonat zu wenig gewertete Spiele hat, verliert Punkte. Keine
 // Vorschrift, gegen WEN — nur, DASS gespielt wird. Der Kalendermonat bleibt der
 // Zeitraum (verständlich und passend zu monatlichen Standortturnieren).
-export const MIN_MATCHES_PER_MONTH = 5   // gewertete Spiele pro Kalendermonat
-export const MONTHLY_PENALTY_ELO = 20    // Abzug, wenn nicht erreicht
+export const MIN_MATCHES_PER_MONTH = 3   // gewertete Spiele pro Kalendermonat (gilt für ALLE, auch Elite)
+export const MONTHLY_PENALTY_ELO = 12    // Abzug, wenn nicht erreicht
 // Erster Monat, der bewertet wird — davor wird NICHT rückwirkend bestraft.
 export const ACTIVITY_RULE_START = "2026-08"   // Format YYYY-MM
 

@@ -43,6 +43,7 @@ export default function LigaPage(){
   const [toast,setToast]=useState("")
   const [showCity,setShowCity]=useState(false)
   const [ligaTab,setLigaTab]=useState<TierKey|null>(null)   // welche Stufe ist im Tab angesteuert (Sprung, nicht Filter)
+  const [saison,setSaison]=useState(false)                  // Saison-Infos (mehr) auf-/zugeklappt
   const [openMatches,setOpenMatches]=useState<Record<string,OpenMatch>>({})
   // ─── FILTER (das Herzstück) ───────────────────────────────────────────────
   // scope: Reichweite · plus Freunde / Kategorie / Spielstil. Alle kombinierbar.
@@ -474,7 +475,7 @@ export default function LigaPage(){
               wenn der Spieler zusätzlich in einer privaten Firmen-Liga ist.
               Die öffentliche Liga braucht keine Auswahl: es gibt nur eine. */}
           {seasons.length>1&&(
-            <button onClick={()=>setShowCity(v=>!v)} style={{background:CELL,color:SUB,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 10px",fontFamily:"inherit"}}>{sel?.name||"Liga"} ▾</button>
+            <button onClick={()=>setShowCity(v=>!v)} style={{background:CELL,color:SUB,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 10px",fontFamily:"inherit"}}>{sel?.name||"League"} ▾</button>
           )}
           <button onClick={()=>setChatOpen(true)} style={{position:"relative",display:"flex",alignItems:"center",gap:5,borderRadius:10,background:CELL,padding:"7px 10px",cursor:"pointer",fontFamily:"inherit"}}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={SUB} strokeWidth="2"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
@@ -512,15 +513,23 @@ export default function LigaPage(){
             <img src="/liga-hero.jpg" alt="" style={{width:"100%",height:132,objectFit:"cover",display:"block"}}/>
             <div style={{position:"absolute",inset:0,background:"linear-gradient(180deg,rgba(20,23,30,.1) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.92) 100%)"}}/>
             <div style={{position:"absolute",left:20,right:20,bottom:13}}>
-              <div style={{fontSize:34,fontWeight:900,lineHeight:.9,textTransform:"uppercase",letterSpacing:"-.02em",color:W}}>{sel?.is_private?sel.name:"Rangliste"}</div>
+              <div style={{fontSize:34,fontWeight:900,lineHeight:.9,textTransform:"uppercase",letterSpacing:"-.02em",color:W}}>{sel?.is_private?sel.name:"Player League"}</div>
               {/* Öffentliche Liga = "Rangliste" (eine Liga, eine Rangliste — kein
                   Stadt-Zusatz mehr, "Weltweit" war verwirrend). Private Firmen-Liga
                   zeigt ihren eigenen Namen. Stufe + Spielerzahl als Untertitel. */}
               <div style={{fontSize:12,color:SUB,fontWeight:400,marginTop:5}}>
-                {meineStufe?.name||"Ohne Stufe"}{count?` · ${count} Spieler`:""}
+                {meineStufe?.name||"Ohne Stufe"}{count?` · ${count} Spieler`:""}{!sel?.is_private&&<>{" · "}<span onClick={()=>setSaison(v=>!v)} style={{fontWeight:700,color:"#57CF79",cursor:"pointer"}}>{saison?"weniger":"mehr"}</span></>}
               </div>
             </div>
           </div>
+
+          {saison&&!sel?.is_private&&(
+            <div style={{padding:"12px 18px 14px",borderTop:"1px solid rgba(255,255,255,.08)"}}>
+              <p style={{fontSize:13,color:"rgba(255,255,255,.9)",fontWeight:300,lineHeight:1.5,margin:"0 0 6px"}}>Die Player League läuft über <b style={{color:W,fontWeight:700}}>eine Saison bis 1. Dezember 2026</b>.</p>
+              <p style={{fontSize:13,color:"rgba(255,255,255,.9)",fontWeight:300,lineHeight:1.5,margin:"0 0 6px"}}>Die <b style={{color:W,fontWeight:700}}>besten 10 jeder League</b> qualifizieren sich automatisch fürs <b style={{color:W,fontWeight:700}}>Endjahresturnier</b>.</p>
+              <p style={{fontSize:13,color:"rgba(255,255,255,.9)",fontWeight:300,lineHeight:1.5,margin:0}}>Ab <b style={{color:W,fontWeight:700}}>50 Spielern pro Kanton</b> wird interkantonal gespielt.</p>
+            </div>
+          )}
 
           {myReg&&myRow&&(<>
             {/* Deine Position — in DEINER Liga, nicht in der Gesamtliste. Sonst

@@ -69,6 +69,10 @@ export async function POST(req: NextRequest) {
   const location_name = String(body.location_name || "").trim().slice(0, 80)
   const level = String(body.level || "").trim().slice(0, 40)
   if (!location_name || !level) return NextResponse.json({ error: "Standort und Level sind Pflicht" }, { status: 400 })
+  // Level nur aus dem erlaubten Set — sonst könnte ein manipulierter Client
+  // beliebige Level-Strings speichern (Datenintegrität in Liste/Filter).
+  const LEVEL_OK = ["1", "2", "3", "4", "5", "6", "7", "alle"]
+  if (!LEVEL_OK.includes(level)) return NextResponse.json({ error: "Ungültiges Level" }, { status: 400 })
 
   const max_players = [2, 3, 4].includes(Number(body.max_players)) ? Number(body.max_players) : 2
   const price_per_player = Math.max(0, Math.min(999, Number(body.price_per_player) || 0))

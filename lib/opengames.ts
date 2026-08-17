@@ -57,6 +57,13 @@ export const OG_STANDORTE: OgStandort[] = [
   },
 ]
 
+// BLACKOUT-TAGE: an diesen Tagen werden für den Standort KEINE Open Games
+// angelegt (z.B. weil ein Turnier die Tische belegt). Format YYYY-MM-DD.
+export const OG_BLACKOUT: Record<string, string[]> = {
+  glattbrugg: ["2026-09-12"], // PPL Cup Glattbrugg
+  stgallen: ["2026-09-26"],   // PPL Cup St. Gallen
+}
+
 // ZUTRITTS-QR pro Standort. Nur Glattbrugg hat eine verschlossene Tür, die den
 // Eversports-QR liest — die anderen Standorte brauchen keinen Code (nur Stripe).
 // Der QR gilt zeitgebunden (öffnet nur zu Open-Game-Zeiten) und wird NUR
@@ -108,6 +115,7 @@ export async function ensureOpenGames(admin: SupabaseClient): Promise<number> {
     const wochentag = tag.getDay()
 
     for (const ort of OG_STANDORTE) {
+      if (OG_BLACKOUT[ort.id]?.includes(ds)) continue   // Turniertag → kein Open Game
       for (const slot of ort.slots) {
         if (slot.day !== wochentag) continue
         const dauer = (slot.end - slot.start) * 60

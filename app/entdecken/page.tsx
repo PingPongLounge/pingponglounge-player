@@ -83,7 +83,7 @@ export default async function EntdeckenPage() {
                 {spielerCount ? ` ${spielerCount} Spieler sind dabei.` : ''}
               </p>
 
-              <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 15, padding: 17, fontSize: 16, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: '#FFF9F3', background: `linear-gradient(${BG},${BG}) padding-box, ${GRAD} border-box`, border: '1.5px solid transparent', textDecoration: 'none' }}>Login / Registrieren</Link>
+              <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 13, padding: 13, fontSize: 14, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: '#FFF9F3', background: `linear-gradient(${BG},${BG}) padding-box, ${GRAD} border-box`, border: '1.5px solid transparent', textDecoration: 'none' }}>Login / Registrieren</Link>
               <Link href="/spielen" style={{ display: 'block', textAlign: 'center', marginTop: 14, color: SUB, fontSize: 13.5, fontWeight: 500, textDecoration: 'none' }}>Schon gespielt? Resultat eintragen →</Link>
             </div>
           </div>

@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import BottomNav from "./BottomNav"
 import StartMenu from "./StartMenu"
@@ -32,14 +32,21 @@ const csub: React.CSSProperties = { fontSize: 14, color: SUB, fontWeight: 300, m
 const thead: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", gap: 10, marginTop: 6 }
 const ehead: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "center", gap: 7 }
 const OUTLINE = `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`
-const cta: React.CSSProperties = { display: "block", textAlign: "center", marginTop: 20, background: OUTLINE, border: "1.5px solid transparent", color: "#FFF9F3", borderRadius: 15, padding: 16, fontSize: 16, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }
-const ghost: React.CSSProperties = { display: "block", textAlign: "center", marginTop: 18, borderRadius: 15, padding: 15, fontSize: 15, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", color: "#FFF9F3", textDecoration: "none", background: OUTLINE, border: "1.5px solid transparent" }
+const cta: React.CSSProperties = { display: "block", textAlign: "center", marginTop: 18, background: OUTLINE, border: "1.5px solid transparent", color: "#FFF9F3", borderRadius: 13, padding: 12, fontSize: 14, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }
+const ghost: React.CSSProperties = { display: "block", textAlign: "center", marginTop: 14, borderRadius: 13, padding: 11, fontSize: 13.5, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", color: "#FFF9F3", textDecoration: "none", background: OUTLINE, border: "1.5px solid transparent" }
 const fact: React.CSSProperties = { display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 0", borderTop: `1px solid ${LINE}` }
 const factK: React.CSSProperties = { fontSize: 12, fontWeight: 700, letterSpacing: ".04em", textTransform: "uppercase", color: MUT }
 const factV: React.CSSProperties = { fontSize: 15, fontWeight: 700, color: W }
 
 export default function StartHomeV2(d: StartData) {
   const root = useRef<HTMLDivElement>(null)
+
+  // Einmaliges Popup nach 10 gespielten Matches: Hinweis aufs Endjahresturnier.
+  const [endjahr, setEndjahr] = useState(false)
+  useEffect(() => {
+    try { if (d.played >= 10 && !localStorage.getItem("endjahr_popup_v1")) setEndjahr(true) } catch { /* ignore */ }
+  }, [])
+  function closeEndjahr() { setEndjahr(false); try { localStorage.setItem("endjahr_popup_v1", "1") } catch { /* ignore */ } }
 
   useEffect(() => {
     const el = root.current
@@ -88,7 +95,26 @@ export default function StartHomeV2(d: StartData) {
               getrennt durch Linien. Vorher eine schwarze Box ohne ein einziges Bild. */}
           <div className="rev" style={{ margin: "0 16px 18px", borderRadius: 24, overflow: "hidden", boxShadow: SHADOW, background: HERO }}>
             <div style={{ position: "relative", height: 132 }}>
-              <img src="/spotlight.jpg" alt="" style={{ width: "100%", height: 132, objectFit: "cover", display: "block" }} />
+              {/* Neon-Grafik statt Foto: Pingpong-Tisch in Perspektive + Ball-Bogen (Vektor, on-brand). */}
+              <svg viewBox="0 0 390 132" preserveAspectRatio="xMidYMid slice" style={{ position: "absolute", inset: 0, width: "100%", height: "100%", display: "block" }} aria-hidden>
+                <defs>
+                  <linearGradient id="htg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#57CF79" /><stop offset="1" stopColor="#38BEB2" /></linearGradient>
+                  <filter id="hglow" x="-30%" y="-30%" width="160%" height="160%"><feGaussianBlur stdDeviation="2.4" result="b" /><feMerge><feMergeNode in="b" /><feMergeNode in="SourceGraphic" /></feMerge></filter>
+                  <radialGradient id="hrg" cx="50%" cy="118%" r="75%"><stop offset="0" stopColor="rgba(87,207,121,.22)" /><stop offset="65%" stopColor="rgba(87,207,121,0)" /></radialGradient>
+                </defs>
+                <rect width="390" height="132" fill="#0C0E12" />
+                <rect width="390" height="132" fill="url(#hrg)" />
+                <g filter="url(#hglow)" stroke="url(#htg)" fill="none" strokeWidth="2.2" strokeLinejoin="round" strokeLinecap="round">
+                  <polygon points="130,44 258,44 346,116 44,116" />
+                  <line x1="195" y1="44" x2="195" y2="116" />
+                  <path d="M92,82 L88,70 L302,70 L298,82" />
+                </g>
+                <g stroke="url(#htg)" strokeWidth="0.8" opacity="0.4">
+                  <line x1="130" y1="71" x2="131" y2="80" /><line x1="163" y1="71" x2="163" y2="80" /><line x1="195" y1="71" x2="195" y2="80" /><line x1="227" y1="71" x2="228" y2="80" /><line x1="262" y1="71" x2="263" y2="80" />
+                </g>
+                <path d="M58,106 Q195,14 322,60" stroke="url(#htg)" strokeWidth="1.6" fill="none" strokeDasharray="2 6" opacity="0.6" filter="url(#hglow)" />
+                <circle cx="322" cy="60" r="5" fill="url(#htg)" filter="url(#hglow)" />
+              </svg>
               <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(20,23,30,.1) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.92) 100%)" }} />
               <div style={{ position: "absolute", left: 20, right: 20, bottom: 13 }}>
                 <div style={{ fontSize: 34, fontWeight: 900, lineHeight: .9, textTransform: "uppercase", letterSpacing: "-.02em", color: W }}>Dein Rang</div>
@@ -179,8 +205,8 @@ export default function StartHomeV2(d: StartData) {
 
           {/* LIGA */}
           <div className="rev" style={card}>
-            <div style={thead}><img src="/icons/liga.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Liga</span></div>
-            <div style={csub}>Fordere heraus und steig auf.</div>
+            <div style={thead}><img src="/icons/liga.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Player League</span></div>
+            <div style={csub}>Fordere heraus, steig auf.</div>
             <div style={{ marginTop: 16 }}>
               {d.season.has ? (
                 <>
@@ -211,7 +237,7 @@ export default function StartHomeV2(d: StartData) {
           {/* TRAINING */}
           <div className="rev" style={card}>
             <div style={thead}><img src="/icons/paddles.svg" alt="" style={{ width: 26, height: 26 }} /><span style={ctitle}>Training</span></div>
-            <div style={csub}>Coaching & Drills · jeden Donnerstag.</div>
+            <div style={csub}>Coaching, Drills und Camps.</div>
             <Link href="/training" style={cta}>Ansehen</Link>
           </div>
 
@@ -230,6 +256,19 @@ export default function StartHomeV2(d: StartData) {
 
         </div>
       </main>
+
+      {/* Popup nach 10 Spielen: Endjahresturnier-Quali (einmalig) */}
+      {endjahr && (
+        <div onClick={closeEndjahr} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 380, background: CARD, borderRadius: 22, padding: "22px 20px", boxShadow: "0 30px 80px rgba(0,0,0,.6)" }}>
+            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 6, ...gt }}>Gut gespielt!</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: W, textTransform: "uppercase", lineHeight: 1, marginBottom: 10 }}>10 Spiele geschafft</div>
+            <p style={{ fontSize: 14, color: SUB, fontWeight: 300, lineHeight: 1.5, marginBottom: 16 }}>Wusstest du: Die <b style={{ color: W, fontWeight: 700 }}>besten 10 Spieler pro League</b> registrieren sich automatisch fürs <b style={{ color: W, fontWeight: 700 }}>Endjahresturnier</b>. Bleib dran!</p>
+            <button onClick={closeEndjahr} style={{ ...cta, marginTop: 0, cursor: "pointer", fontFamily: "inherit" }}>Los geht&apos;s</button>
+          </div>
+        </div>
+      )}
+
       <BottomNav />
     </>
   )

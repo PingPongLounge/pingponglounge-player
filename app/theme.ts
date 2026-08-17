@@ -17,20 +17,21 @@
 
 import type { CSSProperties } from 'react'
 
-/* ---------- Farben ---------- */
-export const BG     = '#12151A'                 // Screen-Hintergrund (Startseiten-Referenz)
-export const CARD   = '#2A2F39'                 // Karten-Fläche (DAS Standard-Kästchen)
-export const CELL   = '#353B46'                 // Zellen / Chips innerhalb Karten
-export const INPUTBG= '#12151A'                 // Eingabefelder (etwas dunkler)
+/* ---------- Farben (Briefing-Look 08/2026: dunkler + helles Neon-Grün) ---------- */
+export const BG     = '#0A0B0D'                 // Screen-Hintergrund (fast schwarz)
+export const CARD   = '#14171C'                 // Karten-Fläche (DAS Standard-Kästchen)
+export const CELL   = '#181C22'                 // Zellen / Chips innerhalb Karten
+export const INPUTBG= '#0F1216'                 // Eingabefelder (etwas dunkler)
 export const W      = '#FFFFFF'                  // Primärtext
 export const SUB    = 'rgba(255,255,255,.9)'   // Sekundärtext (gut lesbar)
-export const MUT    = 'rgba(255,255,255,.82)'    // Labels / gedämpft (Minimum für Text)
-export const LINE   = 'rgba(255,255,255,.06)'   // ultra-dezente Trennlinie
+export const MUT    = 'rgba(255,255,255,.62)'    // Labels / gedämpft
+export const LINE   = 'rgba(255,255,255,.08)'   // dezente Trennlinie
 export const DANGER = '#E5484D'                 // Fehler / Löschen (klares, ruhiges Rot)
 
-export const GREEN  = '#57CF79'
-export const CYAN   = '#1FD1C4'
-export const GRAD   = 'linear-gradient(135deg,#57CF79,#38BEB2)'   // DAS eine Leuchten (Logo + Rang)
+export const GREEN  = '#24E07C'                  // helles Neon-Grün (Akzent)
+export const CYAN   = '#2BD4C4'
+export const INK    = '#05130B'                  // dunkle Schrift NUR auf Neon-Grün-Fill (Button-Label)
+export const GRAD   = 'linear-gradient(135deg,#24E07C,#2BD4C4)'   // Logo + Rang
 export const SHADOW = '0 4px 14px rgba(0,0,0,.35)'
 
 /* ---------- Level-System: 1–7 (Mint → Teal → Bronze → Amber → Silber → Platin → Gold) ----------
@@ -168,20 +169,27 @@ export const chipBtn = (active: boolean): CSSProperties => ({
 export const rowTop: CSSProperties = { borderTop: `1px solid ${LINE}` }
 export const listRow: CSSProperties = { display: 'flex', alignItems: 'center', gap: 12, padding: '16px', borderTop: `1px solid ${LINE}`, textDecoration: 'none' }
 
-/* ---------- Buttons (NUR Verlauf-Umrandung, nicht gefüllt) ----------
-   Transparenter Inhalt (Karten-/BG-Ton via padding-box) + Verlauf-Rand
-   via border-box. Schrift Creme/weiss — nie dunkel. */
+/* ---------- Buttons (Briefing-Look: primär gefüllt Neon-Grün) ----------
+   Primär = Neon-Grün-Fill mit dunkler Ink-Schrift (nur hier ist dunkle Schrift
+   erlaubt — auf dem Grün ist sie am besten lesbar). Sekundär = Grün umrandet,
+   grüner Text. Fliesstext/Karten bleiben immer hell (Creme/Weiss). */
 export const GRAD_OUTLINE = `linear-gradient(${CARD},${CARD}) padding-box, ${GRAD} border-box`
 export const btn: CSSProperties = {
-  display: 'block', textAlign: 'center', borderRadius: 12,
-  padding: '12px', fontSize: 15, fontWeight: 800, color: W, textDecoration: 'none', cursor: 'pointer',
-  background: GRAD_OUTLINE, border: '1.5px solid transparent',
+  display: 'block', textAlign: 'center', borderRadius: 14,
+  padding: '15px', fontSize: 15, fontWeight: 800, color: INK, textDecoration: 'none', cursor: 'pointer',
+  background: GREEN, border: 'none',
 }
-// Primär in einer Karte
+// Sekundär: umrandet, grüner Text
+export const btnOutline: CSSProperties = {
+  display: 'block', textAlign: 'center', borderRadius: 14,
+  padding: '15px', fontSize: 15, fontWeight: 800, color: GREEN, textDecoration: 'none', cursor: 'pointer',
+  background: 'transparent', border: `1.5px solid rgba(36,224,124,.5)`,
+}
+// Primär in einer Karte (gefüllt)
 export const btnInCard: CSSProperties = {
   display: 'inline-block', borderRadius: 11,
-  padding: '8px 18px', fontSize: 14, fontWeight: 800, color: W, textDecoration: 'none', cursor: 'pointer',
-  background: GRAD_OUTLINE, border: '1.5px solid transparent',
+  padding: '9px 18px', fontSize: 14, fontWeight: 800, color: INK, textDecoration: 'none', cursor: 'pointer',
+  background: GREEN, border: 'none',
 }
 // Neutraler/sekundärer Button (z.B. Abbrechen) — gefüllt grau
 export const btnGhost: CSSProperties = {

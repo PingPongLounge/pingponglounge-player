@@ -78,9 +78,9 @@ describe("Limits und Fristen", () => {
     expect(RANKED_WINDOW_MONTHS).toBe(12)
   })
 
-  it("5 gewertete Spiele im Monat, sonst 20 Punkte Abzug", () => {
-    expect(MIN_MATCHES_PER_MONTH).toBe(5)
-    expect(MONTHLY_PENALTY_ELO).toBe(20)
+  it("3 gewertete Spiele im Monat, sonst 12 Punkte Abzug", () => {
+    expect(MIN_MATCHES_PER_MONTH).toBe(3)
+    expect(MONTHLY_PENALTY_ELO).toBe(12)
   })
 
   it("der Monatsschlüssel ist zweistellig — sonst sortiert '2026-9' falsch", () => {
