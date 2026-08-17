@@ -33,6 +33,24 @@ export default function StyleguidePage() {
           <div style={{ display: 'flex', gap: 10 }}>{swatch(GREEN, 'Grün')}{swatch(CYAN, 'Cyan')}</div>
         </div>
 
+        {/* Event-Farben */}
+        <div style={sec}>Event-Farben</div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10 }}>
+          {swatch('#24E07C', 'Open Game')}{swatch('#7A3CFF', 'Turnier')}{swatch('#2BD4C4', 'Training')}{swatch('#FF00C8', 'Single Night')}
+        </div>
+
+        {/* Bilder */}
+        <div style={sec}>Bilder</div>
+        <div style={{ position: 'relative', borderRadius: 20, overflow: 'hidden', height: 200 }}>
+          <img src="/ppl-single-night.png" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover' }} />
+          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(180deg,rgba(5,6,7,.15) 0%,rgba(5,6,7,.5) 50%,rgba(5,6,7,.96) 100%)' }} />
+          <div style={{ position: 'absolute', left: 16, right: 16, bottom: 16 }}>
+            <div style={eyebrow}>Spielen &amp; kennenlernen</div>
+            <div style={{ ...h2, fontSize: 24, marginTop: 6 }}>Single Night</div>
+          </div>
+        </div>
+        <p style={{ ...meta, marginTop: 8 }}>Foto dunkel halten, Verlauf nach unten für Lesbarkeit, Radius 20. Eyebrow neon, Titel weiss.</p>
+
         {/* Typo */}
         <div style={sec}>Typografie</div>
         <div style={{ ...cardPad }}>
@@ -58,7 +76,7 @@ export default function StyleguidePage() {
         <div style={{ ...cardActive, padding: 18 }}>
           <div style={eyebrow}>Aktiv / ausgewählt</div>
           <h2 style={{ ...h2, fontSize: 22, marginTop: 4 }}>Karte aktiv</h2>
-          <p style={{ ...body, marginTop: 6 }}>Gleiches Kästchen, nur mit Verlauf-Outline.</p>
+          <p style={{ ...body, marginTop: 6 }}>Gleiches Kästchen, ausgewählt — grüner Rand + heller.</p>
         </div>
 
         {/* Chips */}
@@ -81,7 +99,7 @@ export default function StyleguidePage() {
         {/* Buttons */}
         <div style={sec}>Buttons</div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
-          <span style={btn}>Primär (Verlauf-Outline)</span>
+          <span style={btn}>Primär (gefüllt Neon)</span>
           <div style={cardPad}><span style={btnInCard}>In Karte</span></div>
           <span style={btnGhost}>Sekundär</span>
           <span style={btnDanger}>Löschen</span>
