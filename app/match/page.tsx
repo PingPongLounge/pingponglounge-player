@@ -129,55 +129,31 @@ export default function MatchPage() {
         </div>
 
         {offizielle.length > 0 && (
-          <div style={{ marginTop: 14, background: C, borderRadius: 22, padding: "4px 16px", boxShadow: "0 1px 4px rgba(0,0,0,.14)" }}>
-              {offizielle.slice(0, 14).map((g, i) => {
+          <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+              {offizielle.slice(0, 14).map((g) => {
                 const frei = Math.max(0, g.max_players - g.current_players)
                 const drin = g.players.some(p => p.user_id === userId)
-                const meinLevel = parseInt(myLevel || "0") || 0
                 const proAbend = g.level === "4-7"
-                const passt = meinLevel > 0 && (proAbend ? meinLevel >= 4 : meinLevel <= 3)
-                const d = g.date ? new Date(g.date) : null
+                const levelLabel = proAbend ? "ADVANCED & ELITE" : "ROOKIE & CHALLENGER"
+                const d = g.date ? new Date(`${g.date}T12:00:00`) : null
+                const heute = d && d.toDateString() === new Date().toDateString()
+                const dayTop = heute ? "HEUTE" : (d ? d.toLocaleDateString("de-CH", { weekday: "short", day: "numeric", month: "short" }).replace(".", "").toUpperCase() : "—")
 
                 return (
-                  <div key={g.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 0", borderTop: i === 0 ? "none" : "1px solid rgba(255,255,255,.07)" }}>
-                    <span style={{ display: "flex", flexDirection: "column", alignItems: "center", width: 44, flexShrink: 0 }}>
-                      <span style={{ fontSize: 17, fontWeight: 900, color: W, lineHeight: 1 }}>
-                        {d ? d.toLocaleDateString("de-CH", { weekday: "short" }).replace(".", "") : "—"}
-                      </span>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: M, marginTop: 2 }}>
-                        {d ? d.toLocaleDateString("de-CH", { day: "2-digit", month: "2-digit" }) : ""}
+                  <Link key={g.id} href={`/match/${g.id}`} style={{ display: "flex", gap: 14, alignItems: "center", background: C, border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: 16, textDecoration: "none" }}>
+                    <span style={{ width: 66, flexShrink: 0 }}>
+                      <span style={{ display: "block", color: "#24E07C", fontSize: 10, fontWeight: 800, letterSpacing: ".04em" }}>{dayTop}</span>
+                      <span style={{ display: "block", fontSize: 22, fontWeight: 900, color: W, marginTop: 2 }}>{String(g.start_hour ?? 19).padStart(2, "0")}:00</span>
+                    </span>
+                    <span style={{ flex: 1, minWidth: 0, borderLeft: "1px solid rgba(255,255,255,.08)", paddingLeft: 14 }}>
+                      <span style={{ display: "block", fontSize: 16, fontWeight: 800, color: W, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{g.location_name}</span>
+                      <span style={{ display: "inline-block", margin: "7px 0", fontSize: 10, fontWeight: 700, letterSpacing: ".04em", color: "#24E07C", border: "1px solid #24E07C", borderRadius: 8, padding: "3px 8px" }}>{levelLabel}</span>
+                      <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: drin ? "#24E07C" : (frei === 0 ? M : "#24E07C") }}>
+                        {drin ? "Du bist dabei ✓" : frei === 0 ? "Ausgebucht" : `${frei} ${frei === 1 ? "Platz" : "Plätze"} frei`}
                       </span>
                     </span>
-
-                    <span style={{ flex: 1, minWidth: 0 }}>
-                      <span style={{ display: "block", fontSize: 15, fontWeight: 800, color: W, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
-                        {g.location_name}
-                      </span>
-                      <span style={{ display: "block", fontSize: 13, color: M, marginTop: 2 }}>
-                        {/* Welche Ligen dieser Abend abdeckt — in ihren Namen, nicht "Pro/Einstieg" */}
-                        {proAbend ? "Advanced & Elite" : "Rookie & Challenger"} · {String(g.start_hour ?? 19).padStart(2, "0")}:00 · {frei} von {g.max_players} frei
-                      </span>
-                    </span>
-
-                    {drin ? (
-                      <Link href={`/match/${g.id}`} style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "#06210F", background: GRAD, borderRadius: 9, padding: "8px 0", width: 96, textAlign: "center", textDecoration: "none", flexShrink: 0 }}>
-                        Dabei ✓
-                      </Link>
-                    ) : frei === 0 ? (
-                      <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: M, width: 96, textAlign: "center", flexShrink: 0 }}>Ausgebucht</span>
-                    ) : !passt ? (
-                      <span title={`Für Level ${g.level}`} style={{ fontSize: 12, fontWeight: 700, color: M, width: 96, textAlign: "center", flexShrink: 0 }}>
-                        Level {g.level}
-                      </span>
-                    ) : (
-                      // "Mitspielen" fuehrt auf die Detailseite: wer kommt, freie
-                      // Plaetze, Ort, Storno — dann dort bezahlen (Playtomic-Weg).
-                      <Link href={`/match/${g.id}`}
-                        style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "#06210F", background: GRAD, borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", textDecoration: "none", flexShrink: 0 }}>
-                        Mitspielen
-                      </Link>
-                    )}
-                  </div>
+                    <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="#24E07C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M9 6l6 6-6 6" /></svg>
+                  </Link>
                 )
               })}
           </div>
