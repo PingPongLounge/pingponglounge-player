@@ -2,6 +2,7 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import BottomNav from "./BottomNav"
+import CampaignOverlay from "./CampaignOverlay"
 import StartMenu from "./StartMenu"
 import PendingConfirmBanner from "./PendingConfirmBanner"
 import StreakBanner from "./StreakBanner"
@@ -293,6 +294,7 @@ export default function StartHomeV2(d: StartData) {
         </div>
       )}
 
+      <CampaignOverlay />
       <BottomNav />
     </>
   )
