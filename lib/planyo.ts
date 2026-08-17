@@ -17,15 +17,17 @@ export const PLANYO_CALENDAR = "47844"
 export const PLANYO_BASE = "https://www.planyo.com"
 export const PLANYO_REST = "https://www.planyo.com/rest/"
 
-// Standort (wie in theme.ts CITIES) → Planyo-Ressourcen-ID.
-// Glattbrugg & St. Gallen fehlen noch in Planyo → sobald angelegt hier ergänzen.
+// Standort (wie in theme.ts CITIES) → Planyo-Ressourcen-ID (aus dem PPL-Planyo,
+// via list_resources ausgelesen).
+// Glattbrugg fehlt bewusst: dieser Standort läuft über Eversports (QR-Tür),
+// nicht über Planyo → dort keine Auto-Reservierung, nur Weiterleitung/Eversports.
 export const PLANYO_RESOURCE: Record<string, string> = {
-  Oerlikon: "142166",
-  Langstrasse: "206740",
-  Basel: "251796",
-  Luzern: "229327", // Standort Kriens/Luzern
-  // Glattbrugg: "…",
-  // "St. Gallen": "…",
+  Oerlikon: "142166",       // Ping Pong - Oerlikon
+  Langstrasse: "206740",    // Ping Pong - Langstrasse
+  Basel: "251796",          // Ping Pong - Basel
+  Luzern: "229327",         // Ping Pong - Kriens (Standort Luzern/Kriens)
+  "St. Gallen": "252049",   // Open Game - St Gallen (eigene Open-Game-Ressource)
+  // Glattbrugg: Eversports, nicht Planyo
 }
 
 /** Buchungs-URL für den Gastgeber (Option A). Wenn die Ressource bekannt ist,

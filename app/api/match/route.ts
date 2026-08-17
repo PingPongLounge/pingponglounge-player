@@ -1,7 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
-import { planyoBookingUrl } from "@/lib/planyo"
+import { planyoBookingUrl, planyoReserve, planyoReserveConfigured } from "@/lib/planyo"
 
 type PubProfile = { id: string; name: string; elo: number; level: string }
 
@@ -125,8 +125,26 @@ export async function POST(req: NextRequest) {
   // Ersteller als erster Spieler
   await admin.from("open_game_players").insert({ game_id: game.id, user_id: user.id, status: "joined" })
 
-  // PPL-Standort: Gastgeber bucht zuerst den Tisch in Planyo, dann veröffentlichen.
+  // PPL-Standort: Tisch muss gebucht werden.
   if (location_type === "ppl") {
+    // Option B — Auto-Reservierung, wenn API-Key + Ressourcen-ID vorhanden sind
+    // (z. B. St. Gallen, Oerlikon, Langstrasse, Basel, Luzern). Klappt sie, wird
+    // sofort veröffentlicht. Bei allem anderen: Fallback auf Weiterleitung (A).
+    if (planyoReserveConfigured(location_name) && date && start_hour !== null) {
+      const { data: prof } = await admin.from("profiles").select("name").eq("id", user.id).maybeSingle()
+      const parts = String(prof?.name || "Player").trim().split(/\s+/)
+      const rr = await planyoReserve({
+        locationName: location_name, dateStr: date, startHour: start_hour, durationMinutes: duration_minutes,
+        firstName: parts[0] || "Player", lastName: parts.slice(1).join(" ") || ".",
+        email: user.email || "", persons: max_players, comments: `Player Open Game · Level ${level}`,
+      })
+      if (rr.ok) {
+        const voll = 1 >= max_players
+        await admin.from("open_games").update({ status: voll ? "full" : "open", updated_at: new Date().toISOString() }).eq("id", game.id).eq("status", "booking_pending")
+        return NextResponse.json({ id: game.id, status: voll ? "full" : "open", reserved: true })
+      }
+      // Kein Tisch frei oder Fehler → Gastgeber wählt selbst einen Slot (Weiterleitung).
+    }
     return NextResponse.json({ id: game.id, status: startStatus, needsBooking: true, bookingUrl: planyoBookingUrl(location_name) })
   }
   return NextResponse.json({ id: game.id, status: startStatus })

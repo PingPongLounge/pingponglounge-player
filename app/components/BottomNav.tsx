@@ -25,7 +25,9 @@ const left: Tab[] = [
   { href: "/match", label: "Events", icon: ICON.events },
 ]
 const right: Tab[] = [
-  { href: "/rangliste", label: "Ranking", icon: ICON.ranking },
+  // "Ranking" führt zur Player League (Saison, Stufen, Fordern). Die reine
+  // Gesamt-Rangliste (/rangliste) bleibt von dort und der Startseite erreichbar.
+  { href: "/liga", label: "Ranking", icon: ICON.ranking },
   { href: "/profil", label: "Profil", icon: ICON.profil },
 ]
 
