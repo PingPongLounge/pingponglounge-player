@@ -48,6 +48,18 @@ export default function StartHomeV2(d: StartData) {
   }, [])
   function closeEndjahr() { setEndjahr(false); try { localStorage.setItem("endjahr_popup_v1", "1") } catch { /* ignore */ } }
 
+  // Einmaliges Popup nach 15 App-Öffnungen: erklärt PingPoints (was & wo einlösen).
+  const [ppInfo, setPpInfo] = useState(false)
+  useEffect(() => {
+    try {
+      if (localStorage.getItem("pp_popup_v1")) return
+      const n = (Number(localStorage.getItem("pp_logins") || "0") || 0) + 1
+      localStorage.setItem("pp_logins", String(n))
+      if (n >= 15) setPpInfo(true)
+    } catch { /* ignore */ }
+  }, [])
+  function closePpInfo() { setPpInfo(false); try { localStorage.setItem("pp_popup_v1", "1") } catch { /* ignore */ } }
+
   useEffect(() => {
     const el = root.current
     if (!el) return
@@ -265,6 +277,18 @@ export default function StartHomeV2(d: StartData) {
             <div style={{ fontSize: 20, fontWeight: 900, color: W, textTransform: "uppercase", lineHeight: 1, marginBottom: 10 }}>10 Spiele geschafft</div>
             <p style={{ fontSize: 14, color: SUB, fontWeight: 300, lineHeight: 1.5, marginBottom: 16 }}>Wusstest du: Die <b style={{ color: W, fontWeight: 700 }}>besten 10 Spieler pro League</b> registrieren sich automatisch fürs <b style={{ color: W, fontWeight: 700 }}>Endjahresturnier</b>. Bleib dran!</p>
             <button onClick={closeEndjahr} style={{ ...cta, marginTop: 0, cursor: "pointer", fontFamily: "inherit" }}>Los geht&apos;s</button>
+          </div>
+        </div>
+      )}
+
+      {/* Popup nach 15 App-Öffnungen: PingPoints erklären (einmalig) */}
+      {ppInfo && !endjahr && (
+        <div onClick={closePpInfo} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+          <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 380, background: CARD, borderRadius: 22, padding: "22px 20px", boxShadow: "0 30px 80px rgba(0,0,0,.6)" }}>
+            <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 6, ...gt }}>PingPoints</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: W, textTransform: "uppercase", lineHeight: 1, marginBottom: 10 }}>Deine Punkte sammeln sich</div>
+            <p style={{ fontSize: 14, color: SUB, fontWeight: 300, lineHeight: 1.5, marginBottom: 16 }}>Du sammelst <b style={{ color: W, fontWeight: 700 }}>PingPoints</b> beim Spielen — z. B. 5 Punkte für je 10 Liga-Spiele. Einlösbar für <b style={{ color: W, fontWeight: 700 }}>Tischbuchungen &amp; Prämien</b> (1 Punkt = CHF 1).</p>
+            <a href="/pingpoints" onClick={closePpInfo} style={{ ...cta, marginTop: 0, cursor: "pointer" }}>PingPoints ansehen</a>
           </div>
         </div>
       )}
