@@ -13,12 +13,24 @@ const PUBLIC_PATHS = ['/', '/login', '/auth', '/spielen', '/entdecken']
 //   hat sie mit 401 abgewiesen, BEVOR der CRON_SECRET-Check greifen konnte —
 //   die Monatsabrechnung, die Warn-Mail und der Inaktivitäts-Abzug liefen deshalb
 //   nie. Die Routen schützen sich selbst über CRON_SECRET.
+// - turniere/[id]/register-guest + checkout: die PPL-Webseite ruft diese Routen
+//   SERVERSEITIG von einer anderen Domain auf — ohne Cookies, also ohne Session.
+//   Die Middleware hat sie mit 401 abgewiesen, BEVOR die Route lief: die
+//   Gastanmeldung fuer Turniere auf pingponglounge.ch funktionierte dadurch gar
+//   nicht, obwohl beide Routen bewusst auth-frei gebaut sind (18.08.).
 const PUBLIC_API = [
   '/api/liga/confirm-email',
   '/api/booking/webhook',
   '/api/spielen/preview',
   '/api/cron/daily',
   '/api/liga/inactivity',
+]
+
+// Routen mit dynamischem Segment, die ebenfalls ohne Login erreichbar sein
+// muessen. Praefix-Vergleich, weil die Turnier-ID variabel ist.
+const PUBLIC_API_PATTERNS = [
+  /^\/api\/turniere\/[^/]+\/register-guest$/,
+  /^\/api\/turniere\/[^/]+\/checkout$/,
 ]
 
 export async function middleware(request: NextRequest) {
@@ -62,6 +74,7 @@ export async function middleware(request: NextRequest) {
 
   // Signierte bzw. selbst-verifizierende API-Routen: kein Login-Redirect
   if (PUBLIC_API.some(p => pathname === p)) return supabaseResponse
+  if (PUBLIC_API_PATTERNS.some(re => re.test(pathname))) return supabaseResponse
 
   // Nicht eingeloggt → Login.
   //
