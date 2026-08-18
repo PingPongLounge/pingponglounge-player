@@ -33,7 +33,18 @@ const PUBLIC_API_PATTERNS = [
   /^\/api\/turniere\/[^/]+\/checkout$/,
 ]
 
+// Kanonische Domain: playerapp.ch. Die alten *.vercel.app-Adressen sind
+// weiterhin erreichbar und landeten auf dem alten Login — sie leiten jetzt
+// dauerhaft (308) auf dieselbe Seite unter playerapp.ch um.
+const KANONISCH = "playerapp.ch"
+
 export async function middleware(request: NextRequest) {
+  const host = request.headers.get("host") || ""
+  if (host.endsWith(".vercel.app")) {
+    const ziel = new URL(request.nextUrl.pathname + request.nextUrl.search, `https://${KANONISCH}`)
+    return NextResponse.redirect(ziel, 308)
+  }
+
   // Next.js lädt verlinkte Seiten im Hintergrund vor (Prefetch). Diese Anfragen
   // laufen durch die Middleware. Trifft ein Prefetch genau in den Moment, in dem
   // Supabase den Token erneuert, sieht die Middleware kurz "keine Session" —
