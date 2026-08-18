@@ -8,7 +8,6 @@ import { BG, CARD, W, SUB, MUT, LINE, GREEN, INK, btn, btnOutline } from "@/app/
 
 const GRAD = "linear-gradient(135deg,#24E07C,#2BD4C4)"
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
-const WEBSITE_BUCHEN = "https://pingponglounge.ch"
 
 // Bleibt exportiert — /entdecken baut die Open-Game-Liste damit (auch wenn die
 // minimale Startseite sie nicht mehr anzeigt, andere Stellen nutzen den Typ).
@@ -55,20 +54,20 @@ export default function StartHomeV2(d: StartData) {
           {/* Offene Ergebnis-Bestätigungen zuoberst — direkt antippbar. */}
           <PendingConfirmBanner />
 
-          {/* Hero-Foto */}
+          {/* Hero-Foto — Schläger & Ball (kein Essen) */}
           <div style={{ height: 210, borderRadius: 20, overflow: "hidden", position: "relative", margin: "4px 0 22px" }}>
-            <img src="/ppl-single-night.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.currentTarget.style.display = "none" }} />
+            <img src="/ppl-training.png" alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} onError={e => { e.currentTarget.style.display = "none" }} />
             <div style={{ position: "absolute", inset: 0, background: "linear-gradient(180deg,rgba(10,11,13,.1) 0%,rgba(10,11,13,.35) 55%,rgba(10,11,13,.95) 100%)" }} />
           </div>
 
-          <h1 style={{ fontSize: 34, fontWeight: 900, letterSpacing: "-1px", color: W, margin: "0 0 18px" }}>Heute spielen?</h1>
+          <h1 style={{ fontSize: 34, fontWeight: 900, letterSpacing: "-1px", color: W, margin: "0 0 18px" }}>Lust zum Spielen?</h1>
 
           <Link href="/match" style={btn}>Spiel finden</Link>
-          <a href={WEBSITE_BUCHEN} target="_blank" rel="noopener" style={{ ...btnOutline, marginTop: 12 }}>Tisch buchen</a>
+          <Link href="/liga" style={{ ...btnOutline, marginTop: 12 }}>Liga fordern</Link>
 
           {/* Dein nächstes Spiel — nur wenn wirklich eine Buchung besteht */}
           {d.nextGame && (
-            <Link href={d.nextGame.href} style={{ display: "flex", alignItems: "center", gap: 10, background: CARD, border: `1px solid ${LINE}`, borderRadius: 16, padding: 16, marginTop: 30, textDecoration: "none" }}>
+            <Link href={d.nextGame.href} style={{ display: "flex", alignItems: "center", gap: 10, background: CARD, border: `1px solid ${LINE}`, borderRadius: 16, padding: 16, marginTop: 22, textDecoration: "none" }}>
               <span style={{ flex: 1, minWidth: 0 }}>
                 <span style={{ display: "block", color: GREEN, fontSize: 11, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase" }}>Dein nächstes Spiel</span>
                 <b style={{ display: "block", fontSize: 16, color: W, marginTop: 3 }}>{d.nextGame.when}</b>
@@ -77,6 +76,33 @@ export default function StartHomeV2(d: StartData) {
               <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke={GREEN} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M9 6l6 6-6 6" /></svg>
             </Link>
           )}
+
+          {/* Nächste Open Games */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "30px 0 12px" }}>
+            <span style={{ color: MUT, fontSize: 12, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase" }}>Nächste Open Games</span>
+            <Link href="/match" style={{ color: GREEN, fontSize: 13, fontWeight: 700, textDecoration: "none" }}>Alle</Link>
+          </div>
+          {d.games.length === 0 ? (
+            <div style={{ background: CARD, border: `1px solid ${LINE}`, borderRadius: 16, padding: 16, color: MUT, fontSize: 14 }}>Aktuell keine offenen Spiele.</div>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {d.games.slice(0, 3).map(g => (
+                <Link key={g.id} href={g.href} style={{ display: "flex", alignItems: "center", gap: 14, background: CARD, border: `1px solid ${LINE}`, borderRadius: 16, padding: "14px 16px", textDecoration: "none", opacity: g.full ? .5 : 1 }}>
+                  <span style={{ width: 58, flexShrink: 0 }}>
+                    <span style={{ display: "block", color: GREEN, fontSize: 10, fontWeight: 800, letterSpacing: ".04em", textTransform: "uppercase" }}>{g.day}</span>
+                    <span style={{ display: "block", fontSize: 18, fontWeight: 900, color: W, marginTop: 2 }}>{g.time}</span>
+                  </span>
+                  <span style={{ flex: 1, minWidth: 0, borderLeft: `1px solid ${LINE}`, paddingLeft: 14 }}>
+                    <span style={{ display: "block", fontSize: 15, fontWeight: 700, color: W, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{g.title}</span>
+                    <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: g.full ? MUT : GREEN, marginTop: 2 }}>{g.full ? "Ausgebucht" : `${g.frei} ${g.frei === 1 ? "Platz" : "Plätze"} frei`}</span>
+                  </span>
+                  <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke={GREEN} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M9 6l6 6-6 6" /></svg>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          <Link href="/match/create" style={{ ...btnOutline, marginTop: 14 }}>Open Game erstellen</Link>
         </div>
       </main>
 

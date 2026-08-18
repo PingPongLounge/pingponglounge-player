@@ -37,7 +37,7 @@ export default function ErstellenPage() {
           <Link href="/entdecken" aria-label="Zurück" style={{ display: "inline-flex" }}>
             <svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={W} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6" /></svg>
           </Link>
-          <span style={{ fontSize: 15, fontWeight: 700, color: W }}>Erstellen</span>
+          <span style={{ fontSize: 15, fontWeight: 700, color: W }}>Events</span>
           <span style={{ width: 22 }} />
         </div>
 
