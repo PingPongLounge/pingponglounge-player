@@ -12,19 +12,19 @@ type Opt = { href: string; title: string; sub: string; color: string; icon: Reac
 
 const OPTIONS: Opt[] = [
   {
-    href: "/match/create", title: "Open Game", sub: "Mit anderen spielen", color: GREEN,
+    href: "/match/create", title: "Open Game", sub: "Selbst erstellen & mitspielen", color: GREEN,
     icon: <g><ellipse cx="10" cy="10" rx="7" ry="7" /><path d="M15 15l5 5" /><circle cx="18.5" cy="6.5" r="1.6" /></g>,
   },
   {
-    href: "/turniere", title: "Turnier", sub: "Um Punkte spielen", color: VIOLET,
+    href: "/turniere", title: "Turnier", sub: "Ansehen & anmelden", color: VIOLET,
     icon: <path d="M7 4h10v5a5 5 0 0 1-10 0zM7 4H4v2a3 3 0 0 0 3 3M17 4h3v2a3 3 0 0 1-3 3M8 21h8M12 17v4" />,
   },
   {
-    href: "/training", title: "Training", sub: "Coaching, Drills & Camps", color: TEAL,
+    href: "/training", title: "Training", sub: "Ansehen & buchen", color: TEAL,
     icon: <g><path d="M4 19V7a2 2 0 0 1 2-2h9l5 4v10a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z" /><path d="M8 12h6M8 16h4" /></g>,
   },
   {
-    href: "/single-night", title: "Single Night", sub: "Spielen & kennenlernen", color: PINK,
+    href: "/single-night", title: "Single Night", sub: "Ticket sichern", color: PINK,
     icon: <g><circle cx="8.5" cy="8" r="3" /><circle cx="16" cy="9" r="2.6" /><path d="M3 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5M14 20c0-2.4 1.6-4 4-4s4 1.6 4 4" /></g>,
   },
 ]
