@@ -53,7 +53,7 @@ function EloChart({history,current}:{history:{elo:number,delta:number,created_at
 
 type EloPoint={elo:number,delta:number,created_at:string}
 type RecentMatch={id:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,confirmed_at:string,p1_id:string,p2_id:string,p1:{name:string}|null,p2:{name:string}|null,season:{name:string,city:string}|null}
-type Profile={id:string,name:string,real_name?:string|null,elo:number,level:string,matches_played:number,matches_won:number,canton:string|null,created_at:string,avatar_url?:string|null}
+type Profile={id:string,name:string,real_name?:string|null,elo:number,level:string,matches_played:number,matches_won:number,canton:string|null,created_at:string,avatar_url?:string|null,allow_challenges?:boolean|null,allow_friend_requests?:boolean|null,visible_in_ranking?:boolean|null}
 
 const CANTON_MAP: Record<string,string> = {
   "Aargau":"AG","Appenzell Ausserrhoden":"AR","Appenzell Innerrhoden":"AI","Basel-Landschaft":"BL",
@@ -78,6 +78,25 @@ export default function ProfilPage(){
   const [cCanton,setCCanton]=useState("")
   const [completing,setCompleting]=useState(false)
   const [completeDone,setCompleteDone]=useState(false)
+  // Ruhe-Einstellungen: alle drei standardmaessig an. null gilt als an, damit
+  // bestehende Konten ohne Wert nichts merken.
+  const [ruhe,setRuhe]=useState<{c:boolean,f:boolean,r:boolean}|null>(null)
+  const [ruheSpeichert,setRuheSpeichert]=useState(false)
+
+  async function setzeRuhe(feld:"allow_challenges"|"allow_friend_requests"|"visible_in_ranking",wert:boolean){
+    setRuheSpeichert(true)
+    const sb=createClient()
+    const {data:{user}}=await sb.auth.getUser()
+    if(!user){ setRuheSpeichert(false); return }
+    await sb.from("profiles").update({[feld]:wert}).eq("id",user.id)
+    setRuhe(alt=>{
+      const basis=alt??{c:true,f:true,r:true}
+      if(feld==="allow_challenges") return {...basis,c:wert}
+      if(feld==="allow_friend_requests") return {...basis,f:wert}
+      return {...basis,r:wert}
+    })
+    setRuheSpeichert(false)
+  }
 
   async function saveComplete(){
     setCompleting(true)
@@ -107,6 +126,12 @@ export default function ProfilPage(){
       setEarnedCount(ach.earned||0)
       setPpBalance(pp.balance||0)
       setProfile(prof.profile)
+      // Ruhe-Schalter aus dem Profil uebernehmen (fehlender Wert = an).
+      setRuhe({
+        c: prof.profile?.allow_challenges !== false,
+        f: prof.profile?.allow_friend_requests !== false,
+        r: prof.profile?.visible_in_ranking !== false,
+      })
       setEloHistory(prof.eloHistory||[])
       setRecentMatches(prof.recentMatches||[])
     } catch {
@@ -199,6 +224,33 @@ export default function ProfilPage(){
             </button>
           </div>
         )}
+
+        {/* Ruhe — wer nicht gestoert werden will, stellt es hier ab. */}
+        <div style={{...cardPad,padding:"18px 20px",marginBottom:10}}>
+          <p style={{fontSize:12.5,fontWeight:700,color:M,letterSpacing:"0.14em",textTransform:"uppercase",marginBottom:4}}>Ruhe</p>
+          <p style={{fontSize:13,color:M,marginBottom:12,lineHeight:1.5}}>
+            Du entscheidest, wer dich erreichen darf. Deine Spiele und dein Rating bleiben in jedem Fall erhalten.
+          </p>
+          {([
+            ["allow_challenges","Herausforderungen erlauben","Andere dürfen dich in der Liga fordern.",(ruhe?.c??true)],
+            ["allow_friend_requests","Freundschaftsanfragen erlauben","Andere dürfen dich als Freund anfragen.",(ruhe?.f??true)],
+            ["visible_in_ranking","In der Rangliste zeigen","Dein Name erscheint in der öffentlichen Rangliste.",(ruhe?.r??true)],
+          ] as [ "allow_challenges"|"allow_friend_requests"|"visible_in_ranking", string, string, boolean ][]).map(([feld,titel,text,an])=>(
+            <div key={feld} style={{display:"flex",alignItems:"center",gap:12,padding:"11px 0",borderTop:"1px solid rgba(255,255,255,.07)"}}>
+              <span style={{flex:1,minWidth:0}}>
+                <span style={{display:"block",fontSize:14,fontWeight:700,color:W}}>{titel}</span>
+                <span style={{display:"block",fontSize:12.5,color:M,marginTop:2}}>{text}</span>
+              </span>
+              <button onClick={()=>setzeRuhe(feld,!an)} disabled={ruheSpeichert}
+                aria-pressed={an} aria-label={titel}
+                style={{flexShrink:0,width:52,height:30,borderRadius:100,border:"none",cursor:ruheSpeichert?"wait":"pointer",
+                  background:an?G:"#353B46",position:"relative",transition:"background .15s"}}>
+                <span style={{position:"absolute",top:3,left:an?25:3,width:24,height:24,borderRadius:"50%",
+                  background:"#0E1013",display:"block",transition:"left .15s"}} />
+              </button>
+            </div>
+          ))}
+        </div>
 
         {/* Rating-Hero — die grosse 4.2-Zahl. Darunter klein das rohe ELO, für
             alle, die es genau wissen wollen. */}

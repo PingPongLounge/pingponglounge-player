@@ -9,7 +9,7 @@ export async function GET() {
   // Profil
   const { data: profile } = await sb
     .from("profiles")
-    .select("id,name,real_name,elo,level,matches_played,matches_won,canton,created_at,avatar_url,home_location,handedness,pips,anti,blade,rubber_fh,rubber_bh,player_category")
+    .select("id,name,real_name,elo,level,matches_played,matches_won,canton,created_at,avatar_url,home_location,handedness,pips,anti,blade,rubber_fh,rubber_bh,player_category,allow_challenges,allow_friend_requests,visible_in_ranking")
     .eq("id", user.id)
     .single()
 

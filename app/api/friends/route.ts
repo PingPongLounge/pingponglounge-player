@@ -51,6 +51,11 @@ export async function POST(req: NextRequest) {
 
   if (action === "request") {
     if (!user_id || user_id === user.id) return NextResponse.json({ error: "Ungültig" }, { status: 400 })
+    // Wer keine Anfragen will, bekommt keine.
+    const { data: zielProfil } = await admin.from("profiles")
+      .select("allow_friend_requests,name").eq("id", user_id).maybeSingle()
+    if (zielProfil && zielProfil.allow_friend_requests === false)
+      return NextResponse.json({ error: `${zielProfil.name || "Dieser Spieler"} nimmt zurzeit keine Anfragen an` }, { status: 403 })
     // Nimmt der andere gerade eine offene Anfrage von mir an? Oder gibt es schon
     // eine Gegenanfrage → dann direkt bestätigen.
     const { data: gegen } = await admin.from("friendships")

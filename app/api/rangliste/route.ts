@@ -32,8 +32,11 @@ export async function GET(req: NextRequest) {
   if (ids.length === 0) return NextResponse.json({ players: [], me: null })
 
   const { data: profs } = await admin.from("profiles")
-    .select("id,name,elo,level,avatar_url,home_location,handedness,pips,anti,player_category")
+    .select("id,name,elo,level,avatar_url,home_location,handedness,pips,anti,player_category,visible_in_ranking")
     .in("id", ids)
+    // Wer sich aus der oeffentlichen Rangliste nimmt, erscheint hier nicht mehr.
+    // Die eigenen Spiele und das eigene Rating bleiben davon unberuehrt.
+    .or("visible_in_ranking.is.null,visible_in_ranking.eq.true")
 
   const { data: locs } = await admin.from("locations").select("id,city,canton,country")
   const locMap = new Map((locs || []).map(l => [l.id, l]))

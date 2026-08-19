@@ -16,6 +16,13 @@ export async function POST(req: NextRequest) {
 
   const admin = createAdminClient()
 
+  // Ruhe-Einstellung des Gegenuebers achten: Wer keine Herausforderungen will,
+  // bekommt auch keine. Serverseitig, nicht nur im UI ausgeblendet.
+  const { data: ziel } = await admin.from("profiles")
+    .select("allow_challenges,name").eq("id", challenged_id).maybeSingle()
+  if (ziel && ziel.allow_challenges === false)
+    return NextResponse.json({ error: `${ziel.name || "Dieser Spieler"} nimmt zurzeit keine Herausforderungen an` }, { status: 403 })
+
   // Beide müssen angemeldet sein
   const { data: regs } = await admin.from("league_registrations")
     .select("player_id").eq("season_id", season_id)
