@@ -6,7 +6,7 @@ const RESEND_URL = "https://api.resend.com/emails"
 // Absender frei konfigurierbar via Vercel-Env RESEND_FROM.
 // Die Domain muss in Resend verifiziert sein, sonst lehnt Resend den Versand ab.
 const FROM = process.env.RESEND_FROM || "Player <points@playerapp.ch>"
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://pingponglounge-player.vercel.app"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
 
 const G = "#57CF79"
 
@@ -376,4 +376,78 @@ export async function sendBookingConfirm(opts: {
     ${zutritt}
     <p style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:18px;line-height:1.5;font-family:system-ui,sans-serif">Absage bis 24 h vorher mit Rückerstattung — in der App unter „Absagen".</p>`
   return sendEmail({ to: opts.to, subject: `${titel} — ${opts.location}`, html: shell(inner) })
+}
+
+
+/** Bestätigung nach einer Turnieranmeldung — für Gäste von pingponglounge.ch
+ *  und für angemeldete Spieler. Wird zweimal gebraucht: sofort bei der
+ *  Anmeldung (gratis oder Zahlung vor Ort) und nach erfolgreicher Zahlung. */
+export async function sendTournamentConfirm(opts: {
+  to: string
+  name: string
+  turnier: string
+  datumLabel: string          // z.B. "Freitag, 12. September 2026"
+  zeitLabel?: string          // z.B. "19:00–22:00 Uhr"
+  ort?: string
+  startgeldChf: number
+  bezahlt: boolean
+  warteliste?: boolean
+  turnierUrl?: string
+  stornoText?: string
+}) {
+  const titel = opts.warteliste ? "Auf der Warteliste" : "Anmeldung bestätigt"
+  const status = opts.warteliste
+    ? "Du stehst auf der Warteliste"
+    : opts.bezahlt ? "Bezahlt" : opts.startgeldChf > 0 ? "Startgeld vor Ort zahlen" : "Teilnahme gratis"
+  const zeile = (label: string, wert: string) => `
+        <div style="font-size:14px;color:rgba(255,255,255,.75);margin-top:4px">${label}: ${wert}</div>`
+  const inner = `
+    <div style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${G};margin-bottom:6px">${status}</div>
+    <h1 style="font-size:24px;font-weight:900;color:#ffffff;margin:0 0 10px">${titel}</h1>
+    <p style="font-size:15px;color:rgba(255,255,255,.85);margin:0 0 18px;line-height:1.5">Hallo ${opts.name}, ${
+      opts.warteliste
+        ? "dein Platz ist reserviert, sobald jemand absagt — wir melden uns per E-Mail."
+        : "wir haben deine Anmeldung erhalten."
+    }</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${CARD};border-radius:16px">
+      <tr><td style="padding:16px 18px;font-family:system-ui,sans-serif">
+        <div style="font-size:16px;font-weight:800;color:#ffffff">${opts.turnier}</div>
+        ${zeile("Datum", opts.datumLabel)}
+        ${opts.zeitLabel ? zeile("Zeit", opts.zeitLabel) : ""}
+        ${opts.ort ? zeile("Ort", opts.ort) : ""}
+        ${zeile("Startgeld", opts.startgeldChf > 0
+          ? `CHF ${opts.startgeldChf}${opts.bezahlt ? " · bezahlt" : " · vor Ort zu zahlen"}`
+          : "gratis")}
+      </td></tr>
+    </table>
+    ${opts.turnierUrl ? outlineButton(opts.turnierUrl, "Turnier ansehen") : ""}
+    <p style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:18px;line-height:1.5;font-family:system-ui,sans-serif">${
+      opts.stornoText || "Abmelden bis zum Anmeldeschluss — schreib uns dazu einfach auf diese Mail."
+    }</p>
+    <p style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:8px;line-height:1.5;font-family:system-ui,sans-serif">Bring Hallenschuhe mit. Schläger und Bälle sind vor Ort.</p>`
+  return sendEmail({
+    to: opts.to,
+    subject: `${titel} — ${opts.turnier}, ${opts.datumLabel}`,
+    html: shell(inner),
+  })
+}
+
+/** Nachricht an Gäste, die von der Warteliste nachrücken. In der App bekommen
+ *  Spieler eine Benachrichtigung — Gäste hatten bisher gar keinen Kanal. */
+export async function sendTournamentWaitlistUp(opts: {
+  to: string; name: string; turnier: string; datumLabel: string; turnierUrl?: string
+}) {
+  const inner = `
+    <div style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${G};margin-bottom:6px">Platz frei geworden</div>
+    <h1 style="font-size:24px;font-weight:900;color:#ffffff;margin:0 0 10px">Du bist dabei</h1>
+    <p style="font-size:15px;color:rgba(255,255,255,.85);margin:0 0 18px;line-height:1.5">Hallo ${opts.name}, es ist ein Platz frei geworden — du rückst von der Warteliste nach.</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${CARD};border-radius:16px">
+      <tr><td style="padding:16px 18px;font-family:system-ui,sans-serif">
+        <div style="font-size:16px;font-weight:800;color:#ffffff">${opts.turnier}</div>
+        <div style="font-size:14px;color:rgba(255,255,255,.75);margin-top:4px">${opts.datumLabel}</div>
+      </td></tr>
+    </table>
+    ${opts.turnierUrl ? outlineButton(opts.turnierUrl, "Turnier ansehen") : ""}
+    <p style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:18px;line-height:1.5;font-family:system-ui,sans-serif">Wenn es dir doch nicht passt, antworte kurz auf diese Mail — dann rückt die nächste Person nach.</p>`
+  return sendEmail({ to: opts.to, subject: `Platz frei — ${opts.turnier}`, html: shell(inner) })
 }

@@ -89,12 +89,12 @@ export async function naechsteWartelistenPos(admin: SupabaseClient, tournamentId
  * wird zu einem regulären Platz. Gibt die nachgerückte Anmeldung zurück (für
  * eine spätere Benachrichtigung) oder null.
  */
-export async function nachruecken(admin: SupabaseClient, tournamentId: string, maxPlayers: number): Promise<{ id: string; email: string | null; player_id: string | null } | null> {
+export async function nachruecken(admin: SupabaseClient, tournamentId: string, maxPlayers: number): Promise<{ id: string; email: string | null; player_id: string | null; first_name: string | null } | null> {
   const b = await belegung(admin, tournamentId, maxPlayers)
   if (b.voll) return null
   const { data: naechster } = await admin
     .from("tournament_registrations")
-    .select("id,email,player_id")
+    .select("id,email,player_id,first_name")
     .eq("tournament_id", tournamentId)
     .eq("status", "active")
     .eq("waitlist", true)

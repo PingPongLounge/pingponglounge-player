@@ -3,7 +3,7 @@ import Stripe from "stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { PP_CONFIG } from "@/lib/rewards"
 import { sessionUuid } from "@/lib/stripe-util"
-import { sendBookingConfirm, sendEmail } from "@/lib/email"
+import { sendBookingConfirm, sendEmail, sendTournamentConfirm } from "@/lib/email"
 import { entryQrFor, weekdayOf, SINGLE_NIGHT_PLAETZE } from "@/lib/opengames"
 import { CAMP_MAX_PER_SESSION } from "@/lib/camp"
 import { campBelegung } from "@/lib/camp-server"
@@ -130,12 +130,34 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true })
     }
 
-    // TURNIER: Zahlung eingegangen → Platz endgültig bestätigt.
+    // TURNIER: Zahlung eingegangen → Platz endgültig bestätigt, Bestätigung raus.
     if (s.payment_status === "paid" && s.metadata?.type === "tournament" && s.metadata.registration_id) {
       const admin = createAdminClient()
-      await admin.from("tournament_registrations")
+      const { data: reg } = await admin.from("tournament_registrations")
         .update({ payment_status: "paid", reserved_until: null })
         .eq("id", s.metadata.registration_id)
+        .select("email,first_name,amount_chf,tournament_id")
+        .maybeSingle()
+
+      // Bisher endete der Vorgang hier — der Gast zahlte und bekam nichts.
+      if (reg?.email) {
+        const { data: t } = await admin.from("player_tournaments")
+          .select("name,date,start_time,end_time,city").eq("id", reg.tournament_id).maybeSingle()
+        const datumLabel = t?.date
+          ? new Date(`${t.date}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })
+          : "Termin folgt"
+        await sendTournamentConfirm({
+          to: reg.email,
+          name: reg.first_name || "zusammen",
+          turnier: t?.name || "Turnier",
+          datumLabel,
+          zeitLabel: t?.start_time ? `${String(t.start_time).slice(0, 5)}${t.end_time ? `–${String(t.end_time).slice(0, 5)}` : ""} Uhr` : undefined,
+          ort: t?.city || undefined,
+          startgeldChf: Number(reg.amount_chf) || 0,
+          bezahlt: true,
+          turnierUrl: `https://pingponglounge.ch/turniere/${reg.tournament_id}`,
+        }).catch(() => { /* Zahlung darf nie am Mailversand scheitern */ })
+      }
       return NextResponse.json({ received: true })
     }
 

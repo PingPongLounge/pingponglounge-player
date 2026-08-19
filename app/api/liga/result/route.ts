@@ -5,7 +5,7 @@ import { sendResultConfirmRequest } from "@/lib/email"
 import { signAction } from "@/lib/token"
 import { notify } from "@/lib/notify"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://pingponglounge-player.vercel.app"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
 
 export async function POST(req: NextRequest) {
   const { match_id, sets, winner_id, played_at } = await req.json()

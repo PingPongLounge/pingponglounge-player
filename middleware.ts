@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_PATHS = ['/', '/login', '/auth', '/spielen', '/entdecken']
+const PUBLIC_PATHS = ['/', '/login', '/auth', '/spielen', '/entdecken', '/turniere', '/rangliste']
 
 // Routen, die bewusst OHNE Login funktionieren müssen:
 // - confirm-email: der Ein-Klick-Link aus der Bestätigungs-Mail (signiert, prüft sich selbst)
@@ -40,7 +40,9 @@ const KANONISCH = "playerapp.ch"
 
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host") || ""
-  if (host.endsWith(".vercel.app")) {
+  // Nur in der Produktion umleiten — Vorschau-Deployments (Preview) muessen
+  // unter ihrer vercel.app-Adresse testbar bleiben.
+  if (process.env.VERCEL_ENV === "production" && host.endsWith(".vercel.app")) {
     const ziel = new URL(request.nextUrl.pathname + request.nextUrl.search, `https://${KANONISCH}`)
     return NextResponse.redirect(ziel, 308)
   }

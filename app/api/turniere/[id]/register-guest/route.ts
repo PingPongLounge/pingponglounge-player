@@ -1,6 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { belegung, naechsteWartelistenPos, seedWert, selfRatingElo, SELF_RATINGS } from "@/lib/tournaments"
 import { NextRequest, NextResponse } from "next/server"
+import { sendTournamentConfirm } from "@/lib/email"
 
 // ANMELDUNG ÜBER PING PONG LOUNGE (Gast, ohne Player-Konto)
 // KEIN Login nötig. Gast gibt Name, E-Mail und eine verständliche
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const admin = createAdminClient()
   const { data: t } = await admin.from("player_tournaments")
-    .select("id,status,max_players,payment_mode,entry_fee_chf,registration_deadline,published_web")
+    .select("id,name,date,start_time,end_time,city,status,max_players,payment_mode,entry_fee_chf,registration_deadline,published_web")
     .eq("id", id).single()
   if (!t) return NextResponse.json({ error: "Turnier nicht gefunden" }, { status: 404 })
   if (!t.published_web) return NextResponse.json({ error: "Turnier nicht für Gäste geöffnet" }, { status: 403 })
@@ -37,8 +38,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   // Schon mit dieser E-Mail angemeldet? (idempotent — kein Doppel)
   const { data: schon } = await admin.from("tournament_registrations")
-    .select("id,waitlist").eq("tournament_id", id).is("player_id", null).ilike("email", email).maybeSingle()
-  if (schon) return NextResponse.json({ ok: true, already: true, waitlist: schon.waitlist })
+    .select("id,waitlist,payment_status").eq("tournament_id", id).is("player_id", null).ilike("email", email).maybeSingle()
+  if (schon) {
+    const offen = t.payment_mode === "online" && Number(t.entry_fee_chf) > 0
+      && !schon.waitlist && schon.payment_status !== "paid"
+    return NextResponse.json({
+      ok: true, already: true, waitlist: schon.waitlist,
+      registration_id: schon.id, needsPayment: offen,
+    })
+  }
 
   const bezahltNoetig = t.payment_mode === "online" && Number(t.entry_fee_chf) > 0
   const b = await belegung(admin, id, t.max_players)
@@ -57,6 +65,26 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }).select("id").single()
 
   if (error) return NextResponse.json({ error: error.code === "23505" ? "Bereits angemeldet" : error.message }, { status: 400 })
+
+  // Mail nur, wenn nichts mehr offen ist — bei Onlinezahlung schickt sie der
+  // Webhook nach dem Zahlungseingang.
+  if (!(bezahltNoetig && !aufWarteliste)) {
+    const datumLabel = t.date
+      ? new Date(`${t.date}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })
+      : "Termin folgt"
+    await sendTournamentConfirm({
+      to: email,
+      name: first,
+      turnier: t.name || "Turnier",
+      datumLabel,
+      zeitLabel: t.start_time ? `${String(t.start_time).slice(0, 5)}${t.end_time ? `–${String(t.end_time).slice(0, 5)}` : ""} Uhr` : undefined,
+      ort: t.city || undefined,
+      startgeldChf: Number(t.entry_fee_chf) || 0,
+      bezahlt: false,
+      warteliste: aufWarteliste,
+      turnierUrl: `https://pingponglounge.ch/turniere/${id}`,
+    }).catch(() => { /* Anmeldung darf nie am Mailversand scheitern */ })
+  }
 
   return NextResponse.json({
     ok: true, registration_id: reg.id,

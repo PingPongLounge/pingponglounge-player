@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server"
 // genau diesen Spieler. Ohne gültige Signatur passiert nichts.
 export const runtime = "nodejs"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://pingponglounge-player.vercel.app"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
 const G = "#57CF79"
 
 const GRAD = "linear-gradient(135deg,#57CF79,#38BEB2)"

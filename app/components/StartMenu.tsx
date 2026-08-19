@@ -88,7 +88,7 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
               <p style={{ fontSize: 12.5, color: M, margin: "5px 0 12px" }}>mit konto: liga, pingpoints, deine spiele und ergebnisse.</p>
               <div style={{ display: "flex", gap: 8 }}>
                 <Link href="/login" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#57CF79", color: "#06210F", borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>anmelden</Link>
-                <Link href="/registrieren" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#232833", color: W, borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>konto erstellen</Link>
+                <Link href="/onboarding" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#232833", color: W, borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>konto erstellen</Link>
               </div>
             </div>
             )}
