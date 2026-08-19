@@ -23,18 +23,18 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
         <defs>
           <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             {/* Gradient verschiebt sich sehr langsam */}
-            <stop offset="0%" stopColor="#57CF79">
+            <stop offset="0%" stopColor="#FF00C8">
               <animate
                 attributeName="stop-color"
-                values="#57CF79;#1FD1C4;#57CF79"
+                values="#FF00C8;#FF5CDC;#FF00C8"
                 dur="8s"
                 repeatCount="indefinite"
               />
             </stop>
-            <stop offset="100%" stopColor="#1FD1C4">
+            <stop offset="100%" stopColor="#FF5CDC">
               <animate
                 attributeName="stop-color"
-                values="#1FD1C4;#57CF79;#1FD1C4"
+                values="#FF5CDC;#FF00C8;#FF5CDC"
                 dur="8s"
                 repeatCount="indefinite"
               />
@@ -70,7 +70,7 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
 
         {/* Ball — leuchtet kurz nach 5s sehr subtil auf */}
         <circle cx="63" cy="58" r="6" fill="url(#logoGrad)" />
-        <circle cx="63" cy="58" r="6" fill="#57CF79" filter="url(#ballGlow)" opacity="0">
+        <circle cx="63" cy="58" r="6" fill="#FF00C8" filter="url(#ballGlow)" opacity="0">
           <animate
             attributeName="opacity"
             values="0;0;0;0;0;0;0.5;0.2;0"
@@ -100,7 +100,7 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
           lineHeight: 1,
           fontFamily: "'League Spartan', system-ui, sans-serif",
           userSelect: "none" as const,
-          background: "linear-gradient(135deg, #57CF79 0%, #1FD1C4 100%)",
+          background: "linear-gradient(135deg, #FF00C8 0%, #FF5CDC 100%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           backgroundClip: "text",

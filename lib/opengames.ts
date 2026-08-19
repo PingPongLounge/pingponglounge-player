@@ -67,8 +67,8 @@ export const SINGLE_NIGHT_INFO = {
 // Rotation der Bändchen-Farben durch die drei Stationen.
 export const SINGLE_NIGHT_STATIONS = ["Rundlauf", "Doppelturnier (Partnerwechsel)", "Speeddating"]
 export const SINGLE_NIGHT_ROTATION: Array<{ farbe: string; hex: string; plan: string[] }> = [
-  { farbe: "Grün", hex: "#24E07C", plan: ["Rundlauf", "Doppel", "Speeddating"] },
-  { farbe: "Blau", hex: "#38BEB2", plan: ["Doppel", "Speeddating", "Rundlauf"] },
+  { farbe: "Grün", hex: "#FF00C8", plan: ["Rundlauf", "Doppel", "Speeddating"] },
+  { farbe: "Blau", hex: "#FF5CDC", plan: ["Doppel", "Speeddating", "Rundlauf"] },
   { farbe: "Rot", hex: "#FF5A5A", plan: ["Speeddating", "Rundlauf", "Doppel"] },
 ]
 

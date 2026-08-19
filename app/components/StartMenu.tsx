@@ -52,12 +52,12 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
   return (
     <>
       {avatar ? (
-        <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#57CF79,#38BEB2)", color: "#06210F", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+        <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#FF00C8,#FF5CDC)", color: "#FFFFFF", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           {avatar}
         </button>
       ) : (
         <button onClick={() => setOpen(true)} aria-label="Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), background: C, borderRadius: 11, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#57CF79"/><stop offset="1" stopColor="#1FD1C4"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#FF00C8"/><stop offset="1" stopColor="#FF5CDC"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
       )}
 
@@ -73,21 +73,21 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
 
             {authed ? (
             <Link href="/profil" onClick={() => setOpen(false)} style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 14px", background: C, borderRadius: 16, textDecoration: "none" }}>
-              <span style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#57CF79,#38BEB2)", padding: 2, flexShrink: 0, display: "block" }}>
+              <span style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#FF00C8,#FF5CDC)", padding: 2, flexShrink: 0, display: "block" }}>
                 <span style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#13161B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.7" strokeLinecap="round"><circle cx="10" cy="9.4" r="5.4"/><path d="M13.9 13.3 19.4 18.8"/><circle cx="18" cy="6.4" r="1.8" fill="#fff" stroke="none"/></svg></span>
               </span>
               <span style={{ flex: 1 }}>
                 <span style={{ display: "block", fontSize: 16, fontWeight: 500, color: W }}>{name}</span>
                 <span style={{ display: "block", fontSize: 11, color: M, marginTop: 2 }}>{sub || "profil ansehen"}</span>
               </span>
-              <span style={{ color: "#57CF79", fontSize: 18 }}>›</span>
+              <span style={{ color: "#FF00C8", fontSize: 18 }}>›</span>
             </Link>
             ) : (
             <div style={{ background: C, borderRadius: 16, padding: "15px 15px 13px" }}>
               <p style={{ fontSize: 15, fontWeight: 600, color: W, margin: 0 }}>noch nicht angemeldet</p>
               <p style={{ fontSize: 12.5, color: M, margin: "5px 0 12px" }}>mit konto: liga, pingpoints, deine spiele und ergebnisse.</p>
               <div style={{ display: "flex", gap: 8 }}>
-                <Link href="/login" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#57CF79", color: "#06210F", borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>anmelden</Link>
+                <Link href="/login" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#FF00C8", color: "#FFFFFF", borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>anmelden</Link>
                 <Link href="/onboarding" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#232833", color: W, borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>konto erstellen</Link>
               </div>
             </div>

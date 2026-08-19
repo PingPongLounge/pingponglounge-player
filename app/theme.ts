@@ -3,7 +3,7 @@
 // =====================================================================
 // Finale Regeln (von Oliver bestätigt, Referenz: Startseite /entdecken)
 //
-//  • Verlauf (#57CF79 → #1FD1C4) NUR für Logo + Rang-Zahl. Sonst nie.
+//  • Verlauf (#FF00C8 → #FF5CDC) NUR für Logo + Rang-Zahl. Sonst nie.
 //  • Überschriften/Titel extra fett (900), GROSSBUCHSTABEN, weiss.
 //  • Fliesstext leicht (300) aber weiss (~.85–.9) — Kontrast über Gewicht.
 //  • Karten randlos (kein Border), Füllung + dezenter Schatten.
@@ -28,10 +28,10 @@ export const MUT    = 'rgba(255,255,255,.62)'    // Labels / gedämpft
 export const LINE   = 'rgba(255,255,255,.08)'   // dezente Trennlinie
 export const DANGER = '#E5484D'                 // Fehler / Löschen (klares, ruhiges Rot)
 
-export const GREEN  = '#24E07C'                  // helles Neon-Grün (Akzent)
+export const GREEN  = '#FF00C8'                  // helles Neon-Grün (Akzent)
 export const CYAN   = '#2BD4C4'
 export const INK    = '#05130B'                  // dunkle Schrift NUR auf Neon-Grün-Fill (Button-Label)
-export const GRAD   = 'linear-gradient(135deg,#24E07C,#2BD4C4)'   // Logo + Rang
+export const GRAD   = 'linear-gradient(135deg,#FF00C8,#2BD4C4)'   // Logo + Rang
 export const SHADOW = '0 4px 14px rgba(0,0,0,.35)'
 
 /* ---------- Level-System: 1–7 (Mint → Teal → Bronze → Amber → Silber → Platin → Gold) ----------
@@ -183,7 +183,7 @@ export const btn: CSSProperties = {
 export const btnOutline: CSSProperties = {
   display: 'block', textAlign: 'center', borderRadius: 14,
   padding: '15px', fontSize: 15, fontWeight: 800, color: GREEN, textDecoration: 'none', cursor: 'pointer',
-  background: 'transparent', border: `1.5px solid rgba(36,224,124,.5)`,
+  background: 'transparent', border: `1.5px solid rgba(255,0,200,.5)`,
 }
 // Primär in einer Karte (gefüllt)
 export const btnInCard: CSSProperties = {

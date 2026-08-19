@@ -25,7 +25,7 @@ export default function PendingConfirmBanner() {
   }, [])
 
   if (items.length === 0) return null
-  const GRAD = "linear-gradient(135deg,#57CF79,#38BEB2)"
+  const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
 
   const one = items.length === 1 ? items[0] : null
   const href = one ? `/liga/match/${one.id}` : "/liga"
@@ -51,7 +51,7 @@ export default function PendingConfirmBanner() {
       </span>
       <span style={{
         flexShrink: 0, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".04em",
-        color: "#06210F", background: GRAD, borderRadius: 9, padding: "9px 13px",
+        color: "#FFFFFF", background: GRAD, borderRadius: 9, padding: "9px 13px",
       }}>Bestätigen</span>
     </button>
   )

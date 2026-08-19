@@ -8,7 +8,7 @@ const RESEND_URL = "https://api.resend.com/emails"
 const FROM = process.env.RESEND_FROM || "Player <points@playerapp.ch>"
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
 
-const G = "#57CF79"
+const G = "#FF00C8"
 
 export async function sendEmail(opts: { to: string; subject: string; html: string }): Promise<{ ok: boolean; skipped?: boolean; error?: string }> {
   const key = process.env.RESEND_API_KEY
@@ -33,7 +33,7 @@ export async function sendEmail(opts: { to: string; subject: string; html: strin
   }
 }
 
-const GRAD = "linear-gradient(135deg,#57CF79,#38BEB2)"
+const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
 const CARD = "#2A2F39"
 
 // Voll deckender dunkler Hintergrund über die ganze Breite — sonst bleibt auf dem

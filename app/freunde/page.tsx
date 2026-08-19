@@ -134,7 +134,7 @@ export default function FreundePage() {
               <div style={{
                 width: 28, height: 28, borderRadius: "50%",
                 background: GRAD,
-                color: "#06210F",
+                color: "#FFFFFF",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 fontSize: 13, fontWeight: 900, flexShrink: 0,
               }}>{i + 1}</div>

@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import PlayerLogo from "../components/PlayerLogo"
@@ -37,11 +37,23 @@ export default function LoginPage() {
   const router = useRouter()
   const [msg, setMsg] = useState("")
 
+  // Wohin nach dem Anmelden? Die Middleware haengt returnTo an, aeltere Links
+  // benutzen next. Nur relative Pfade — sonst waere das eine offene Weiterleitung.
+  // Bewusst aus window.location statt useSearchParams: das braucht sonst eine
+  // Suspense-Huelle und bricht sonst den Build.
+  const [ziel, setZiel] = useState("/entdecken")
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search)
+    const roh = p.get("returnTo") || p.get("next") || ""
+    if (roh.startsWith("/") && !roh.startsWith("//")) setZiel(roh)
+  }, [])
+  const rueckweg = () => `${window.location.origin}/auth/callback?next=${encodeURIComponent(ziel)}`
+
   async function signInWithGoogle() {
     const supabase = createClient()
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: window.location.origin + "/auth/callback" },
+      options: { redirectTo: rueckweg() },
     })
   }
 
@@ -51,7 +63,7 @@ export default function LoginPage() {
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) { setError(error.message); setLoading(false); return }
-    router.refresh(); router.push("/entdecken")
+    router.refresh(); router.push(ziel)
   }
 
   async function handleRegister(e: React.FormEvent) {
@@ -60,7 +72,7 @@ export default function LoginPage() {
     const supabase = createClient()
     const { error } = await supabase.auth.signUp({
       email, password,
-      options: { emailRedirectTo: window.location.origin + "/auth/callback" },
+      options: { emailRedirectTo: rueckweg() },
     })
     if (error) { setError(error.message); setLoading(false); return }
     setSent(true); setLoading(false)
@@ -72,7 +84,7 @@ export default function LoginPage() {
     const supabase = createClient()
     await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: window.location.origin + "/auth/callback" },
+      options: { emailRedirectTo: rueckweg() },
     })
     setSent(true); setLoading(false)
   }
@@ -89,7 +101,8 @@ export default function LoginPage() {
     setLoading(false)
   }
 
-  const tabLabels = { login: "Login", register: "Neu", magic: "Link", reset: "" }
+  // "Login / Neu / Link" sagte niemandem, was passiert.
+  const tabLabels = { login: "Einloggen", register: "Konto erstellen", magic: "Magic Link", reset: "" }
 
   return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: DARK, padding: "20px" }}>

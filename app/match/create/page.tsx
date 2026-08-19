@@ -144,7 +144,7 @@ export default function CreateMatchPage() {
                 <button key={a} onClick={() => setOrtsart(a)} style={{
                   flex: 1, padding: "12px 8px", borderRadius: 13, fontSize: 13, fontWeight: 700, cursor: "pointer",
                   border: `1.5px solid ${ortsart === a ? GREEN : LINE}`,
-                  color: ortsart === a ? GREEN : MUT, background: ortsart === a ? "rgba(36,224,124,.12)" : "transparent",
+                  color: ortsart === a ? GREEN : MUT, background: ortsart === a ? "rgba(255,0,200,.12)" : "transparent",
                 }}>{a === "ppl" ? "Ping Pong Lounge" : "Anderer Ort"}</button>
               ))}
             </div>
@@ -231,7 +231,7 @@ export default function CreateMatchPage() {
                   <button key={l} onClick={() => setOtherLevel(l)} style={{
                     padding: "10px 4px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer",
                     border: `1.5px solid ${otherLevel === l ? GREEN : LINE}`, color: otherLevel === l ? GREEN : SUB,
-                    background: otherLevel === l ? "rgba(36,224,124,.12)" : "transparent",
+                    background: otherLevel === l ? "rgba(255,0,200,.12)" : "transparent",
                   }}>L{l}</button>
                 ))}
               </div>

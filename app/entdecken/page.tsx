@@ -6,7 +6,7 @@ import StartHomeV2, { Game } from '@/app/components/StartHomeV2'
 
 const BG = '#12151A', W = '#FFFFFF'
 const SUB = 'rgba(255,255,255,.9)', MUT = 'rgba(255,255,255,.85)'
-const GRAD = 'linear-gradient(135deg,#57CF79,#38BEB2)'
+const GRAD = 'linear-gradient(135deg,#FF00C8,#FF5CDC)'
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }
 
 const LV = [
@@ -17,7 +17,7 @@ const LV = [
 function Logo() {
   return (
     <svg width={56} height={56} viewBox="0 0 80 80" fill="none" style={{ display: 'block' }}>
-      <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#57CF79" /><stop offset="100%" stopColor="#1FD1C4" /></linearGradient></defs>
+      <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#FF00C8" /><stop offset="100%" stopColor="#FF5CDC" /></linearGradient></defs>
       {/* P immer nur Outline; um -2 verschoben, damit das P selbst mittig sitzt (Ball hängt raus) */}
       <g transform="translate(-2,0)">
         <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="2.5" strokeLinejoin="round" />
@@ -64,7 +64,7 @@ export default async function EntdeckenPage() {
                   Wortmarkenbreite. Das P bleibt Outline, der Ball sitzt rechts unten. */}
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
                 <svg width="72" height="72" viewBox="0 0 80 80" fill="none" aria-hidden>
-                  <defs><linearGradient id="hlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#57CF79" /><stop offset="1" stopColor="#1FD1C4" /></linearGradient></defs>
+                  <defs><linearGradient id="hlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#FF00C8" /><stop offset="1" stopColor="#FF5CDC" /></linearGradient></defs>
                   <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#hlg)" strokeWidth="3.6" strokeLinejoin="round" />
                   <circle cx="63" cy="58" r="6.5" fill="url(#hlg)" />
                 </svg>
@@ -72,7 +72,7 @@ export default async function EntdeckenPage() {
                   <div style={{ fontSize: 30, fontWeight: 900, letterSpacing: '.24em', lineHeight: 1, paddingLeft: '.24em', ...gt }}>PLAYER</div>
                   <div style={{ fontSize: 9.5, fontWeight: 700, color: SUB, textTransform: 'uppercase', marginTop: 7, textAlign: 'justify', textAlignLast: 'justify' }}>Pingpong Next Level</div>
                 </div>
-                <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#06210F', background: GRAD, borderRadius: 999, padding: '3px 8px', marginTop: 12 }}>Beta</span>
+                <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#FFFFFF', background: GRAD, borderRadius: 999, padding: '3px 8px', marginTop: 12 }}>Beta</span>
               </div>
 
               <h1 style={{ fontSize: 32, fontWeight: 900, lineHeight: 1.05, letterSpacing: '-.025em', margin: '0 0 11px', color: W, textAlign: 'center' }}>

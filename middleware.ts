@@ -1,7 +1,20 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PUBLIC_PATHS = ['/', '/login', '/auth', '/spielen', '/entdecken', '/turniere', '/rangliste']
+// Entdecken ohne Konto: Liste UND Detailseite. Der Vergleich war vorher exakt
+// (pathname === p), darum lief /turniere/<id> — also genau der Link von der
+// Webseite — in die Login-Wand.
+const PUBLIC_PATHS = ['/', '/login', '/onboarding', '/auth', '/spielen', '/entdecken',
+  '/turniere', '/rangliste', '/match', '/single-night']
+
+// Diese Unterseiten brauchen trotzdem ein Konto: erstellen, mitspielen, eintragen.
+const GESCHUETZT = ['/match/create', '/match/erstellen', '/erstellen']
+
+// Oeffentlich lesbare API-Routen — ausschliesslich GET. Ohne diese Zeilen
+// antwortete die API einem ausgeloggten Besucher mit 401; die Seite zeigte
+// daraufhin "0 offene Turniere" und "0 Spieler", waehrend die Webseite zwei
+// Turniere und 22 Spieler auswies. Kein Datenproblem — ein Zugriffsproblem.
+const PUBLIC_API_GET = ['/api/turniere', '/api/rangliste', '/api/match', '/api/single-night']
 
 // Routen, die bewusst OHNE Login funktionieren müssen:
 // - confirm-email: der Ein-Klick-Link aus der Bestätigungs-Mail (signiert, prüft sich selbst)
@@ -82,8 +95,16 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
   // Öffentliche Pfade: immer zugänglich (auch ausgeloggt → /entdecken zeigt die Teaser-Startseite)
-  const isPublic = PUBLIC_PATHS.some(p => pathname === p || pathname.startsWith('/auth'))
+  const istGeschuetzt = GESCHUETZT.some(p => pathname === p || pathname.startsWith(p + '/'))
+  const isPublic = !istGeschuetzt && (
+    pathname.startsWith('/auth') ||
+    PUBLIC_PATHS.some(p => pathname === p || (p !== '/' && pathname.startsWith(p + '/')))
+  )
   if (isPublic) return supabaseResponse
+
+  // Lesende Zugriffe auf oeffentliche Listen — ohne Konto.
+  if (request.method === 'GET' && PUBLIC_API_GET.some(p => pathname === p || pathname.startsWith(p + '/')))
+    return supabaseResponse
 
   // Signierte bzw. selbst-verifizierende API-Routen: kein Login-Redirect
   if (PUBLIC_API.some(p => pathname === p)) return supabaseResponse
@@ -117,7 +138,12 @@ export async function middleware(request: NextRequest) {
     // zufällig neben einer Token-Erneuerung lief, die gültige Session mitgerissen.
     // Der Spieler flog raus, sobald er eine Seite ansteuerte. Eine echte Schleife
     // gibt es nicht mehr, seit die Cookies korrekt weitergereicht werden.
-    const redirect = NextResponse.redirect(new URL('/login', request.url))
+    // Wohin der Spieler wollte, geht nicht verloren: nach dem Anmelden kehrt er
+    // genau auf diese Seite zurueck — samt Standort, Datum und Event-ID.
+    const zurueckZu = pathname + (request.nextUrl.search || '')
+    const ziel = new URL('/login', request.url)
+    ziel.searchParams.set('returnTo', zurueckZu)
+    const redirect = NextResponse.redirect(ziel)
     supabaseResponse.cookies.getAll().forEach(c => redirect.cookies.set(c))
     return redirect
   }

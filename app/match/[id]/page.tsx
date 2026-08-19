@@ -186,7 +186,7 @@ export default function MatchDetailPage({ params }: { params: Promise<{ id: stri
                 const p = players[i]
                 return (
                   <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 12px", ...cell }}>
-                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: p ? "linear-gradient(135deg,#24E07C,#2BD4C4)" : "#181C22", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: p ? "#05130B" : M }}>{p ? (p.name || "").split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase() : "+"}</div>
+                    <div style={{ width: 36, height: 36, borderRadius: "50%", background: p ? "linear-gradient(135deg,#FF00C8,#2BD4C4)" : "#181C22", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 800, color: p ? "#05130B" : M }}>{p ? (p.name || "").split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase() : "+"}</div>
                     {p ? (
                       <div style={{ flex: 1 }}>
                         <span style={{ fontSize: 14, fontWeight: 700, color: W }}>{p.name}</span>

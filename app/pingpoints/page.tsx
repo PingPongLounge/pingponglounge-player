@@ -4,7 +4,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { BG, CELL, W, SUB, MUT, GRAD, gt, card, body, meta, chipBtn, btnInCard } from "@/app/theme"
 
-const G="#57CF79"
+const G="#FF00C8"
 
 const sourceIcon: Record<string,string> = {
   liga_win:"🏆", liga_played:"🏓", liga_upset:"⚡",

@@ -5,5 +5,5 @@
    das explizite border:none entfernt wurde. */
 button, input, textarea, select { border: none; outline: none; }
 button { background: none; }
-:root { --green: #57CF79; --dark: #14161A; --card: #15161A; --border: #26282E; --muted: #6B6E7A; --text: #E8E6E1; }
+:root { --green: #FF00C8; --dark: #14161A; --card: #15161A; --border: #26282E; --muted: #6B6E7A; --text: #E8E6E1; }
 body { font-family: var(--font-league-spartan), "League Spartan", system-ui, sans-serif; background: #14161A; color: #E8E6E1; -webkit-font-smoothing: antialiased; }

@@ -1,7 +1,8 @@
 "use client"
 import { useEffect, useState } from "react"
 
-const GRAD = "linear-gradient(135deg,#57CF79,#38BEB2)"
+// Nur noch PPL-Pink — Gruen und Tuerkis sind aus der Player-App raus.
+const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
 const gt: React.CSSProperties = {
   background: GRAD,
   WebkitBackgroundClip: "text",
@@ -12,51 +13,43 @@ const gt: React.CSSProperties = {
 const PLAYER_LETTERS = ["P", "L", "A", "Y", "E", "R"]
 
 export default function SplashScreen() {
-  const [phase, setPhase] = useState<"show" | "fade" | "done">("show")
+  // Startet ausgeschaltet: wer die App in dieser Sitzung schon geoeffnet hat,
+  // sieht gar nichts mehr — kein Aufblitzen, kein Warten.
+  const [phase, setPhase] = useState<"aus" | "show" | "fade" | "done">("aus")
   const [showBall, setShowBall] = useState(false)
   const [letterIndex, setLetterIndex] = useState(0)
 
   useEffect(() => {
-    // Sequenz: Paddle zeichnen → Ball → Buchstaben. Keine Tagline —
-    // "Pingpong Next Level" steht auf der Startseite, hier braucht es sie nicht.
-    const t1 = setTimeout(() => setShowBall(true), 260)
+    // Einmal pro Sitzung, und nur wenn Bewegung erwuenscht ist.
+    let wenigerBewegung = false
+    try { wenigerBewegung = window.matchMedia("(prefers-reduced-motion: reduce)").matches } catch { }
+    let schonGesehen = false
+    try { schonGesehen = sessionStorage.getItem("ppl_splash") === "1" } catch { }
+    if (wenigerBewegung || schonGesehen) { setPhase("done"); return }
+    try { sessionStorage.setItem("ppl_splash", "1") } catch { }
+    setPhase("show")
 
-    // Buchstaben nach und nach einblenden
+    // Die Sequenz laeuft jetzt in gut einer halben Sekunde durch.
+    const t1 = setTimeout(() => setShowBall(true), 140)
     const letterTimers: ReturnType<typeof setTimeout>[] = []
     PLAYER_LETTERS.forEach((_, i) => {
-      letterTimers.push(setTimeout(() => setLetterIndex(i + 1), 400 + i * 45))
+      letterTimers.push(setTimeout(() => setLetterIndex(i + 1), 200 + i * 30))
     })
 
-    const dismiss = () => {
-      setTimeout(() => setPhase("fade"), 100)
-      setTimeout(() => setPhase("done"), 700)
-    }
-
-    // Das Logo soll man bewusst sehen: die ganze Sequenz (Paddle zeichnen →
-    // Ball → Buchstaben) läuft ~1,1 s, danach hält es kurz und "atmet". Der
-    // Splash bleibt daher mindestens ~2,4 s stehen, auch wenn schon geladen.
-    const MIN_MS = 2400
-    if (document.readyState === "complete") {
-      const minTimer = setTimeout(dismiss, MIN_MS)
-      return () => { clearTimeout(t1); clearTimeout(minTimer); letterTimers.forEach(clearTimeout) }
-    }
-
-    let loaded = false
-    let minDone = false
-    const tryDismiss = () => { if (loaded && minDone) dismiss() }
-
-    const onLoad = () => { loaded = true; tryDismiss() }
-    window.addEventListener("load", onLoad)
-    const minTimer = setTimeout(() => { minDone = true; tryDismiss() }, MIN_MS)
+    // Hoechstens 700 ms stehen, dann ausblenden — unabhaengig davon, ob die
+    // Seite fertig geladen ist. Der Rest laedt sichtbar weiter.
+    const raus = setTimeout(() => {
+      setPhase("fade")
+      setTimeout(() => setPhase("done"), 260)
+    }, 700)
 
     return () => {
-      clearTimeout(t1); clearTimeout(minTimer)
+      clearTimeout(t1); clearTimeout(raus)
       letterTimers.forEach(clearTimeout)
-      window.removeEventListener("load", onLoad)
     }
   }, [])
 
-  if (phase === "done") return null
+  if (phase === "aus" || phase === "done") return null
 
   return (
     <div
@@ -71,7 +64,7 @@ export default function SplashScreen() {
         justifyContent: "center",
         gap: 16,
         opacity: phase === "fade" ? 0 : 1,
-        transition: "opacity 0.6s ease",
+        transition: "opacity 0.25s ease",
         pointerEvents: "none",
       }}
     >
@@ -85,8 +78,8 @@ export default function SplashScreen() {
         >
           <defs>
             <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#57CF79" />
-              <stop offset="100%" stopColor="#1FD1C4" />
+              <stop offset="0%" stopColor="#FF00C8" />
+              <stop offset="100%" stopColor="#FF5CDC" />
             </linearGradient>
           </defs>
 

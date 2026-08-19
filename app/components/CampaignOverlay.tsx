@@ -8,7 +8,7 @@ type Campaign = {
   cta_label: string | null; cta_url: string | null; image_url: string | null
 }
 
-const GREEN = "#24E07C"
+const GREEN = "#FF00C8"
 const INK = "#05130B"
 
 export default function CampaignOverlay() {

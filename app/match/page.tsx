@@ -117,7 +117,7 @@ export default function MatchPage() {
                 ["Spielen & eintragen", "Vor Ort spielst du gegen wen du willst. Nach dem Spiel trägst du das Ergebnis ein — dein Rating steigt."],
               ] as [string, string][]).map(([t, d], i) => (
                 <div key={t} style={{ display: "flex", gap: 13, alignItems: "flex-start", padding: "12px 0", borderTop: i === 0 ? "none" : `1px solid rgba(255,255,255,.07)` }}>
-                  <span style={{ width: 24, height: 24, borderRadius: "50%", background: GRAD, color: "#06210F", fontSize: 12, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i + 1}</span>
+                  <span style={{ width: 24, height: 24, borderRadius: "50%", background: GRAD, color: "#FFFFFF", fontSize: 12, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i + 1}</span>
                   <span>
                     <span style={{ display: "block", fontSize: 14, fontWeight: 800, color: W }}>{t}</span>
                     <span style={{ display: "block", fontSize: 13, color: MUT, marginTop: 2, lineHeight: 1.45 }}>{d}</span>
@@ -142,17 +142,17 @@ export default function MatchPage() {
                 return (
                   <Link key={g.id} href={`/match/${g.id}`} style={{ display: "flex", gap: 14, alignItems: "center", background: C, border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: 16, textDecoration: "none" }}>
                     <span style={{ width: 66, flexShrink: 0 }}>
-                      <span style={{ display: "block", color: "#24E07C", fontSize: 10, fontWeight: 800, letterSpacing: ".04em" }}>{dayTop}</span>
+                      <span style={{ display: "block", color: "#FF00C8", fontSize: 10, fontWeight: 800, letterSpacing: ".04em" }}>{dayTop}</span>
                       <span style={{ display: "block", fontSize: 22, fontWeight: 900, color: W, marginTop: 2 }}>{String(g.start_hour ?? 19).padStart(2, "0")}:00</span>
                     </span>
                     <span style={{ flex: 1, minWidth: 0, borderLeft: "1px solid rgba(255,255,255,.08)", paddingLeft: 14 }}>
                       <span style={{ display: "block", fontSize: 16, fontWeight: 800, color: W, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{g.location_name}</span>
-                      <span style={{ display: "inline-block", margin: "7px 0", fontSize: 10, fontWeight: 700, letterSpacing: ".04em", color: "#24E07C", border: "1px solid #24E07C", borderRadius: 8, padding: "3px 8px" }}>{levelLabel}</span>
-                      <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: drin ? "#24E07C" : (frei === 0 ? M : "#24E07C") }}>
+                      <span style={{ display: "inline-block", margin: "7px 0", fontSize: 10, fontWeight: 700, letterSpacing: ".04em", color: "#FF00C8", border: "1px solid #FF00C8", borderRadius: 8, padding: "3px 8px" }}>{levelLabel}</span>
+                      <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: drin ? "#FF00C8" : (frei === 0 ? M : "#FF00C8") }}>
                         {drin ? "Du bist dabei ✓" : frei === 0 ? "Ausgebucht" : `${frei} ${frei === 1 ? "Platz" : "Plätze"} frei`}
                       </span>
                     </span>
-                    <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="#24E07C" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M9 6l6 6-6 6" /></svg>
+                    <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="#FF00C8" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M9 6l6 6-6 6" /></svg>
                   </Link>
                 )
               })}

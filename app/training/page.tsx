@@ -7,8 +7,8 @@ import { ratingLabel } from "@/app/theme"
 import { OG_TRAINING_PREIS_CHF } from "@/lib/opengames"
 
 const BG = "#12151A", CARD = "#2A2F39", CELL = "#353B46", W = "#FFFFFF"
-const MUT = "rgba(255,255,255,.82)", GREEN = "#57CF79"
-const GRAD = "linear-gradient(135deg,#57CF79,#38BEB2)"
+const MUT = "rgba(255,255,255,.82)", GREEN = "#FF00C8"
+const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
 
 type Player = { user_id: string; name: string; elo: number; level: string }
 type Training = {
@@ -63,14 +63,14 @@ export default function TrainingPage() {
         <a href="/trainingscamp"
           style={{ display: "block", textDecoration: "none", margin: "16px 0 8px", borderRadius: 22, overflow: "hidden", background: CARD, boxShadow: "0 4px 18px rgba(0,0,0,.4)" }}>
           <div style={{ background: GRAD, padding: "18px 18px 16px" }}>
-            <div style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: ".14em", color: "#06210F", textTransform: "uppercase" }}>Trainingscamp · 13.–16. August</div>
-            <div style={{ fontSize: 27, fontWeight: 900, color: "#06210F", lineHeight: 1, marginTop: 4, textTransform: "uppercase", letterSpacing: "-.01em" }}>4 Tage mit Profis</div>
+            <div style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: ".14em", color: "#FFFFFF", textTransform: "uppercase" }}>Trainingscamp · 13.–16. August</div>
+            <div style={{ fontSize: 27, fontWeight: 900, color: "#FFFFFF", lineHeight: 1, marginTop: 4, textTransform: "uppercase", letterSpacing: "-.01em" }}>4 Tage mit Profis</div>
           </div>
           <div style={{ padding: "14px 18px 16px" }}>
             <div style={{ fontSize: 14, fontWeight: 800, color: W }}>Elias Schmid <span style={{ color: MUT, fontWeight: 500 }}>· Schweizer Nr. 1</span></div>
             <div style={{ fontSize: 14, fontWeight: 800, color: W, marginTop: 2 }}>Simon Berglund <span style={{ color: MUT, fontWeight: 500 }}>· Schwedens Nr. 3</span></div>
             <div style={{ fontSize: 13, color: MUT, marginTop: 8, lineHeight: 1.5 }}>PPL24 Glattbrugg · für alle Levels · Halbtag CHF 75 · Ganztag CHF 150</div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 14, background: GRAD, color: "#06210F", borderRadius: 12, padding: "11px 16px", fontSize: 13.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 14, background: GRAD, color: "#FFFFFF", borderRadius: 12, padding: "11px 16px", fontSize: 13.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em" }}>
               Jetzt anmelden →
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function TrainingPage() {
                     {frei === 0 ? (
                       <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: MUT, width: 96, textAlign: "center", flexShrink: 0 }}>Ausgebucht</span>
                     ) : (
-                      <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "#06210F", background: GRAD, borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", flexShrink: 0 }}>Mitmachen</span>
+                      <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "#FFFFFF", background: GRAD, borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", flexShrink: 0 }}>Mitmachen</span>
                     )}
                   </Link>
 
@@ -133,8 +133,8 @@ export default function TrainingPage() {
         <div onClick={campSchliessen} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 380, background: CARD, borderRadius: 22, overflow: "hidden", boxShadow: "0 30px 80px rgba(0,0,0,.6)" }}>
             <div style={{ background: GRAD, padding: "20px 20px 16px" }}>
-              <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: ".14em", color: "#06210F", textTransform: "uppercase" }}>Trainingscamp · 13.–16. August</div>
-              <div style={{ fontSize: 26, fontWeight: 900, color: "#06210F", lineHeight: 1, marginTop: 5, textTransform: "uppercase" }}>4 Tage mit Profis</div>
+              <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: ".14em", color: "#FFFFFF", textTransform: "uppercase" }}>Trainingscamp · 13.–16. August</div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: "#FFFFFF", lineHeight: 1, marginTop: 5, textTransform: "uppercase" }}>4 Tage mit Profis</div>
             </div>
             <div style={{ padding: "16px 20px 20px" }}>
               <div style={{ fontSize: 14.5, fontWeight: 800, color: W }}>Elias Schmid <span style={{ color: MUT, fontWeight: 500 }}>· Schweizer Nr. 1</span></div>

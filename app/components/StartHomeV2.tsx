@@ -6,7 +6,7 @@ import CampaignOverlay from "./CampaignOverlay"
 import PendingConfirmBanner from "./PendingConfirmBanner"
 import { BG, CARD, W, SUB, MUT, LINE, GREEN, INK, btn, btnOutline } from "@/app/theme"
 
-const GRAD = "linear-gradient(135deg,#24E07C,#2BD4C4)"
+const GRAD = "linear-gradient(135deg,#FF00C8,#2BD4C4)"
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
 
 // Bleibt exportiert — /entdecken baut die Open-Game-Liste damit (auch wenn die
