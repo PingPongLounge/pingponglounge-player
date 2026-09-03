@@ -4,227 +4,26 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
-import { BG, CARD, W, MUT, SUB, GREEN, GRAD, CITIES, card, cardPad, cardActive, cell, chip, btn, btnInCard, btnGhost, chipBtn, levelBadge, statusPill, h1, body, backLink } from "@/app/theme"
-import { SectionBlock, SectionStat, SectionRow, SectionIntro, SectionTopBar } from "@/app/components/SectionUI"
 import { OG_PREIS_CHF, OG_STORNO_STUNDEN } from "@/lib/opengames"
 
-const M=MUT, G=GREEN, C=CARD
+const V="#8C3DFF", B="#080808", P="#F4F1EB", MUT="#8e8b87", LINE="#292929"
+function whenLabel(date:string|null,hour:number|null){if(!date)return hour!=null?`${String(hour).padStart(2,"0")}:00`:"Zeit offen";const d=new Date(`${date}T12:00:00`);return `${d.toLocaleDateString("de-CH",{weekday:"short",day:"numeric",month:"short"})}${hour!=null?` · ${String(hour).padStart(2,"0")}:00`:""}`}
+type Player={user_id:string;name:string;elo:number;level:string}
+type Game={id:string;created_by:string;location_name:string;date:string|null;start_hour:number|null;duration_minutes:number;max_players:number;current_players:number;price_per_player:number;is_official?:boolean;level:string;status:string;notes:string|null;created_at:string;players:Player[]}
 
-function whenLabel(date: string | null, hour: number | null): string {
-  if (!date) return hour != null ? `${String(hour).padStart(2,"0")}:00` : "Zeit offen"
-  const d = new Date(date)
-  const ds = d.toLocaleDateString("de-CH", { weekday: "short", day: "numeric", month: "short" })
-  return hour != null ? `${ds} · ${String(hour).padStart(2,"0")}:00` : ds
-}
-
-type Player = { user_id: string; name: string; elo: number; level: string }
-type Game = {
-  id: string; created_by: string; location_name: string; date: string | null; start_hour: number | null
-  duration_minutes: number; max_players: number; current_players: number; price_per_player: number; is_official?: boolean
-  level: string; status: string; notes: string | null; created_at: string; players: Player[]
-}
-
-export default function MatchPage() {
-  const router = useRouter()
-  const [games, setGames]     = useState<Game[]>([])
-  const [userId, setUserId]   = useState<string | null>(null)
-  const [myGame, setMyGame]   = useState<string | null>(null)
-  const [filterLevel, setFilterLevel] = useState("")
-  const [filterCity, setFilterCity]   = useState("")
-  const [loading, setLoading] = useState(true)
-  const [joining, setJoining] = useState<string | null>(null)
-  const [error, setError]         = useState("")
-  const [joinError, setJoinError] = useState("")
-  const [myLevel, setMyLevel]     = useState<string | null>(null)
-  const [infoOpen, setInfoOpen]   = useState(false)
-
-  const load = useCallback(async () => {
-    setError("")
-    try {
-      const sb = createClient()
-      const { data: { user } } = await sb.auth.getUser()
-      setUserId(user?.id || null)
-      if (user) {
-        const { data: p } = await sb.from("profiles").select("level").eq("id", user.id).maybeSingle()
-        setMyLevel(p?.level || null)
-      }
-      const res = await fetch("/api/match")
-      const json = await res.json()
-      const list: Game[] = json.matches || []
-      setGames(list)
-      setMyGame(list.find(g => g.created_by === user?.id)?.id || null)
-    } catch {
-      setError("Spiele konnten nicht geladen werden")
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => { load() }, [load])
-
-  async function join(id: string) {
-    setJoining(id); setJoinError("")
-    const res = await fetch(`/api/match/${id}/join`, { method: "POST" })
-    if (res.ok) router.push(`/match/${id}`)
-    else { const j = await res.json(); setJoinError(j.error || "Fehler beim Beitreten"); setJoining(null) }
-  }
-
-  async function cancel(id: string) { await fetch(`/api/match/${id}/cancel`, { method: "POST" }); load() }
-
-
-  // Der Filter lief noch auf dem alten System (Rookie/Challenger/Advanced/Elite),
-  // erstellt werden Open Games aber mit Level 1–7 → der Filter traf nie zu.
-  const LEVELS = ["1", "2", "3", "4", "5", "6", "7"]
-
-  const filtered = games.filter(g =>
-    (!filterLevel || g.level === filterLevel) &&
-    (!filterCity  || g.location_name === filterCity)
-  )
-
-  // Die festen Abende der Lounge zuerst, danach das, was sich Spieler selbst
-  // ausgedacht haben. Beides in einen Topf zu werfen, war der alte Zustand.
-  const offizielle = games.filter(g => g.is_official)
-  const eigene = filtered.filter(g => !g.is_official)
-
-  // Zahlen für den Kopfblock
-  const freiePlaetze = games.reduce((n, g) => n + Math.max(0, g.max_players - g.current_players), 0)
-  const meineSpiele = games.filter(g => g.players.some(p => p.user_id === userId)).length
-
-  return (
-    <main style={{ minHeight: "100vh", background: BG, padding: "0 0 100px" }}>
-      <SectionTopBar section="Open Game" />
-      <div style={{ maxWidth: 560, margin: "0 auto", padding: "6px 16px 0" }}>
-        {/* Nur das Bild und die Abende. Kein "0 Deine Anmeldungen"-Block, keine
-            Intro-Karte, kein Filter — Open Game soll in zwei Klick buchbar sein:
-            Mitspielen antippen, bezahlen, fertig. */}
-        <SectionBlock title="Open Game" meta={`Deine nächsten Abende · CHF ${OG_PREIS_CHF} · 4 Std.`} img="/gl-tische.jpg" />
-
-        {/* Ein Satz erklärt, worum es geht — der Rest klappt auf, wer's genau
-            wissen will. Ohne das stand nur "Open Game", und niemand wusste, was das ist. */}
-        <div style={{ margin: "12px 4px 0" }}>
-          <p style={{ fontSize: 14, color: SUB, lineHeight: 1.5 }}>
-            Feste Spielabende in deiner Stärkeklasse — komm vorbei, spiel mit wer da ist, trag dein Ergebnis ein.
-          </p>
-          <button onClick={() => setInfoOpen(v => !v)}
-            style={{ marginTop: 8, background: "none", padding: 0, color: G, fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: "inherit", display: "flex", alignItems: "center", gap: 5 }}>
-            So funktioniert's <span style={{ transform: infoOpen ? "rotate(180deg)" : "none", transition: "transform .2s" }}>▾</span>
-          </button>
-          {infoOpen && (
-            <div style={{ marginTop: 12, background: C, borderRadius: 16, padding: "6px 16px" }}>
-              {([
-                ["Abend wählen", `Feste Abende in Glattbrugg und St. Gallen, je 6 Plätze pro Stärkeklasse (Einstieg 1–3 · Pro 4–7). So spielst du gegen Leute auf deinem Niveau.`],
-                ["Platz sichern", `CHF ${OG_PREIS_CHF} für 4 Stunden. Absage bis ${OG_STORNO_STUNDEN} h vorher — Geld zurück.`],
-                ["Spielen & eintragen", "Vor Ort spielst du gegen wen du willst. Nach dem Spiel trägst du das Ergebnis ein — dein Rating steigt."],
-              ] as [string, string][]).map(([t, d], i) => (
-                <div key={t} style={{ display: "flex", gap: 13, alignItems: "flex-start", padding: "12px 0", borderTop: i === 0 ? "none" : `1px solid rgba(255,255,255,.07)` }}>
-                  <span style={{ width: 24, height: 24, borderRadius: "50%", background: GRAD, color: "#FFFFFF", fontSize: 12, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{i + 1}</span>
-                  <span>
-                    <span style={{ display: "block", fontSize: 14, fontWeight: 800, color: W }}>{t}</span>
-                    <span style={{ display: "block", fontSize: 13, color: MUT, marginTop: 2, lineHeight: 1.45 }}>{d}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {offizielle.length > 0 && (
-          <div style={{ marginTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
-              {offizielle.slice(0, 14).map((g) => {
-                const frei = Math.max(0, g.max_players - g.current_players)
-                const drin = g.players.some(p => p.user_id === userId)
-                const proAbend = g.level === "4-7"
-                const levelLabel = proAbend ? "ADVANCED & ELITE" : "ROOKIE & CHALLENGER"
-                const d = g.date ? new Date(`${g.date}T12:00:00`) : null
-                const heute = d && d.toDateString() === new Date().toDateString()
-                const dayTop = heute ? "HEUTE" : (d ? d.toLocaleDateString("de-CH", { weekday: "short", day: "numeric", month: "short" }).replace(".", "").toUpperCase() : "—")
-
-                return (
-                  <Link key={g.id} href={`/match/${g.id}`} style={{ display: "flex", gap: 14, alignItems: "center", background: C, border: "1px solid rgba(255,255,255,.08)", borderRadius: 18, padding: 16, textDecoration: "none" }}>
-                    <span style={{ width: 66, flexShrink: 0 }}>
-                      <span style={{ display: "block", color: "#FF00C8", fontSize: 10, fontWeight: 800, letterSpacing: ".04em" }}>{dayTop}</span>
-                      <span style={{ display: "block", fontSize: 22, fontWeight: 900, color: W, marginTop: 2 }}>{String(g.start_hour ?? 19).padStart(2, "0")}:00</span>
-                    </span>
-                    <span style={{ flex: 1, minWidth: 0, borderLeft: "1px solid rgba(255,255,255,.08)", paddingLeft: 14 }}>
-                      <span style={{ display: "block", fontSize: 16, fontWeight: 800, color: W, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{g.location_name}</span>
-                      <span style={{ display: "inline-block", margin: "7px 0", fontSize: 10, fontWeight: 700, letterSpacing: ".04em", color: "#FF00C8", border: "1px solid #FF00C8", borderRadius: 8, padding: "3px 8px" }}>{levelLabel}</span>
-                      <span style={{ display: "block", fontSize: 13, fontWeight: 600, color: drin ? "#FF00C8" : (frei === 0 ? M : "#FF00C8") }}>
-                        {drin ? "Du bist dabei ✓" : frei === 0 ? "Ausgebucht" : `${frei} ${frei === 1 ? "Platz" : "Plätze"} frei`}
-                      </span>
-                    </span>
-                    <svg viewBox="0 0 24 24" width={18} height={18} fill="none" stroke="#FF00C8" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}><path d="M9 6l6 6-6 6" /></svg>
-                  </Link>
-                )
-              })}
-          </div>
-        )}
-
-        {/* Selbst erstellte Spiele — nur wenn es welche gibt. Kein Filter mehr:
-            bei einer Handvoll Spielen ist er Ballast. */}
-        {eigene.length > 0 && (
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", margin: "26px 0 12px" }}>
-            <span style={{ fontSize: 15, fontWeight: 900, textTransform: "uppercase", color: W }}>Von Spielern</span>
-            {myGame && (
-              <button onClick={() => cancel(myGame)} style={{ ...btnGhost, display: "inline-block", padding: "10px 16px", fontSize: 12, whiteSpace: "nowrap" }}>Mein Spiel löschen</button>
-            )}
-          </div>
-        )}
-
-        {loading ? (
-          <div style={{ textAlign: "center", padding: "40px 0", color: M }}><div style={{ fontSize: 28, marginBottom: 10 }}>🏓</div><p style={{ ...body }}>Lädt …</p></div>
-        ) : error ? (
-          <div style={{ textAlign: "center", padding: "40px 0", color: M }}><p style={{ ...body, marginBottom: 16 }}>{error}</p><button onClick={load} style={{ ...btn, display: "inline-block", padding: "10px 24px" }}>Nochmals</button></div>
-        ) : eigene.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "22px 16px 6px" }}>
-            <Link href="/match/create" style={{ color: M, fontSize: 13.5, fontWeight: 600, textDecoration: "none" }}>Lieber selbst ein Spiel erstellen? →</Link>
-          </div>
-        ) : (
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {eigene.map(g => {
-              const isMe = g.created_by === userId
-              const joined = g.players.some(p => p.user_id === userId)
-              const host = g.players.find(p => p.user_id === g.created_by) || g.players[0]
-              const full = g.current_players >= g.max_players
-              return (
-                <div key={g.id} style={{ ...card, ...(isMe ? cardActive : {}), overflow: "hidden" }}>
-                  <div style={{ padding: "14px 16px 10px" }}>
-                    <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 8 }}>
-                      <div style={{ flex: 1 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, flexWrap: "wrap" }}>
-                          <span style={{ fontSize: 14, fontWeight: 700, color: W }}>{host?.name || "Spieler"}</span>
-                          <span style={{ fontSize: 11, color: M, fontWeight: 500 }}>Elo {host?.elo ?? "—"}</span>
-                          {isMe && <span style={statusPill}>Dein Spiel</span>}
-                        </div>
-                        <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
-                          <span style={levelBadge(g.level)}>{g.level}</span>
-                          <span style={{ ...chip }}>📍 {g.location_name}</span>
-                          <span style={{ ...chip }}>🕐 {whenLabel(g.date, g.start_hour)}</span>
-                          {g.price_per_player > 0
-                            ? <span style={{ ...chip }}>💰 CHF {g.price_per_player}</span>
-                            : <span style={{ ...chip, color: G }}>Gratis</span>}
-                        </div>
-                      </div>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: full ? M : G, flexShrink: 0, marginTop: 2 }}>{g.current_players}/{g.max_players}</span>
-                    </div>
-                    {g.notes && <p style={{ ...body, fontStyle: "italic", margin: "2px 0 4px" }}>&quot;{g.notes}&quot;</p>}
-                  </div>
-                  <div style={{ padding: "4px 16px 14px" }}>
-                    {isMe || joined ? (
-                      <Link href={`/match/${g.id}`} style={{ ...btnInCard, display: "block", textAlign: "center" }}>{isMe ? "Dein Spiel ansehen" : "Du bist dabei · ansehen"}</Link>
-                    ) : full ? (
-                      <p style={{ ...body, textAlign: "center" }}>Voll</p>
-                    ) : (
-                      <button onClick={() => join(g.id)} disabled={joining === g.id} style={{ ...btnInCard, display: "block", width: "100%", textAlign: "center" }}>{joining === g.id ? "Trete bei …" : "Mitspielen →"}</button>
-                    )}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        )}
-      </div>
-      {joinError && <div style={{ position: "fixed", bottom: 80, left: 0, right: 0, padding: "12px 20px", background: "#f87171", color: "#fff", textAlign: "center", fontSize: 13, fontWeight: 700, zIndex: 200 }}>{joinError}</div>}
-      <BottomNav />
-    </main>
-  )
+export default function MatchPage(){
+ const router=useRouter(); const [games,setGames]=useState<Game[]>([]); const [userId,setUserId]=useState<string|null>(null); const [myGame,setMyGame]=useState<string|null>(null); const [loading,setLoading]=useState(true); const [joining,setJoining]=useState<string|null>(null); const [error,setError]=useState(""); const [joinError,setJoinError]=useState(""); const [infoOpen,setInfoOpen]=useState(false)
+ const load=useCallback(async()=>{setError("");try{const sb=createClient();const{data:{user}}=await sb.auth.getUser();setUserId(user?.id||null);const res=await fetch("/api/match");const json=await res.json();const list:Game[]=json.matches||[];setGames(list);setMyGame(list.find(g=>g.created_by===user?.id)?.id||null)}catch{setError("Spiele konnten nicht geladen werden")}finally{setLoading(false)}},[])
+ useEffect(()=>{load()},[load])
+ async function join(id:string){setJoining(id);setJoinError("");const res=await fetch(`/api/match/${id}/join`,{method:"POST"});if(res.ok)router.push(`/match/${id}`);else{const j=await res.json();setJoinError(j.error||"Fehler beim Beitreten");setJoining(null)}}
+ async function cancel(id:string){await fetch(`/api/match/${id}/cancel`,{method:"POST"});load()}
+ const offizielle=games.filter(g=>g.is_official); const eigene=games.filter(g=>!g.is_official)
+ return <main style={{minHeight:"100vh",background:B,color:P,paddingBottom:105}}><div style={{maxWidth:560,margin:"0 auto"}}>
+  <section style={{padding:"34px 20px 28px",borderBottom:`1px solid ${LINE}`}}><div style={{fontSize:10,fontWeight:900,letterSpacing:".18em",color:V,marginBottom:16}}>PLAY</div><h1 style={{fontFamily:"Impact,Arial Narrow,sans-serif",fontSize:"clamp(54px,15vw,82px)",fontWeight:400,lineHeight:.86,margin:0}}>JUST<br/>PLAY.</h1><div style={{width:70,height:4,background:V,margin:"18px 0"}}/><p style={{maxWidth:390,color:"#aaa",fontSize:14,lineHeight:1.5,margin:0}}>Komm alleine. Triff andere. Spiel Ping Pong. Bei Open Games ist jeder willkommen.</p></section>
+  <section style={{padding:"25px 20px 10px"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline"}}><div><div style={{fontSize:10,fontWeight:900,letterSpacing:".14em",color:V}}>OPEN GAMES</div><h2 style={{fontFamily:"Impact,Arial Narrow,sans-serif",fontSize:32,fontWeight:400,margin:"5px 0 0"}}>KOMM VORBEI.<br/>SPIEL MIT.</h2></div><button onClick={()=>setInfoOpen(v=>!v)} style={{background:"none",border:0,color:V,fontWeight:900,fontSize:11,cursor:"pointer"}}>SO GEHT'S {infoOpen?"↑":"↓"}</button></div>
+   {infoOpen&&<div style={{marginTop:18,borderTop:`1px solid ${LINE}`}}>{[["01","Abend wählen","Festen Open-Game-Abend auswählen."],["02","Platz sichern",`CHF ${OG_PREIS_CHF} für 4 Stunden. Absage bis ${OG_STORNO_STUNDEN} h vorher.`],["03","Spielen","Vor Ort gegen andere spielen und Resultate eintragen."]].map(x=><div key={x[0]} style={{display:"grid",gridTemplateColumns:"42px 1fr",gap:10,padding:"14px 0",borderBottom:`1px solid ${LINE}`}}><b style={{color:V}}>{x[0]}</b><div><b>{x[1]}</b><div style={{color:MUT,fontSize:12,marginTop:3}}>{x[2]}</div></div></div>)}</div>}
+  </section>
+  <section style={{padding:"10px 20px 28px"}}>{loading?<div style={{padding:"35px 0",color:MUT}}>Open Games werden geladen …</div>:error?<div style={{padding:"30px 0"}}><p style={{color:MUT}}>{error}</p><button onClick={load} style={{background:V,color:P,border:0,padding:"12px 18px",fontWeight:900}}>NOCHMALS</button></div>:offizielle.length===0?<div style={{borderTop:`1px solid ${LINE}`,padding:"20px 0",color:MUT}}>Aktuell keine offiziellen Open Games.</div>:offizielle.slice(0,14).map(g=>{const frei=Math.max(0,g.max_players-g.current_players),drin=g.players.some(p=>p.user_id===userId),d=g.date?new Date(`${g.date}T12:00:00`):null,heute=d&&d.toDateString()===new Date().toDateString(),day=heute?"HEUTE":d?d.toLocaleDateString("de-CH",{weekday:"short",day:"numeric",month:"short"}).toUpperCase():"—";return <Link key={g.id} href={`/match/${g.id}`} style={{display:"grid",gridTemplateColumns:"70px 1fr auto",gap:14,alignItems:"center",color:P,textDecoration:"none",borderTop:`1px solid ${LINE}`,padding:"18px 0"}}><div><b style={{display:"block",fontSize:10,color:V}}>{day}</b><strong style={{fontSize:21}}>{String(g.start_hour??19).padStart(2,"0")}:00</strong></div><div><strong style={{fontSize:17}}>{g.location_name}</strong><div style={{fontSize:11,color:MUT,marginTop:5}}>Level {g.level} · CHF {g.price_per_player||OG_PREIS_CHF}</div><div style={{fontSize:12,color:drin?V:frei?P:MUT,marginTop:5,fontWeight:800}}>{drin?"DU BIST DABEI ✓":frei?`${frei} ${frei===1?"PLATZ":"PLÄTZE"} FREI`:"AUSGEBUCHT"}</div></div><b style={{color:V,fontSize:20}}>→</b></Link>})}</section>
+  <section style={{background:P,color:B,padding:"30px 20px"}}><div style={{fontSize:10,fontWeight:900,letterSpacing:".14em",color:"#6425b8"}}>COMMUNITY</div><h2 style={{fontFamily:"Impact,Arial Narrow,sans-serif",fontSize:34,fontWeight:400,lineHeight:.95,margin:"8px 0 18px"}}>DEIN SPIEL.<br/>DEINE LEUTE.</h2>{eigene.length===0?<><p style={{color:"#666",fontSize:13,lineHeight:1.5}}>Kein passendes Open Game? Erstelle selbst ein Spiel und finde Mitspieler.</p><Link href="/match/create" style={{display:"block",marginTop:18,borderTop:"1px solid #bbb",padding:"16px 0",color:B,textDecoration:"none",fontWeight:900}}>SPIEL ERSTELLEN <span style={{float:"right",color:"#6425b8"}}>→</span></Link></>:<>{myGame&&<button onClick={()=>cancel(myGame)} style={{background:"none",border:0,borderBottom:"1px solid #999",padding:"0 0 4px",fontWeight:800,cursor:"pointer",marginBottom:12}}>Mein Spiel löschen</button>}{eigene.map(g=>{const isMe=g.created_by===userId,joined=g.players.some(p=>p.user_id===userId),host=g.players.find(p=>p.user_id===g.created_by)||g.players[0],full=g.current_players>=g.max_players;return <div key={g.id} style={{borderTop:"1px solid #bbb",padding:"17px 0"}}><div style={{display:"flex",justifyContent:"space-between",gap:12}}><div><strong>{host?.name||"Spieler"}</strong><div style={{fontSize:12,color:"#666",marginTop:4}}>{g.location_name} · {whenLabel(g.date,g.start_hour)} · Level {g.level}</div>{g.notes&&<div style={{fontSize:12,color:"#666",marginTop:5}}>{g.notes}</div>}</div><b>{g.current_players}/{g.max_players}</b></div>{isMe||joined?<Link href={`/match/${g.id}`} style={{display:"block",color:"#6425b8",fontWeight:900,textDecoration:"none",marginTop:12}}>{isMe?"DEIN SPIEL ANSEHEN":"DU BIST DABEI →"}</Link>:full?<div style={{marginTop:12,color:"#777",fontWeight:800}}>VOLL</div>:<button onClick={()=>join(g.id)} disabled={joining===g.id} style={{background:"none",border:0,padding:0,color:"#6425b8",fontWeight:900,cursor:"pointer",marginTop:12}}>{joining===g.id?"TRITT BEI …":"MITSPIELEN →"}</button>}</div>})}<Link href="/match/create" style={{display:"block",borderTop:"1px solid #bbb",padding:"16px 0",color:B,textDecoration:"none",fontWeight:900}}>WEITERES SPIEL ERSTELLEN <span style={{float:"right",color:"#6425b8"}}>→</span></Link></>}</section>
+ </div>{joinError&&<div style={{position:"fixed",bottom:78,left:12,right:12,maxWidth:520,margin:"auto",padding:"12px 18px",background:"#b91c1c",color:"#fff",textAlign:"center",fontSize:13,fontWeight:800,zIndex:200}}>{joinError}</div>}<BottomNav/></main>
 }
