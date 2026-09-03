@@ -10,6 +10,7 @@ export type NotifType =
   | "challenge" | "challenge_accepted" | "result_confirm" | "result_confirmed"
   | "result_declined"
   | "waitlist_promoted" | "friend_request" | "friend_accepted" | "reminder"
+  | "event_invite"
 
 export async function notify(
   admin: SupabaseClient,
