@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import BottomNav from "@/app/components/BottomNav"
 
-const BLACK="#080808", OFF="#F4F1EB", V="#8C3DFF", MUT="rgba(244,241,235,.55)
+const BLACK="#080808", OFF="#F4F1EB", V="#8C3DFF", MUT="rgba(244,241,235,.55)"
 type Notif={id:string;type:string;title:string;body:string|null;link:string|null;read_at:string|null;created_at:string}
 function seit(iso:string){const s=Math.floor((Date.now()-new Date(iso).getTime())/1000);if(s<60)return"gerade eben";if(s<3600)return`vor ${Math.floor(s/60)} Min`;if(s<86400)return`vor ${Math.floor(s/3600)} Std`;if(s<172800)return"gestern";return`vor ${Math.floor(s/86400)} Tagen`}
 
