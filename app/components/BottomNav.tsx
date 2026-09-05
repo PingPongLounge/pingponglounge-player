@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation"
 const ITEMS = [
   ["HOME", "/entdecken"],
   ["SPIELEN", "/match"],
-  ["RANGLISTE", "/rangliste"],
+  ["LIGA", "/liga"],
   ["EVENTS", "/turniere"],
   ["PROFIL", "/profil"],
 ] as const
