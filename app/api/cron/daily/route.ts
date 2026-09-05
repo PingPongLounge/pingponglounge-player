@@ -18,17 +18,12 @@ async function run(req: NextRequest) {
 
   const confirmed = await autoConfirmOverdue(admin)
   const reminded = await remindStuckOnboarding(admin)
-  const expired = await expireOldChallenges(admin)   // Forderungen verfallen nach 7 Tagen
+  const expired = await expireOldChallenges(admin)
 
-  // Offizielle Open Games für die nächsten drei Wochen anlegen (idempotent).
   let angelegt = 0
   try { angelegt = await ensureOpenGames(admin) }
   catch (e) { console.error("Open Games anlegen fehlgeschlagen:", e) }
 
-  // Aktivitätspflicht: den Vormonat abrechnen, ab dem 25. warnen.
-  // Die Abrechnung läuft JEDEN Tag, nicht nur am 1. — sie ist idempotent
-  // (elo_history.note), und fiel der Cron am 1. aus, wurde der Monat vorher
-  // nie nachgeholt.
   let penalties = 0
   try { penalties = await applyMonthlyPenalties(admin) }
   catch (e) { console.error("Monatsabrechnung fehlgeschlagen:", e) }
@@ -37,15 +32,14 @@ async function run(req: NextRequest) {
   try { warned = await warnMonthlyOpen(admin) }
   catch (e) { console.error("Monats-Warnungen fehlgeschlagen:", e) }
 
-  // Abgelaufene Turnier-Reservierungen aufräumen (Hygiene).
   let freigegeben = 0
   try { freigegeben = await releaseStaleReservations(admin) }
   catch (e) { console.error("Turnier-Reservierungen freigeben fehlgeschlagen:", e) }
 
-  // Der alte Inaktivitäts-Abzug (/api/liga/inactivity) ist ABGESCHALTET. Er zog
-  // ebenfalls −20 ELO und lief zusammen mit der Monatspflicht — ein durchgehend
-  // inaktiver Spieler hätte pro Monat bis zu 40 verloren. Die Monatspflicht
-  // (4 Matches/Monat) ist der Nachfolger; ein Abzug reicht.
+  // Der alte Inaktivitäts-Abzug (/api/liga/inactivity) ist abgeschaltet.
+  // Es gilt nur die EINE Aktivitätsregel der globalen Liga aus rewards.ts
+  // (aktuell 3 gewertete Matches pro Kalendermonat). Optionale Seasons dürfen
+  // keinen zusätzlichen Rating-Abzug auslösen.
 
   return NextResponse.json({ ok: true, confirmed, reminded, expired, angelegt, penalties, warned, freigegeben })
 }
