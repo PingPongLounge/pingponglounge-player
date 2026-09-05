@@ -3,19 +3,21 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 import { STAFF_EMAILS } from "@/lib/staff"
 
-function roundRobin(players: string[]): Array<{round:number,p1:string,p2:string}> {
+function roundRobinRounds(players: string[]): Array<Array<{p1:string,p2:string}>> {
   const list = [...players]
   if (list.length % 2 !== 0) list.push("BYE")
   const n = list.length
-  const matches: Array<{round:number,p1:string,p2:string}> = []
+  const rounds: Array<Array<{p1:string,p2:string}>> = []
   for (let round = 0; round < n - 1; round++) {
+    const games: Array<{p1:string,p2:string}> = []
     for (let i = 0; i < n / 2; i++) {
       const p1 = list[i], p2 = list[n - 1 - i]
-      if (p1 !== "BYE" && p2 !== "BYE") matches.push({ round: round + 1, p1, p2 })
+      if (p1 !== "BYE" && p2 !== "BYE") games.push({ p1, p2 })
     }
+    rounds.push(games)
     list.splice(1, 0, list.pop()!)
   }
-  return matches
+  return rounds
 }
 
 export async function POST(req: NextRequest) {
@@ -27,7 +29,12 @@ export async function POST(req: NextRequest) {
   if (!user || !STAFF_EMAILS.includes(user.email||"")) return NextResponse.json({ error: "Kein Zugriff" }, { status: 403 })
 
   const admin = createAdminClient()
-  const { data: season } = await admin.from("league_seasons").select("id,is_global,status").eq("id", season_id).maybeSingle()
+  const { data: season } = await admin
+    .from("league_seasons")
+    .select("id,is_global,is_private,status,start_date")
+    .eq("id", season_id)
+    .maybeSingle()
+
   if (!season) return NextResponse.json({ error: "Saison nicht gefunden" }, { status: 404 })
   if (season.is_global) return NextResponse.json({ error: "Für die globale Liga dürfen keine Season-Matches generiert werden" }, { status: 400 })
 
@@ -43,13 +50,52 @@ export async function POST(req: NextRequest) {
   const { data: regs } = await admin.from("league_registrations").select("player_id").eq("season_id", season_id)
   if (!regs || regs.length < 2) return NextResponse.json({ error: "Zu wenige Spieler" }, { status: 400 })
 
-  const players = regs.map(r => r.player_id)
-  const matches = roundRobin(players)
-  const deadline = new Date(); deadline.setDate(deadline.getDate() + 14)
-  const inserts = matches.map(m => ({ season_id, round: m.round, p1_id: m.p1, p2_id: m.p2, deadline: deadline.toISOString() }))
+  const playerIds = regs.map(r => r.player_id)
+
+  // Für die freiwillige öffentliche 3-Monats-Season sortieren wir nach aktuellem
+  // globalem Rating. Dadurch starten die ersten Zuteilungen möglichst nah am
+  // Leistungsniveau, ohne eine zweite Wertung zu erzeugen.
+  let players = playerIds
+  if (!season.is_private) {
+    const { data: profs } = await admin.from("profiles").select("id,elo").in("id", playerIds)
+    const elo = new Map((profs || []).map(p => [p.id, p.elo ?? 1000]))
+    players = [...playerIds].sort((a,b) => (elo.get(b) || 1000) - (elo.get(a) || 1000))
+  }
+
+  const rr = roundRobinRounds(players)
+
+  // Private Firmenligen behalten den klassischen vollständigen Round Robin.
+  // Die öffentliche freiwillige Season ist bewusst schlanker: max. 8 Gegner
+  // in vier 3-Wochen-Blöcken (= ungefähr 12 Wochen). Je zwei Round-Robin-Runden
+  // werden zu einem sichtbaren Season-Block zusammengefasst.
+  const selectedRounds = season.is_private ? rr : rr.slice(0, 8)
+  const start = season.start_date ? new Date(season.start_date) : new Date()
+
+  const inserts: Array<Record<string, unknown>> = []
+  selectedRounds.forEach((games, idx) => {
+    const block = season.is_private ? idx + 1 : Math.floor(idx / 2) + 1
+    const deadline = new Date(start)
+    deadline.setDate(deadline.getDate() + (season.is_private ? 14 * (idx + 1) : 21 * block))
+    for (const g of games) {
+      inserts.push({
+        season_id,
+        round: block,
+        p1_id: g.p1,
+        p2_id: g.p2,
+        deadline: deadline.toISOString(),
+        ranked: true,
+      })
+    }
+  })
 
   const { error } = await admin.from("league_matches").insert(inserts)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  await admin.from("league_seasons").update({ status: "running" }).eq("id", season_id)
-  return NextResponse.json({ ok: true, count: inserts.length })
+
+  await admin.from("league_seasons").update({ status: "running", current_round: 1 }).eq("id", season_id)
+  return NextResponse.json({
+    ok: true,
+    count: inserts.length,
+    rounds: season.is_private ? selectedRounds.length : Math.min(4, Math.ceil(selectedRounds.length / 2)),
+    mode: season.is_private ? "round_robin" : "three_month_season",
+  })
 }
