@@ -3,13 +3,10 @@ import { League_Spartan } from "next/font/google"
 import "./globals.css"
 import AppHeader from "./components/AppHeader"
 import SplashScreen from "./components/SplashScreen"
+import InvitePopup from "./components/InvitePopup"
 
-// Ohne og:image kommt beim Teilen in WhatsApp eine nackte Zeile an — genau der
-// Moment, in dem die Leute entscheiden, ob sie tippen. Deshalb: Karte, Titel, Text.
 const BASE = "https://playerapp.ch"
 
-// League Spartan stand bisher nur in globals.css beim Namen — geladen wurde sie
-// nie, darum lief die App auf der Systemschrift.
 const leagueSpartan = League_Spartan({
   subsets: ["latin"],
   variable: "--font-league-spartan",
@@ -22,8 +19,6 @@ export const metadata: Metadata = {
   alternates: { canonical: BASE },
   title: "Player — Pingpong Next Level",
   description: "Liga, Open Games und Turniere — vom Anfänger bis zum Profi. Spiel, trag dein Resultat ein, steig auf.",
-  // Safari (Favoriten, Home-Bildschirm) und Android zeigen KEIN SVG-Favicon —
-  // ohne PNG/ICO kam die graue Kachel mit dem Anfangsbuchstaben.
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -51,16 +46,16 @@ export const metadata: Metadata = {
   },
 }
 
-// themeColor gehört seit Next 14 in den viewport-Export, nicht in metadata.
-export const viewport = { themeColor: "#0A0B0D" }
+export const viewport = { themeColor: "#080808" }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de" className={leagueSpartan.variable}>
-      <body style={{ margin: 0, background: "#0A0B0D", color: "#E8E6E1", fontFamily: "var(--font-league-spartan), system-ui, sans-serif", minHeight: "100vh" }}>
+      <body style={{ margin: 0, background: "#080808", color: "#F4F1EB", fontFamily: "var(--font-league-spartan), system-ui, sans-serif", minHeight: "100vh" }}>
         <SplashScreen />
         <AppHeader />
         {children}
+        <InvitePopup />
       </body>
     </html>
   )

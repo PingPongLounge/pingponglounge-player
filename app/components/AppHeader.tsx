@@ -6,65 +6,12 @@ import { createClient } from "@/lib/supabase/client"
 import StartMenu from "./StartMenu"
 import NotificationBell from "./NotificationBell"
 
-// Nur bei Auth/Onboarding-Flows verstecken
-// Sektionsseiten haben ihren eigenen "PLAYER LIGA/TURNIER/…"-Header → globalen ausblenden
-const HIDE = ["/", "/login", "/onboarding", "/spielen", "/join", "/auth", "/liga", "/match", "/turniere", "/training", "/shop"]
+const HIDE=["/","/login","/onboarding","/spielen","/join","/auth","/liga","/match","/turniere","/training","/shop"]
+const BLACK="#080808",OFF="#F4F1EB",V="#8C3DFF"
 
-const BG = "#08090B" // fast schwarz, damit sich der Header klar abhebt
-const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
-const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
-
-export default function AppHeader() {
-  const path = usePathname() || "/"
-  const [initialen, setInitialen] = useState("")
-
-  useEffect(() => {
-    ;(async () => {
-      const sb = createClient()
-      const { data: { user } } = await sb.auth.getUser()
-      if (!user) return
-      const { data: p } = await sb.from("profiles").select("name").eq("id", user.id).maybeSingle()
-      const n = (p?.name || "").trim()
-      if (n) setInitialen(n.split(/\s+/).map((w: string) => w[0]).join("").slice(0, 2).toUpperCase())
-    })()
-  }, [])
-
-  if (HIDE.some(h => h === path || (h !== "/" && path.startsWith(h)))) return null
-
-  return (
-    <header style={{ position: "sticky", top: 0, zIndex: 50, background: BG, borderBottom: "1px solid rgba(255,255,255,.08)" }}>
-      {/* Volle Fensterbreite, Inhalt bis 1100px, aussen 16px am Handy und
-          32px am Desktop — das Menue sitzt damit oben rechts im Browserfenster
-          und nicht am Rand einer schmalen Handy-Spalte. */}
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "14px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        {/* Logo, Wortmarke, Beta — der Chip beschreibt die App, nicht den Spieler */}
-        <Link href="/entdecken" aria-label="Startseite" style={{ display: "flex", alignItems: "center", gap: 9, textDecoration: "none" }}>
-          <svg width="24" height="24" viewBox="0 0 80 80" fill="none" aria-hidden>
-            <defs><linearGradient id="hdg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#FF00C8" /><stop offset="1" stopColor="#FF5CDC" /></linearGradient></defs>
-            <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#hdg)" strokeWidth="3.6" strokeLinejoin="round" />
-            <circle cx="63" cy="58" r="6.5" fill="url(#hdg)" />
-          </svg>
-          <span style={{ display: "flex", flexDirection: "column" }}>
-            <span style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 19, fontWeight: 900, letterSpacing: ".18em", ...gt }}>PLAYER</span>
-              <span style={{ fontSize: 8.5, fontWeight: 900, letterSpacing: ".08em", textTransform: "uppercase", color: "#FFFFFF", background: GRAD, borderRadius: 999, padding: "2px 6px" }}>Beta</span>
-            </span>
-            <span style={{ fontSize: 8.5, fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", color: "rgba(255,255,255,.6)", marginTop: 2 }}>Pingpong Next Level</span>
-          </span>
-        </Link>
-
-        {/* Avatar direkt neben dem Menü. Vorher stand er in einer ZWEITEN Kopfzeile
-            darunter — mit Warenkorb und "Hi, …". Zwei Kopfzeilen sind eine zu viel. */}
-        <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-          {initialen && <NotificationBell />}
-          {initialen && (
-            <Link href="/profil" aria-label="Profil" style={{ width: 38, height: 38, borderRadius: "50%", background: GRAD, color: "#FFFFFF", fontSize: 13.5, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", textDecoration: "none", flexShrink: 0 }}>
-              {initialen}
-            </Link>
-          )}
-          <StartMenu inline />
-        </div>
-      </div>
-    </header>
-  )
+export default function AppHeader(){
+ const path=usePathname()||"/";const[initialen,setInitialen]=useState("")
+ useEffect(()=>{;(async()=>{const sb=createClient();const{data:{user}}=await sb.auth.getUser();if(!user)return;const{data:p}=await sb.from("profiles").select("name").eq("id",user.id).maybeSingle();const n=(p?.name||"").trim();if(n)setInitialen(n.split(/\s+/).map((w:string)=>w[0]).join("").slice(0,2).toUpperCase())})()},[])
+ if(HIDE.some(h=>h===path||(h!=="/"&&path.startsWith(h))))return null
+ return <header style={{position:"sticky",top:0,zIndex:50,background:BLACK,borderBottom:"1px solid rgba(244,241,235,.12)"}}><div style={{maxWidth:1100,margin:"0 auto",padding:"14px clamp(16px,4vw,32px)",display:"flex",alignItems:"center",justifyContent:"space-between"}}><Link href="/entdecken" aria-label="PPL Player Startseite" style={{display:"inline-flex",alignItems:"baseline",textDecoration:"none",fontWeight:900,letterSpacing:"-.035em",lineHeight:1,fontSize:21}}><span style={{color:OFF}}>PPL</span><span style={{color:V}}>.</span><span style={{color:V,marginLeft:6}}>PLAYER</span></Link><div style={{display:"flex",alignItems:"center",gap:9}}>{initialen&&<NotificationBell/>}{initialen&&<Link href="/profil" aria-label="Profil" style={{width:38,height:38,borderRadius:"50%",border:`1px solid ${V}`,background:"transparent",color:OFF,fontSize:12,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",textDecoration:"none",flexShrink:0}}>{initialen}</Link>}<StartMenu inline/></div></div></header>
 }

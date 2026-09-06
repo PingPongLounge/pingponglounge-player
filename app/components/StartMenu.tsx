@@ -12,8 +12,6 @@ function Icon({ d, fillBall }: { d: string; fillBall?: string }) {
   )
 }
 
-/** Deep-Link in den Buchungsflow der Website — Buchungsart und, wenn bekannt,
- *  der zuletzt gewaehlte Standort. */
 function buchenLink(): string {
   const basis = "https://pingponglounge.ch/buchen?type=table&utm_source=player"
   try {
@@ -26,8 +24,6 @@ const row: React.CSSProperties = { display: "flex", alignItems: "center", gap: 4
 
 export default function StartMenu({ name = "Spieler", sub = "", inline = false, avatar }: { name?: string; sub?: string; inline?: boolean; avatar?: string }) {
   const [open, setOpen] = useState(false)
-  // Ohne Anmeldung zeigte das Menu Profil, PingPoints und "abmelden" — lauter
-  // Sackgassen. Jetzt kennt es den Status.
   const [authed, setAuthed] = useState<boolean | null>(null)
   const router = useRouter()
 
@@ -93,16 +89,11 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
             </div>
             )}
 
-            {/* "einstellungen" zeigte auf dasselbe Ziel wie "profil" — es gibt gar
-                keine Einstellungen. Stattdessen die Rangliste, die bisher über
-                keinen einzigen Link erreichbar war. */}
             <div style={{ background: C, borderRadius: 16, overflow: "hidden", marginTop: 10 }}>
               {authed && <Link2 href="/profil" label="profil" icon={<Icon d='<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>' />} />}
               <Link2 href="/rangliste" label="rangliste" icon={<Icon d='<path d="M5 20v-6M12 20v-11M19 20v-8"/>' />} />
               {authed && <Link2 href="/matchhistorie" label="deine spiele" icon={<Icon d='<path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/>' />} />}
               {authed && <Link2 href="/pingpoints" label="pingpoints" icon={<Icon d='<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>' />} />}
-              {/* Der Shop hing als Warenkorb-Symbol im Kopf der Startseite — dem
-                  prominentesten Platz der App, für einen Nebenschauplatz. */}
               <Link2 href="/shop" label="shop" icon={<Icon d='<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2l2.2 12.2a1.5 1.5 0 0 0 1.5 1.3h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6"/>' />} />
             </div>
 
@@ -111,9 +102,6 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
               <Link2 href="/liga" label="liga" icon={<Icon d='<path d="M5 20v-4M12 20v-8M19 20v-12"/><circle cx="19" cy="4.6" r="1.6" fill="#fff" stroke="none"/>' />} />
               <Link2 href="/match" label="open game" icon={<Icon d='<g transform="translate(2.2 0)"><ellipse cx="10" cy="9.8" rx="6" ry="5.2" transform="rotate(-42 10 9.8)"/><path d="M14 13.6 18 17.6" stroke-width="3.4"/><circle cx="18.6" cy="5.7" r="1.6" fill="#fff" stroke="none"/></g>' />} />
               <Link2 href="/turniere" label="turnier" icon={<Icon d='<path d="M3 6h5v5h4M3 16h5v-5M12 11h5"/><circle cx="19" cy="11" r="1.6" fill="#fff" stroke="none"/>' />} />
-              {/* Tisch buchen fuehrt auf die Website — die Buchung lebt dort, nicht
-                  doppelt im Player. Der Player ist die Sport-App (Liga, Open Game,
-                  Turnier, Training). */}
               <a href={buchenLink()} target="_blank" rel="noopener noreferrer" style={row}>
                 <Icon d='<path d="M4 11h16M6 11v6M18 11v6M12 11V6M10 7.6h4M10 9.5h4"/>' /><span style={{ flex: 1, fontSize: 15, fontWeight: 500, color: W }}>tisch buchen</span><span style={{ color: M, fontSize: 13 }}>↗</span>
               </a>
