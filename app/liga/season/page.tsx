@@ -15,6 +15,10 @@ type Assignment = {
   confirmed_at: string | null
   ranked: boolean
   i_am_p1: boolean
+  entered_by: string | null
+  can_confirm: boolean
+  score_line: string | null
+  i_won: boolean | null
 }
 
 type Season = {
@@ -87,6 +91,20 @@ export default function SeasonPage() {
     setOppSets(0)
   }
 
+  async function confirmResult(a: Assignment) {
+    setBusy(a.id)
+    setError("")
+    const r = await fetch("/api/liga/confirm", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ match_id: a.id }),
+    })
+    const j = await r.json().catch(() => ({}))
+    if (!r.ok) setError(j.error || "Resultat konnte nicht bestätigt werden")
+    await load()
+    setBusy(null)
+  }
+
   async function submitResult() {
     if (!resultFor || mySets === oppSets || (mySets === 0 && oppSets === 0)) return
     setBusy(resultFor.id)
@@ -139,6 +157,7 @@ export default function SeasonPage() {
             const done = s.assignments.filter(a => a.status === "confirmed").length
             const total = s.assignments.length
             const rounds = Array.from(new Set(s.assignments.map(a => a.round))).sort((a,b) => a-b)
+            const next = s.assignments.find(a => a.status !== "confirmed")
             return <section key={s.id} style={{ marginTop: 18, padding: 18, borderRadius: 22, background: CARD, border: `1px solid ${LINE}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
                 <div>
@@ -151,6 +170,16 @@ export default function SeasonPage() {
                   <div style={{ color: MUT, fontSize: 11 }}>gespielt</div>
                 </div>
               </div>
+
+              {total > 0 && <div style={{ marginTop: 16, height: 5, borderRadius: 99, background: "rgba(255,255,255,.08)", overflow: "hidden" }}><div style={{ height: "100%", width: `${Math.round((done / total) * 100)}%`, background: V }} /></div>}
+
+              {next && <div style={{ marginTop: 16, padding: 14, borderRadius: 16, background: "#0B0B0B", border: `1px solid ${LINE}` }}>
+                <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: ".13em", color: V }}>ALS NÄCHSTES</div>
+                <div style={{ marginTop: 6, display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
+                  <div><div style={{ fontSize: 19, fontWeight: 900 }}>{next.opponent_name}</div><div style={{ color: MUT, fontSize: 12, marginTop: 3 }}>Runde {next.round}{next.deadline ? ` · bis ${fmtDate(next.deadline)}` : ""}</div></div>
+                  {next.can_confirm ? <button onClick={() => confirmResult(next)} disabled={busy === next.id} style={{ background: V, color: "white", border: 0, borderRadius: 11, padding: "10px 12px", fontSize: 11, fontWeight: 900, cursor: "pointer" }}>{busy === next.id ? "…" : `BESTÄTIGEN ${next.score_line || ""}`}</button> : next.status === "p1_entered" ? <span style={{ color: MUT, fontSize: 11, fontWeight: 800, textAlign: "right" }}>WARTET AUF<br/>GEGNER</span> : <button onClick={() => openResult(next)} style={{ background: V, color: "white", border: 0, borderRadius: 11, padding: "10px 12px", fontSize: 11, fontWeight: 900, cursor: "pointer" }}>RESULTAT</button>}
+                </div>
+              </div>}
 
               {s.status === "open" && total === 0 && <div style={{ marginTop: 16, borderTop: `1px solid ${LINE}`, paddingTop: 14 }}>
                 <div style={{ color: MUT, fontSize: 13, lineHeight: 1.5 }}>Du bist angemeldet. Der Spielplan wird zum Season-Start erstellt.</div>
@@ -168,12 +197,14 @@ export default function SeasonPage() {
                     </div>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.opponent_name}</div>
-                      <div style={{ color: MUT, fontSize: 12, marginTop: 2 }}>{a.opponent_elo ? `ELO ${a.opponent_elo} · ` : ""}{a.deadline ? `bis ${fmtDate(a.deadline)}` : ""}</div>
+                      <div style={{ color: MUT, fontSize: 12, marginTop: 2 }}>{a.opponent_elo ? `ELO ${a.opponent_elo} · ` : ""}{a.deadline ? `bis ${fmtDate(a.deadline)}` : ""}{a.score_line ? ` · ${a.score_line}` : ""}</div>
                     </div>
-                    {finished ? <span style={{ color: "#7EE787", fontSize: 12, fontWeight: 900 }}>✓ DONE</span> : waiting ? <span style={{ color: MUT, fontSize: 11, fontWeight: 800, textAlign: "right" }}>WARTET AUF<br/>BESTÄTIGUNG</span> : <button onClick={() => openResult(a)} style={{ background: V, color: "white", border: 0, borderRadius: 11, padding: "10px 11px", fontSize: 11, fontWeight: 900, cursor: "pointer" }}>RESULTAT</button>}
+                    {finished ? <span style={{ color: "#7EE787", fontSize: 12, fontWeight: 900 }}>✓ DONE</span> : a.can_confirm ? <button onClick={() => confirmResult(a)} disabled={busy === a.id} style={{ background: V, color: "white", border: 0, borderRadius: 11, padding: "10px 11px", fontSize: 11, fontWeight: 900, cursor: "pointer" }}>{busy === a.id ? "…" : "BESTÄTIGEN"}</button> : waiting ? <span style={{ color: MUT, fontSize: 11, fontWeight: 800, textAlign: "right" }}>WARTET AUF<br/>BESTÄTIGUNG</span> : <button onClick={() => openResult(a)} style={{ background: V, color: "white", border: 0, borderRadius: 11, padding: "10px 11px", fontSize: 11, fontWeight: 900, cursor: "pointer" }}>RESULTAT</button>}
                   </div>
                 })}
               </div>)}
+
+              {total > 0 && done === total && <div style={{ marginTop: 18, padding: 16, borderRadius: 16, background: "rgba(140,61,255,.12)", border: "1px solid rgba(140,61,255,.35)" }}><div style={{ color: V, fontSize: 11, fontWeight: 900, letterSpacing: ".12em" }}>SEASON ABGESCHLOSSEN</div><div style={{ marginTop: 6, fontSize: 20, fontWeight: 900 }}>Alle Matches gespielt.</div><div style={{ color: MUT, fontSize: 12, marginTop: 4 }}>Deine Resultate sind bereits in deiner globalen ELO enthalten.</div></div>}
             </section>
           })}
 
