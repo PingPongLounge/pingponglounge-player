@@ -37,7 +37,7 @@ export async function GET() {
   if (joinedIds.length) {
     const { data: matches } = await admin
       .from("league_matches")
-      .select("id,season_id,p1_id,p2_id,round,status,deadline,confirmed_at,ranked")
+      .select("id,season_id,p1_id,p2_id,round,status,deadline,confirmed_at,ranked,entered_by,sets,winner_id")
       .in("season_id", joinedIds)
       .or(`p1_id.eq.${user.id},p2_id.eq.${user.id}`)
       .order("round", { ascending: true })
@@ -53,6 +53,10 @@ export async function GET() {
     for (const m of matches || []) {
       const oppId = m.p1_id === user.id ? m.p2_id : m.p1_id
       const opp = names.get(oppId)
+      const sets = (m.sets as Array<{ p1: number; p2: number }> | null) || []
+      const iAmP1 = m.p1_id === user.id
+      const myWins = sets.filter(s => (iAmP1 ? s.p1 > s.p2 : s.p2 > s.p1)).length
+      const oppWins = sets.filter(s => (iAmP1 ? s.p2 > s.p1 : s.p1 > s.p2)).length
       const arr = assignmentsBySeason.get(m.season_id) || []
       arr.push({
         id: m.id,
@@ -65,7 +69,11 @@ export async function GET() {
         deadline: m.deadline,
         confirmed_at: m.confirmed_at,
         ranked: m.ranked !== false,
-        i_am_p1: m.p1_id === user.id,
+        i_am_p1: iAmP1,
+        entered_by: m.entered_by ?? null,
+        can_confirm: m.status === "p1_entered" && !!m.entered_by && m.entered_by !== user.id,
+        score_line: sets.length ? `${myWins}:${oppWins}` : null,
+        i_won: m.winner_id ? m.winner_id === user.id : null,
       })
       assignmentsBySeason.set(m.season_id, arr)
     }
