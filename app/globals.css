@@ -8,3 +8,47 @@ button, input, textarea, select { border: none; outline: none; }
 button { background: none; }
 :root { --green: #8C3DFF; --dark: #080808; --card: #121214; --border: #1A1A1E; --muted: #6B6E7A; --text: #F4F1EB; }
 body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0C; color: #FFF9F3; -webkit-font-smoothing: antialiased; }
+
+/* ── PLAYER V2: Desktop-Rahmen (07.09.2026, Oliver) ──────────────────────
+   Auf dem Handy bleibt alles wie es ist: eine Spalte, sauber, ruhig.
+   Auf dem Desktop stand der Inhalt bisher als schmaler Streifen in einer
+   riesigen schwarzen Flaeche. Dahinter liegt jetzt ein echtes PPL-Foto,
+   stark abgedunkelt und leicht unscharf, dazu feines Korn — Atmosphaere,
+   die nie mit dem Text konkurriert: der Inhalt sitzt auf deckendem Schwarz.
+
+   Die Breite bestimmt die Seite selbst (620px fuer Listen, bis 1100px fuer
+   Uebersichten) — hier steht nur der Rahmen. */
+@media (min-width: 900px) {
+  body::before {
+    content: "";
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image: url("/ppl-lounge-hero.png");
+    background-size: cover; background-position: center;
+    filter: blur(9px) saturate(.85);
+    opacity: .30;
+    transform: scale(1.06);   /* schneidet die weichen Raender der Unschaerfe ab */
+  }
+  body::after {
+    content: "";
+    position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(120% 90% at 50% 0%, rgba(8,8,8,.55) 0%, rgba(8,8,8,.86) 55%, #080808 100%),
+      linear-gradient(180deg, rgba(8,8,8,.4) 0%, rgba(8,8,8,.8) 100%);
+  }
+  body > * { position: relative; z-index: 1; }
+
+  /* Der Inhalt bekommt einen eigenen, deckenden Grund — der Hintergrund
+     darf die Lesbarkeit unter keinen Umstaenden anfassen. */
+  main {
+    background: #080808;
+    max-width: 1100px;
+    margin: 0 auto;
+    min-height: 100dvh;
+    box-shadow: 0 0 90px rgba(0,0,0,.6);
+  }
+}
+
+/* Platz fuer die feste Navigation — sonst verdeckt sie die letzte Zeile. */
+main { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
+
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
