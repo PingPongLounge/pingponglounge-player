@@ -94,7 +94,10 @@ export default function LoginPage() {
     setLoading(true); setError("")
     const supabase = createClient()
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + "/auth/callback?next=/auth/reset",
+      // 07.09.2026: zeigte auf /auth/reset — dort gab es nie eine page.tsx,
+      // der Link aus der Mail endete also in einem 404. Ziel ist jetzt die
+      // Seite, die es wirklich gibt und die die Sitzung selbst herstellt.
+      redirectTo: window.location.origin + "/auth/callback?next=/auth/reset-password&type=recovery",
     })
     if (error) { setError(error.message); setLoading(false); return }
     setMsg("Passwort-Reset Link geschickt — check deine Emails.")

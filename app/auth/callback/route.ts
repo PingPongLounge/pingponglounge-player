@@ -27,26 +27,37 @@ export async function GET(request: NextRequest) {
     }
   )
 
+  // Bei einem Reset traegt Supabase im PKCE-Flow keinen type mit — dann
+  // entscheidet das Ziel aus next. Ohne das landete der Nutzer nach dem
+  // Tausch auf der Startseite statt beim Passwortformular.
+  const istRecovery = type === 'recovery' || next.startsWith('/auth/reset')
+
   // PKCE Flow (code parameter)
   if (code) {
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      if (type === 'recovery') {
-        return NextResponse.redirect(`${origin}/auth/reset-password`)
+      if (istRecovery) {
+        const ziel = NextResponse.redirect(`${origin}/auth/reset-password`)
+        response.cookies.getAll().forEach(c => ziel.cookies.set(c))
+        return ziel
       }
       return response
     }
+    console.error('[auth/callback] exchangeCodeForSession:', error.message)
   }
 
   // Token Hash Flow (direkter Link aus Email — kein PKCE nötig)
   if (token_hash && type) {
     const { error } = await supabase.auth.verifyOtp({ token_hash, type })
     if (!error) {
-      if (type === 'recovery') {
-        return NextResponse.redirect(`${origin}/auth/reset-password`)
+      if (istRecovery) {
+        const ziel = NextResponse.redirect(`${origin}/auth/reset-password`)
+        response.cookies.getAll().forEach(c => ziel.cookies.set(c))
+        return ziel
       }
       return response
     }
+    console.error('[auth/callback] verifyOtp:', error.message)
   }
 
   // Fehler

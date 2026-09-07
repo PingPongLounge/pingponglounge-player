@@ -32,7 +32,11 @@ export default async function EntdeckenPage() {
     const ANTON = 'var(--font-anton), Impact, sans-serif'
     const INTER = 'var(--font-inter), system-ui, sans-serif'
     const heute = new Date().toISOString().slice(0, 10)
-    const admin = createAdminClient()
+    /* Fehlt der Service-Key, warf createAdminClient() und die oeffentliche
+       Startseite antwortete mit 500 — die eine Seite, die jeder Besucher
+       zuerst sieht. Sie faellt jetzt auf den normalen Server-Client zurueck:
+       alles hier ist ohnehin oeffentlich lesbar. */
+    const admin = process.env.SUPABASE_SERVICE_ROLE_KEY ? createAdminClient() : sb
 
     // Alles parallel — die Seite soll nicht fuenf Abfragen hintereinander warten.
     const [spielerRes, topRes, gamesRes, seasonRes, tourRes, feedRes] = await Promise.all([

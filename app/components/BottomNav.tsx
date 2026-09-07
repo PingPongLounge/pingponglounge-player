@@ -52,7 +52,8 @@ export default function BottomNav() {
     <nav aria-label="Player Navigation" style={{
       position: "fixed", left: 0, right: 0, bottom: 0, zIndex: 100,
       background: "rgba(8,8,8,.92)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)",
-      borderTop: "1px solid rgba(244,241,235,.14)",
+      /* Keine Trennlinie: die Navigation hebt sich durch Unschaerfe und
+         den dunkleren Grund ab — eine Linie liess sie wie einen Footer wirken. */
       paddingBottom: "env(safe-area-inset-bottom)",
     }}>
       <div style={{
