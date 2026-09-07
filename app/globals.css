@@ -45,11 +45,20 @@ body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0
 .ppl-huelle { width: 100%; max-width: 620px; margin: 0 auto; }
 @media (min-width: 900px) { .ppl-huelle { max-width: 1000px; } }
 
-/* Der Hero traegt Bild UND Titel zusammen (Oliver 07.09.: "der Text kann
-   oben ueber dem Bild sein") — er braucht deshalb den groessten Teil des
-   ersten Bildschirms, nicht nur ein Drittel. */
-.ppl-fotohero { min-height: clamp(470px, 76svh, 700px); }
-@media (min-width: 900px) { .ppl-fotohero { min-height: clamp(540px, 80svh, 800px); } }
+/* ── Hero (Referenz-Mockup) ──────────────────────────────────────────────
+   Das Foto nimmt rund die Haelfte des ersten Bildschirms — genug fuer
+   Stimmung, wenig genug, dass der Inhalt darunter sofort sichtbar ist.
+   Die Kante zum Off-White ist gerade; die schraegen Uebergaenge sind weg. */
+.ppl-hero { min-height: 52svh; }
+@media (min-width: 700px)  { .ppl-hero { min-height: 46svh; } }
+@media (min-width: 900px)  { .ppl-hero { min-height: 50svh; } }
+
+/* Die Anton-Zeile ist das groesste Element der Seite. */
+.ppl-hero-titel { font-size: clamp(52px, 15.5vw, 76px); }
+@media (min-width: 700px) { .ppl-hero-titel { font-size: clamp(64px, 8.5vw, 104px); } }
+
+/* Auf dem Desktop darf das Bild breiter und ruhiger stehen. */
+@media (min-width: 900px) { .ppl-hero-bild { object-position: var(--pos-desktop, 50% 42%); } }
 
 /* Zwei Spalten fuer Listen: ab 900px laufen lange Listen zweispaltig,
    damit auf dem Desktop nicht 40 Zeilen in einer duennen Saeule stehen. */

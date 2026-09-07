@@ -12,7 +12,7 @@ import { createClient } from "@/lib/supabase/client"
 import NotificationBell from "./NotificationBell"
 import { CREME, VIOLETT, INTER } from "@/app/theme"
 
-export default function HeroKopf({ ziel = "/entdecken" }: { ziel?: string }) {
+export default function HeroKopf({ ziel = "/entdecken", rechts }: { ziel?: string; rechts?: React.ReactNode }) {
   const [angemeldet, setAngemeldet] = useState(false)
   useEffect(() => {
     const sb = createClient()
@@ -33,7 +33,7 @@ export default function HeroKopf({ ziel = "/entdecken" }: { ziel?: string }) {
       </Link>
       {/* Nur die Glocke. Das Menü sitzt unten in der Navigation
           (Vorgabe Oliver 07.09.: "menu immer unten"). */}
-      {angemeldet && <NotificationBell />}
+      {rechts ?? (angemeldet && <NotificationBell />)}
     </div>
   )
 }

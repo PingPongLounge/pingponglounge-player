@@ -1,247 +1,217 @@
-/* PLAYER V2 — gemeinsame Bausteine (07.09.2026, verbindlich).
-   Grundlage ist ab jetzt das Referenzbild von Oliver. Kein zweites
-   Designsystem: Farben und Schriften kommen aus app/theme.ts.
+/* PLAYER V2 — das gemeinsame Bausystem (07.09.2026, verbindlich).
+   Grundlage ist das Referenz-Mockup mit den fuenf Screens HOME / SPIELEN /
+   LIGA / EVENTS / PROFIL. Kein zweites Designsystem: Farben und Schriften
+   kommen aus app/theme.ts.
 
-   Die Logik dahinter:
-     SCHWARZ   Atmosphaere, Hero, Navigation, Community, Bilder, Aktionen
-     OFF-WHITE Lesen und Verstehen: Rankings, Zahlen, Erklaerungen
-     VIOLETT   Interaktion, aktive Elemente, Highlights
+   Jede Hauptseite besteht aus genau zwei Bereichen:
 
-   Was die Referenz gegenueber dem bisherigen Stand aendert:
-     1. Jeder Bereich beginnt mit einem echten Foto von echten Leuten,
-        rund ein Drittel des ersten Bildschirms.
-     2. Darunter, auf deckendem Schwarz, EIN grosser Anton-Titel — mehr
-        braucht es nicht.
-     3. Zahlen stehen als Reihe, nicht als Kaertchen.
-     4. Listen sind Zeilen mit Bild links und Pille rechts.
+     HERO      dunkel, echtes PPL-Foto, 45-55% der ersten Bildschirmhoehe.
+               Darauf ein kleines violettes Etikett, darunter die sehr grosse
+               weisse Anton-Zeile — das groesste Element der Seite — und ein
+               bis zwei Zeilen Erklaerung. Keine Karten, keine Schreibschrift.
 
-   07.09.2026, Oliver: "lass die Neon Signs weg, mach Titel wieder
-   groesser." Die Neon-Schreibschrift (Kaushan) ist damit raus — im
-   Player traegt der Anton-Titel den Kopf allein.
+     INHALT    Off-White #F4F1EB. Hier geht es nicht um Stimmung, sondern um
+               Orientierung, Daten, Entscheidungen. Editorial: Typografie,
+               Linien, Abstaende, kleine Symbole, Avatare, klare Listen.
+
+   Die beiden treffen mit einer GERADEN Kante aufeinander. Die schraegen
+   Uebergaenge von vorher sind bewusst weg (Vorgabe Oliver 07.09.).
+
+   Violett ist nur: Haupt-Aktion, aktive Navigation, aktiver Zustand,
+   kleine Hervorhebung, Link und Pfeil.
 
    Ohne "use client" — laeuft in Server- wie Client-Seiten. */
 import { SCHWARZ, CREME, VIOLETT, ANTON, INTER } from "@/app/theme"
 
-/* ---------- Schraege Kante ------------------------------------------------
-   Der Uebergang zwischen Schwarz und Off-White ist nie eine gerade Linie,
-   sondern faellt ueber die volle Breite um HOEHE Pixel. Kein Torn Paper,
-   keine Zacken — eine Kante, immer dieselbe Richtung (links hoeher). */
-const HOEHE = 20
+/* Die Off-White-Flaeche und das, was darauf liegt. */
+export const FLAECHE = CREME          // #F4F1EB — der Inhaltsgrund
+export const PANEL = "#FFFFFF"        // gruppierte Listen sitzen auf Weiss
+export const LINIE = "rgba(8,8,8,.10)"
+export const TEXT_LEISE = "rgba(8,8,8,.56)"
 
-export function KanteZuHell({ hoehe = HOEHE }: { hoehe?: number }) {
-  return (
-    <div aria-hidden style={{
-      height: hoehe, background: CREME, marginTop: -1,
-      clipPath: `polygon(0 0, 100% ${hoehe}px, 100% 100%, 0 100%)`,
-    }} />
-  )
-}
-
-export function KanteZuDunkel({ hoehe = HOEHE }: { hoehe?: number }) {
-  return (
-    <div aria-hidden style={{
-      height: hoehe, background: SCHWARZ, marginTop: -1,
-      clipPath: `polygon(0 0, 100% ${hoehe}px, 100% 100%, 0 100%)`,
-    }} />
-  )
-}
-
-/** Off-White-Informationsflaeche mit schraegen Kanten oben und unten. */
-export function HellFlaeche({ children, kanteOben = true, kanteUnten = true, padding = "30px 0 34px", eng = false }:
-  { children: React.ReactNode; kanteOben?: boolean; kanteUnten?: boolean; padding?: string; eng?: boolean }) {
-  return (
-    <>
-      {kanteOben && <KanteZuHell />}
-      <section style={{ background: CREME, color: SCHWARZ }}>
-        <div className={eng ? "ppl-eng" : "ppl-breit"} style={{ padding }}>{children}</div>
-      </section>
-      {kanteUnten && <KanteZuDunkel />}
-    </>
-  )
-}
-
-/* ---------- Foto-Hero -----------------------------------------------------
-   Ein echtes Bild aus der Lounge, und der Text steht DARAUF — nicht darunter
-   (Oliver, 07.09.: "der Text kann oben ueber dem Bild sein").
-
-   Damit die Schrift trotzdem sicher lesbar bleibt, liegen zwei Schichten
-   dazwischen: ein Verlauf, der nach unten in deckendes Schwarz laeuft, und
-   darueber ein sanfter dunkler Schleier ueber dem ganzen Bild. Getestet auf
-   den hellsten Stellen der PPL-Fotos — auch dort bleibt Weiss auf Schwarz
-   deutlich ueber dem Kontrastminimum.
-
-   Der Inhalt sitzt unten im Bild (flex-end): das Foto traegt die Stimmung
-   oben, der Titel steht auf dem ruhigen, dunklen Teil unten. */
-export function FotoHero({
-  bild, pos = "50% 40%", hoehe, kopf, children, alt = "",
+/* ---------- Hero ----------------------------------------------------------
+   Foto, Verlauf, Etikett, Zeile, Erklaerung. Der Verlauf ist der einzige
+   Grund, warum die weisse Schrift auf jedem Foto sicher lesbar bleibt:
+   unten laeuft er in nahezu deckendes Schwarz aus, dort steht der Text. */
+export function Hero({
+  bild, pos = "50% 45%", etikett, titel, subline, kopf, alt = "",
 }: {
-  bild: string; pos?: string; hoehe?: string
-  kopf?: React.ReactNode; children?: React.ReactNode; alt?: string
+  bild: string; pos?: string
+  etikett: string; titel: React.ReactNode; subline?: React.ReactNode
+  kopf?: React.ReactNode; alt?: string
 }) {
   return (
-    <header className="ppl-fotohero" style={{
+    <header className="ppl-hero" style={{
       position: "relative", background: SCHWARZ, overflow: "hidden",
       display: "flex", flexDirection: "column",
-      ...(hoehe ? { minHeight: hoehe } : null),
     }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={bild} alt={alt} aria-hidden={alt ? undefined : true} style={{
-        position: "absolute", inset: 0, width: "100%", height: "100%",
-        objectFit: "cover", objectPosition: pos,
-      }} />
+      <img src={bild} alt={alt} aria-hidden={alt ? undefined : true} className="ppl-hero-bild"
+        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: pos }} />
       <div aria-hidden style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(to bottom, rgba(8,8,8,.52) 0%, rgba(8,8,8,.26) 22%, rgba(8,8,8,.52) 52%, rgba(8,8,8,.84) 78%, rgba(8,8,8,.96) 94%, #080808 100%)",
+        background: "linear-gradient(to bottom, rgba(8,8,8,.55) 0%, rgba(8,8,8,.18) 26%, rgba(8,8,8,.46) 55%, rgba(8,8,8,.86) 80%, rgba(8,8,8,.96) 100%)",
       }} />
 
       {kopf && <div style={{ position: "relative", zIndex: 2 }}>{kopf}</div>}
 
-      {children && (
-        <div className="ppl-breit" style={{
-          position: "relative", zIndex: 2, marginTop: "auto",
-          paddingTop: 26, paddingBottom: 30,
-        }}>{children}</div>
-      )}
+      <div className="ppl-breit" style={{
+        position: "relative", zIndex: 2, marginTop: "auto",
+        paddingTop: 24, paddingBottom: 26,
+      }}>
+        <div style={{
+          fontFamily: INTER, fontSize: 12.5, fontWeight: 900, letterSpacing: ".18em",
+          textTransform: "uppercase", color: VIOLETT, marginBottom: 8,
+        }}>{etikett}</div>
+
+        <h1 className="ppl-hero-titel" style={{
+          fontFamily: ANTON, fontWeight: 400, textTransform: "uppercase",
+          letterSpacing: ".002em", lineHeight: .87, color: "#FFFFFF", margin: 0,
+        }}>{titel}</h1>
+
+        {subline && (
+          <p style={{
+            fontFamily: INTER, fontSize: 15.5, lineHeight: 1.45, margin: "14px 0 0",
+            color: "rgba(255,255,255,.86)", maxWidth: "40ch",
+          }}>{subline}</p>
+        )}
+      </div>
     </header>
   )
 }
 
-/* ---------- Etikett ueber einer Ueberschrift ------------------------------ */
-export function Etikett({ text, hell = false }: { text: string; hell?: boolean }) {
+/* ---------- Inhaltsflaeche ------------------------------------------------
+   Gerade Kante nach dem Hero, Off-White bis zum Seitenende. */
+export function Inhalt({ children, oben = 26, unten = 34 }:
+  { children: React.ReactNode; oben?: number; unten?: number }) {
   return (
-    <div style={{
-      fontFamily: INTER, fontSize: 12, fontWeight: 900, letterSpacing: ".16em",
-      textTransform: "uppercase", color: hell ? "rgba(8,8,8,.55)" : VIOLETT,
-    }}>{text}</div>
+    <section style={{ background: FLAECHE, color: SCHWARZ }}>
+      <div className="ppl-breit" style={{ paddingTop: oben, paddingBottom: unten }}>
+        {children}
+      </div>
+    </section>
   )
 }
 
-/* ---------- Display-Ueberschrift ------------------------------------------ */
-export function Titel({ children, hell = false, gross = false }:
-  { children: React.ReactNode; hell?: boolean; gross?: boolean }) {
+/* ---------- Abschnittskopf ------------------------------------------------
+   Kleine dunkle Ueberschrift links, rechts optional "Alle ›" in Violett. */
+export function AbschnittKopf({ titel, mehr, href, dunkel = false }:
+  { titel: string; mehr?: string; href?: string; dunkel?: boolean }) {
   return (
-    <h2 style={{
-      fontFamily: ANTON, fontWeight: 400,
-      fontSize: gross ? "clamp(44px,12vw,72px)" : "clamp(30px,8vw,42px)",
-      lineHeight: .94, textTransform: "uppercase", letterSpacing: ".005em",
-      margin: "8px 0 0", color: hell ? SCHWARZ : CREME,
-    }}>{children}</h2>
+    <div style={{
+      display: "flex", alignItems: "baseline", justifyContent: "space-between",
+      gap: 14, marginBottom: 12,
+    }}>
+      <h2 style={{
+        fontFamily: INTER, fontSize: 12.5, fontWeight: 900, letterSpacing: ".14em",
+        textTransform: "uppercase", margin: 0, color: dunkel ? CREME : SCHWARZ,
+      }}>{titel}</h2>
+      {mehr && href && (
+        <a href={href} style={{
+          fontFamily: INTER, fontSize: 13, fontWeight: 700, color: VIOLETT,
+          textDecoration: "none", whiteSpace: "nowrap",
+        }}>{mehr} ›</a>
+      )}
+    </div>
+  )
+}
+
+/* ---------- Weisses Feld --------------------------------------------------
+   Gruppierte Listen sitzen auf Weiss, damit die Off-White-Flaeche Struktur
+   bekommt, ohne dass jede Zeile eine eigene Karte wird. */
+export function Feld({ children, padding = 0 }: { children: React.ReactNode; padding?: number | string }) {
+  return (
+    <div style={{ background: PANEL, borderRadius: 16, overflow: "hidden", padding }}>
+      {children}
+    </div>
   )
 }
 
 /* ---------- Zahlenreihe ---------------------------------------------------
-   Referenz: drei bis vier Zahlen nebeneinander, direkt auf der Flaeche,
-   getrennt durch eine feine Linie. Keine Kaertchen. */
+   Drei bis vier Zahlen nebeneinander, getrennt durch feine Linien. */
 export type StatWert = { wert: string | number; label: string; akzent?: boolean }
 
-export function StatsReihe({ werte, hell = false }: { werte: StatWert[]; hell?: boolean }) {
-  const linie = hell ? "1px solid rgba(8,8,8,.14)" : "1px solid rgba(244,241,235,.14)"
+export function StatsReihe({ werte, hell = true, padding = "16px 0" }:
+  { werte: StatWert[]; hell?: boolean; padding?: string }) {
+  const linie = hell ? LINIE : "rgba(244,241,235,.14)"
   return (
-    <div style={{ display: "grid", gridTemplateColumns: `repeat(${werte.length},1fr)` }}>
+    <div style={{ display: "grid", gridTemplateColumns: `repeat(${werte.length},1fr)`, padding }}>
       {werte.map((x, i) => (
         <div key={x.label} style={{
-          paddingLeft: i === 0 ? 0 : 14, borderLeft: i === 0 ? "none" : linie, minWidth: 0,
+          textAlign: "center", minWidth: 0,
+          borderLeft: i === 0 ? "none" : `1px solid ${linie}`,
         }}>
-          <strong style={{
-            display: "block", fontFamily: ANTON, fontWeight: 400,
-            fontSize: "clamp(26px,7.5vw,42px)", lineHeight: .95,
-            fontVariantNumeric: "tabular-nums",
+          <div style={{
+            fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(22px,6.2vw,30px)",
+            lineHeight: 1, fontVariantNumeric: "tabular-nums",
             color: x.akzent ? VIOLETT : (hell ? SCHWARZ : CREME),
-          }}>{x.wert}</strong>
-          <small style={{
-            display: "block", fontFamily: INTER, fontSize: 11.5, fontWeight: 800,
-            letterSpacing: ".13em", textTransform: "uppercase", marginTop: 7,
-            color: hell ? "rgba(8,8,8,.55)" : "rgba(244,241,235,.55)",
-          }}>{x.label}</small>
+          }}>{x.wert}</div>
+          <div style={{
+            fontFamily: INTER, fontSize: 11, fontWeight: 700, marginTop: 6,
+            color: hell ? TEXT_LEISE : "rgba(244,241,235,.55)",
+          }}>{x.label}</div>
         </div>
       ))}
     </div>
   )
 }
 
-/* ---------- Grosse Kennzahl ----------------------------------------------
-   Referenz Liga: eine riesige Platzziffer, daneben die Veraenderung. */
-export function GrosseZahl({ wert, label, delta, hell = false }:
-  { wert: string | number; label: string; delta?: { richtung: "hoch" | "runter" | "gleich"; text: string }; hell?: boolean }) {
-  const farbe = delta?.richtung === "hoch" ? VIOLETT
-    : delta?.richtung === "runter" ? "rgba(229,72,77,.95)"
-    : (hell ? "rgba(8,8,8,.55)" : "rgba(244,241,235,.55)")
+/* ---------- Aktionszeile --------------------------------------------------
+   Referenz SPIELEN: Symbol links, Titel und ein Satz, Pfeil rechts.
+   Bewusst untereinander statt als Raster — die Reihenfolge ist die
+   Empfehlung, und eine 2x2-Matrix zwingt zu einer Wahl ohne Rangfolge. */
+export function AktionsZeile({ symbol, titel, unter, erste = false }:
+  { symbol: React.ReactNode; titel: string; unter: string; erste?: boolean }) {
   return (
-    <div style={{ display: "flex", alignItems: "flex-end", gap: 18, flexWrap: "wrap" }}>
-      <div style={{ minWidth: 0 }}>
-        <strong style={{
-          display: "block", fontFamily: ANTON, fontWeight: 400,
-          fontSize: "clamp(74px,23vw,132px)", lineHeight: .82,
-          letterSpacing: "-.01em", fontVariantNumeric: "tabular-nums",
-          color: hell ? SCHWARZ : CREME,
-        }}>{wert}</strong>
-        <small style={{
-          display: "block", fontFamily: INTER, fontSize: 12, fontWeight: 800,
-          letterSpacing: ".15em", textTransform: "uppercase", marginTop: 10,
-          color: hell ? "rgba(8,8,8,.55)" : "rgba(244,241,235,.55)",
-        }}>{label}</small>
-      </div>
-      {delta && (
-        <span style={{
-          fontFamily: INTER, fontSize: 14, fontWeight: 800, color: farbe,
-          paddingBottom: 6, display: "inline-flex", alignItems: "center", gap: 6,
-        }}>
-          <span aria-hidden style={{ fontSize: 12 }}>
-            {delta.richtung === "hoch" ? "▲" : delta.richtung === "runter" ? "▼" : "—"}
-          </span>
-          {delta.text}
-        </span>
-      )}
+    <div style={{
+      display: "flex", alignItems: "center", gap: 15, padding: "17px 16px",
+      borderTop: erste ? "none" : `1px solid ${LINIE}`,
+    }}>
+      <span aria-hidden style={{
+        width: 34, height: 34, flexShrink: 0, display: "grid", placeItems: "center", color: SCHWARZ,
+      }}>{symbol}</span>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <b style={{
+          display: "block", fontFamily: INTER, fontSize: 14.5, fontWeight: 900,
+          letterSpacing: ".05em", textTransform: "uppercase", color: SCHWARZ,
+        }}>{titel}</b>
+        <span style={{ display: "block", fontFamily: INTER, fontSize: 13.5, color: TEXT_LEISE, marginTop: 3 }}>{unter}</span>
+      </span>
+      <Pfeil />
     </div>
   )
 }
 
-/* ---------- Datumsblock ---------------------------------------------------
-   Referenz Events: Tag gross, Monat klein darunter, links neben der Zeile. */
-export function DatumBlock({ tag, monat, hell = false }: { tag: string | number; monat: string; hell?: boolean }) {
+export function Pfeil({ farbe = "rgba(8,8,8,.34)" }: { farbe?: string }) {
   return (
-    <div aria-hidden style={{ textAlign: "center", width: 52, flexShrink: 0 }}>
-      <div style={{
-        fontFamily: ANTON, fontWeight: 400, fontSize: 34, lineHeight: .9,
-        color: hell ? SCHWARZ : CREME, fontVariantNumeric: "tabular-nums",
-      }}>{tag}</div>
-      <div style={{
-        fontFamily: INTER, fontSize: 11, fontWeight: 900, letterSpacing: ".14em",
-        textTransform: "uppercase", marginTop: 5, color: VIOLETT,
-      }}>{monat}</div>
-    </div>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={farbe}
+      strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ flexShrink: 0 }}>
+      <path d="M9 5l7 7-7 7" />
+    </svg>
   )
 }
 
 /* ---------- Listenzeile ---------------------------------------------------
-   Ein Muster fuer alle Listen: links ein Bild oder ein Datum, in der Mitte
-   Titel und zwei Metazeilen, rechts eine Aktion. Ohne Kaertchen — nur eine
-   feine Linie darueber. */
-export function ListenZeile({ links, titel, unter, meta, rechts, hell = false, erste = false }: {
+   Ein Muster fuer alle Listen: links ein Bild, ein Datum oder eine Ziffer,
+   in der Mitte Titel und Meta, rechts eine Zahl oder eine Aktion. */
+export function ListenZeile({ links, titel, unter, meta, rechts, erste = false, aktiv = false }: {
   links?: React.ReactNode; titel: React.ReactNode; unter?: React.ReactNode
-  meta?: React.ReactNode; rechts?: React.ReactNode; hell?: boolean; erste?: boolean
+  meta?: React.ReactNode; rechts?: React.ReactNode; erste?: boolean; aktiv?: boolean
 }) {
-  const linie = hell ? "1px solid rgba(8,8,8,.12)" : "1px solid rgba(244,241,235,.12)"
   return (
     <div style={{
-      display: "flex", alignItems: "center", gap: 14, padding: "15px 0",
-      borderTop: erste ? "none" : linie,
+      display: "flex", alignItems: "center", gap: 13, padding: "13px 16px",
+      borderTop: erste ? "none" : `1px solid ${LINIE}`,
+      background: aktiv ? "rgba(140,61,255,.10)" : "transparent",
     }}>
       {links}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{
-          fontFamily: INTER, fontSize: 16, fontWeight: 800, lineHeight: 1.25,
-          color: hell ? SCHWARZ : CREME,
+          fontFamily: INTER, fontSize: 15, fontWeight: 700, lineHeight: 1.25, color: SCHWARZ,
           overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
         }}>{titel}</div>
-        {unter && <div style={{
-          fontFamily: INTER, fontSize: 13.5, marginTop: 4, lineHeight: 1.35,
-          color: hell ? "rgba(8,8,8,.62)" : "rgba(244,241,235,.62)",
-        }}>{unter}</div>}
-        {meta && <div style={{
-          fontFamily: INTER, fontSize: 12, fontWeight: 800, letterSpacing: ".06em",
-          textTransform: "uppercase", marginTop: 6, color: VIOLETT,
-        }}>{meta}</div>}
+        {unter && <div style={{ fontFamily: INTER, fontSize: 13, color: TEXT_LEISE, marginTop: 3, lineHeight: 1.35 }}>{unter}</div>}
+        {meta && <div style={{ fontFamily: INTER, fontSize: 13, color: TEXT_LEISE, marginTop: 1, lineHeight: 1.35 }}>{meta}</div>}
       </div>
       {rechts && <div style={{ flexShrink: 0 }}>{rechts}</div>}
     </div>
@@ -249,80 +219,97 @@ export function ListenZeile({ links, titel, unter, meta, rechts, hell = false, e
 }
 
 /** Quadratisches Vorschaubild fuer eine Listenzeile. */
-export function ZeilenBild({ src, groesse = 52 }: { src: string; groesse?: number }) {
+export function ZeilenBild({ src, groesse = 44 }: { src: string; groesse?: number }) {
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt="" aria-hidden style={{
-      width: groesse, height: groesse, borderRadius: 12, objectFit: "cover", flexShrink: 0,
+      width: groesse * 1.35, height: groesse, borderRadius: 8, objectFit: "cover", flexShrink: 0,
     }} />
   )
 }
 
-/* ---------- Kachel --------------------------------------------------------
-   Referenz Profil: dunkle Kacheln mit Symbol, Zahl und Bezeichnung. */
-export function Kachel({ symbol, wert, label, aktiv = false }:
-  { symbol?: React.ReactNode; wert: React.ReactNode; label: string; aktiv?: boolean }) {
+/* ---------- Datumsblock ---------------------------------------------------
+   Referenz EVENTS: Tag gross, Monat klein darunter, links neben der Zeile. */
+export function DatumBlock({ tag, monat }: { tag: string | number; monat: string }) {
   return (
-    <div style={{
-      background: aktiv ? "rgba(140,61,255,.14)" : "#111113",
-      border: aktiv ? `1px solid rgba(140,61,255,.42)` : "1px solid rgba(244,241,235,.09)",
-      borderRadius: 18, padding: "18px 16px", minWidth: 0,
-    }}>
-      {symbol && <div aria-hidden style={{ fontSize: 20, lineHeight: 1, marginBottom: 12, color: VIOLETT }}>{symbol}</div>}
+    <div aria-hidden style={{ textAlign: "center", width: 42, flexShrink: 0 }}>
       <div style={{
-        fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(24px,6.5vw,32px)",
-        lineHeight: .95, color: CREME, fontVariantNumeric: "tabular-nums",
-      }}>{wert}</div>
+        fontFamily: ANTON, fontWeight: 400, fontSize: 26, lineHeight: .95,
+        color: SCHWARZ, fontVariantNumeric: "tabular-nums",
+      }}>{tag}</div>
       <div style={{
-        fontFamily: INTER, fontSize: 11.5, fontWeight: 800, letterSpacing: ".12em",
-        textTransform: "uppercase", marginTop: 7, color: "rgba(244,241,235,.55)",
-      }}>{label}</div>
+        fontFamily: INTER, fontSize: 10.5, fontWeight: 900, letterSpacing: ".12em",
+        textTransform: "uppercase", marginTop: 3, color: TEXT_LEISE,
+      }}>{monat}</div>
     </div>
   )
 }
 
-/* ---------- Pillen --------------------------------------------------------
-   Kleine Statuspille (frei/ausgebucht/Level) — kein Knopf. */
-export function Pille({ text, ton = "neutral", hell = false }:
-  { text: string; ton?: "neutral" | "violett" | "warn"; hell?: boolean }) {
-  const stil = ton === "violett"
-    ? { background: "rgba(140,61,255,.16)", color: hell ? "#5B1FBF" : "#D9C2FF" }
-    : ton === "warn"
-    ? { background: "rgba(229,72,77,.14)", color: "#E5484D" }
-    : { background: hell ? "rgba(8,8,8,.07)" : "rgba(244,241,235,.09)", color: hell ? "rgba(8,8,8,.62)" : "rgba(244,241,235,.62)" }
+/* ---------- Grosse Kennzahl ----------------------------------------------
+   Referenz LIGA: die Platzziffer ist das groesste Element der Inhaltsflaeche. */
+export function GrosseZahl({ wert, rechts }:
+  { wert: string | number; rechts?: React.ReactNode }) {
+  return (
+    <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+      <strong style={{
+        fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(52px,15vw,76px)",
+        lineHeight: .88, letterSpacing: "-.01em", fontVariantNumeric: "tabular-nums", color: SCHWARZ,
+      }}>{wert}</strong>
+      {rechts}
+    </div>
+  )
+}
+
+/* ---------- Pillen und Knoepfe ------------------------------------------- */
+export function Pille({ text, ton = "neutral" }: { text: string; ton?: "neutral" | "violett" | "gut" | "warn" }) {
+  const stil = ton === "violett" ? { background: "rgba(140,61,255,.12)", color: "#5B1FBF" }
+    : ton === "gut" ? { background: "rgba(22,142,90,.12)", color: "#12764B" }
+    : ton === "warn" ? { background: "rgba(229,72,77,.12)", color: "#C0353A" }
+    : { background: "rgba(8,8,8,.06)", color: TEXT_LEISE }
   return (
     <span style={{
-      ...stil, display: "inline-block", borderRadius: 999, padding: "5px 11px",
-      fontFamily: INTER, fontSize: 11.5, fontWeight: 800, letterSpacing: ".06em",
+      ...stil, display: "inline-block", borderRadius: 999, padding: "4px 10px",
+      fontFamily: INTER, fontSize: 11, fontWeight: 900, letterSpacing: ".06em",
       textTransform: "uppercase", whiteSpace: "nowrap",
     }}>{text}</span>
   )
 }
 
-/* ---------- Knoepfe ------------------------------------------------------- */
 const knopfBasis: React.CSSProperties = {
   display: "inline-flex", alignItems: "center", justifyContent: "center",
-  borderRadius: 100, padding: "15px 24px", fontFamily: INTER, fontSize: 14,
-  fontWeight: 900, letterSpacing: ".1em", textTransform: "uppercase",
-  textDecoration: "none", cursor: "pointer", border: "none", whiteSpace: "nowrap",
+  borderRadius: 100, fontFamily: INTER, fontWeight: 900, letterSpacing: ".08em",
+  textTransform: "uppercase", textDecoration: "none", cursor: "pointer",
+  border: "none", whiteSpace: "nowrap",
 }
-export const knopfPrimaer: React.CSSProperties = { ...knopfBasis, background: VIOLETT, color: CREME }
-export const knopfOutline: React.CSSProperties = {
-  ...knopfBasis, background: "transparent", color: CREME,
-  border: "1.5px solid rgba(244,241,235,.34)", padding: "13.5px 24px",
-}
-/** Auf heller Flaeche: dunkler Rahmen statt hellem. */
+export const knopfPrimaer: React.CSSProperties = { ...knopfBasis, background: VIOLETT, color: "#FFFFFF", padding: "15px 24px", fontSize: 13.5 }
+export const knopfKlein: React.CSSProperties = { ...knopfBasis, background: VIOLETT, color: "#FFFFFF", padding: "8px 14px", fontSize: 11 }
 export const knopfOutlineHell: React.CSSProperties = {
   ...knopfBasis, background: "transparent", color: SCHWARZ,
-  border: "1.5px solid rgba(8,8,8,.28)", padding: "13.5px 24px",
+  border: "1.5px solid rgba(8,8,8,.24)", padding: "13.5px 24px", fontSize: 13.5,
 }
-/** Kleine Pillen-Aktion am rechten Rand einer Listenzeile. */
-export const knopfKlein: React.CSSProperties = {
-  ...knopfBasis, background: VIOLETT, color: CREME,
-  padding: "9px 16px", fontSize: 11.5, letterSpacing: ".08em",
-}
-export const knopfKleinOutline: React.CSSProperties = {
+/** Auf dunklem Grund (im Hero oder in schwarzen Bereichen). */
+export const knopfOutline: React.CSSProperties = {
   ...knopfBasis, background: "transparent", color: CREME,
-  border: "1.5px solid rgba(244,241,235,.30)", padding: "7.5px 16px",
-  fontSize: 11.5, letterSpacing: ".08em",
+  border: "1.5px solid rgba(244,241,235,.32)", padding: "13.5px 24px", fontSize: 13.5,
+}
+
+/* ---------- Strichsymbole -------------------------------------------------
+   Ein Stil fuer die ganze App: 24er Raster, 1.8 Strichstaerke, keine Emojis. */
+export function Symbol({ art, groesse = 24, farbe = "currentColor" }:
+  { art: "suche" | "spieler" | "plus" | "verlauf" | "pokal" | "freunde" | "zahnrad" | "kalender" | "blitz"; groesse?: number; farbe?: string }) {
+  const p: Record<string, React.ReactNode> = {
+    suche: <><circle cx="11" cy="11" r="6.5" /><path d="M16 16l4.5 4.5" /></>,
+    spieler: <><circle cx="12" cy="8.2" r="3.6" /><path d="M5.5 20c1.3-3.4 3.8-5.1 6.5-5.1s5.2 1.7 6.5 5.1" /></>,
+    plus: <><circle cx="12" cy="12" r="8.5" /><path d="M12 8.5v7M8.5 12h7" /></>,
+    verlauf: <><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></>,
+    pokal: <><path d="M7 4h10v5a5 5 0 0 1-10 0z" /><path d="M7 6H4.5v1.5A3 3 0 0 0 7.5 10M17 6h2.5v1.5A3 3 0 0 1 16.5 10" /><path d="M12 14v3M9 20h6" /></>,
+    freunde: <><circle cx="9.5" cy="8.5" r="3.2" /><path d="M3.5 19c1.1-2.9 3.3-4.4 6-4.4s4.9 1.5 6 4.4" /><path d="M16.5 6.2a3.2 3.2 0 0 1 0 6.1M17.5 14.9c2 .6 3.4 1.9 4.2 4.1" /></>,
+    zahnrad: <><circle cx="12" cy="12" r="3.1" /><path d="M12 3.5v2.2M12 18.3v2.2M20.5 12h-2.2M5.7 12H3.5M18 6l-1.6 1.6M7.6 16.4 6 18M18 18l-1.6-1.6M7.6 7.6 6 6" /></>,
+    kalender: <><rect x="4" y="6" width="16" height="14" rx="2.5" /><path d="M8 3.5V7M16 3.5V7M4 11h16" /></>,
+    blitz: <><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z" /></>,
+  }
+  return (
+    <svg width={groesse} height={groesse} viewBox="0 0 24 24" fill="none" stroke={farbe}
+      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>{p[art]}</svg>
+  )
 }

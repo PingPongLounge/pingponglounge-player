@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import StartHomeV2, { Game } from '@/app/components/StartHomeV2'
-import { FotoHero } from '@/app/components/V2'
+import { Hero } from '@/app/components/V2'
 
 
 const LV = [
@@ -107,42 +107,37 @@ export default async function EntdeckenPage() {
           </div>
         </nav>
 
-        {/* Kopf nach Referenzbild: erst das Foto, dann — auf deckendem
-            Schwarz — die Neonzeile. Das Neon liegt nie auf einem Bild. */}
-        <FotoHero bild="/ppl-start.jpg" pos="72% 46%" kopf={
-          <div className="ppl-breit" style={{ display: 'flex', alignItems: 'center', gap: 11, paddingTop: 16 }}>
-            <svg width="30" height="30" viewBox="0 0 80 80" fill="none" aria-hidden>
-              <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke={CREME} strokeWidth="6" strokeLinejoin="round" />
-              <circle cx="63" cy="58" r="7" fill={VIOLETT} />
-            </svg>
-            <span style={{ fontFamily: ANTON, fontSize: 23, letterSpacing: '.06em', color: CREME, lineHeight: 1, textShadow: '0 1px 14px rgba(0,0,0,.6)' }}>PLAYER</span>
-          </div>
-        }>
-          <div>
-            <h1 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 'clamp(56px,16vw,104px)', lineHeight: .86, textTransform: 'uppercase', margin: '6px 0 20px', color: CREME }}>
-              Ping Pong<br />spielen.
-            </h1>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 12px', marginBottom: 28 }}>
-              {['Rating', 'Ranking', 'Liga', 'Community'].map((wort, i) => (
-                <span key={wort} style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
-                  {i > 0 ? <span aria-hidden style={{ width: 5, height: 5, borderRadius: 100, background: VIOLETT }} /> : null}
-                  <span style={{ fontFamily: INTER, fontSize: 15, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: CREME }}>{wort}</span>
-                </span>
-              ))}
+        {/* Kopf nach Referenz-Mockup: Foto, Etikett, sehr grosse Anton-Zeile,
+            zwei Zeilen Erklaerung. Darunter die Aktionen. */}
+        <Hero
+          bild="/ppl-start.jpg" pos="66% 46%"
+          etikett="Player"
+          titel={<>Ping Pong<br />spielen.</>}
+          subline="Rating, Ranking, Liga und Community — vom ersten Ballwechsel bis zur Saison."
+          kopf={
+            <div className="ppl-breit" style={{ display: 'flex', alignItems: 'center', gap: 11, paddingTop: 16 }}>
+              <svg width="28" height="28" viewBox="0 0 80 80" fill="none" aria-hidden>
+                <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke={CREME} strokeWidth="6" strokeLinejoin="round" />
+                <circle cx="63" cy="58" r="7" fill={VIOLETT} />
+              </svg>
+              <span style={{ fontFamily: ANTON, fontSize: 21, letterSpacing: '.06em', color: CREME, lineHeight: 1, textShadow: '0 1px 14px rgba(0,0,0,.6)' }}>PLAYER</span>
             </div>
+          }
+        />
 
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-              <Link href="/match" style={{ flex: '1 1 200px', textAlign: 'center', background: CREME, color: SCHWARZ, borderRadius: 100, padding: '16px 24px', fontFamily: INTER, fontSize: 15, fontWeight: 900, letterSpacing: '.1em', textTransform: 'uppercase', textDecoration: 'none' }}>
-                Umschauen
-              </Link>
-              <Link href="/login" style={{ flex: '1 1 200px', textAlign: 'center', background: 'transparent', color: CREME, border: `1px solid ${TRENN}`, borderRadius: 100, padding: '15px 24px', fontFamily: INTER, fontSize: 15, fontWeight: 900, letterSpacing: '.1em', textTransform: 'uppercase', textDecoration: 'none' }}>
-                Login / Registrieren
-              </Link>
-            </div>
-            {spielerCount ? <div style={{ marginTop: 14, fontFamily: INTER, fontSize: 15, color: LEISE }}>{spielerCount} Spieler sind dabei.</div> : null}
+        {/* Aktionen direkt unter dem Hero, auf Schwarz — sie gehoeren zur
+            Ansprache, nicht zur Informationsflaeche. */}
+        <div className="ppl-breit" style={{ paddingTop: 22, paddingBottom: 4 }}>
+          <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
+            <Link href="/match" style={{ flex: '1 1 200px', textAlign: 'center', background: CREME, color: SCHWARZ, borderRadius: 100, padding: '16px 24px', fontFamily: INTER, fontSize: 15, fontWeight: 900, letterSpacing: '.1em', textTransform: 'uppercase', textDecoration: 'none' }}>
+              Umschauen
+            </Link>
+            <Link href="/login" style={{ flex: '1 1 200px', textAlign: 'center', background: 'transparent', color: CREME, border: `1px solid ${TRENN}`, borderRadius: 100, padding: '15px 24px', fontFamily: INTER, fontSize: 15, fontWeight: 900, letterSpacing: '.1em', textTransform: 'uppercase', textDecoration: 'none' }}>
+              Login / Registrieren
+            </Link>
           </div>
-        </FotoHero>
+          {spielerCount ? <div style={{ marginTop: 14, fontFamily: INTER, fontSize: 15, color: LEISE }}>{spielerCount} Spieler sind dabei.</div> : null}
+        </div>
 
         {/* 1 · OPEN GAMES */}
         <section className="ppl-breit" style={abschnitt}>
@@ -324,6 +319,34 @@ export default async function EntdeckenPage() {
     })),
   ].slice(0, 5)
 
+  /* DEINE LETZTEN MATCHES (Referenz HOME) — dieselbe Quelle wie im Profil:
+     bestaetigte Liga-Spiele, in denen ich vorkomme. Nichts Erfundenes; gibt
+     es keine, faellt der Block weg. */
+  const { data: letzteRoh } = await sb.from('league_matches')
+    .select('id,p1_id,p2_id,winner_id,sets,played_at,confirmed_at')
+    .eq('status', 'confirmed')
+    .or(`p1_id.eq.${user.id},p2_id.eq.${user.id}`)
+    .order('confirmed_at', { ascending: false }).limit(3)
+  type MRoh = { id: string; p1_id: string; p2_id: string; winner_id: string | null; sets: Array<{ p1: number; p2: number }> | null; played_at: string | null }
+  const mListe = (letzteRoh || []) as MRoh[]
+  const gegnerIds = [...new Set(mListe.map(m => (m.p1_id === user.id ? m.p2_id : m.p1_id)))]
+  const { data: gegnerProfile } = gegnerIds.length
+    ? await sb.from('public_profiles').select('id,name,avatar_url').in('id', gegnerIds)
+    : { data: [] as Array<{ id: string; name: string; avatar_url: string | null }> }
+  const letzteMatches = mListe.map(m => {
+    const ichP1 = m.p1_id === user.id
+    const gid = ichP1 ? m.p2_id : m.p1_id
+    const g = (gegnerProfile || []).find(x => x.id === gid)
+    // Satzstaende aus meiner Sicht: gewonnene Saetze zuerst.
+    const meine = (m.sets || []).filter(x => (ichP1 ? x.p1 > x.p2 : x.p2 > x.p1)).length
+    const seine = (m.sets || []).filter(x => (ichP1 ? x.p2 > x.p1 : x.p1 > x.p2)).length
+    return {
+      id: m.id, gegnerId: gid, gegner: g?.name || 'Spieler', avatar: g?.avatar_url || null,
+      satz: (m.sets || []).length ? `${meine}:${seine}` : '',
+      sieg: m.winner_id === user.id,
+    }
+  })
+
   const rank = (higherRes.count ?? 0) + 1
   const ppBalance = (ppRes.data || []).reduce((s, t) => s + Number(t.amount || 0), 0)
 
@@ -404,6 +427,7 @@ export default async function EntdeckenPage() {
       season={{ has: !!season, label: seasonLabel, city: season?.city || '', leagueRank }}
       tour={tour}
       nextGame={nextGame}
+      letzteMatches={letzteMatches}
     />
   )
 }

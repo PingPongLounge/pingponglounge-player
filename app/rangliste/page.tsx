@@ -7,7 +7,10 @@ import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import HeroKopf from "@/app/components/HeroKopf"
-import { FotoHero, GrosseZahl, KanteZuHell, Etikett } from "@/app/components/V2"
+import {
+  Hero, Inhalt, AbschnittKopf, Feld, StatsReihe, GrosseZahl, ListenZeile,
+  TEXT_LEISE, FLAECHE,
+} from "@/app/components/V2"
 import { SCHWARZ, CREME, VIOLETT, ANTON, INTER, MUT } from "@/app/theme"
 
 const CANTONS = ["AG","AI","AR","BE","BL","BS","FR","GE","GL","GR","JU","LU","NE","NW","OW","SG","SH","SO","SZ","TG","TI","UR","VD","VS","ZG","ZH"]
@@ -37,78 +40,87 @@ export default function RanglistePage() {
 
   return (
     <>
-      <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER }}>
+      <main style={{ minHeight: "100dvh", background: FLAECHE, color: SCHWARZ, fontFamily: INTER }}>
 
-        <FotoHero bild="/ppl-rangliste.jpg" pos="56% 42%" kopf={<HeroKopf />}>
-          <Etikett text="Ranking" />
-          <h1 style={{
-            fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(56px,16vw,104px)",
-            lineHeight: .86, textTransform: "uppercase", letterSpacing: ".005em", margin: "6px 0 0",
-          }}>Your<br />rank.</h1>
-          <p style={{ fontFamily: INTER, fontSize: 16, color: MUT, lineHeight: 1.5, margin: "10px 0 0", maxWidth: "40ch" }}>
-            Spiele Matches. Baue dein Rating auf. Finde Spieler auf deinem Niveau.
-          </p>
+        <Hero
+          bild="/ppl-spielen.jpg" pos="70% 44%"
+          kopf={<HeroKopf />}
+          etikett="Ranking"
+          titel={<>Your<br />rank.</>}
+          subline={<>Spiele Matches. Baue dein Rating auf.<br />Finde Spieler auf deinem Niveau.</>}
+        />
+
+        <Inhalt>
           {me && (
-            <div style={{ marginTop: 24 }}>
-              <GrosseZahl wert={canton ? me.rank_filtered : me.rank_global} label="Dein Rang" />
-              <div style={{ fontSize: 15, color: MUT, marginTop: 10 }}>{me.elo} Rating · Level {me.level}</div>
-            </div>
+            <>
+              <AbschnittKopf titel="Dein Rang" />
+              <Feld padding="18px 16px 0">
+                <GrosseZahl
+                  wert={`#${canton ? me.rank_filtered : me.rank_global}`}
+                  rechts={<span style={{ fontFamily: INTER, fontSize: 14, color: TEXT_LEISE, lineHeight: 1.5 }}>
+                    <b style={{ display: "block", color: SCHWARZ, fontSize: 15 }}>Level {me.level}</b>
+                    {canton || "Ganze Schweiz"}
+                  </span>}
+                />
+                <div style={{ borderTop: "1px solid rgba(8,8,8,.10)", marginTop: 16 }}>
+                  <StatsReihe werte={[{ wert: me.elo, label: "Rating" }, { wert: `#${me.rank_global}`, label: "Schweiz" }, { wert: me.rank_filtered ? `#${me.rank_filtered}` : "—", label: canton || "Kanton", akzent: true }]} />
+                </div>
+              </Feld>
+            </>
           )}
-        </FotoHero>
 
-        <KanteZuHell />
-        <section style={{ background: CREME, color: SCHWARZ }}>
-          <div className="ppl-breit" style={{ paddingTop: 26, paddingBottom: 34 }}>
-            <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 14, marginBottom: 16 }}>
-              <div>
-                <Etikett text={canton || "Schweiz"} hell />
-                <h2 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(30px,8vw,42px)", lineHeight: .94, textTransform: "uppercase", margin: "8px 0 0", color: SCHWARZ }}>Rangliste</h2>
-              </div>
+          <div style={{ marginTop: me ? 26 : 0 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, marginBottom: 12 }}>
+              <h2 style={{ fontFamily: INTER, fontSize: 12.5, fontWeight: 900, letterSpacing: ".14em", textTransform: "uppercase", margin: 0, color: SCHWARZ }}>
+                Rangliste · {canton || "Schweiz"}
+              </h2>
               <select value={canton} onChange={e => setCanton(e.target.value)} style={{
-                fontFamily: INTER, fontSize: 14, fontWeight: 700, color: SCHWARZ, background: "transparent",
-                border: "1px solid rgba(8,8,8,.24)", borderRadius: 100, padding: "9px 14px", cursor: "pointer",
+                fontFamily: INTER, fontSize: 13, fontWeight: 700, color: SCHWARZ, background: "#FFFFFF",
+                border: "1px solid rgba(8,8,8,.16)", borderRadius: 100, padding: "8px 12px", cursor: "pointer",
               }}>
                 <option value="">Ganze Schweiz</option>
                 {CANTONS.map(c => <option key={c} value={c}>{c}</option>)}
               </select>
             </div>
 
-            {loading && <p style={{ fontSize: 16, color: "rgba(8,8,8,.6)" }}>Rangliste wird geladen …</p>}
-            {!loading && error && <p style={{ fontSize: 16, color: "rgba(8,8,8,.66)" }}>{error}</p>}
+            {loading && <p style={{ fontSize: 15, color: TEXT_LEISE, margin: 0 }}>Rangliste wird geladen …</p>}
+            {!loading && error && <p style={{ fontSize: 15, color: TEXT_LEISE, margin: 0 }}>{error}</p>}
             {!loading && !error && players.length === 0 && (
-              <p style={{ fontSize: 16, color: "rgba(8,8,8,.66)" }}>Noch niemand in dieser Auswahl.</p>
+              <p style={{ fontSize: 15, color: TEXT_LEISE, margin: 0 }}>Noch niemand in dieser Auswahl.</p>
             )}
 
-            {!loading && !error && players.map(p => {
-              const meins = me?.user_id === p.user_id
-              const platz = canton ? p.rank_filtered : p.rank_global
-              return (
-                <Link key={p.user_id} href={`/spieler/${p.user_id}`} style={{
-                  display: "flex", alignItems: "center", gap: 12, padding: "12px 10px",
-                  marginLeft: meins ? -10 : 0, marginRight: meins ? -10 : 0,
-                  borderTop: meins ? "1px solid rgba(140,61,255,.28)" : "1px solid rgba(8,8,8,.12)",
-                  background: meins ? "rgba(140,61,255,.13)" : "transparent",
-                  borderRadius: meins ? 10 : 0, textDecoration: "none", color: SCHWARZ,
-                }}>
-                  <span style={{ width: 30, textAlign: "center", flexShrink: 0, fontFamily: ANTON, fontSize: 20, color: meins ? VIOLETT : "rgba(8,8,8,.45)", fontVariantNumeric: "tabular-nums" }}>{platz}</span>
-                  <span style={{ width: 38, height: 38, borderRadius: "50%", flexShrink: 0, overflow: "hidden", background: "rgba(8,8,8,.10)", display: "grid", placeItems: "center" }}>
-                    {p.avatar
-                      /* eslint-disable-next-line @next/next/no-img-element */
-                      ? <img src={p.avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                      : <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: "rgba(8,8,8,.5)" }}>{ini(p.name)}</span>}
-                  </span>
-                  <span style={{ flex: 1, minWidth: 0 }}>
-                    <b style={{ display: "block", fontSize: 17, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{p.name}</b>
-                    <span style={{ display: "block", fontSize: 14, color: "rgba(8,8,8,.55)", marginTop: 2 }}>
-                      {meins ? "Du · " : ""}Level {p.level}{p.canton ? ` · ${p.canton}` : ""}
-                    </span>
-                  </span>
-                  <span style={{ fontFamily: ANTON, fontSize: 22, minWidth: 54, textAlign: "right", flexShrink: 0, color: meins ? VIOLETT : SCHWARZ, fontVariantNumeric: "tabular-nums" }}>{p.elo}</span>
-                </Link>
-              )
-            })}
+            {!loading && !error && players.length > 0 && (
+              <Feld>
+                {players.map((p, i) => {
+                  const meins = me?.user_id === p.user_id
+                  const platz = canton ? p.rank_filtered : p.rank_global
+                  return (
+                    <Link key={p.user_id} href={`/spieler/${p.user_id}`} style={{ textDecoration: "none", display: "block" }}>
+                      <ListenZeile
+                        erste={i === 0}
+                        aktiv={meins}
+                        links={
+                          <span style={{ display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
+                            <span style={{ width: 24, textAlign: "center", fontFamily: ANTON, fontSize: 18, color: meins ? VIOLETT : TEXT_LEISE, fontVariantNumeric: "tabular-nums" }}>{platz}</span>
+                            <span style={{ width: 36, height: 36, borderRadius: "50%", overflow: "hidden", background: "rgba(8,8,8,.08)", display: "grid", placeItems: "center" }}>
+                              {p.avatar
+                                /* eslint-disable-next-line @next/next/no-img-element */
+                                ? <img src={p.avatar} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                                : <span style={{ fontFamily: INTER, fontSize: 12.5, fontWeight: 800, color: TEXT_LEISE }}>{ini(p.name)}</span>}
+                            </span>
+                          </span>
+                        }
+                        titel={p.name}
+                        unter={`${meins ? "Du · " : ""}Level ${p.level}${p.canton ? ` · ${p.canton}` : ""}`}
+                        rechts={<span style={{ fontFamily: ANTON, fontSize: 20, minWidth: 50, textAlign: "right", color: meins ? VIOLETT : SCHWARZ, fontVariantNumeric: "tabular-nums" }}>{p.elo}</span>}
+                      />
+                    </Link>
+                  )
+                })}
+              </Feld>
+            )}
           </div>
-        </section>
+        </Inhalt>
       </main>
       <BottomNav />
     </>

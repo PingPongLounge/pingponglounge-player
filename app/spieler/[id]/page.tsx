@@ -11,7 +11,10 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { createClient } from "@/lib/supabase/server"
 import ProfilAvatar from "@/app/components/ProfilAvatar"
 import ProfilAktionen from "@/app/components/ProfilAktionen"
-import StatsBand from "@/app/components/StatsBand"
+import {
+  Hero, Inhalt, AbschnittKopf, Feld, StatsReihe, ListenZeile, Pille,
+  knopfPrimaer, knopfOutlineHell, TEXT_LEISE, FLAECHE,
+} from "@/app/components/V2"
 
 const SCHWARZ = "#080808", CREME = "#F4F1EB", VIOLETT = "#8C3DFF"
 const LEISE = "rgba(244,241,235,.62)", TRENN = "rgba(244,241,235,.13)"
@@ -72,88 +75,75 @@ export default async function SpielerSeite({ params }: { params: Promise<{ id: s
   const quote = gespielt ? Math.round((gewonnen / gespielt) * 100) : null
 
   return (
-    <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER, paddingBottom: 56 }}>
+    <>
+    <main style={{ minHeight: "100dvh", background: FLAECHE, color: SCHWARZ, fontFamily: INTER }}>
 
-      {/* ── SCHWARZER KOPF: Avatar, Name, Level/Ort, Aktionen ── */}
-      <header className="ppl-breit" style={{ paddingTop: 22, paddingBottom: 34 }}>
-        <Link href="/rangliste" style={{
-          fontFamily: INTER, fontSize: 13, fontWeight: 800, letterSpacing: ".08em",
-          textTransform: "uppercase", color: LEISE, textDecoration: "none",
-        }}>← Rangliste</Link>
+      <Hero
+        bild="/ppl-profil.jpg" pos="34% 46%"
+        etikett="Player"
+        titel={p.name}
+        subline={`Level ${p.level}${p.canton ? ` · ${p.canton}` : ""}`}
+        kopf={
+          <div className="ppl-breit" style={{ paddingTop: 16 }}>
+            <Link href="/rangliste" style={{
+              fontFamily: INTER, fontSize: 13, fontWeight: 800, letterSpacing: ".08em",
+              textTransform: "uppercase", color: "rgba(255,255,255,.8)", textDecoration: "none",
+            }}>← Rangliste</Link>
+          </div>
+        }
+      />
 
-        <div style={{ marginTop: 10 }}>
-          <ProfilAvatar src={p.avatar_url} name={p.name} groesse={104} editierbar={eigenes} />
+      <Inhalt>
+        <Feld padding="18px 16px">
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <ProfilAvatar src={p.avatar_url} name={p.name} groesse={64} editierbar={eigenes} />
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <strong style={{ display: "block", fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(24px,6.5vw,32px)", lineHeight: 1, textTransform: "uppercase" }}>{p.name}</strong>
+              <span style={{ display: "block", fontSize: 14.5, color: TEXT_LEISE, marginTop: 5 }}>Level {p.level}{p.canton ? ` · ${p.canton}` : ""}</span>
+            </div>
+          </div>
+          <div style={{ borderTop: "1px solid rgba(8,8,8,.10)", marginTop: 16 }}>
+            <StatsReihe werte={[
+              { wert: p.elo ?? 1000, label: "Rating" },
+              { wert: `#${(hoeher ?? 0) + 1}`, label: "Rang", akzent: true },
+              { wert: gespielt, label: "Matches" },
+              { wert: quote !== null ? `${quote}%` : "—", label: "Win Rate" },
+            ]} />
+          </div>
+        </Feld>
+
+        <div style={{ marginTop: 18 }}>
+          {eigenes
+            ? <div style={{ display: "flex", gap: 10, flexWrap: "wrap", maxWidth: 480 }}>
+                <Link href="/profil" style={{ ...knopfPrimaer, flex: "1 1 150px" }}>Mein Profil</Link>
+                <Link href="/liga" style={{ ...knopfOutlineHell, flex: "1 1 150px" }}>Liga</Link>
+              </div>
+            : <ProfilAktionen spielerId={id} name={p.name} angemeldet={!!user} />}
         </div>
 
-        <h1 style={{
-          fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(50px,14vw,88px)",
-          lineHeight: .88, textTransform: "uppercase", margin: "20px 0 0",
-        }}>{p.name}</h1>
-
-        <div style={{ fontFamily: INTER, fontSize: 16, color: LEISE, marginTop: 8 }}>
-          Level {p.level}{p.canton ? ` · ${p.canton}` : ""}
+        <div style={{ marginTop: 26 }}>
+          <AbschnittKopf titel="Letzte Spiele" />
+          <Feld>
+            {spiele.length ? spiele.map((m, i) => {
+              const meins = m.p1_id === id
+              const gewann = m.winner_id === id
+              const saetze = (m.sets || []).map(x => (meins ? `${x.p1}:${x.p2}` : `${x.p2}:${x.p1}`)).join("  ")
+              return (
+                <ListenZeile
+                  key={m.id}
+                  erste={i === 0}
+                  titel={`vs. ${nameVon(meins ? m.p2_id : m.p1_id)}`}
+                  unter={`${saetze || "ohne Sätze"}${m.played_at ? ` · ${new Date(m.played_at).toLocaleDateString("de-CH", { day: "numeric", month: "short", year: "numeric" })}` : ""}`}
+                  rechts={<Pille text={gewann ? "Sieg" : "Niederlage"} ton={gewann ? "gut" : "warn"} />}
+                />
+              )
+            }) : (
+              <div style={{ padding: 16, fontSize: 15, color: TEXT_LEISE }}>Noch keine bestätigten Spiele.</div>
+            )}
+          </Feld>
         </div>
-
-        {eigenes
-          ? <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 22 }}>
-              <Link href="/profil" style={{
-                flex: "1 1 150px", textAlign: "center", background: VIOLETT, color: CREME,
-                borderRadius: 100, padding: "15px 20px", fontFamily: INTER, fontSize: 14,
-                fontWeight: 900, letterSpacing: ".1em", textTransform: "uppercase", textDecoration: "none",
-              }}>Mein Profil</Link>
-              <Link href="/liga" style={{
-                flex: "1 1 150px", textAlign: "center", background: "transparent", color: CREME,
-                border: `1.5px solid rgba(244,241,235,.34)`, borderRadius: 100, padding: "13.5px 20px",
-                fontFamily: INTER, fontSize: 14, fontWeight: 900, letterSpacing: ".1em",
-                textTransform: "uppercase", textDecoration: "none",
-              }}>Liga</Link>
-            </div>
-          : <ProfilAktionen spielerId={id} name={p.name} angemeldet={!!user} />}
-      </header>
-
-      {/* ── OFF-WHITE STATS: der eine helle Kontrast ── */}
-      <StatsBand werte={[
-        { wert: p.elo ?? 1000, label: "Rating" },
-        { wert: `#${(hoeher ?? 0) + 1}`, label: "Rang", akzent: true },
-        { wert: gespielt, label: "Matches" },
-        { wert: quote !== null ? `${quote}%` : "—", label: "Win Rate" },
-      ]} />
-
-      {/* ── SCHWARZER INHALT: letzte Spiele ── */}
-      <section className="ppl-breit" style={{ paddingTop: 34 }}>
-        <h2 style={{
-          fontFamily: INTER, fontSize: 12, fontWeight: 900, letterSpacing: ".16em",
-          textTransform: "uppercase", color: VIOLETT, margin: "0 0 4px",
-        }}>Letzte Spiele</h2>
-
-        {spiele.length ? spiele.map(m => {
-          const meins = m.p1_id === id
-          const gewann = m.winner_id === id
-          const saetze = (m.sets || []).map(s => (meins ? `${s.p1}:${s.p2}` : `${s.p2}:${s.p1}`)).join("  ")
-          return (
-            <div key={m.id} style={{
-              display: "flex", alignItems: "center", gap: 12,
-              padding: "16px 0", borderTop: `1px solid ${TRENN}`,
-            }}>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <b style={{ display: "block", fontFamily: INTER, fontSize: 17, fontWeight: 700 }}>{nameVon(meins ? m.p2_id : m.p1_id)}</b>
-                <span style={{ display: "block", fontFamily: INTER, fontSize: 14, color: LEISE, marginTop: 3 }}>
-                  {saetze || "ohne Sätze"}{m.played_at ? ` · ${new Date(m.played_at).toLocaleDateString("de-CH", { day: "numeric", month: "short", year: "numeric" })}` : ""}
-                </span>
-              </span>
-              <span style={{
-                fontFamily: INTER, fontSize: 13, fontWeight: 900, letterSpacing: ".08em",
-                textTransform: "uppercase", color: gewann ? VIOLETT : LEISE, whiteSpace: "nowrap",
-              }}>{gewann ? "Sieg" : "Niederlage"}</span>
-            </div>
-          )
-        }) : (
-          <p style={{
-            fontFamily: INTER, fontSize: 16, color: LEISE,
-            padding: "16px 0", borderTop: `1px solid ${TRENN}`, margin: 0,
-          }}>Noch keine bestätigten Spiele.</p>
-        )}
-      </section>
+      </Inhalt>
     </main>
+    </>
   )
 }

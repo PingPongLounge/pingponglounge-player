@@ -12,7 +12,10 @@ import {
   SCHWARZ, CREME, VIOLETT, ANTON, INTER,
 } from "@/app/theme"
 import HeroKopf from "@/app/components/HeroKopf"
-import { FotoHero, GrosseZahl, KanteZuHell, KanteZuDunkel, Etikett, Titel, knopfPrimaer, knopfOutline } from "@/app/components/V2"
+import {
+  Hero, Inhalt, AbschnittKopf, Feld, StatsReihe, GrosseZahl, ListenZeile, Pille,
+  knopfPrimaer, knopfKlein, knopfOutlineHell, TEXT_LEISE, FLAECHE,
+} from "@/app/components/V2"
 
 const C=CARD, B=CELL, M=SUB
 const SHADOW="0 1px 4px rgba(0,0,0,.14)"
@@ -460,7 +463,7 @@ export default function LigaPage(){
   })()
 
   return (
-    <main style={{minHeight:"100vh",background:BG,paddingBottom:90}}>
+    <main style={{minHeight:"100vh",background:FLAECHE,paddingBottom:90}}>
       {/* Topbar — dunkel. Grün nur im Logo und im Zähler: eine grelle Leiste war
           das Lauteste auf dem Screen und sagte nichts. Ein Akzent pro Screen. */}
       {/* 07.09.2026: Der eigene Kopfbalken ist weg — PPL., Glocke und Menue
@@ -481,80 +484,79 @@ export default function LigaPage(){
       )}
 
       <div className="ppl-huelle">
-        {/* Offene Bestätigungen zuoberst — direkt antippbar. */}
-        <div style={{padding:"14px 15px 0"}}><PendingConfirmBanner/></div>
-        {/* ══ SCHWARZER LIGA-HERO ═══════════════════════════════════════
-            Der Rang ist das dominante Element. Alles andere ordnet sich unter:
-            Etikett, Titel, ein Satz, dann die Zahl. */}
-        <FotoHero bild="/ppl-liga.jpg" pos="58% 40%" kopf={<HeroKopf/>}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
-            <Etikett text="PPL League"/>
-            {seasons.length>1&&(
-              <button onClick={()=>setShowCity(v=>!v)} style={{background:CELL,color:SUB,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 10px",fontFamily:"inherit"}}>{sel?.name||"League"} ▾</button>
-            )}
-          </div>
-          <h1 style={{fontFamily:ANTON,fontWeight:400,fontSize:"clamp(56px,16vw,104px)",lineHeight:.86,textTransform:"uppercase",letterSpacing:".005em",margin:"6px 0 0",color:W}}>
-            {sel?.is_private?sel.name:<>Climb<br/>it.</>}
-          </h1>
-          <p style={{fontFamily:INTER,fontSize:16,color:MUT,lineHeight:1.5,margin:"10px 0 0",maxWidth:"44ch"}}>
-            Steig im Ranking auf, fordere Spieler in deiner Nähe heraus und verteidige deinen Platz.
-          </p>
+        {/* ══ HERO nach Referenz-Mockup ══════════════════════════════ */}
+        <Hero
+          bild="/ppl-rangliste.jpg" pos="56% 40%"
+          kopf={<HeroKopf/>}
+          etikett="PPL League"
+          titel={sel?.is_private?sel.name:<>Climb<br/>the ranks.</>}
+          subline={<>Steig im Ranking auf und fordere<br/>Spieler auf deinem Niveau heraus.</>}
+        />
+
+        {/* ══ DEIN RANG — die Zahl gehoert auf die helle Flaeche ══ */}
+        <Inhalt unten={6}>
+          {seasons.length>1&&(
+            <div style={{marginBottom:16}}>
+              <button onClick={()=>setShowCity(v=>!v)} style={{background:"rgba(8,8,8,.06)",color:SCHWARZ,fontSize:12.5,fontWeight:800,cursor:"pointer",borderRadius:100,padding:"8px 14px",fontFamily:INTER}}>{sel?.name||"League"} ▾</button>
+            </div>
+          )}
 
           {myReg&&myRow?(
             <>
-              <div style={{marginTop:26}}>
-                <GrosseZahl wert={meinRang} label="Dein aktueller Rang"/>
-                <div style={{fontFamily:INTER,fontSize:15,color:MUT,marginTop:10}}>
-                  {ratingLabel(myRow.elo)} Rating{meineStufe?` · ${meineStufe.name}`:""}
+              <AbschnittKopf titel="Dein Rang"/>
+              <Feld padding="18px 16px 0">
+                <GrosseZahl
+                  wert={`#${meinRang}`}
+                  rechts={
+                    <span style={{fontFamily:INTER,fontSize:14,color:TEXT_LEISE,lineHeight:1.5}}>
+                      {meineStufe?<b style={{display:"block",color:SCHWARZ,fontSize:15}}>{meineStufe.name}</b>:null}
+                      {sel?.city||city||"Schweiz"}
+                    </span>
+                  }
+                />
+                <div style={{borderTop:"1px solid rgba(8,8,8,.10)",marginTop:16}}>
+                  <StatsReihe werte={[
+                    {wert:ratingLabel(myRow.elo),label:"Rating"},
+                    {wert:monatCount,label:"Diesen Monat"},
+                    {wert:`${monatCount}/${MIN_MATCHES_PER_MONTH}`,label:"Monatssoll",akzent:!monatOk},
+                  ]}/>
                 </div>
-              </div>
+              </Feld>
 
-              {/* Monatspflicht — echte Regel, kurz gesagt. */}
-              <div style={{marginTop:22,borderTop:`1px solid ${LINE}`,paddingTop:16}}>
-                <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,fontFamily:INTER,fontSize:15}}>
-                  <span style={{color:MUT}}>
-                    {monatOk
-                      ?`Soll erfüllt · ${monatCount} Matches diesen Monat`
-                      :`Noch ${MIN_MATCHES_PER_MONTH-monatCount} Spiele bis Monatsende`}
-                  </span>
-                  <b style={{color:monatOk?VIOLETT:W,whiteSpace:"nowrap"}}>{monatCount}/{MIN_MATCHES_PER_MONTH}</b>
-                </div>
-                {!monatOk&&(
-                  <div style={{height:5,borderRadius:100,background:"rgba(244,241,235,.12)",marginTop:10,overflow:"hidden"}}>
-                    <div style={{height:"100%",width:`${Math.min(100,(monatCount/MIN_MATCHES_PER_MONTH)*100)}%`,background:VIOLETT,borderRadius:100}}/>
-                  </div>
-                )}
-                {!monatOk&&(
-                  <div style={{fontFamily:INTER,fontSize:14,color:MUT,marginTop:8}}>Sonst −{MONTHLY_PENALTY_ELO} Punkte.</div>
-                )}
-              </div>
+              {!monatOk&&(
+                <p style={{fontFamily:INTER,fontSize:13.5,color:TEXT_LEISE,margin:"10px 2px 0"}}>
+                  Noch {MIN_MATCHES_PER_MONTH-monatCount} gewertete Spiele bis Monatsende, sonst −{MONTHLY_PENALTY_ELO} Punkte.
+                </p>
+              )}
 
-              <div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:22}}>
+              <div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:18,maxWidth:480}}>
                 {rows.length>1&&(
                   <button onClick={()=>setPickOpen(true)} style={{...knopfPrimaer,flex:"1 1 170px"}}>Ergebnis eintragen</button>
                 )}
-                <button onClick={()=>setChatOpen(true)} style={{...knopfOutline,flex:"1 1 130px",position:"relative"}}>
+                <button onClick={()=>setChatOpen(true)} style={{...knopfOutlineHell,flex:"1 1 130px",position:"relative"}}>
                   Liga-Chat
                   {ungelesen>0&&(
-                    <span style={{marginLeft:9,minWidth:20,height:20,borderRadius:100,background:VIOLETT,color:W,fontSize:11,fontWeight:900,display:"inline-flex",alignItems:"center",justifyContent:"center",padding:"0 6px"}}>{ungelesen>9?"9+":ungelesen}</span>
+                    <span style={{marginLeft:9,minWidth:20,height:20,borderRadius:100,background:VIOLETT,color:"#FFFFFF",fontSize:11,fontWeight:900,display:"inline-flex",alignItems:"center",justifyContent:"center",padding:"0 6px"}}>{ungelesen>9?"9+":ungelesen}</span>
                   )}
                 </button>
               </div>
               {letzteNachricht&&(
-                <div style={{fontFamily:INTER,fontSize:14,color:MUT,marginTop:10,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{letzteNachricht}</div>
+                <div style={{fontFamily:INTER,fontSize:13.5,color:TEXT_LEISE,marginTop:10,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{letzteNachricht}</div>
               )}
             </>
           ):(
-            <div style={{marginTop:26}}>
-              <p style={{fontFamily:INTER,fontSize:16,color:MUT,lineHeight:1.55,margin:"0 0 18px",maxWidth:"46ch"}}>
+            <Feld padding={20}>
+              <p style={{fontFamily:INTER,fontSize:15.5,color:TEXT_LEISE,lineHeight:1.55,margin:"0 0 18px",maxWidth:"46ch"}}>
                 Eine Liga für alle — kein Beitreten in Klassen. Deine Stufe kommt aus deinem Rating. Fordere jeden, auch die Nummer eins.
               </p>
               <button onClick={join} disabled={busy} style={{...knopfPrimaer,width:"100%",maxWidth:360,opacity:busy?.6:1}}>
                 {busy?"…":"Los geht's"}
               </button>
-            </div>
+            </Feld>
           )}
-        </FotoHero>
+
+          <div style={{marginTop:18}}><PendingConfirmBanner/></div>
+        </Inhalt>
 
         {loading?(
           <p style={{textAlign:"center",color:M,padding:"40px 0"}}>Lädt …</p>
@@ -565,9 +567,9 @@ export default function LigaPage(){
           {/* Neu hier? — Erklärung (nur Nicht-Mitglieder) */}
           {!myReg&&(
             <div style={{padding:"4px 14px 0"}}>
-              <div style={{borderRadius:24,padding:22,boxShadow:SHADOW,background:CARD}}>
-                <div style={{fontSize:11,fontWeight:800,letterSpacing:".1em",textTransform:"uppercase",...gt}}>Neu hier?</div>
-                <div style={{fontSize:22,fontWeight:900,color:W,margin:"6px 0 16px"}}>So funktioniert die Liga</div>
+              <div style={{borderRadius:16,padding:20,background:"#FFFFFF"}}>
+                <div style={{fontSize:11.5,fontWeight:900,letterSpacing:".14em",textTransform:"uppercase",color:VIOLETT}}>Neu hier?</div>
+                <div style={{fontFamily:ANTON,fontWeight:400,fontSize:26,textTransform:"uppercase",color:SCHWARZ,margin:"8px 0 16px"}}>So funktioniert die Liga</div>
                 {([
                   ["1","Du bist automatisch dabei","Eine Liga für alle — kein Beitreten, keine Klassen. Deine Stufe kommt aus deiner Elo."],
                   ["2","Spielen & fordern","Fordere jeden — auch den Tabellenersten. Jedes bestätigte Resultat zählt."],
@@ -575,10 +577,10 @@ export default function LigaPage(){
                 ] as [string,string,string][]).map(([n,t,d])=>(
                   <div key={n} style={{display:"flex",gap:13,alignItems:"flex-start",marginBottom:14}}>
                     <span style={{width:27,height:27,borderRadius:"50%",background:GRAD,color:"#FFFFFF",fontSize:13,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{n}</span>
-                    <div><div style={{fontSize:14.5,fontWeight:800,color:W}}>{t}</div><div style={{fontSize:12.5,color:MUT,marginTop:2,lineHeight:1.4}}>{d}</div></div>
+                    <div><div style={{fontSize:14.5,fontWeight:800,color:SCHWARZ}}>{t}</div><div style={{fontSize:13,color:TEXT_LEISE,marginTop:2,lineHeight:1.4}}>{d}</div></div>
                   </div>
                 ))}
-                <button onClick={join} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:6,background:GRAD,color:"#FFFFFF",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":"Los geht's"}</button>
+                <button onClick={join} disabled={busy} style={{...knopfPrimaer,display:"flex",width:"100%",marginTop:6,cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":"Los geht's"}</button>
               </div>
             </div>
           )}
@@ -591,11 +593,9 @@ export default function LigaPage(){
               Flaeche — dunkle Schrift, hoher Kontrast, keine dunkle Tabelle.
               Filter, Sprung-Tabs und die Aktionen pro Zeile sind unveraendert,
               nur neu gesetzt. */}
-          <KanteZuHell />
-          <section style={{background:CREME,color:SCHWARZ}}>
+          <section style={{background:FLAECHE,color:SCHWARZ}}>
             <div className="ppl-breit" style={{paddingTop:26,paddingBottom:30}}>
-              <Etikett text={`${sel?.city||city||"Schweiz"}${meineStufe?` · ${meineStufe.name}`:""}`} hell/>
-              <h2 style={{fontFamily:ANTON,fontWeight:400,fontSize:"clamp(30px,8vw,42px)",lineHeight:.94,textTransform:"uppercase",margin:"8px 0 20px",color:SCHWARZ}}>Ranking</h2>
+              <AbschnittKopf titel={`Ranking · ${sel?.city||city||"Schweiz"}`}/>
 
               {/* Filter */}
               <button onClick={()=>setFilterOpen(true)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.14)",borderRadius:100,padding:"11px 16px",cursor:"pointer",fontFamily:INTER,marginBottom:12}}>
@@ -658,7 +658,7 @@ export default function LigaPage(){
 
               {/* ── Liga verstehen — die ECHTE Logik, keine erfundene ── */}
               <div style={{marginTop:30,borderTop:"1px solid rgba(8,8,8,.18)",paddingTop:22}}>
-                <Etikett text="Liga verstehen" hell/>
+                <AbschnittKopf titel="Liga verstehen"/>
                 <h3 style={{fontFamily:ANTON,fontWeight:400,fontSize:"clamp(24px,6.5vw,32px)",lineHeight:.98,textTransform:"uppercase",margin:"8px 0 12px",color:SCHWARZ}}>Wie steige ich auf?</h3>
                 <p style={{fontFamily:INTER,fontSize:16,lineHeight:1.55,color:"rgba(8,8,8,.72)",margin:"0 0 10px",maxWidth:"52ch"}}>
                   Fordere Spieler rund um deinen Rang heraus. Jedes bestätigte Spiel verschiebt dein Rating — ein Sieg gegen jemand Stärkeren bringt am meisten, gegen jemand Schwächeren am wenigsten.
@@ -669,7 +669,6 @@ export default function LigaPage(){
               </div>
             </div>
           </section>
-          <KanteZuDunkel />
 
           {/* ══ SCHWARZ: NÄCHSTE GEGNER ═══════════════════════════════════
               Nicht die ganze Tabelle, sondern die Leute direkt um dich herum —
@@ -679,33 +678,37 @@ export default function LigaPage(){
             const nah=idx<0?[]:displayRows.slice(Math.max(0,idx-2),idx+3).filter(r=>r.user_id!==userId).slice(0,4)
             if(!nah.length) return null
             return (
-              <section className="ppl-breit" style={{paddingTop:30}}>
-                <Etikett text="In deiner Reichweite"/>
-                <Titel>Nächste Gegner</Titel>
-                <div style={{marginTop:16}}>
+              <section style={{background:FLAECHE}}>
+                <div className="ppl-breit" style={{paddingTop:4,paddingBottom:34}}>
+                <AbschnittKopf titel="Who's next?"/>
+                <Feld>
                   {nah.map(r=>{
                     const ini=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                     const om=openMatches[r.user_id]
                     return (
-                      <div key={r.user_id} style={{display:"flex",alignItems:"center",gap:12,padding:"14px 0",borderTop:`1px solid ${LINE}`}}>
-                        <div style={{width:44,height:44,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:CELL,display:"grid",placeItems:"center"}}>
-                          {r.avatar
-                            /* eslint-disable-next-line @next/next/no-img-element */
-                            ? <img src={r.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                            : <span style={{fontFamily:INTER,fontSize:14,fontWeight:800,color:MUT}}>{ini}</span>}
-                        </div>
-                        <span style={{flex:1,minWidth:0}}>
-                          <b style={{display:"block",fontFamily:INTER,fontSize:17,fontWeight:700,color:W,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{r.name}</b>
-                          <span style={{display:"block",fontFamily:INTER,fontSize:14,color:MUT,marginTop:2}}>#{r.platz} · {ratingLabel(r.elo)} Rating</span>
-                        </span>
-                        {!om
-                          ? <button onClick={()=>openForder(r)} style={{fontFamily:INTER,fontSize:12,fontWeight:900,letterSpacing:".08em",textTransform:"uppercase",padding:"10px 16px",borderRadius:100,background:VIOLETT,color:W,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>Challenge</button>
-                          : om.status==="challenge_sent"&&!om.iAmP1
-                            ? <button onClick={()=>acceptChallenge(om.id)} style={{fontFamily:INTER,fontSize:12,fontWeight:900,letterSpacing:".08em",textTransform:"uppercase",padding:"10px 16px",borderRadius:100,background:VIOLETT,color:W,border:"none",cursor:"pointer",whiteSpace:"nowrap"}}>Annehmen</button>
-                            : <button onClick={()=>openPlayer(r.user_id)} style={{fontFamily:INTER,fontSize:12,fontWeight:900,letterSpacing:".08em",textTransform:"uppercase",padding:"10px 16px",borderRadius:100,background:"transparent",color:W,border:"1.5px solid rgba(244,241,235,.30)",cursor:"pointer",whiteSpace:"nowrap"}}>Profil</button>}
-                      </div>
+                      <ListenZeile
+                        key={r.user_id}
+                        erste={nah[0].user_id===r.user_id}
+                        links={
+                          <div style={{width:40,height:40,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:"rgba(8,8,8,.08)",display:"grid",placeItems:"center"}}>
+                            {r.avatar
+                              /* eslint-disable-next-line @next/next/no-img-element */
+                              ? <img src={r.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                              : <span style={{fontFamily:INTER,fontSize:13,fontWeight:800,color:TEXT_LEISE}}>{ini}</span>}
+                          </div>
+                        }
+                        titel={r.name}
+                        unter={`#${r.platz} · ${ratingLabel(r.elo)} Rating`}
+                        rechts={
+                          !om
+                            ? <button onClick={()=>openForder(r)} style={knopfKlein}>Herausfordern</button>
+                            : om.status==="challenge_sent"&&!om.iAmP1
+                              ? <button onClick={()=>acceptChallenge(om.id)} style={knopfKlein}>Annehmen</button>
+                              : <button onClick={()=>openPlayer(r.user_id)} style={{background:"none",border:"none",padding:0,cursor:"pointer"}}><Pille text="Profil"/></button>}
+                      />
                     )
                   })}
+                </Feld>
                 </div>
               </section>
             )
@@ -715,18 +718,18 @@ export default function LigaPage(){
               stand aber ganz oben bei Leuten, die längst in einer sind. */}
           <div style={{padding:"18px 14px 6px",textAlign:"center"}}>
             {reqDone ? (
-              <div style={{fontSize:12.5,color:SUB,lineHeight:1.5}}>
+              <div style={{fontSize:13,color:TEXT_LEISE,lineHeight:1.5}}>
                 {reqCount>1
                   ? `Danke — ${reqCount} Leute wollen eine Liga in ${reqCity}. Wir melden uns, sobald sie steht.`
                   : `Danke — wir melden uns, sobald sich genug Leute für ${reqCity} finden.`}
               </div>
             ) : reqOpen ? (
-              <div style={{background:CARD,borderRadius:18,padding:"16px 16px",boxShadow:SHADOW,textAlign:"left"}}>
-                <div style={{fontSize:13.5,fontWeight:800,color:W,marginBottom:10}}>In welcher Stadt fehlt dir eine Liga?</div>
+              <div style={{background:"#FFFFFF",borderRadius:16,padding:16,textAlign:"left"}}>
+                <div style={{fontSize:14,fontWeight:800,color:SCHWARZ,marginBottom:10}}>In welcher Stadt fehlt dir eine Liga?</div>
                 <input value={reqCity} onChange={e=>setReqCity(e.target.value)} placeholder="z.B. Winterthur" autoFocus
-                  style={{width:"100%",boxSizing:"border-box",background:"#0E0E10",borderRadius:12,padding:"12px 14px",color:W,fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:10}}/>
+                  style={{width:"100%",boxSizing:"border-box",background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.14)",borderRadius:12,padding:"12px 14px",color:SCHWARZ,fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:10}}/>
                 <button onClick={sendLigaAnfrage} disabled={busy||!reqCity.trim()}
-                  style={{display:"block",width:"100%",textAlign:"center",borderRadius:12,padding:12,fontSize:13,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",color:"#FFFFFF",background:GRAD,cursor:(busy||!reqCity.trim())?"not-allowed":"pointer",opacity:(busy||!reqCity.trim())?.5:1,fontFamily:"inherit"}}>
+                  style={{...knopfPrimaer,display:"flex",width:"100%",cursor:(busy||!reqCity.trim())?"not-allowed":"pointer",opacity:(busy||!reqCity.trim())?.5:1}}>
                   {busy?"…":"Anfrage senden"}
                 </button>
               </div>

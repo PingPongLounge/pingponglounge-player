@@ -6,14 +6,15 @@
    leichtem Glow. Es gibt keine zweite Navigation im Player — wer eine
    Kopfzeile braucht, nimmt die Hero-Ueberschrift der Seite.
 
-   07.09.2026, Oliver: "menu immer unten". Das Menue ist der sechste Punkt
-   hier und nirgends sonst — oben stehen nur noch Wortzeichen und Glocke.
+   Fuenf Punkte, wie im Referenz-Mockup: Home, Spielen, Liga, Events, Profil.
+   Was frueher im Hamburger-Menue stand, steht jetzt auf PROFIL als Liste
+   (Match-History, Achievements, Freunde, Einstellungen) — eine zweite
+   Hauptnavigation gibt es nicht mehr.
 
    Hoehe 66px plus Safe Area. Jede Seite laesst unten Platz dafuer
    (siehe PlayerRahmen), damit die Navigation nichts verdeckt. */
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import StartMenu from "./StartMenu"
 import { CREME, VIOLETT, INTER } from "@/app/theme"
 
 const AUS = "#77736f"
@@ -62,7 +63,7 @@ export default function BottomNav() {
     }}>
       <div style={{
         maxWidth: 1000, margin: "0 auto", height: 66,
-        display: "grid", gridTemplateColumns: "repeat(6,1fr)", alignItems: "stretch",
+        display: "grid", gridTemplateColumns: "repeat(5,1fr)", alignItems: "stretch",
       }}>
         {ITEMS.map(it => {
           const an = it.key === aktiv
@@ -88,7 +89,6 @@ export default function BottomNav() {
             </Link>
           )
         })}
-        <StartMenu variant="nav" aktivFarbe={CREME} ausFarbe={AUS} />
       </div>
     </nav>
   )
