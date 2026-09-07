@@ -45,7 +45,7 @@ export default function StartHomeV2(d: StartData) {
       <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER }}>
 
         {/* ══ FOTO-HERO ═══════════════════════════════════════════════ */}
-        <FotoHero bild="/ppl-smash.jpg" pos="58% 38%" kopf={<HeroKopf />}>
+        <FotoHero bild="/ppl-home.jpg" pos="54% 44%" kopf={<HeroKopf />}>
           <NeonTitel text="Your turn." />
 
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 12 }}>

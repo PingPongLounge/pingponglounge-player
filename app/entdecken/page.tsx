@@ -109,7 +109,7 @@ export default async function EntdeckenPage() {
 
         {/* Kopf nach Referenzbild: erst das Foto, dann — auf deckendem
             Schwarz — die Neonzeile. Das Neon liegt nie auf einem Bild. */}
-        <FotoHero bild="/ppl-serve.jpg" pos="46% 34%" kopf={
+        <FotoHero bild="/ppl-start.jpg" pos="50% 46%" kopf={
           <div className="ppl-breit" style={{ display: 'flex', alignItems: 'center', gap: 11, paddingTop: 16 }}>
             <svg width="30" height="30" viewBox="0 0 80 80" fill="none" aria-hidden>
               <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke={CREME} strokeWidth="6" strokeLinejoin="round" />

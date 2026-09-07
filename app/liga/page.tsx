@@ -486,7 +486,7 @@ export default function LigaPage(){
         {/* ══ SCHWARZER LIGA-HERO ═══════════════════════════════════════
             Der Rang ist das dominante Element. Alles andere ordnet sich unter:
             Etikett, Titel, ein Satz, dann die Zahl. */}
-        <FotoHero bild="/ppl-lounge-weit.jpg" pos="50% 46%" kopf={<HeroKopf/>}>
+        <FotoHero bild="/ppl-liga.jpg" pos="54% 44%" kopf={<HeroKopf/>}>
           <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
             <Etikett text="PPL League"/>
             {seasons.length>1&&(

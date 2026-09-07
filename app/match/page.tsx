@@ -106,7 +106,7 @@ export default function MatchPage() {
       <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER }}>
 
         {/* ══ FOTO-HERO ══ */}
-        <FotoHero bild="/ppl-runde.jpg" pos="62% 42%" kopf={<HeroKopf />}>
+        <FotoHero bild="/ppl-spielen.jpg" pos="50% 40%" kopf={<HeroKopf />}>
           <Etikett text="Spielen" />
           <NeonTitel text="Play just play." />
           <p style={{ fontFamily: INTER, fontSize: 16, color: MUT, lineHeight: 1.5, margin: "10px 0 0", maxWidth: "42ch" }}>
