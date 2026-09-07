@@ -66,7 +66,7 @@ export default function AchievementsPage() {
 
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
-      <div style={{ maxWidth: 560, margin: "0 auto" }}>
+      <div className="ppl-huelle">
 
         <Link href="/profil" style={{ color: MUT, textDecoration: "none", fontSize: 13 }}>← Profil</Link>
 

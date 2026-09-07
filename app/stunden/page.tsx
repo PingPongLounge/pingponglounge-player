@@ -119,7 +119,7 @@ export default function StundenPage() {
 
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "20px 20px 80px" }}>
-      <div style={{ maxWidth: 480, margin: "0 auto" }}>
+      <div className="ppl-huelle">
         <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: MUT, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
 
         <div style={{ textAlign: "center", margin: "32px 0 28px" }}>

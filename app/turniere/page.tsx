@@ -11,7 +11,8 @@
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import { KanteZuHell, KanteZuDunkel, Neon, Etikett, Titel, knopfPrimaer, knopfOutline } from "@/app/components/V2"
+import HeroKopf from "@/app/components/HeroKopf"
+import { FotoHero, NeonTitel, KanteZuHell, KanteZuDunkel, Neon, Etikett, Titel, knopfPrimaer, knopfOutline } from "@/app/components/V2"
 import { SCHWARZ, CREME, VIOLETT, ANTON, INTER, LINE, MUT } from "@/app/theme"
 
 type Tournament = {
@@ -54,26 +55,19 @@ export default function TurnierePage() {
       <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER }}>
 
         {/* ══ FOTO-HERO ══ */}
-        <header style={{ position: "relative", minHeight: 380, display: "flex", flexDirection: "column", justifyContent: "flex-end", padding: "0 22px 32px" }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/turnier-hero.jpg" alt="" aria-hidden style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover" }} />
-          <div aria-hidden style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, rgba(8,8,8,.52) 0%, rgba(8,8,8,.26) 26%, rgba(8,8,8,.84) 66%, ${SCHWARZ} 100%)` }} />
-          <div style={{ position: "relative", zIndex: 2, maxWidth: 620, margin: "0 auto", width: "100%" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16, marginBottom: 20 }}>
-              <Etikett text="Events" />
-              <Neon text="What's on?" />
-            </div>
-            <h1 style={{
-              fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(46px,13vw,76px)",
-              lineHeight: .9, textTransform: "uppercase", margin: 0,
-            }}>Events<br />play. meet. repeat.</h1>
-          </div>
-        </header>
+        <FotoHero bild="/ppl-abend.jpg" pos="50% 44%" kopf={<HeroKopf />}>
+          <Etikett text="Events" />
+          <NeonTitel text="See you there." />
+          <h1 style={{
+            fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(38px,10.5vw,60px)",
+            lineHeight: .92, textTransform: "uppercase", margin: "8px 0 0",
+          }}>Play. Meet. Repeat.</h1>
+        </FotoHero>
 
         {/* ══ OFF-WHITE: nächste Events ══ */}
         <KanteZuHell />
         <section style={{ background: CREME, color: SCHWARZ }}>
-          <div style={{ maxWidth: 620, margin: "0 auto", padding: "28px 22px 30px" }}>
+          <div className="ppl-breit" style={{ paddingTop: 28, paddingBottom: 30 }}>
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 14 }}>
               <div>
                 <Etikett text={kommend.length ? `${kommend.length} ${kommend.length === 1 ? "Event" : "Events"}` : "Termine"} hell />
@@ -166,7 +160,7 @@ export default function TurnierePage() {
         <KanteZuDunkel />
 
         {/* ══ SCHWARZ: Community ══ */}
-        <section style={{ ...breit, paddingTop: 30 }}>
+        <section className="ppl-breit" style={{ paddingTop: 30 }}>
           <Etikett text="Community" />
           <Titel>Alle Level willkommen</Titel>
           <p style={{ fontFamily: INTER, fontSize: 16, color: MUT, lineHeight: 1.55, margin: "14px 0 20px", maxWidth: "42ch" }}>

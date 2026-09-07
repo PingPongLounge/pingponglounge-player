@@ -17,7 +17,8 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 import { OG_PREIS_CHF, OG_STORNO_STUNDEN } from "@/lib/opengames"
-import { KanteZuHell, KanteZuDunkel, Neon, Etikett, Titel, knopfPrimaer, knopfOutline } from "@/app/components/V2"
+import HeroKopf from "@/app/components/HeroKopf"
+import { FotoHero, NeonTitel, KanteZuHell, KanteZuDunkel, Neon, Etikett, Titel, ListenZeile, knopfPrimaer, knopfOutline, knopfKlein } from "@/app/components/V2"
 import { SCHWARZ, CREME, VIOLETT, ANTON, INTER, LINE, MUT } from "@/app/theme"
 
 type Player = { user_id: string; name: string; elo: number; level: string }
@@ -104,31 +105,26 @@ export default function MatchPage() {
     <>
       <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER }}>
 
-        {/* ══ SCHWARZER HERO ══ */}
-        <header style={{ ...breit, paddingTop: 26, paddingBottom: 32 }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-            <Etikett text="Spielen" />
-            <Neon text="Game on" />
-          </div>
-          <h1 style={{
-            fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(52px,15vw,86px)",
-            lineHeight: .88, textTransform: "uppercase", margin: "18px 0 0",
-          }}>Play<br />just play.</h1>
-          <p style={{ fontFamily: INTER, fontSize: 16, color: MUT, lineHeight: 1.5, margin: "16px 0 0", maxWidth: "42ch" }}>
+        {/* ══ FOTO-HERO ══ */}
+        <FotoHero bild="/ppl-runde.jpg" pos="62% 42%" kopf={<HeroKopf />}>
+          <Etikett text="Spielen" />
+          <NeonTitel text="Play just play." />
+          <p style={{ fontFamily: INTER, fontSize: 16, color: MUT, lineHeight: 1.5, margin: "10px 0 0", maxWidth: "42ch" }}>
             Finde ein Spiel. Fordere jemanden heraus. Oder starte selbst eins.
           </p>
-        </header>
+        </FotoHero>
 
         {/* ══ OFF-WHITE: die drei Wege ══ */}
         <KanteZuHell />
         <section style={{ background: CREME, color: SCHWARZ }}>
-          <div style={{ maxWidth: 620, margin: "0 auto", padding: "28px 22px 30px" }}>
+          <div className="ppl-breit" style={{ paddingTop: 28, paddingBottom: 30 }}>
             <Etikett text="Drei Wege" hell />
             <h2 style={{
               fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(30px,8vw,42px)",
               lineHeight: .94, textTransform: "uppercase", margin: "8px 0 6px", color: SCHWARZ,
             }}>Was willst du machen?</h2>
 
+            <div className="ppl-g3">
             <Weg nr="01" titel="Ich suche ein Spiel" primaer
               text="Zeige mir offene Spiele und passende Gegner."
               knopf="Spiel finden" href="#heute" />
@@ -138,8 +134,9 @@ export default function MatchPage() {
             <Weg nr="03" titel="Ich organisiere ein Spiel"
               text="Lege Ort und Zeit fest. Andere Player können beitreten."
               knopf="Spiel erstellen" href="/match/create" />
+            </div>
 
-            <div style={{ borderTop: "1px solid rgba(8,8,8,.16)", paddingTop: 18, marginTop: 4 }}>
+            <div style={{ borderTop: "1px solid rgba(8,8,8,.16)", paddingTop: 18, marginTop: 18 }}>
               <p style={{ fontFamily: INTER, fontSize: 15, lineHeight: 1.55, color: "rgba(8,8,8,.58)", margin: 0, maxWidth: "50ch" }}>
                 Ein Platz im Open Game kostet CHF {OG_PREIS_CHF}.– pro Person. Absagen bis {OG_STORNO_STUNDEN} Stunden vorher sind kostenlos.
               </p>
@@ -149,7 +146,7 @@ export default function MatchPage() {
         <KanteZuDunkel />
 
         {/* ══ SCHWARZ: heute wird gespielt ══ */}
-        <section id="heute" style={{ ...breit, paddingTop: 30, scrollMarginTop: 16 }}>
+        <section id="heute" className="ppl-breit" style={{ paddingTop: 30, scrollMarginTop: 16 }}>
           <Etikett text={alle.length ? `${alle.length} offen` : "Open Games"} />
           <Titel>Heute wird gespielt</Titel>
 

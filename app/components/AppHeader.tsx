@@ -6,7 +6,10 @@ import { createClient } from "@/lib/supabase/client"
 import StartMenu from "./StartMenu"
 import NotificationBell from "./NotificationBell"
 
-const HIDE=["/","/login","/onboarding","/spielen","/join","/auth","/liga","/match","/turniere","/training","/shop"]
+// 07.09.2026: /entdecken bringt seit V2 seinen eigenen Kopf mit (HeroKopf ueber
+// dem Foto bzw. die oeffentliche Navigation) — hier stand bisher ein zweiter
+// Kopf darueber.
+const HIDE=["/","/entdecken","/rangliste","/profil","/spieler","/login","/onboarding","/spielen","/join","/auth","/liga","/match","/turniere","/training","/shop"]
 const BLACK="#080808",OFF="#F4F1EB",V="#8C3DFF"
 
 export default function AppHeader(){

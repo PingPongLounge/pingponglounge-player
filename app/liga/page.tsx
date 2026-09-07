@@ -11,7 +11,8 @@ import {
   gt, GRAD, card, ratingLabel,
   SCHWARZ, CREME, VIOLETT, ANTON, INTER,
 } from "@/app/theme"
-import { KanteZuHell, KanteZuDunkel, Neon, Etikett, Titel, knopfPrimaer, knopfOutline } from "@/app/components/V2"
+import HeroKopf from "@/app/components/HeroKopf"
+import { FotoHero, NeonTitel, GrosseZahl, KanteZuHell, KanteZuDunkel, Neon, Etikett, Titel, knopfPrimaer, knopfOutline } from "@/app/components/V2"
 
 const C=CARD, B=CELL, M=SUB
 const SHADOW="0 1px 4px rgba(0,0,0,.14)"
@@ -462,37 +463,14 @@ export default function LigaPage(){
     <main style={{minHeight:"100vh",background:BG,paddingBottom:90}}>
       {/* Topbar — dunkel. Grün nur im Logo und im Zähler: eine grelle Leiste war
           das Lauteste auf dem Screen und sagte nichts. Ein Akzent pro Screen. */}
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"13px 15px",background:"#121214",borderBottom:`1px solid ${LINE}`,position:"sticky",top:0,zIndex:10}}>
-        <Link href="/entdecken" style={{display:"flex",alignItems:"center",gap:8,textDecoration:"none"}}>
-          <svg width="21" height="21" viewBox="0 0 80 80" fill="none">
-            <defs><linearGradient id="plg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#8C3DFF"/><stop offset="1" stopColor="#C9A8FF"/></linearGradient></defs>
-            <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#plg)" strokeWidth="3.6" strokeLinejoin="round"/>
-            <circle cx="63" cy="58" r="6.5" fill="url(#plg)"/>
-          </svg>
-          <span style={{fontSize:12.5,fontWeight:900,letterSpacing:".20em",color:W}}>PLAYER</span>
-        </Link>
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
-          {/* Umschalter nur, wenn es überhaupt etwas umzuschalten gibt — also
-              wenn der Spieler zusätzlich in einer privaten Firmen-Liga ist.
-              Die öffentliche Liga braucht keine Auswahl: es gibt nur eine. */}
-          {seasons.length>1&&(
-            <button onClick={()=>setShowCity(v=>!v)} style={{background:CELL,color:SUB,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 10px",fontFamily:"inherit"}}>{sel?.name||"League"} ▾</button>
-          )}
-          <button onClick={()=>setChatOpen(true)} style={{position:"relative",display:"flex",alignItems:"center",gap:5,borderRadius:10,background:CELL,padding:"7px 10px",cursor:"pointer",fontFamily:"inherit"}}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={SUB} strokeWidth="2"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
-            <span style={{fontSize:12,fontWeight:700,color:SUB}}>Chat</span>
-            {ungelesen>0&&(
-              <span style={{position:"absolute",top:-5,right:-5,minWidth:17,height:17,borderRadius:999,background:GRAD,color:"#FFFFFF",fontSize:10,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",padding:"0 4px"}}>{ungelesen>9?"9+":ungelesen}</span>
-            )}
-          </button>
-          <NotificationBell/>
-        </div>
-      </div>
+      {/* 07.09.2026: Der eigene Kopfbalken ist weg — PPL., Glocke und Menue
+         sitzen jetzt in HeroKopf ueber dem Foto, der Liga-Chat als Knopf im
+         Hero. Vorher standen hier zwei Koepfe uebereinander. */}
 
       {/* Liga-Umschalter: öffentliche Liga ↔ private Firmen-Ligen */}
       {showCity&&(
         <div onClick={()=>setShowCity(false)} style={{position:"fixed",inset:0,zIndex:20}}>
-          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:54,right:14,background:"#121214",borderRadius:14,padding:6,minWidth:180}}>
+          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:74,right:14,background:"#121214",borderRadius:14,padding:6,minWidth:180}}>
             {seasons.map(s=>(
               <div key={s.id} onClick={()=>{setSeasonId(s.id);setCity(s.city);setShowCity(false)}} style={{padding:"11px 12px",borderRadius:9,fontSize:14,fontWeight:s.id===seasonId?600:400,color:s.id===seasonId?GREEN:W,cursor:"pointer"}}>
                 {s.name}{s.is_private?" · privat":""}
@@ -502,31 +480,31 @@ export default function LigaPage(){
         </div>
       )}
 
-      <div style={{maxWidth:480,margin:"0 auto"}}>
+      <div className="ppl-huelle">
         {/* Offene Bestätigungen zuoberst — direkt antippbar. */}
         <div style={{padding:"14px 15px 0"}}><PendingConfirmBanner/></div>
         {/* ══ SCHWARZER LIGA-HERO ═══════════════════════════════════════
             Der Rang ist das dominante Element. Alles andere ordnet sich unter:
             Etikett, Titel, ein Satz, dann die Zahl. */}
-        <header style={{maxWidth:620,margin:"0 auto",padding:"18px 22px 30px"}}>
-          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:16}}>
+        <FotoHero bild="/ppl-lounge-weit.jpg" pos="50% 46%" kopf={<HeroKopf/>}>
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12}}>
             <Etikett text="PPL League"/>
-            <Neon text="Climb it"/>
+            {seasons.length>1&&(
+              <button onClick={()=>setShowCity(v=>!v)} style={{background:CELL,color:SUB,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 10px",fontFamily:"inherit"}}>{sel?.name||"League"} ▾</button>
+            )}
           </div>
-          <Titel gross>{sel?.is_private?sel.name:"Liga"}</Titel>
-          <p style={{fontFamily:INTER,fontSize:16,color:MUT,lineHeight:1.5,margin:"14px 0 0",maxWidth:"44ch"}}>
+          <NeonTitel text="Climb it."/>
+          {sel?.is_private&&<Titel>{sel.name}</Titel>}
+          <p style={{fontFamily:INTER,fontSize:16,color:MUT,lineHeight:1.5,margin:"10px 0 0",maxWidth:"44ch"}}>
             Steig im Ranking auf, fordere Spieler in deiner Nähe heraus und verteidige deinen Platz.
           </p>
 
           {myReg&&myRow?(
             <>
-              <div style={{display:"flex",alignItems:"flex-end",gap:18,marginTop:28}}>
-                <div style={{fontFamily:ANTON,fontWeight:400,fontSize:"clamp(76px,24vw,132px)",lineHeight:.8,color:W,fontVariantNumeric:"tabular-nums"}}>{meinRang}</div>
-                <div style={{paddingBottom:8,minWidth:0}}>
-                  <div style={{fontFamily:INTER,fontSize:12,fontWeight:900,letterSpacing:".14em",textTransform:"uppercase",color:VIOLETT}}>Dein aktueller Rang</div>
-                  <div style={{fontFamily:INTER,fontSize:15,color:MUT,marginTop:6}}>
-                    {ratingLabel(myRow.elo)} Rating{meineStufe?` · ${meineStufe.name}`:""}
-                  </div>
+              <div style={{marginTop:26}}>
+                <GrosseZahl wert={meinRang} label="Dein aktueller Rang"/>
+                <div style={{fontFamily:INTER,fontSize:15,color:MUT,marginTop:10}}>
+                  {ratingLabel(myRow.elo)} Rating{meineStufe?` · ${meineStufe.name}`:""}
                 </div>
               </div>
 
@@ -570,12 +548,12 @@ export default function LigaPage(){
               <p style={{fontFamily:INTER,fontSize:16,color:MUT,lineHeight:1.55,margin:"0 0 18px",maxWidth:"46ch"}}>
                 Eine Liga für alle — kein Beitreten in Klassen. Deine Stufe kommt aus deinem Rating. Fordere jeden, auch die Nummer eins.
               </p>
-              <button onClick={join} disabled={busy} style={{...knopfPrimaer,width:"100%",opacity:busy?.6:1}}>
+              <button onClick={join} disabled={busy} style={{...knopfPrimaer,width:"100%",maxWidth:360,opacity:busy?.6:1}}>
                 {busy?"…":"Los geht's"}
               </button>
             </div>
           )}
-        </header>
+        </FotoHero>
 
         {loading?(
           <p style={{textAlign:"center",color:M,padding:"40px 0"}}>Lädt …</p>
@@ -614,7 +592,7 @@ export default function LigaPage(){
               nur neu gesetzt. */}
           <KanteZuHell />
           <section style={{background:CREME,color:SCHWARZ}}>
-            <div style={{maxWidth:620,margin:"0 auto",padding:"26px 22px 30px"}}>
+            <div className="ppl-breit" style={{paddingTop:26,paddingBottom:30}}>
               <Etikett text={`${sel?.city||city||"Schweiz"}${meineStufe?` · ${meineStufe.name}`:""}`} hell/>
               <h2 style={{fontFamily:ANTON,fontWeight:400,fontSize:"clamp(30px,8vw,42px)",lineHeight:.94,textTransform:"uppercase",margin:"8px 0 20px",color:SCHWARZ}}>Ranking</h2>
 
@@ -700,7 +678,7 @@ export default function LigaPage(){
             const nah=idx<0?[]:displayRows.slice(Math.max(0,idx-2),idx+3).filter(r=>r.user_id!==userId).slice(0,4)
             if(!nah.length) return null
             return (
-              <section style={{maxWidth:620,margin:"0 auto",padding:"30px 22px 0"}}>
+              <section className="ppl-breit" style={{paddingTop:30}}>
                 <Etikett text="In deiner Reichweite"/>
                 <Titel>Nächste Gegner</Titel>
                 <div style={{marginTop:16}}>

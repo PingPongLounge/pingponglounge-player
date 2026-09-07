@@ -12,6 +12,7 @@ import { createClient } from "@/lib/supabase/server"
 import ProfilAvatar from "@/app/components/ProfilAvatar"
 import ProfilAktionen from "@/app/components/ProfilAktionen"
 import StatsBand from "@/app/components/StatsBand"
+import { NeonTitel } from "@/app/components/V2"
 
 const SCHWARZ = "#080808", CREME = "#F4F1EB", VIOLETT = "#8C3DFF"
 const LEISE = "rgba(244,241,235,.62)", TRENN = "rgba(244,241,235,.13)"
@@ -75,13 +76,15 @@ export default async function SpielerSeite({ params }: { params: Promise<{ id: s
     <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER, paddingBottom: 56 }}>
 
       {/* ── SCHWARZER KOPF: Avatar, Name, Level/Ort, Aktionen ── */}
-      <header style={{ maxWidth: 620, margin: "0 auto", padding: "22px 22px 34px" }}>
+      <header className="ppl-breit" style={{ paddingTop: 22, paddingBottom: 34 }}>
         <Link href="/rangliste" style={{
           fontFamily: INTER, fontSize: 13, fontWeight: 800, letterSpacing: ".08em",
           textTransform: "uppercase", color: LEISE, textDecoration: "none",
         }}>← Rangliste</Link>
 
-        <div style={{ marginTop: 26 }}>
+        <NeonTitel text="Game face." groesse="clamp(38px,11vw,64px)" />
+
+        <div style={{ marginTop: 10 }}>
           <ProfilAvatar src={p.avatar_url} name={p.name} groesse={104} editierbar={eigenes} />
         </div>
 
@@ -120,7 +123,7 @@ export default async function SpielerSeite({ params }: { params: Promise<{ id: s
       ]} />
 
       {/* ── SCHWARZER INHALT: letzte Spiele ── */}
-      <section style={{ maxWidth: 620, margin: "0 auto", padding: "34px 22px 0" }}>
+      <section className="ppl-breit" style={{ paddingTop: 34 }}>
         <h2 style={{
           fontFamily: INTER, fontSize: 12, fontWeight: 900, letterSpacing: ".16em",
           textTransform: "uppercase", color: VIOLETT, margin: "0 0 4px",

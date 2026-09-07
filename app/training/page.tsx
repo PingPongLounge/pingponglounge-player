@@ -54,7 +54,7 @@ export default function TrainingPage() {
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "0 0 100px" }}>
       <SectionTopBar section="Training" />
-      <div style={{ maxWidth: 480, margin: "0 auto", padding: "6px 16px 0" }}>
+      <div className="ppl-huelle" style={{ padding: "6px 16px 0" }}>
         <SectionBlock title="Training" meta={`Geführtes Coaching · CHF ${OG_TRAINING_PREIS_CHF} · alle Level`} img="/training-hero.jpg" />
 
         {/* ─── TRAININGSCAMP-BANNER (Aktion) ──────────────────────────────────

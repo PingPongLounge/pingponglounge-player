@@ -100,7 +100,7 @@ export default function TrainingscampPage() {
 
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "0 0 100px" }}>
-      <div style={{ maxWidth: 480, margin: "0 auto" }}>
+      <div className="ppl-huelle">
 
         {/* STEP 1 — DETAIL */}
         {step === 1 && (<>

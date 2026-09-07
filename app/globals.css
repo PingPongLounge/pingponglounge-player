@@ -1,5 +1,6 @@
 /* 06.09.2026: League Spartan raus. Anton und Inter kommen ueber next/font
-   aus app/layout.tsx — kein zweiter Ladeweg, keine Systemschrift mehr. */
+   aus app/layout.tsx — kein zweiter Ladeweg, keine Systemschrift mehr.
+   07.09.2026: dazu Kaushan Script als --font-neon, nur fuer die Neonzeile. */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 /* Kein Standard-Rahmen auf Buttons/Feldern: sonst zeichnet der Browser eine
    weisse Umrandung um jeden Button (Namen, Tabs, Chips) — dort wo im Style
@@ -9,15 +10,59 @@ button { background: none; }
 :root { --green: #8C3DFF; --dark: #080808; --card: #121214; --border: #1A1A1E; --muted: #6B6E7A; --text: #F4F1EB; }
 body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0C; color: #FFF9F3; -webkit-font-smoothing: antialiased; }
 
+/* ── PLAYER V2: Breiten (07.09.2026, Referenzbild) ───────────────────────
+   Eine Regel fuer die ganze App, statt maxWidth:620 in jeder Datei.
+
+     .ppl-breit  Standardspalte: Hero, Listen, Zahlenreihen
+     .ppl-eng    Leseflaeche: Fliesstext, Formulare, Erklaerungen
+
+   Auf dem Handy ist das eine Spalte mit 22px Rand — unveraendert.
+   Ab 900px wird sie breit: Oliver hat ausdruecklich verlangt, dass der
+   Desktop kein 390px-Streifen in schwarzer Leere ist. Contentbreite dort
+   900–1100px, Leseflaechen bleiben schmaler, damit Zeilen lesbar bleiben. */
+.ppl-breit { width: 100%; max-width: 620px; margin: 0 auto; padding-left: 22px; padding-right: 22px; }
+.ppl-eng   { width: 100%; max-width: 620px; margin: 0 auto; padding-left: 22px; padding-right: 22px; }
+@media (min-width: 900px) {
+  .ppl-breit { max-width: 1000px; padding-left: 40px; padding-right: 40px; }
+  .ppl-eng   { max-width: 760px;  padding-left: 40px; padding-right: 40px; }
+}
+
+/* Raster, die auf dem Handy untereinander und auf dem Desktop nebeneinander
+   stehen. Damit fuellt die breite Spalte sich mit Inhalt statt mit Luft. */
+.ppl-g2, .ppl-g3, .ppl-g4 { display: grid; gap: 14px; grid-template-columns: 1fr; }
+.ppl-g4 { grid-template-columns: 1fr 1fr; }
+@media (min-width: 700px) {
+  .ppl-g2 { grid-template-columns: 1fr 1fr; }
+  .ppl-g3 { grid-template-columns: 1fr 1fr; }
+}
+@media (min-width: 900px) {
+  .ppl-g2 { gap: 18px; }
+  .ppl-g3 { grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .ppl-g4 { grid-template-columns: repeat(4, 1fr); gap: 18px; }
+}
+
+/* Zwei Spalten fuer Listen: ab 900px laufen lange Listen zweispaltig,
+   damit auf dem Desktop nicht 40 Zeilen in einer duennen Saeule stehen. */
+.ppl-huelle { width: 100%; max-width: 620px; margin: 0 auto; }
+@media (min-width: 900px) { .ppl-huelle { max-width: 1000px; } }
+
+.ppl-fotohero { height: clamp(215px, 34svh, 330px); }
+@media (min-width: 900px) { .ppl-huelle { width: 100%; max-width: 620px; margin: 0 auto; }
+@media (min-width: 900px) { .ppl-huelle { max-width: 1000px; } }
+
+.ppl-fotohero { height: clamp(330px, 48svh, 470px); } }
+
+.ppl-liste2 { display: grid; grid-template-columns: 1fr; }
+@media (min-width: 900px) {
+  .ppl-liste2 { grid-template-columns: 1fr 1fr; column-gap: 44px; }
+}
+
 /* ── PLAYER V2: Desktop-Rahmen (07.09.2026, Oliver) ──────────────────────
    Auf dem Handy bleibt alles wie es ist: eine Spalte, sauber, ruhig.
    Auf dem Desktop stand der Inhalt bisher als schmaler Streifen in einer
    riesigen schwarzen Flaeche. Dahinter liegt jetzt ein echtes PPL-Foto,
-   stark abgedunkelt und leicht unscharf, dazu feines Korn — Atmosphaere,
-   die nie mit dem Text konkurriert: der Inhalt sitzt auf deckendem Schwarz.
-
-   Die Breite bestimmt die Seite selbst (620px fuer Listen, bis 1100px fuer
-   Uebersichten) — hier steht nur der Rahmen. */
+   stark abgedunkelt und leicht unscharf — Atmosphaere, die nie mit dem Text
+   konkurriert: der Inhalt sitzt auf deckendem Schwarz. */
 @media (min-width: 900px) {
   body::before {
     content: "";

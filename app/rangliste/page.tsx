@@ -6,7 +6,8 @@
 import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import { KanteZuHell, Neon, Etikett } from "@/app/components/V2"
+import HeroKopf from "@/app/components/HeroKopf"
+import { FotoHero, NeonTitel, GrosseZahl, KanteZuHell, Etikett } from "@/app/components/V2"
 import { SCHWARZ, CREME, VIOLETT, ANTON, INTER, MUT } from "@/app/theme"
 
 const CANTONS = ["AG","AI","AR","BE","BL","BS","FR","GE","GL","GR","JU","LU","NE","NW","OW","SG","SH","SO","SZ","TG","TI","UR","VD","VS","ZG","ZH"]
@@ -38,33 +39,23 @@ export default function RanglistePage() {
     <>
       <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER }}>
 
-        <header style={{ maxWidth: 620, margin: "0 auto", padding: "26px 22px 32px" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
-            <Etikett text="Ranking" />
-            <Neon text="Climb it" />
-          </div>
-          <h1 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(52px,15vw,86px)", lineHeight: .88, textTransform: "uppercase", margin: "18px 0 0" }}>
-            Your<br />rank.
-          </h1>
-          <p style={{ fontFamily: INTER, fontSize: 16, color: MUT, lineHeight: 1.5, margin: "16px 0 0", maxWidth: "40ch" }}>
+        <FotoHero bild="/ppl-crew.jpg" pos="58% 40%" kopf={<HeroKopf />}>
+          <Etikett text="Ranking" />
+          <NeonTitel text="Your rank." />
+          <p style={{ fontFamily: INTER, fontSize: 16, color: MUT, lineHeight: 1.5, margin: "10px 0 0", maxWidth: "40ch" }}>
             Spiele Matches. Baue dein Rating auf. Finde Spieler auf deinem Niveau.
           </p>
           {me && (
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 16, marginTop: 26 }}>
-              <span style={{ fontFamily: ANTON, fontSize: "clamp(62px,18vw,96px)", lineHeight: .82, fontVariantNumeric: "tabular-nums" }}>
-                {canton ? me.rank_filtered : me.rank_global}
-              </span>
-              <span style={{ paddingBottom: 8 }}>
-                <span style={{ display: "block", fontSize: 12, fontWeight: 900, letterSpacing: ".14em", textTransform: "uppercase", color: VIOLETT }}>Dein Rang</span>
-                <span style={{ display: "block", fontSize: 15, color: MUT, marginTop: 5 }}>{me.elo} Rating · Level {me.level}</span>
-              </span>
+            <div style={{ marginTop: 24 }}>
+              <GrosseZahl wert={canton ? me.rank_filtered : me.rank_global} label="Dein Rang" />
+              <div style={{ fontSize: 15, color: MUT, marginTop: 10 }}>{me.elo} Rating · Level {me.level}</div>
             </div>
           )}
-        </header>
+        </FotoHero>
 
         <KanteZuHell />
         <section style={{ background: CREME, color: SCHWARZ }}>
-          <div style={{ maxWidth: 620, margin: "0 auto", padding: "26px 22px 34px" }}>
+          <div className="ppl-breit" style={{ paddingTop: 26, paddingBottom: 34 }}>
             <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 14, marginBottom: 16 }}>
               <div>
                 <Etikett text={canton || "Schweiz"} hell />

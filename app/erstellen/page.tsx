@@ -32,7 +32,7 @@ const OPTIONS: Opt[] = [
 export default function ErstellenPage() {
   return (
     <main style={{ minHeight: "100vh", background: BG, padding: "16px 16px 110px" }}>
-      <div style={{ maxWidth: 480, margin: "0 auto" }}>
+      <div className="ppl-huelle">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2, marginBottom: 18 }}>
           <Link href="/entdecken" aria-label="Zurück" style={{ display: "inline-flex" }}>
             <svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={W} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6" /></svg>

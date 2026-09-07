@@ -57,7 +57,7 @@ export default function BottomNav() {
       paddingBottom: "env(safe-area-inset-bottom)",
     }}>
       <div style={{
-        maxWidth: 620, margin: "0 auto", height: 66,
+        maxWidth: 1000, margin: "0 auto", height: 66,
         display: "grid", gridTemplateColumns: "repeat(5,1fr)", alignItems: "stretch",
       }}>
         {ITEMS.map(it => {

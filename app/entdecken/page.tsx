@@ -3,6 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import StartHomeV2, { Game } from '@/app/components/StartHomeV2'
+import { FotoHero, NeonTitel } from '@/app/components/V2'
 
 
 const LV = [
@@ -86,7 +87,7 @@ export default async function EntdeckenPage() {
       { href: '/feed', label: 'Community' },
     ]
 
-    const abschnitt: React.CSSProperties = { padding: '30px 22px', borderTop: `1px solid ${TRENN}`, maxWidth: 620, margin: '0 auto' }
+    const abschnitt: React.CSSProperties = { paddingTop: 30, paddingBottom: 30, borderTop: `1px solid ${TRENN}` }
     const kopf: React.CSSProperties = { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 14, marginBottom: 16 }
     const etikett: React.CSSProperties = { fontFamily: INTER, fontSize: 12, fontWeight: 900, letterSpacing: '.16em', textTransform: 'uppercase', color: VIOLETT }
     const mehr: React.CSSProperties = { fontFamily: INTER, fontSize: 13, fontWeight: 700, color: CREME, textDecoration: 'none', whiteSpace: 'nowrap' }
@@ -98,7 +99,7 @@ export default async function EntdeckenPage() {
 
         {/* Oeffentliche Navigation — sichtbar ohne Konto, Login blockiert nichts. */}
         <nav style={{ borderBottom: `1px solid ${TRENN}`, background: SCHWARZ, position: 'sticky', top: 0, zIndex: 40 }}>
-          <div style={{ maxWidth: 620, margin: '0 auto', padding: '11px 22px', display: 'flex', alignItems: 'center', gap: 18, overflowX: 'auto' }}>
+          <div className="ppl-breit" style={{ paddingTop: 11, paddingBottom: 11, display: 'flex', alignItems: 'center', gap: 18, overflowX: 'auto' }}>
             {NAV.map(n => (
               <Link key={n.href} href={n.href} style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: CREME, textDecoration: 'none', whiteSpace: 'nowrap' }}>{n.label}</Link>
             ))}
@@ -106,21 +107,21 @@ export default async function EntdeckenPage() {
           </div>
         </nav>
 
-        {/* Kopf: Foto traegt die Stimmung, der Verlauf traegt die Schrift. */}
-        <header style={{ position: 'relative', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', minHeight: 480, padding: '0 22px 40px' }}>
-          <div aria-hidden style={{ position: 'absolute', inset: 0, backgroundImage: "url('/hero-pokal.jpg')", backgroundSize: 'cover', backgroundPosition: '52% 42%' }} />
-          <div aria-hidden style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, rgba(10,10,12,.58) 0%, rgba(10,10,12,.30) 24%, rgba(10,10,12,.86) 66%, ${SCHWARZ} 100%)` }} />
+        {/* Kopf nach Referenzbild: erst das Foto, dann — auf deckendem
+            Schwarz — die Neonzeile. Das Neon liegt nie auf einem Bild. */}
+        <FotoHero bild="/ppl-serve.jpg" pos="46% 34%" kopf={
+          <div className="ppl-breit" style={{ display: 'flex', alignItems: 'center', gap: 11, paddingTop: 16 }}>
+            <svg width="30" height="30" viewBox="0 0 80 80" fill="none" aria-hidden>
+              <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke={CREME} strokeWidth="6" strokeLinejoin="round" />
+              <circle cx="63" cy="58" r="7" fill={VIOLETT} />
+            </svg>
+            <span style={{ fontFamily: ANTON, fontSize: 23, letterSpacing: '.06em', color: CREME, lineHeight: 1, textShadow: '0 1px 14px rgba(0,0,0,.6)' }}>PLAYER</span>
+          </div>
+        }>
+          <div>
+            <NeonTitel text="Just play." />
 
-          <div style={{ position: 'relative', zIndex: 2, width: '100%', maxWidth: 620, margin: '0 auto' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-              <svg width="38" height="38" viewBox="0 0 80 80" fill="none" aria-hidden>
-                <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke={CREME} strokeWidth="5" strokeLinejoin="round" />
-                <circle cx="63" cy="58" r="7" fill={VIOLETT} />
-              </svg>
-              <span style={{ fontFamily: ANTON, fontSize: 29, letterSpacing: '.06em', color: CREME, lineHeight: 1 }}>PLAYER</span>
-            </div>
-
-            <h1 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 'clamp(46px,12.5vw,74px)', lineHeight: .93, textTransform: 'uppercase', margin: '0 0 18px', color: CREME }}>
+            <h1 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 'clamp(46px,12.5vw,74px)', lineHeight: .93, textTransform: 'uppercase', margin: '10px 0 18px', color: CREME }}>
               Ping Pong<br />spielen.
             </h1>
 
@@ -143,10 +144,10 @@ export default async function EntdeckenPage() {
             </div>
             {spielerCount ? <div style={{ marginTop: 14, fontFamily: INTER, fontSize: 15, color: LEISE }}>{spielerCount} Spieler sind dabei.</div> : null}
           </div>
-        </header>
+        </FotoHero>
 
         {/* 1 · OPEN GAMES */}
-        <section style={abschnitt}>
+        <section className="ppl-breit" style={abschnitt}>
           <div style={kopf}>
             <div>
               <div style={etikett}>Open Games</div>
@@ -169,7 +170,7 @@ export default async function EntdeckenPage() {
         </section>
 
         {/* 2 · RANKING */}
-        <section style={abschnitt}>
+        <section className="ppl-breit" style={abschnitt}>
           <div style={kopf}>
             <div>
               <div style={etikett}>Ranking</div>
@@ -190,7 +191,7 @@ export default async function EntdeckenPage() {
         </section>
 
         {/* 3 · LIGA */}
-        <section style={abschnitt}>
+        <section className="ppl-breit" style={abschnitt}>
           <div style={kopf}>
             <div>
               <div style={etikett}>Liga</div>
@@ -210,7 +211,7 @@ export default async function EntdeckenPage() {
         </section>
 
         {/* 4 · EVENTS */}
-        <section style={abschnitt}>
+        <section className="ppl-breit" style={abschnitt}>
           <div style={kopf}>
             <div>
               <div style={etikett}>Events</div>
@@ -230,7 +231,7 @@ export default async function EntdeckenPage() {
         </section>
 
         {/* 5 · COMMUNITY */}
-        <section style={{ ...abschnitt, paddingBottom: 46 }}>
+        <section className="ppl-breit" style={{ ...abschnitt, paddingBottom: 46 }}>
           <div style={kopf}>
             <div>
               <div style={etikett}>Community</div>
@@ -253,8 +254,8 @@ export default async function EntdeckenPage() {
         </section>
 
         {/* Schluss: erst hier wird ein Konto verlangt. */}
-        <section style={{ background: FENSTER, padding: '38px 22px 46px' }}>
-          <div style={{ maxWidth: 620, margin: '0 auto' }}>
+        <section style={{ background: FENSTER }}>
+          <div className="ppl-breit" style={{ paddingTop: 38, paddingBottom: 46 }}>
             <h2 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 'clamp(32px,8vw,46px)', lineHeight: .95, textTransform: 'uppercase', margin: '0 0 12px', color: CREME }}>
               Selber spielen?
             </h2>

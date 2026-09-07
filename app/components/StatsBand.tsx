@@ -12,8 +12,8 @@ export type Wert = { wert: string | number; label: string; akzent?: boolean }
 export default function StatsBand({ werte }: { werte: Wert[] }) {
   return (
     <section style={{ background: CREME, color: SCHWARZ }}>
-      <div style={{
-        maxWidth: 620, margin: "0 auto", padding: "30px 22px 32px",
+      <div className="ppl-breit" style={{
+        padding: "30px 0 32px",
         display: "grid", gridTemplateColumns: `repeat(${werte.length}, 1fr)`, gap: 0,
       }}>
         {werte.map((w, i) => (
