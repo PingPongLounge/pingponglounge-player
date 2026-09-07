@@ -1,7 +1,6 @@
 "use client"
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import StartMenu from "./StartMenu"
 import NotificationBell from "./NotificationBell"
 
 const CARD = "#1A1A1E", W = "#FFFFFF"
@@ -30,7 +29,6 @@ export function SectionTopBar({ section: _section }: { section: string }) {
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
           <NotificationBell />
-          <StartMenu inline />
         </div>
       </div>
     </div>

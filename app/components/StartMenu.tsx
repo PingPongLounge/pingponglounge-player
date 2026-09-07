@@ -22,7 +22,11 @@ function buchenLink(): string {
 
 const row: React.CSSProperties = { display: "flex", alignItems: "center", gap: 4, padding: "13px 15px", borderTop: `1px solid #1A1A1E`, textDecoration: "none" }
 
-export default function StartMenu({ name = "Spieler", sub = "", inline = false, avatar }: { name?: string; sub?: string; inline?: boolean; avatar?: string }) {
+/* 07.09.2026, Oliver: "menu immer unten". Der Ausloeser sitzt jetzt als
+   sechster Punkt in der unteren Navigation (variant="nav") — dort, wo im
+   Player alle Navigation sitzt. Die Variante "knopf" bleibt nur noch fuer
+   Seiten, die noch keinen Hero-Kopf haben. */
+export default function StartMenu({ name = "Spieler", sub = "", inline = false, avatar, variant = "knopf", aktivFarbe, ausFarbe }: { name?: string; sub?: string; inline?: boolean; avatar?: string; variant?: "knopf" | "nav"; aktivFarbe?: string; ausFarbe?: string }) {
   const [open, setOpen] = useState(false)
   const [authed, setAuthed] = useState<boolean | null>(null)
   const router = useRouter()
@@ -45,9 +49,22 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
     </Link>
   )
 
+  const AUS = ausFarbe || "#77736f"
+  const AN = aktivFarbe || "#F4F1EB"
+
   return (
     <>
-      {avatar ? (
+      {variant === "nav" ? (
+        <button onClick={() => setOpen(true)} aria-label="Menü" aria-expanded={open} style={{
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          gap: 5, background: "none", cursor: "pointer", height: "100%", width: "100%",
+          color: open ? AN : AUS, fontFamily: "var(--font-inter), system-ui, sans-serif",
+        }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={open ? AN : AUS}
+            strokeWidth="1.8" strokeLinecap="round" aria-hidden><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <span style={{ fontSize: 10.5, fontWeight: open ? 900 : 700, letterSpacing: ".07em", textTransform: "uppercase" }}>Menü</span>
+        </button>
+      ) : avatar ? (
         <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#8C3DFF,#C9A8FF)", color: "#FFFFFF", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           {avatar}
         </button>
@@ -58,8 +75,10 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
       )}
 
       {open && (
-        <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 200, display: "flex", justifyContent: "flex-end" }}>
-          <div onClick={e => e.stopPropagation()} style={{ width: "82%", maxWidth: 340, height: "100%", background: "#0E1013", borderLeft: `1px solid ${B}`, padding: "22px 16px", overflowY: "auto" }}>
+        <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 200, display: "flex", justifyContent: variant === "nav" ? "center" : "flex-end", alignItems: variant === "nav" ? "flex-end" : "stretch" }}>
+          <div onClick={e => e.stopPropagation()} style={variant === "nav"
+            ? { width: "100%", maxWidth: 620, maxHeight: "84dvh", background: "#0E1013", borderTop: "2px solid #8C3DFF", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "18px 16px calc(22px + env(safe-area-inset-bottom))", overflowY: "auto", boxShadow: "0 -24px 70px rgba(0,0,0,.6)" }
+            : { width: "82%", maxWidth: 340, height: "100%", background: "#0E1013", borderLeft: `1px solid ${B}`, padding: "22px 16px", overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
               <span style={{ fontSize: 21, fontWeight: 600 }}>menü</span>
               <button onClick={() => setOpen(false)} aria-label="schliessen" style={{ background: "none", cursor: "pointer", padding: 4 }}>

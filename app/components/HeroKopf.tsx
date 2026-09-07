@@ -10,7 +10,6 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import NotificationBell from "./NotificationBell"
-import StartMenu from "./StartMenu"
 import { CREME, VIOLETT, INTER } from "@/app/theme"
 
 export default function HeroKopf({ ziel = "/entdecken" }: { ziel?: string }) {
@@ -32,10 +31,9 @@ export default function HeroKopf({ ziel = "/entdecken" }: { ziel?: string }) {
       }}>
         PPL<span style={{ color: VIOLETT }}>.</span>
       </Link>
-      <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-        {angemeldet && <NotificationBell />}
-        <StartMenu inline />
-      </div>
+      {/* Nur die Glocke. Das Menü sitzt unten in der Navigation
+          (Vorgabe Oliver 07.09.: "menu immer unten"). */}
+      {angemeldet && <NotificationBell />}
     </div>
   )
 }
