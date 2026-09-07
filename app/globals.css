@@ -40,17 +40,19 @@ body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0
   .ppl-g4 { grid-template-columns: repeat(4, 1fr); gap: 18px; }
 }
 
-/* Zwei Spalten fuer Listen: ab 900px laufen lange Listen zweispaltig,
-   damit auf dem Desktop nicht 40 Zeilen in einer duennen Saeule stehen. */
+/* Aeussere Huelle einer Seite, wenn der Inhalt seinen eigenen Innenabstand
+   mitbringt (Liga, Profil, aeltere Seiten). */
 .ppl-huelle { width: 100%; max-width: 620px; margin: 0 auto; }
 @media (min-width: 900px) { .ppl-huelle { max-width: 1000px; } }
 
-.ppl-fotohero { height: clamp(215px, 34svh, 330px); }
-@media (min-width: 900px) { .ppl-huelle { width: 100%; max-width: 620px; margin: 0 auto; }
-@media (min-width: 900px) { .ppl-huelle { max-width: 1000px; } }
+/* Der Hero traegt Bild UND Titel zusammen (Oliver 07.09.: "der Text kann
+   oben ueber dem Bild sein") — er braucht deshalb den groessten Teil des
+   ersten Bildschirms, nicht nur ein Drittel. */
+.ppl-fotohero { min-height: clamp(470px, 76svh, 700px); }
+@media (min-width: 900px) { .ppl-fotohero { min-height: clamp(540px, 80svh, 800px); } }
 
-.ppl-fotohero { height: clamp(330px, 48svh, 470px); } }
-
+/* Zwei Spalten fuer Listen: ab 900px laufen lange Listen zweispaltig,
+   damit auf dem Desktop nicht 40 Zeilen in einer duennen Saeule stehen. */
 .ppl-liste2 { display: grid; grid-template-columns: 1fr; }
 @media (min-width: 900px) {
   .ppl-liste2 { grid-template-columns: 1fr 1fr; column-gap: 44px; }

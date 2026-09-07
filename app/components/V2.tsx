@@ -61,9 +61,17 @@ export function HellFlaeche({ children, kanteOben = true, kanteUnten = true, pad
 }
 
 /* ---------- Foto-Hero -----------------------------------------------------
-   Ein echtes Bild aus der Lounge, rund ein Drittel des ersten Bildschirms,
-   das nach unten in deckendes Schwarz laeuft. Darauf liegt nur die schmale
-   Kopfzeile (PPL. links, Glocke rechts) — Text kommt erst darunter. */
+   Ein echtes Bild aus der Lounge, und der Text steht DARAUF — nicht darunter
+   (Oliver, 07.09.: "der Text kann oben ueber dem Bild sein").
+
+   Damit die Schrift trotzdem sicher lesbar bleibt, liegen zwei Schichten
+   dazwischen: ein Verlauf, der nach unten in deckendes Schwarz laeuft, und
+   darueber ein sanfter dunkler Schleier ueber dem ganzen Bild. Getestet auf
+   den hellsten Stellen der PPL-Fotos — auch dort bleibt Weiss auf Schwarz
+   deutlich ueber dem Kontrastminimum.
+
+   Der Inhalt sitzt unten im Bild (flex-end): das Foto traegt die Stimmung
+   oben, der Titel steht auf dem ruhigen, dunklen Teil unten. */
 export function FotoHero({
   bild, pos = "50% 40%", hoehe, kopf, children, alt = "",
 }: {
@@ -71,28 +79,28 @@ export function FotoHero({
   kopf?: React.ReactNode; children?: React.ReactNode; alt?: string
 }) {
   return (
-    <header style={{ position: "relative", background: SCHWARZ }}>
-      {/* Hoehe kommt aus globals.css (.ppl-fotohero): Handy rund ein Drittel
-          des Bildschirms, Desktop deutlich mehr — sonst wirkt das Bild dort
-          wie ein Streifen. hoehe= ueberschreibt das nur im Ausnahmefall. */}
-      <div className="ppl-fotohero" style={{ position: "relative", overflow: "hidden", ...(hoehe ? { height: hoehe } : null) }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={bild} alt={alt} aria-hidden={alt ? undefined : true} style={{
-          position: "absolute", inset: 0, width: "100%", height: "100%",
-          objectFit: "cover", objectPosition: pos,
-        }} />
-        <div aria-hidden style={{
-          position: "absolute", inset: 0,
-          background: "linear-gradient(to bottom, rgba(8,8,8,.42) 0%, rgba(8,8,8,.14) 24%, rgba(8,8,8,.50) 60%, rgba(8,8,8,.94) 84%, #080808 96%)",
-        }} />
-        {kopf && (
-          <div style={{ position: "absolute", top: 0, left: 0, right: 0 }}>{kopf}</div>
-        )}
-      </div>
+    <header className="ppl-fotohero" style={{
+      position: "relative", background: SCHWARZ, overflow: "hidden",
+      display: "flex", flexDirection: "column",
+      ...(hoehe ? { minHeight: hoehe } : null),
+    }}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={bild} alt={alt} aria-hidden={alt ? undefined : true} style={{
+        position: "absolute", inset: 0, width: "100%", height: "100%",
+        objectFit: "cover", objectPosition: pos,
+      }} />
+      <div aria-hidden style={{
+        position: "absolute", inset: 0,
+        background: "linear-gradient(to bottom, rgba(8,8,8,.52) 0%, rgba(8,8,8,.26) 22%, rgba(8,8,8,.52) 52%, rgba(8,8,8,.84) 78%, rgba(8,8,8,.96) 94%, #080808 100%)",
+      }} />
+
+      {kopf && <div style={{ position: "relative", zIndex: 2 }}>{kopf}</div>}
+
       {children && (
-        <div className="ppl-breit" style={{ position: "relative", paddingTop: 4, paddingBottom: 30 }}>
-          {children}
-        </div>
+        <div className="ppl-breit" style={{
+          position: "relative", zIndex: 2, marginTop: "auto",
+          paddingTop: 26, paddingBottom: 30,
+        }}>{children}</div>
       )}
     </header>
   )

@@ -45,7 +45,7 @@ export default function StartHomeV2(d: StartData) {
       <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER }}>
 
         {/* ══ FOTO-HERO ═══════════════════════════════════════════════ */}
-        <FotoHero bild="/ppl-home.jpg" pos="54% 44%" kopf={<HeroKopf />}>
+        <FotoHero bild="/ppl-lachen.jpg" pos="62% 38%" kopf={<HeroKopf />}>
           <h1 style={{
             fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(56px,16vw,104px)",
             lineHeight: .86, textTransform: "uppercase", letterSpacing: ".005em", margin: "6px 0 0",

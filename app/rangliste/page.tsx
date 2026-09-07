@@ -39,7 +39,7 @@ export default function RanglistePage() {
     <>
       <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER }}>
 
-        <FotoHero bild="/ppl-rangliste.jpg" pos="50% 38%" kopf={<HeroKopf />}>
+        <FotoHero bild="/ppl-rangliste.jpg" pos="56% 42%" kopf={<HeroKopf />}>
           <Etikett text="Ranking" />
           <h1 style={{
             fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(56px,16vw,104px)",

@@ -55,7 +55,7 @@ export default function TurnierePage() {
       <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER }}>
 
         {/* ══ FOTO-HERO ══ */}
-        <FotoHero bild="/ppl-events.jpg" pos="50% 44%" kopf={<HeroKopf />}>
+        <FotoHero bild="/ppl-events.jpg" pos="48% 40%" kopf={<HeroKopf />}>
           <Etikett text="Events" />
           <h1 style={{
             fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(56px,16vw,104px)",
