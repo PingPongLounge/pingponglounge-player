@@ -12,7 +12,7 @@ import {
   SCHWARZ, CREME, VIOLETT, ANTON, INTER,
 } from "@/app/theme"
 import HeroKopf from "@/app/components/HeroKopf"
-import { FotoHero, NeonTitel, GrosseZahl, KanteZuHell, KanteZuDunkel, Neon, Etikett, Titel, knopfPrimaer, knopfOutline } from "@/app/components/V2"
+import { FotoHero, GrosseZahl, KanteZuHell, KanteZuDunkel, Etikett, Titel, knopfPrimaer, knopfOutline } from "@/app/components/V2"
 
 const C=CARD, B=CELL, M=SUB
 const SHADOW="0 1px 4px rgba(0,0,0,.14)"
@@ -493,8 +493,9 @@ export default function LigaPage(){
               <button onClick={()=>setShowCity(v=>!v)} style={{background:CELL,color:SUB,fontSize:12,fontWeight:700,cursor:"pointer",borderRadius:10,padding:"7px 10px",fontFamily:"inherit"}}>{sel?.name||"League"} ▾</button>
             )}
           </div>
-          <NeonTitel text="Climb it."/>
-          {sel?.is_private&&<Titel>{sel.name}</Titel>}
+          <h1 style={{fontFamily:ANTON,fontWeight:400,fontSize:"clamp(56px,16vw,104px)",lineHeight:.86,textTransform:"uppercase",letterSpacing:".005em",margin:"6px 0 0",color:W}}>
+            {sel?.is_private?sel.name:<>Climb<br/>it.</>}
+          </h1>
           <p style={{fontFamily:INTER,fontSize:16,color:MUT,lineHeight:1.5,margin:"10px 0 0",maxWidth:"44ch"}}>
             Steig im Ranking auf, fordere Spieler in deiner Nähe heraus und verteidige deinen Platz.
           </p>

@@ -18,7 +18,7 @@ import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 import { OG_PREIS_CHF, OG_STORNO_STUNDEN } from "@/lib/opengames"
 import HeroKopf from "@/app/components/HeroKopf"
-import { FotoHero, NeonTitel, KanteZuHell, KanteZuDunkel, Neon, Etikett, Titel, ListenZeile, knopfPrimaer, knopfOutline, knopfKlein } from "@/app/components/V2"
+import { FotoHero, KanteZuHell, KanteZuDunkel, Etikett, Titel, ListenZeile, knopfPrimaer, knopfOutline, knopfKlein } from "@/app/components/V2"
 import { SCHWARZ, CREME, VIOLETT, ANTON, INTER, LINE, MUT } from "@/app/theme"
 
 type Player = { user_id: string; name: string; elo: number; level: string }
@@ -108,7 +108,10 @@ export default function MatchPage() {
         {/* ══ FOTO-HERO ══ */}
         <FotoHero bild="/ppl-spielen.jpg" pos="50% 40%" kopf={<HeroKopf />}>
           <Etikett text="Spielen" />
-          <NeonTitel text="Play just play." />
+          <h1 style={{
+            fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(56px,16vw,104px)",
+            lineHeight: .86, textTransform: "uppercase", letterSpacing: ".005em", margin: "6px 0 0",
+          }}>Play<br />just play.</h1>
           <p style={{ fontFamily: INTER, fontSize: 16, color: MUT, lineHeight: 1.5, margin: "10px 0 0", maxWidth: "42ch" }}>
             Finde ein Spiel. Fordere jemanden heraus. Oder starte selbst eins.
           </p>
@@ -162,7 +165,6 @@ export default function MatchPage() {
           {/* Leerzustand: kein grosses schwarzes Loch, sondern eine Einladung. */}
           {!loading && !error && alle.length === 0 && (
             <div style={{ marginTop: 22, borderTop: `1px solid ${LINE}`, paddingTop: 26 }}>
-              <div style={{ marginBottom: 14 }}><Neon text="Your turn" groesse={17} /></div>
               <h3 style={{
                 fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(28px,8vw,40px)",
                 lineHeight: .96, textTransform: "uppercase", margin: "0 0 10px",

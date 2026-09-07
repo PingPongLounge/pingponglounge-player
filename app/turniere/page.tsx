@@ -12,7 +12,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import HeroKopf from "@/app/components/HeroKopf"
-import { FotoHero, NeonTitel, KanteZuHell, KanteZuDunkel, Neon, Etikett, Titel, knopfPrimaer, knopfOutline } from "@/app/components/V2"
+import { FotoHero, KanteZuHell, KanteZuDunkel, Etikett, Titel, knopfPrimaer, knopfOutline } from "@/app/components/V2"
 import { SCHWARZ, CREME, VIOLETT, ANTON, INTER, LINE, MUT } from "@/app/theme"
 
 type Tournament = {
@@ -57,11 +57,10 @@ export default function TurnierePage() {
         {/* ══ FOTO-HERO ══ */}
         <FotoHero bild="/ppl-events.jpg" pos="50% 44%" kopf={<HeroKopf />}>
           <Etikett text="Events" />
-          <NeonTitel text="See you there." />
           <h1 style={{
-            fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(38px,10.5vw,60px)",
-            lineHeight: .92, textTransform: "uppercase", margin: "8px 0 0",
-          }}>Play. Meet. Repeat.</h1>
+            fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(56px,16vw,104px)",
+            lineHeight: .86, textTransform: "uppercase", letterSpacing: ".005em", margin: "6px 0 0",
+          }}>Play.<br />Meet.<br />Repeat.</h1>
         </FotoHero>
 
         {/* ══ OFF-WHITE: nächste Events ══ */}

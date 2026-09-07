@@ -7,7 +7,7 @@ import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import HeroKopf from "@/app/components/HeroKopf"
-import { FotoHero, NeonTitel, GrosseZahl, KanteZuHell, Etikett } from "@/app/components/V2"
+import { FotoHero, GrosseZahl, KanteZuHell, Etikett } from "@/app/components/V2"
 import { SCHWARZ, CREME, VIOLETT, ANTON, INTER, MUT } from "@/app/theme"
 
 const CANTONS = ["AG","AI","AR","BE","BL","BS","FR","GE","GL","GR","JU","LU","NE","NW","OW","SG","SH","SO","SZ","TG","TI","UR","VD","VS","ZG","ZH"]
@@ -41,7 +41,10 @@ export default function RanglistePage() {
 
         <FotoHero bild="/ppl-rangliste.jpg" pos="50% 38%" kopf={<HeroKopf />}>
           <Etikett text="Ranking" />
-          <NeonTitel text="Your rank." />
+          <h1 style={{
+            fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(56px,16vw,104px)",
+            lineHeight: .86, textTransform: "uppercase", letterSpacing: ".005em", margin: "6px 0 0",
+          }}>Your<br />rank.</h1>
           <p style={{ fontFamily: INTER, fontSize: 16, color: MUT, lineHeight: 1.5, margin: "10px 0 0", maxWidth: "40ch" }}>
             Spiele Matches. Baue dein Rating auf. Finde Spieler auf deinem Niveau.
           </p>

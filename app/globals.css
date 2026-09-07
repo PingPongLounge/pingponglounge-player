@@ -1,6 +1,5 @@
 /* 06.09.2026: League Spartan raus. Anton und Inter kommen ueber next/font
-   aus app/layout.tsx — kein zweiter Ladeweg, keine Systemschrift mehr.
-   07.09.2026: dazu Kaushan Script als --font-neon, nur fuer die Neonzeile. */
+   aus app/layout.tsx — kein zweiter Ladeweg, keine Systemschrift mehr. */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 /* Kein Standard-Rahmen auf Buttons/Feldern: sonst zeichnet der Browser eine
    weisse Umrandung um jeden Button (Namen, Tabs, Chips) — dort wo im Style

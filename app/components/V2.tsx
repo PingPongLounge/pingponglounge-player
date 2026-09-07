@@ -8,19 +8,19 @@
      VIOLETT   Interaktion, aktive Elemente, Highlights
 
    Was die Referenz gegenueber dem bisherigen Stand aendert:
-     1. Das Neon ist die HAUPTZEILE, nicht ein kleines Schild daneben —
-        eine gekippte Schreibschrift mit Glow ("Your turn.", "Climb it.").
-     2. Jeder Bereich beginnt mit einem echten Foto von echten Leuten,
+     1. Jeder Bereich beginnt mit einem echten Foto von echten Leuten,
         rund ein Drittel des ersten Bildschirms.
+     2. Darunter, auf deckendem Schwarz, EIN grosser Anton-Titel — mehr
+        braucht es nicht.
      3. Zahlen stehen als Reihe, nicht als Kaertchen.
      4. Listen sind Zeilen mit Bild links und Pille rechts.
 
-   Das Neon liegt dabei NIE auf dem Foto: das Bild laeuft nach unten in
-   deckendes Schwarz aus, und erst dort beginnt die Schrift. Damit gilt
-   Olivers Regel ("Neon nie auf einem Bild") auch hier.
+   07.09.2026, Oliver: "lass die Neon Signs weg, mach Titel wieder
+   groesser." Die Neon-Schreibschrift (Kaushan) ist damit raus — im
+   Player traegt der Anton-Titel den Kopf allein.
 
    Ohne "use client" — laeuft in Server- wie Client-Seiten. */
-import { SCHWARZ, CREME, VIOLETT, ANTON, INTER, NEON } from "@/app/theme"
+import { SCHWARZ, CREME, VIOLETT, ANTON, INTER } from "@/app/theme"
 
 /* ---------- Schraege Kante ------------------------------------------------
    Der Uebergang zwischen Schwarz und Off-White ist nie eine gerade Linie,
@@ -57,46 +57,6 @@ export function HellFlaeche({ children, kanteOben = true, kanteUnten = true, pad
       </section>
       {kanteUnten && <KanteZuDunkel />}
     </>
-  )
-}
-
-/* ---------- Neon ----------------------------------------------------------
-   Referenz: gekippte Schreibschrift, weisser Kern, violetter Halo. Zwei
-   Groessen — NeonTitel als Hauptzeile eines Bereichs, Neon als kleines
-   Schild. Nie auf einer hellen Leseflaeche, nie auf einem Foto. */
-const glow = (staerke = 1) => [
-  `0 0 ${3 * staerke}px #FFFFFF`,
-  `0 0 ${9 * staerke}px #F0E2FF`,
-  `0 0 ${20 * staerke}px ${VIOLETT}`,
-  `0 0 ${42 * staerke}px ${VIOLETT}`,
-  `0 0 ${78 * staerke}px rgba(140,61,255,.55)`,
-].join(", ")
-
-/** Die grosse Neon-Zeile eines Bereichs. Hoechstens EINE pro Seite. */
-export function NeonTitel({ text, kippen = -4, groesse = "clamp(46px,14vw,86px)" }:
-  { text: string; kippen?: number; groesse?: string }) {
-  return (
-    <div style={{ padding: "6px 0 10px", overflow: "visible" }}>
-      <span style={{
-        display: "inline-block",
-        fontFamily: NEON, fontWeight: 400, fontSize: groesse, lineHeight: 1.02,
-        color: "#FBF5FF", transform: `rotate(${kippen}deg)`, transformOrigin: "left center",
-        textShadow: glow(1),
-      }}>{text}</span>
-    </div>
-  )
-}
-
-/** Kleines Neonschild — z.B. neben einer Rubrik. */
-export function Neon({ text, groesse = 22, kippen = -3 }:
-  { text: string; groesse?: number; kippen?: number }) {
-  return (
-    <span aria-hidden style={{
-      display: "inline-block",
-      fontFamily: NEON, fontWeight: 400, fontSize: groesse, lineHeight: 1.1,
-      color: "#FBF5FF", transform: `rotate(${kippen}deg)`,
-      textShadow: glow(.62),
-    }}>{text}</span>
   )
 }
 

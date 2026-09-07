@@ -3,12 +3,12 @@
 
    Aufbau, verbindlich fuer alle V2-Screens:
      FOTO (echte Leute, ~1/3 Bildschirm, laeuft in Schwarz aus)
-       ↓  NEONZEILE + Name + zwei Aktionen           auf Schwarz
+       ↓  GROSSER TITEL + Name + zwei Aktionen        auf Schwarz
        ↘  OFF-WHITE: die Zahlen und das naechste Match
        ↘  SCHWARZ: Community, offene Spiele, Turnier
 
-   Das Neon liegt bewusst UNTER dem Foto, nicht darauf: Olivers Regel gilt
-   auch hier, und die Schrift ist auf deckendem Schwarz ohnehin lesbarer.
+   Der Titel sitzt bewusst UNTER dem Foto, nicht darauf: auf deckendem
+   Schwarz ist er lesbar, und das Bild bleibt ein Bild.
 
    Alle Zahlen und Listen sind echte Daten aus entdecken/page.tsx —
    keine Platzhalter. Fehlt etwas, wird der Block weggelassen, nicht erfunden. */
@@ -18,7 +18,7 @@ import PendingConfirmBanner from "./PendingConfirmBanner"
 import ProfilAvatar from "./ProfilAvatar"
 import HeroKopf from "./HeroKopf"
 import {
-  FotoHero, NeonTitel, KanteZuHell, KanteZuDunkel, Etikett, Titel,
+  FotoHero, KanteZuHell, KanteZuDunkel, Etikett, Titel,
   StatsReihe, ListenZeile, knopfPrimaer, knopfOutline, knopfOutlineHell,
   knopfKlein, knopfKleinOutline,
 } from "./V2"
@@ -46,7 +46,10 @@ export default function StartHomeV2(d: StartData) {
 
         {/* ══ FOTO-HERO ═══════════════════════════════════════════════ */}
         <FotoHero bild="/ppl-home.jpg" pos="54% 44%" kopf={<HeroKopf />}>
-          <NeonTitel text="Your turn." />
+          <h1 style={{
+            fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(56px,16vw,104px)",
+            lineHeight: .86, textTransform: "uppercase", letterSpacing: ".005em", margin: "6px 0 0",
+          }}>Ready<br />to play?</h1>
 
           <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 12 }}>
             <ProfilAvatar src={d.avatarUrl} name={d.firstName} groesse={64} />

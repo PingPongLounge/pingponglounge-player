@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { Anton, Inter, Kaushan_Script } from "next/font/google"
+import { Anton, Inter } from "next/font/google"
 import "./globals.css"
 import AppHeader from "./components/AppHeader"
 import SplashScreen from "./components/SplashScreen"
@@ -11,9 +11,6 @@ const BASE = "https://playerapp.ch"
 // Titel, Inter fuer die Oberflaeche, dasselbe System wie pingponglounge.ch.
 const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-anton", display: "swap" })
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" })
-// 07.09.2026: Dritte Schrift, aber nur fuer EINE Sache — die Neonzeile aus
-// dem Referenzbild. Nirgends sonst, sonst wird aus dem Akzent Dekoration.
-const neon = Kaushan_Script({ subsets: ["latin"], weight: "400", variable: "--font-neon", display: "swap" })
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
@@ -51,7 +48,7 @@ export const viewport = { themeColor: "#080808" }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={`${anton.variable} ${inter.variable} ${neon.variable}`}>
+    <html lang="de" className={`${anton.variable} ${inter.variable}`}>
       <body style={{ margin: 0, background: "#080808", color: "#F4F1EB", fontFamily: "var(--font-inter), system-ui, sans-serif", minHeight: "100vh" }}>
         <SplashScreen />
         <AppHeader />

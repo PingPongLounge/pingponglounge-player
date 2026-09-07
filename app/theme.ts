@@ -51,11 +51,6 @@ export const VIOLETT = '#8C3DFF'
 export const VIOLETT_HELL = '#C9A8FF'
 export const ANTON = "var(--font-anton), Impact, sans-serif"   // nur Display
 export const INTER = "var(--font-inter), system-ui, sans-serif" // alles Funktionale
-/* Neon-Schreibschrift — ausschliesslich fuer die Neonzeile (V2.tsx).
-   Achtung: ein ungueltiges var() macht die GANZE font-family-Deklaration
-   ungueltig, der Browser faellt dann auf seine Serifenschrift zurueck.
-   Die Variable wird in app/layout.tsx gesetzt — beides gehoert zusammen. */
-export const NEON = "var(--font-neon), 'Brush Script MT', cursive"
 
 /* ---------- Level-System: 1–7 (Mint → Teal → Bronze → Amber → Silber → Platin → Gold) ----------
    Aufsteigend — dunkle Schrift drauf (TEXT_ON = #15110A). */

@@ -12,7 +12,6 @@ import { createClient } from "@/lib/supabase/server"
 import ProfilAvatar from "@/app/components/ProfilAvatar"
 import ProfilAktionen from "@/app/components/ProfilAktionen"
 import StatsBand from "@/app/components/StatsBand"
-import { NeonTitel } from "@/app/components/V2"
 
 const SCHWARZ = "#080808", CREME = "#F4F1EB", VIOLETT = "#8C3DFF"
 const LEISE = "rgba(244,241,235,.62)", TRENN = "rgba(244,241,235,.13)"
@@ -82,15 +81,13 @@ export default async function SpielerSeite({ params }: { params: Promise<{ id: s
           textTransform: "uppercase", color: LEISE, textDecoration: "none",
         }}>← Rangliste</Link>
 
-        <NeonTitel text="Game face." groesse="clamp(38px,11vw,64px)" />
-
         <div style={{ marginTop: 10 }}>
           <ProfilAvatar src={p.avatar_url} name={p.name} groesse={104} editierbar={eigenes} />
         </div>
 
         <h1 style={{
-          fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(42px,12vw,68px)",
-          lineHeight: .95, textTransform: "uppercase", margin: "20px 0 0",
+          fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(50px,14vw,88px)",
+          lineHeight: .88, textTransform: "uppercase", margin: "20px 0 0",
         }}>{p.name}</h1>
 
         <div style={{ fontFamily: INTER, fontSize: 16, color: LEISE, marginTop: 8 }}>

@@ -3,7 +3,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import StartHomeV2, { Game } from '@/app/components/StartHomeV2'
-import { FotoHero, NeonTitel } from '@/app/components/V2'
+import { FotoHero } from '@/app/components/V2'
 
 
 const LV = [
@@ -119,9 +119,7 @@ export default async function EntdeckenPage() {
           </div>
         }>
           <div>
-            <NeonTitel text="Just play." />
-
-            <h1 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 'clamp(46px,12.5vw,74px)', lineHeight: .93, textTransform: 'uppercase', margin: '10px 0 18px', color: CREME }}>
+            <h1 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 'clamp(56px,16vw,104px)', lineHeight: .86, textTransform: 'uppercase', margin: '6px 0 20px', color: CREME }}>
               Ping Pong<br />spielen.
             </h1>
 
