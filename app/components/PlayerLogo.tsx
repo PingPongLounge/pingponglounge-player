@@ -98,7 +98,7 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
           letterSpacing: "3px",
           textTransform: "uppercase" as const,
           lineHeight: 1,
-          fontFamily: "'League Spartan', system-ui, sans-serif",
+          fontFamily: "var(--font-anton), Impact, sans-serif",
           userSelect: "none" as const,
           background: "linear-gradient(135deg, #FF00C8 0%, #FF5CDC 100%)",
           WebkitBackgroundClip: "text",

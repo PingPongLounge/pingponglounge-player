@@ -79,7 +79,7 @@ export default function AdminLigaPage(){
     <main style={{minHeight:"100vh",background:BG,padding:"20px 20px 80px"}}>
       <div style={{maxWidth:600,margin:"0 auto"}}>
         <Link href="/dashboard" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← dashboard</Link>
-        <h1 style={{fontSize:28,fontWeight:900,fontFamily:"'League Spartan', system-ui, sans-serif",textTransform:"uppercase",letterSpacing:".1em",margin:"16px 0 24px",background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>liga admin</h1>
+        <h1 style={{fontSize:28,fontWeight:900,fontFamily:"var(--font-anton), Impact, sans-serif",textTransform:"uppercase",letterSpacing:".1em",margin:"16px 0 24px",background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>liga admin</h1>
 
         {/* Create form */}
         <div style={{background:C,borderRadius:14,padding:"20px",marginBottom:24}}>

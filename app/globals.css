@@ -1,4 +1,5 @@
-@import url("https://fonts.googleapis.com/css2?family=League+Spartan:wght@900;800;700;600&display=swap");
+/* 06.09.2026: League Spartan raus. Anton und Inter kommen ueber next/font
+   aus app/layout.tsx — kein zweiter Ladeweg, keine Systemschrift mehr. */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 /* Kein Standard-Rahmen auf Buttons/Feldern: sonst zeichnet der Browser eine
    weisse Umrandung um jeden Button (Namen, Tabs, Chips) — dort wo im Style
@@ -6,4 +7,4 @@
 button, input, textarea, select { border: none; outline: none; }
 button { background: none; }
 :root { --green: #FF00C8; --dark: #14161A; --card: #15161A; --border: #26282E; --muted: #6B6E7A; --text: #E8E6E1; }
-body { font-family: var(--font-league-spartan), "League Spartan", system-ui, sans-serif; background: #14161A; color: #E8E6E1; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0C; color: #FFF9F3; -webkit-font-smoothing: antialiased; }

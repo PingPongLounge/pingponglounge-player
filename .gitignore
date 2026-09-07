@@ -50,3 +50,6 @@ next-env.d.ts
 _patch_*.py
 _mail_patch.py
 _player_audit.tar.gz
+
+# Ablage fuer Uebertragungen, gehoert nicht ins Repo
+/_to_delete/

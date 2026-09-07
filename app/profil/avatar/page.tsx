@@ -137,7 +137,7 @@ export default function AvatarPage() {
         {/* Header */}
         <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:24 }}>
           <Link href="/profil" style={{ color:M, fontSize:20, textDecoration:"none" }}>←</Link>
-          <h1 style={{ ...h1, fontSize:22, fontFamily:"'League Spartan', system-ui, sans-serif", letterSpacing:".1em", margin:0 }}>
+          <h1 style={{ ...h1, fontSize:22, fontFamily:"var(--font-anton), Impact, sans-serif", letterSpacing:".1em", margin:0 }}>
             Avatar erstellen
           </h1>
         </div>

@@ -6,7 +6,7 @@ import { Suspense } from "react"
 const input: React.CSSProperties = {
   background: "#1A1C1F", borderRadius: 10,
   padding: "14px 16px", color: "#fff", fontSize: 15, outline: "none",
-  width: "100%", fontFamily: "'League Spartan', system-ui, sans-serif",
+  width: "100%", fontFamily: "var(--font-anton), Impact, sans-serif",
   boxSizing: "border-box" as const,
 }
 
@@ -15,7 +15,7 @@ const btn: React.CSSProperties = {
   borderRadius: 10, padding: "14px", fontSize: "14px", fontWeight: 700,
   cursor: "pointer", color: "#FFFFFF", textTransform: "uppercase" as const,
   letterSpacing: "0.06em", width: "100%",
-  fontFamily: "'League Spartan', system-ui, sans-serif",
+  fontFamily: "var(--font-anton), Impact, sans-serif",
 }
 
 function FormContent() {

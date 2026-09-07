@@ -39,7 +39,7 @@ export default function StaffRedeemPage() {
     <main style={{ minHeight: "100vh", background: BG, padding: "20px", display: "flex", alignItems: "center", justifyContent: "center" }}>
       <div style={{ maxWidth: 420, width: "100%" }}>
         <p style={{ fontSize: 11, fontWeight: 700, color: M, letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 8 }}>staff tool</p>
-        <h1 style={{ fontSize: 28, fontWeight: 900, fontFamily: "'League Spartan', system-ui, sans-serif", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 4, background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>code einlösen</h1>
+        <h1 style={{ fontSize: 28, fontWeight: 900, fontFamily: "var(--font-anton), Impact, sans-serif", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 4, background: GRAD, WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>code einlösen</h1>
         <p style={{ fontSize: 13, color: M, marginBottom: 28 }}>gutscheincode des kunden eintippen oder per kamera scannen.</p>
 
         <form onSubmit={handleCheck}>

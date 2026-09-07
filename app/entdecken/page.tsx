@@ -6,26 +6,11 @@ import StartHomeV2, { Game } from '@/app/components/StartHomeV2'
 
 const BG = '#12151A', W = '#FFFFFF'
 const SUB = 'rgba(255,255,255,.9)', MUT = 'rgba(255,255,255,.85)'
-const GRAD = 'linear-gradient(135deg,#FF00C8,#FF5CDC)'
-const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: 'text', backgroundClip: 'text', WebkitTextFillColor: 'transparent' }
 
 const LV = [
   { n: 'Level 1', min: 0 }, { n: 'Level 2', min: 1050 }, { n: 'Level 3', min: 1150 },
   { n: 'Level 4', min: 1250 }, { n: 'Level 5', min: 1350 }, { n: 'Level 6', min: 1450 }, { n: 'Level 7', min: 1600 },
 ]
-
-function Logo() {
-  return (
-    <svg width={56} height={56} viewBox="0 0 80 80" fill="none" style={{ display: 'block' }}>
-      <defs><linearGradient id="lg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stopColor="#FF00C8" /><stop offset="100%" stopColor="#FF5CDC" /></linearGradient></defs>
-      {/* P immer nur Outline; um -2 verschoben, damit das P selbst mittig sitzt (Ball hängt raus) */}
-      <g transform="translate(-2,0)">
-        <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#lg)" strokeWidth="2.5" strokeLinejoin="round" />
-        <circle cx="63" cy="58" r="6" fill="url(#lg)" />
-      </g>
-    </svg>
-  )
-}
 
 function initialsFrom(name?: string | null): string {
   if (!name) return 'PP'
@@ -40,80 +25,62 @@ export default async function EntdeckenPage() {
   const { data: { user } } = await sb.auth.getUser()
 
   if (!user) {
-    // Wie viele spielen schon mit? Der stärkste Grund mitzumachen ist,
-    // dass es bereits läuft.
+    // Oeffentliche Startseite (06.09.2026): PLAYER → Ping Pong spielen →
+    // Rating, Ranking, Liga, Community → Login. Vier Elemente, mehr nicht.
+    // Vorher stand hier der alte pinke Auftritt (#FF00C8/#FF5CDC) mit Hero,
+    // drei Erklaerzeilen und Verlaufsschrift. Farben hier bewusst als
+    // Konstanten im Block, weil app/theme.ts noch die alten Werte fuehrt.
+    const SCHWARZ = '#0A0A0C', CREME = '#FFF9F3', VIOLETT = '#8C3DFF'
+    const LEISE = 'rgba(255,249,243,.65)'
+    const SAEULEN = ['Rating', 'Ranking', 'Liga', 'Community']
+
     const { count: spielerCount } = await sb
       .from('public_profiles')
       .select('id', { count: 'exact', head: true })
 
-    // Eine Zeile im Block — dasselbe Muster wie überall: Icon, Text, Linie.
-    const ROW: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 13, padding: '14px 18px', borderTop: '1px solid rgba(255,255,255,.07)' }
-    const RIC: React.CSSProperties = { width: 34, height: 34, borderRadius: 10, background: '#353B46', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }
-
     return (
-      <main style={{ minHeight: '100vh', background: BG, paddingBottom: 40 }}>
-        <div style={{ maxWidth: 480, margin: '0 auto' }}>
+      <main style={{ minHeight: '100dvh', background: SCHWARZ, display: 'flex', flexDirection: 'column' }}>
+        {/* Das Foto traegt die Stimmung, der Verlauf traegt die Schrift —
+            kein Text sitzt auf einer hellen Bildstelle. */}
+        <div style={{ position: 'relative', flex: '1 1 auto', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', minHeight: 540, padding: '0 22px 44px' }}>
+          <div aria-hidden style={{ position: 'absolute', inset: 0, backgroundImage: "url('/hero-pokal.jpg')", backgroundSize: 'cover', backgroundPosition: '52% 42%' }} />
+          <div aria-hidden style={{ position: 'absolute', inset: 0, background: `linear-gradient(180deg, rgba(10,10,12,.60) 0%, rgba(10,10,12,.32) 26%, rgba(10,10,12,.86) 66%, ${SCHWARZ} 100%)` }} />
 
-          {/* Ein Bild, ein Satz, ein Knopf. Vorher: Hero + VIER Karten + eine
-              Bottom-Nav, die für Ausgeloggte überall in die Login-Wand lief. */}
-          <div style={{ position: 'relative', minHeight: 470, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '26px 22px 30px' }}>
-            <div style={{ position: 'absolute', inset: 0, backgroundImage: `linear-gradient(180deg, rgba(20,23,30,.2) 0%, rgba(20,23,30,.72) 52%, ${BG} 100%), url('/hero-pokal.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }} />
-
-            <div style={{ position: 'relative', zIndex: 2 }}>
-              {/* Logo mittig und gross: P über der Wortmarke, Tagline exakt auf
-                  Wortmarkenbreite. Das P bleibt Outline, der Ball sitzt rechts unten. */}
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: 28 }}>
-                <svg width="72" height="72" viewBox="0 0 80 80" fill="none" aria-hidden>
-                  <defs><linearGradient id="hlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#FF00C8" /><stop offset="1" stopColor="#FF5CDC" /></linearGradient></defs>
-                  <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#hlg)" strokeWidth="3.6" strokeLinejoin="round" />
-                  <circle cx="63" cy="58" r="6.5" fill="url(#hlg)" />
-                </svg>
-                <div style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'stretch', marginTop: 8 }}>
-                  <div style={{ fontSize: 30, fontWeight: 900, letterSpacing: '.24em', lineHeight: 1, paddingLeft: '.24em', ...gt }}>PLAYER</div>
-                  <div style={{ fontSize: 9.5, fontWeight: 700, color: SUB, textTransform: 'uppercase', marginTop: 7, textAlign: 'justify', textAlignLast: 'justify' }}>Pingpong Next Level</div>
-                </div>
-                <span style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: '#FFFFFF', background: GRAD, borderRadius: 999, padding: '3px 8px', marginTop: 12 }}>Beta</span>
-              </div>
-
-              <h1 style={{ fontSize: 32, fontWeight: 900, lineHeight: 1.05, letterSpacing: '-.025em', margin: '0 0 11px', color: W, textAlign: 'center' }}>
-                Spiel. Trag ein.<br /><span style={gt}>Steig auf.</span>
-              </h1>
-              <p style={{ fontSize: 14.5, color: SUB, fontWeight: 300, lineHeight: 1.55, margin: '0 0 26px', textAlign: 'center' }}>
-                Liga, Turniere und Trainings — vom Anfänger bis zum Profi.
-                {spielerCount ? ` ${spielerCount} Spieler sind dabei.` : ''}
-              </p>
-
-              <Link href="/login" style={{ display: 'block', textAlign: 'center', borderRadius: 13, padding: 13, fontSize: 14, fontWeight: 800, textTransform: 'uppercase', letterSpacing: '.03em', color: '#FFF9F3', background: `linear-gradient(${BG},${BG}) padding-box, ${GRAD} border-box`, border: '1.5px solid transparent', textDecoration: 'none' }}>Login / Registrieren</Link>
-              <Link href="/spielen" style={{ display: 'block', textAlign: 'center', marginTop: 14, color: SUB, fontSize: 13.5, fontWeight: 500, textDecoration: 'none' }}>Schon gespielt? Resultat eintragen →</Link>
-            </div>
-          </div>
-
-          {/* EIN Block statt vier Karten — drei Zeilen sagen, was einen erwartet. */}
-          <div style={{ margin: '4px 14px 0', background: '#1C212B', borderRadius: 22, overflow: 'hidden', boxShadow: '0 1px 4px rgba(0,0,0,.14)' }}>
-            <div style={{ padding: '15px 18px 3px', fontSize: 11, fontWeight: 800, letterSpacing: '.14em', textTransform: 'uppercase', color: MUT }}>Was dich erwartet</div>
-
-            <div style={{ ...ROW, borderTop: 'none', paddingTop: 12 }}>
-              <span style={RIC}><img src="/icons/liga.svg" alt="" style={{ width: 19, height: 19 }} /></span>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: 14, fontWeight: 800, color: W }}>Liga</span>
-                <span style={{ display: 'block', fontSize: 12, color: MUT, marginTop: 2 }}>Fordere andere, trag dein Resultat ein, steig in der Tabelle.</span>
-              </span>
+          <div style={{ position: 'relative', zIndex: 2, width: '100%', maxWidth: 520, margin: '0 auto' }}>
+            {/* Wortmarke: P als Outline, der Ball violett. */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 26 }}>
+              <svg width="40" height="40" viewBox="0 0 80 80" fill="none" aria-hidden>
+                <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke={CREME} strokeWidth="5" strokeLinejoin="round" />
+                <circle cx="63" cy="58" r="7" fill={VIOLETT} />
+              </svg>
+              <span style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', fontSize: 30, letterSpacing: '.06em', color: CREME, lineHeight: 1 }}>PLAYER</span>
             </div>
 
-            <div style={ROW}>
-              <span style={RIC}><img src="/icons/open-game.svg" alt="" style={{ width: 19, height: 19 }} /></span>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: 14, fontWeight: 800, color: W }}>Open Game</span>
-                <span style={{ display: 'block', fontSize: 12, color: MUT, marginTop: 2 }}>Tisch und Zeit reinstellen — wer Lust hat, spielt mit.</span>
-              </span>
+            <h1 style={{ fontFamily: 'var(--font-anton), Impact, sans-serif', fontWeight: 400, fontSize: 'clamp(46px,13vw,76px)', lineHeight: .93, letterSpacing: '.005em', textTransform: 'uppercase', margin: '0 0 20px', color: CREME }}>
+              Ping Pong<br />spielen.
+            </h1>
+
+            {/* Die vier Saeulen als eine Zeile — keine Karten, keine Erklaerungen. */}
+            <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '8px 12px', marginBottom: 32 }}>
+              {SAEULEN.map((wort, i) => (
+                <span key={wort} style={{ display: 'inline-flex', alignItems: 'center', gap: 12 }}>
+                  {i > 0 ? <span aria-hidden style={{ width: 5, height: 5, borderRadius: 100, background: VIOLETT }} /> : null}
+                  <span style={{ fontSize: 16, fontWeight: 800, letterSpacing: '.1em', textTransform: 'uppercase', color: CREME }}>{wort}</span>
+                </span>
+              ))}
             </div>
 
-            <div style={ROW}>
-              <span style={RIC}><img src="/icons/turnier.svg" alt="" style={{ width: 19, height: 19 }} /></span>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: 'block', fontSize: 14, fontWeight: 800, color: W }}>Turnier &amp; Training</span>
-                <span style={{ display: 'block', fontSize: 12, color: MUT, marginTop: 2 }}>K.o.-Bracket, Podest, PingPoints. Dazu Coaching &amp; Drills.</span>
-              </span>
+            <Link href="/login" style={{ display: 'block', textAlign: 'center', background: CREME, color: SCHWARZ, borderRadius: 100, padding: '17px 24px', fontSize: 16, fontWeight: 900, letterSpacing: '.1em', textTransform: 'uppercase', textDecoration: 'none' }}>
+              Login / Registrieren
+            </Link>
+
+            <div style={{ marginTop: 18, textAlign: 'center' }}>
+              <Link href="/spielen" style={{ fontSize: 16, fontWeight: 600, color: CREME, textDecoration: 'none' }}>
+                Schon gespielt? Resultat eintragen
+              </Link>
+              {spielerCount ? (
+                <div style={{ marginTop: 10, fontSize: 16, color: LEISE }}>{spielerCount} Spieler sind dabei.</div>
+              ) : null}
             </div>
           </div>
         </div>

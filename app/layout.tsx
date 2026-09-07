@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { League_Spartan } from "next/font/google"
+import { Anton, Inter } from "next/font/google"
 import "./globals.css"
 import AppHeader from "./components/AppHeader"
 import SplashScreen from "./components/SplashScreen"
@@ -7,18 +7,16 @@ import InvitePopup from "./components/InvitePopup"
 
 const BASE = "https://playerapp.ch"
 
-const leagueSpartan = League_Spartan({
-  subsets: ["latin"],
-  variable: "--font-league-spartan",
-  weight: ["400", "500", "600", "700", "800", "900"],
-  display: "swap",
-})
+// 06.09.2026: League Spartan raus. Zwei Schriften, mehr nicht — Anton fuer
+// Titel, Inter fuer die Oberflaeche, dasselbe System wie pingponglounge.ch.
+const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-anton", display: "swap" })
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" })
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   alternates: { canonical: BASE },
-  title: "Player — Pingpong Next Level",
-  description: "Liga, Open Games und Turniere — vom Anfänger bis zum Profi. Spiel, trag dein Resultat ein, steig auf.",
+  title: "PPL Player — Ping Pong spielen",
+  description: "Ping Pong spielen — Rating, Ranking, Liga und Community. Vom Anfänger bis zum Profi.",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
@@ -34,14 +32,14 @@ export const metadata: Metadata = {
     locale: "de_CH",
     url: BASE,
     siteName: "Player",
-    title: "Player — Spiel. Trag ein. Steig auf.",
-    description: "Liga, Open Games und Turniere — vom Anfänger bis zum Profi.",
+    title: "PPL Player — Ping Pong spielen",
+    description: "Rating, Ranking, Liga und Community.",
     images: [{ url: "/share-card.jpg", width: 1200, height: 630, alt: "Player — Pingpong Next Level" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Player — Spiel. Trag ein. Steig auf.",
-    description: "Liga, Open Games und Turniere — vom Anfänger bis zum Profi.",
+    title: "PPL Player — Ping Pong spielen",
+    description: "Rating, Ranking, Liga und Community.",
     images: ["/share-card.jpg"],
   },
 }
@@ -50,7 +48,7 @@ export const viewport = { themeColor: "#080808" }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="de" className={leagueSpartan.variable}>
+    <html lang="de" className={`${anton.variable} ${inter.variable}`}>
       <body style={{ margin: 0, background: "#080808", color: "#F4F1EB", fontFamily: "var(--font-league-spartan), system-ui, sans-serif", minHeight: "100vh" }}>
         <SplashScreen />
         <AppHeader />
