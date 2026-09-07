@@ -23,7 +23,7 @@ export default function StreakBanner() {
   }, [])
 
   if (!info) return null
-  const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
+  const GRAD = "linear-gradient(135deg,#8C3DFF,#C9A8FF)"
 
   return (
     <div style={{

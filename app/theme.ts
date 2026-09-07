@@ -3,7 +3,7 @@
 // =====================================================================
 // Finale Regeln (von Oliver bestätigt, Referenz: Startseite /entdecken)
 //
-//  • Verlauf (#FF00C8 → #FF5CDC) NUR für Logo + Rang-Zahl. Sonst nie.
+//  • Verlauf (Violett hell→dunkel) NUR für Logo + Rang-Zahl. Sonst nie.
 //  • Überschriften/Titel extra fett (900), GROSSBUCHSTABEN, weiss.
 //  • Fliesstext leicht (300) aber weiss (~.85–.9) — Kontrast über Gewicht.
 //  • Karten randlos (kein Border), Füllung + dezenter Schatten.
@@ -17,22 +17,40 @@
 
 import type { CSSProperties } from 'react'
 
-/* ---------- Farben (Briefing-Look 08/2026: dunkler + helles Neon-Grün) ---------- */
-export const BG     = '#0A0B0D'                 // Screen-Hintergrund (fast schwarz)
-export const CARD   = '#14171C'                 // Karten-Fläche (DAS Standard-Kästchen)
-export const CELL   = '#181C22'                 // Zellen / Chips innerhalb Karten
-export const INPUTBG= '#0F1216'                 // Eingabefelder (etwas dunkler)
-export const W      = '#FFFFFF'                  // Primärtext
-export const SUB    = 'rgba(255,255,255,.9)'   // Sekundärtext (gut lesbar)
-export const MUT    = 'rgba(255,255,255,.62)'    // Labels / gedämpft
-export const LINE   = 'rgba(255,255,255,.08)'   // dezente Trennlinie
-export const DANGER = '#E5484D'                 // Fehler / Löschen (klares, ruhiges Rot)
+/* ---------- Farben — PLAYER V2 (07.09.2026, verbindlich) --------------------
+   Drei Farben, eine Logik. Sie gilt fuer Player UND pingponglounge.ch:
 
-export const GREEN  = '#FF00C8'                  // helles Neon-Grün (Akzent)
-export const CYAN   = '#2BD4C4'
-export const INK    = '#05130B'                  // dunkle Schrift NUR auf Neon-Grün-Fill (Button-Label)
-export const GRAD   = 'linear-gradient(135deg,#FF00C8,#2BD4C4)'   // Logo + Rang
+     SCHWARZ   #080808  Atmosphaere, Hero, Navigation, Community, Bilder, Aktionen
+     OFF-WHITE #F4F1EB  Lesen und Verstehen: Rankings, Zahlen, Erklaerungen
+     VIOLETT   #8C3DFF  Interaktion, aktive Elemente, Highlights
+
+   Die alten Werte standen bis hierher auf Neon-Pink (#FF00C8) und Tuerkis
+   (#2BD4C4) — mit Namen wie GREEN, die schon lange nicht mehr stimmten. Die
+   Namen bleiben, weil ueber 200 Stellen sie importieren; die WERTE sind neu.
+   Wer neu schreibt, nimmt SCHWARZ / CREME / VIOLETT. */
+export const BG     = '#080808'                  // Screen-Hintergrund
+export const CARD   = '#121214'                  // Karten-Flaeche
+export const CELL   = '#1A1A1E'                  // Zellen / Chips innerhalb Karten
+export const INPUTBG= '#0E0E10'                  // Eingabefelder
+export const W      = '#F4F1EB'                  // Primaertext (Off-White, kein reines Weiss)
+export const SUB    = 'rgba(244,241,235,.90)'    // Sekundaertext
+export const MUT    = 'rgba(244,241,235,.62)'    // Labels / gedaempft
+export const LINE   = 'rgba(244,241,235,.13)'    // dezente Trennlinie
+export const DANGER = '#E5484D'                  // Fehler / Loeschen
+
+export const GREEN  = '#8C3DFF'                  // @deprecated Name — ist UV-Violett
+export const CYAN   = '#C9A8FF'                  // heller Violett-Ton (war Tuerkis)
+export const INK    = '#080808'                  // Schrift auf violetter oder heller Flaeche
+export const GRAD   = 'linear-gradient(135deg,#8C3DFF,#C9A8FF)'   // Logo + Rang
 export const SHADOW = '0 4px 14px rgba(0,0,0,.35)'
+
+/* Neue, ehrlich benannte Namen fuer alles, was ab jetzt geschrieben wird. */
+export const SCHWARZ = '#080808'
+export const CREME   = '#F4F1EB'
+export const VIOLETT = '#8C3DFF'
+export const VIOLETT_HELL = '#C9A8FF'
+export const ANTON = "var(--font-anton), Impact, sans-serif"   // nur Display
+export const INTER = "var(--font-inter), system-ui, sans-serif" // alles Funktionale
 
 /* ---------- Level-System: 1–7 (Mint → Teal → Bronze → Amber → Silber → Platin → Gold) ----------
    Aufsteigend — dunkle Schrift drauf (TEXT_ON = #15110A). */

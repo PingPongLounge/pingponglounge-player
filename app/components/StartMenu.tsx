@@ -4,7 +4,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 
-const C = "#171A1F", B = "#232833", W = "#fff", M = "rgba(255,255,255,.85)"
+const C = "#121214", B = "#1A1A1E", W = "#fff", M = "rgba(255,255,255,.85)"
 
 function Icon({ d, fillBall }: { d: string; fillBall?: string }) {
   return (
@@ -20,7 +20,7 @@ function buchenLink(): string {
   } catch { return basis }
 }
 
-const row: React.CSSProperties = { display: "flex", alignItems: "center", gap: 4, padding: "13px 15px", borderTop: `1px solid #20242E`, textDecoration: "none" }
+const row: React.CSSProperties = { display: "flex", alignItems: "center", gap: 4, padding: "13px 15px", borderTop: `1px solid #1A1A1E`, textDecoration: "none" }
 
 export default function StartMenu({ name = "Spieler", sub = "", inline = false, avatar }: { name?: string; sub?: string; inline?: boolean; avatar?: string }) {
   const [open, setOpen] = useState(false)
@@ -84,7 +84,7 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
               <p style={{ fontSize: 12.5, color: M, margin: "5px 0 12px" }}>mit konto: liga, pingpoints, deine spiele und ergebnisse.</p>
               <div style={{ display: "flex", gap: 8 }}>
                 <Link href="/login" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#8C3DFF", color: "#FFFFFF", borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>anmelden</Link>
-                <Link href="/onboarding" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#232833", color: W, borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>konto erstellen</Link>
+                <Link href="/onboarding" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#1A1A1E", color: W, borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>konto erstellen</Link>
               </div>
             </div>
             )}
@@ -108,7 +108,7 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
             </div>
 
             {authed && (
-              <button onClick={logout} style={{ width: "100%", marginTop: 20, background: "#353B46", color: W, borderRadius: 12, padding: 12, fontSize: 13, fontWeight: 500, textTransform: "lowercase", cursor: "pointer" }}>abmelden</button>
+              <button onClick={logout} style={{ width: "100%", marginTop: 20, background: "#1A1A1E", color: W, borderRadius: 12, padding: 12, fontSize: 13, fontWeight: 500, textTransform: "lowercase", cursor: "pointer" }}>abmelden</button>
             )}
           </div>
         </div>

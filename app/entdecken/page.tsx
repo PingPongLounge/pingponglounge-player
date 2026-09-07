@@ -2,11 +2,8 @@ import { createClient } from '@/lib/supabase/server'
 import { createAdminClient } from '@/lib/supabase/admin'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
-import BottomNav from '@/app/components/BottomNav'
 import StartHomeV2, { Game } from '@/app/components/StartHomeV2'
 
-const BG = '#12151A', W = '#FFFFFF'
-const SUB = 'rgba(255,255,255,.9)', MUT = 'rgba(255,255,255,.85)'
 
 const LV = [
   { n: 'Level 1', min: 0 }, { n: 'Level 2', min: 1050 }, { n: 'Level 3', min: 1150 },
@@ -31,7 +28,7 @@ export default async function EntdeckenPage() {
     // Open Games, Rangliste, Liga, Events, Community. Angemeldet werden muss
     // erst, wer etwas TUT; jeder Knopf hier fuehrt auf eine Leseansicht.
     const SCHWARZ = '#0A0A0C', CREME = '#FFF9F3', VIOLETT = '#8C3DFF'
-    const FENSTER = '#16181D', LEISE = 'rgba(255,249,243,.65)', TRENN = 'rgba(255,249,243,.13)'
+    const FENSTER = '#121214', LEISE = 'rgba(255,249,243,.65)', TRENN = 'rgba(255,249,243,.13)'
     const ANTON = 'var(--font-anton), Impact, sans-serif'
     const INTER = 'var(--font-inter), system-ui, sans-serif'
     const heute = new Date().toISOString().slice(0, 10)
@@ -269,7 +266,7 @@ export default async function EntdeckenPage() {
     )
   }
 
-  const { data: profile } = await sb.from('profiles').select('id,name,level,elo,matches_played,matches_won').eq('id', user.id).maybeSingle()
+  const { data: profile } = await sb.from('profiles').select('id,name,level,elo,matches_played,matches_won,avatar_url,canton').eq('id', user.id).maybeSingle()
   // Level-Gate: Wer noch keine Einstufung hat, wird zuerst zum Onboarding (Level-Abfrage) geschickt.
   if (!profile || !profile.level) redirect('/onboarding')
   const elo = profile?.elo ?? 1000
@@ -289,6 +286,40 @@ export default async function EntdeckenPage() {
     sb.from('player_tournaments').select('id,name,date,format,status').in('status', ['open', 'running']).order('date', { ascending: true, nullsFirst: false }).limit(1).maybeSingle(),
     sb.from('league_registrations').select('season_id, league_seasons(id,city,skill_class)').eq('player_id', user.id).limit(1).maybeSingle(),
   ])
+
+  // WAS LAEUFT — echte Aktivitaet, nichts Erfundenes: offene Forderungen an
+  // mich und wer zuletzt in meiner Saison dazugekommen ist.
+  const meineSaison = (membershipRes.data as { season_id?: string } | null)?.season_id || null
+  const [fordRes, neuRes] = await Promise.all([
+    sb.from('league_matches').select('id,p1_id,season_id,created_at')
+      .eq('p2_id', user.id).eq('status', 'challenge_sent')
+      .order('created_at', { ascending: false }).limit(3),
+    meineSaison
+      ? sb.from('league_registrations').select('player_id,created_at')
+          .eq('season_id', meineSaison).neq('player_id', user.id)
+          .order('created_at', { ascending: false }).limit(3)
+      : Promise.resolve({ data: [] as Array<{ player_id: string; created_at: string }> }),
+  ])
+  const aktivIds = [
+    ...(fordRes.data || []).map(f => f.p1_id),
+    ...((neuRes.data || []) as Array<{ player_id: string }>).map(n => n.player_id),
+  ]
+  const { data: aktivProfile } = aktivIds.length
+    ? await sb.from('public_profiles').select('id,name,avatar_url').in('id', [...new Set(aktivIds)])
+    : { data: [] as Array<{ id: string; name: string; avatar_url: string | null }> }
+  const profVon = (pid: string) => (aktivProfile || []).find(x => x.id === pid)
+  const aktivitaet = [
+    ...(fordRes.data || []).map(f => ({
+      art: 'forderung' as const, id: f.id, spielerId: f.p1_id,
+      name: profVon(f.p1_id)?.name || 'Spieler', avatar: profVon(f.p1_id)?.avatar_url || null,
+      text: 'hat dich herausgefordert',
+    })),
+    ...((neuRes.data || []) as Array<{ player_id: string }>).map(n => ({
+      art: 'neu' as const, id: n.player_id, spielerId: n.player_id,
+      name: profVon(n.player_id)?.name || 'Spieler', avatar: profVon(n.player_id)?.avatar_url || null,
+      text: 'neu in deiner Liga',
+    })),
+  ].slice(0, 5)
 
   const rank = (higherRes.count ?? 0) + 1
   const ppBalance = (ppRes.data || []).reduce((s, t) => s + Number(t.amount || 0), 0)
@@ -355,6 +386,9 @@ export default async function EntdeckenPage() {
     <StartHomeV2
       firstName={firstName}
       initials={initials}
+      avatarUrl={profile?.avatar_url || null}
+      canton={profile?.canton || null}
+      aktivitaet={aktivitaet}
       lvl={lvl}
       rank={rank}
       elo={elo}

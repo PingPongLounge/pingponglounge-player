@@ -23,18 +23,18 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
         <defs>
           <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             {/* Gradient verschiebt sich sehr langsam */}
-            <stop offset="0%" stopColor="#FF00C8">
+            <stop offset="0%" stopColor="#8C3DFF">
               <animate
                 attributeName="stop-color"
-                values="#FF00C8;#FF5CDC;#FF00C8"
+                values="#8C3DFF;#C9A8FF;#8C3DFF"
                 dur="8s"
                 repeatCount="indefinite"
               />
             </stop>
-            <stop offset="100%" stopColor="#FF5CDC">
+            <stop offset="100%" stopColor="#C9A8FF">
               <animate
                 attributeName="stop-color"
-                values="#FF5CDC;#FF00C8;#FF5CDC"
+                values="#C9A8FF;#8C3DFF;#C9A8FF"
                 dur="8s"
                 repeatCount="indefinite"
               />
@@ -70,7 +70,7 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
 
         {/* Ball — leuchtet kurz nach 5s sehr subtil auf */}
         <circle cx="63" cy="58" r="6" fill="url(#logoGrad)" />
-        <circle cx="63" cy="58" r="6" fill="#FF00C8" filter="url(#ballGlow)" opacity="0">
+        <circle cx="63" cy="58" r="6" fill="#8C3DFF" filter="url(#ballGlow)" opacity="0">
           <animate
             attributeName="opacity"
             values="0;0;0;0;0;0;0.5;0.2;0"
@@ -100,7 +100,7 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
           lineHeight: 1,
           fontFamily: "var(--font-anton), Impact, sans-serif",
           userSelect: "none" as const,
-          background: "linear-gradient(135deg, #FF00C8 0%, #FF5CDC 100%)",
+          background: "linear-gradient(135deg, #8C3DFF 0%, #C9A8FF 100%)",
           WebkitBackgroundClip: "text",
           WebkitTextFillColor: "transparent",
           backgroundClip: "text",

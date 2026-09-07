@@ -6,7 +6,7 @@ import BottomNav from "@/app/components/BottomNav"
 import { BG, CARD, CELL, W, SUB, MUT, LINE, GREEN, DANGER, btn } from "@/app/theme"
 import { SINGLE_NIGHT_TICKETS, SINGLE_NIGHT_ABLAUF, SINGLE_NIGHT_ROTATION, SINGLE_NIGHT_INFO } from "@/lib/opengames"
 
-const PINK = "#FF00C8"
+const PINK = "#8C3DFF"
 
 type SnEvent = { id: string; date: string; start_hour: number | null; location_name: string; plaetze: number; frei: number }
 

@@ -5,8 +5,8 @@ import BottomNav from "@/app/components/BottomNav"
 import { BG, CARD, W, SUB, MUT, LINE, GREEN, CYAN } from "@/app/theme"
 
 const VIOLET = "#7A3CFF"
-const PINK = "#FF00C8"
-const TEAL = "#2BD4C4"
+const PINK = "#8C3DFF"
+const TEAL = "#C9A8FF"
 
 type Opt = { href: string; title: string; sub: string; color: string; icon: ReactNode }
 

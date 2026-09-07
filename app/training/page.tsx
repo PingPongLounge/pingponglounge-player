@@ -6,9 +6,9 @@ import { SectionBlock, SectionIntro, SectionTopBar } from "@/app/components/Sect
 import { ratingLabel } from "@/app/theme"
 import { OG_TRAINING_PREIS_CHF } from "@/lib/opengames"
 
-const BG = "#12151A", CARD = "#2A2F39", CELL = "#353B46", W = "#FFFFFF"
-const MUT = "rgba(255,255,255,.82)", GREEN = "#FF00C8"
-const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
+const BG = "#0E0E10", CARD = "#1A1A1E", CELL = "#1A1A1E", W = "#FFFFFF"
+const MUT = "rgba(255,255,255,.82)", GREEN = "#8C3DFF"
+const GRAD = "linear-gradient(135deg,#8C3DFF,#C9A8FF)"
 
 type Player = { user_id: string; name: string; elo: number; level: string }
 type Training = {
@@ -140,7 +140,7 @@ export default function TrainingPage() {
               <div style={{ fontSize: 14.5, fontWeight: 800, color: W }}>Elias Schmid <span style={{ color: MUT, fontWeight: 500 }}>· Schweizer Nr. 1</span></div>
               <div style={{ fontSize: 14.5, fontWeight: 800, color: W, marginTop: 3 }}>Simon Berglund <span style={{ color: MUT, fontWeight: 500 }}>· Schwedens Nr. 3</span></div>
               <div style={{ fontSize: 13, color: MUT, marginTop: 10, lineHeight: 1.5 }}>PPL24 Glattbrugg · für alle Levels · Halbtag CHF 75 · Ganztag CHF 150</div>
-              <a href="/trainingscamp" onClick={campSchliessen} style={{ display: "block", textAlign: "center", marginTop: 16, background: `linear-gradient(#2A2F39,#2A2F39) padding-box, ${GRAD} border-box`, border: "1.5px solid transparent", color: "#FFF9F3", borderRadius: 14, padding: 15, fontSize: 15, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }}>Zum Trainingscamp →</a>
+              <a href="/trainingscamp" onClick={campSchliessen} style={{ display: "block", textAlign: "center", marginTop: 16, background: `linear-gradient(#1A1A1E,#1A1A1E) padding-box, ${GRAD} border-box`, border: "1.5px solid transparent", color: "#FFF9F3", borderRadius: 14, padding: 15, fontSize: 15, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }}>Zum Trainingscamp →</a>
               <button onClick={campSchliessen} style={{ display: "block", width: "100%", textAlign: "center", marginTop: 8, background: "none", color: MUT, fontSize: 13, fontWeight: 600, padding: 8, cursor: "pointer", fontFamily: "inherit" }}>Später</button>
             </div>
           </div>

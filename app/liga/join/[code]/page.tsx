@@ -2,8 +2,8 @@
 import { useEffect, useState, use } from "react"
 import { createClient } from "@/lib/supabase/client"
 
-const BG = "#1C212B", CARD = "#2A2F39", W = "#fff", MUT = "rgba(255,255,255,.7)"
-const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
+const BG = "#121214", CARD = "#1A1A1E", W = "#fff", MUT = "rgba(255,255,255,.7)"
+const GRAD = "linear-gradient(135deg,#8C3DFF,#C9A8FF)"
 
 export default function JoinLeaguePage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params)
@@ -57,13 +57,13 @@ export default function JoinLeaguePage({ params }: { params: Promise<{ code: str
         {state === "joining" && <div style={{ color: MUT, fontSize: 14 }}>Tritt bei …</div>}
 
         {state === "done" && (
-          <div style={{ color: "#FF00C8", fontSize: 15, fontWeight: 800 }}>✓ Drin{org ? ` — ${org}` : ""}! Weiter zur Liga …</div>
+          <div style={{ color: "#8C3DFF", fontSize: 15, fontWeight: 800 }}>✓ Drin{org ? ` — ${org}` : ""}! Weiter zur Liga …</div>
         )}
 
         {state === "error" && (
           <>
             <div style={{ color: "#FF7A7A", fontSize: 14, marginBottom: 14 }}>{msg}</div>
-            <button onClick={() => setState("ready")} style={{ width: "100%", background: "#353B46", color: W, borderRadius: 14, padding: 13, fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
+            <button onClick={() => setState("ready")} style={{ width: "100%", background: "#1A1A1E", color: W, borderRadius: 14, padding: 13, fontSize: 14, fontWeight: 800, cursor: "pointer", fontFamily: "inherit" }}>
               Nochmal versuchen
             </button>
           </>

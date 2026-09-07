@@ -10,15 +10,15 @@ import { NextRequest, NextResponse } from "next/server"
 export const runtime = "nodejs"
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
-const G = "#FF00C8"
+const G = "#8C3DFF"
 
-const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
-const CARD = "#2A2F39"
+const GRAD = "linear-gradient(135deg,#8C3DFF,#C9A8FF)"
+const CARD = "#1A1A1E"
 
 function page(title: string, text: string, ok: boolean) {
   return new NextResponse(
     `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title}</title>
-    <body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#12151A;font-family:system-ui,-apple-system,sans-serif;padding:24px">
+    <body style="margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0E0E10;font-family:system-ui,-apple-system,sans-serif;padding:24px">
       <div style="max-width:420px;width:100%;background:${CARD};border-radius:24px;padding:34px 26px;text-align:center;color:#fff">
         <img src="${BASE_URL}/logo-mail.png" alt="Player" width="170" style="display:block;margin:0 auto 22px;width:170px;height:auto">
         <div style="font-size:23px;font-weight:900;margin-bottom:10px;color:${ok ? G : "#fff"}">${title}</div>

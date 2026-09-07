@@ -1,8 +1,8 @@
 "use client"
 import { useEffect, useRef, useState, useCallback } from "react"
 
-const CARD = "#2A2F39", CELL = "#353B46", W = "#FFFFFF"
-const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
+const CARD = "#1A1A1E", CELL = "#1A1A1E", W = "#FFFFFF"
+const GRAD = "linear-gradient(135deg,#8C3DFF,#C9A8FF)"
 const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.82)"
 const LINE = "rgba(255,255,255,.07)"
 
@@ -40,7 +40,7 @@ export default function LigaChatHome({
   return (
     <div style={{ margin: "0 18px", borderRadius: 20, background: CARD, overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "14px 18px", borderBottom: `1px solid ${LINE}` }}>
-        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#FF00C8", boxShadow: "0 0 8px #FF00C8" }} />
+        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#8C3DFF", boxShadow: "0 0 8px #8C3DFF" }} />
         <span style={{ fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: W }}>{seasonLabel}</span>
         <span style={{ marginLeft: "auto", fontSize: 11, color: MUT, fontWeight: 500 }}>{playerCount} Spieler</span>
       </div>
@@ -73,7 +73,7 @@ export default function LigaChatHome({
           <input
             value={text} onChange={e => setText(e.target.value)} onKeyDown={e => { if (e.key === "Enter") send() }}
             placeholder="Nachricht an die Liga…"
-            style={{ flex: 1, background: "#12151A", borderRadius: 12, padding: "11px 14px", color: W, fontSize: 13, outline: "none", fontFamily: "inherit" }}
+            style={{ flex: 1, background: "#0E0E10", borderRadius: 12, padding: "11px 14px", color: W, fontSize: 13, outline: "none", fontFamily: "inherit" }}
           />
           <button onClick={send} disabled={sending} style={{ width: 44, borderRadius: 12, background: GRAD, color: "#08120a", fontSize: 18, fontWeight: 800, cursor: "pointer" }}>→</button>
         </div>

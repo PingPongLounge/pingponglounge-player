@@ -36,7 +36,7 @@ export default function StyleguidePage() {
         {/* Event-Farben */}
         <div style={sec}>Event-Farben</div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: 10 }}>
-          {swatch('#FF00C8', 'Open Game')}{swatch('#7A3CFF', 'Turnier')}{swatch('#2BD4C4', 'Training')}{swatch('#FF00C8', 'Single Night')}
+          {swatch('#8C3DFF', 'Open Game')}{swatch('#7A3CFF', 'Turnier')}{swatch('#C9A8FF', 'Training')}{swatch('#8C3DFF', 'Single Night')}
         </div>
 
         {/* Bilder */}

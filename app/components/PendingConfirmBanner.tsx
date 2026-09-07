@@ -25,7 +25,7 @@ export default function PendingConfirmBanner() {
   }, [])
 
   if (items.length === 0) return null
-  const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
+  const GRAD = "linear-gradient(135deg,#8C3DFF,#C9A8FF)"
 
   const one = items.length === 1 ? items[0] : null
   const href = one ? `/liga/match/${one.id}` : "/liga"

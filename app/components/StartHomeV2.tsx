@@ -1,17 +1,249 @@
 "use client"
+/* PLAYER V2 — Startseite fuer Angemeldete (07.09.2026, Referenz).
+
+   Rhythmus, verbindlich fuer alle V2-Screens:
+     SCHWARZER HERO  ↘  OFF-WHITE INFORMATION  ↘  SCHWARZER INHALT
+   Die Uebergaenge sind leicht schraege Kanten (20px ueber die volle Breite),
+   kein Torn Paper. Bausteine kommen aus components/V2.tsx, Farben aus theme.ts.
+
+   Alle Zahlen und Listen hier sind echte Daten aus entdecken/page.tsx —
+   keine Platzhalter. Fehlt etwas, wird der Block weggelassen, nicht erfunden. */
 import Link from "next/link"
 import BottomNav from "./BottomNav"
 import PendingConfirmBanner from "./PendingConfirmBanner"
+import ProfilAvatar from "./ProfilAvatar"
+import { KanteZuHell, KanteZuDunkel, Neon, Etikett, Titel, knopfPrimaer, knopfOutline, knopfOutlineHell } from "./V2"
+import { SCHWARZ, CREME, VIOLETT, ANTON, INTER, LINE, MUT } from "@/app/theme"
 
-export type Game={id:string;href:string;day:string;time:string;title:string;sub:string;frei:number;full:boolean;ratio:string}
-export type StartData={firstName:string;initials:string;lvl:string;rank:number;elo:number;pct:number;nextLabel:string;ppBalance:number;wins:number;played:number;games:Game[];season:{has:boolean;label:string;city:string;leagueRank:number};tour:{name:string;dateLabel:string;formatLabel:string}|null;nextGame?:{href:string;when:string;location:string}|null}
-const V="#8C3DFF",B="#080808",P="#F4F1EB",LINE="#292929",MUT="#8d8b88"
-const darkRow={display:"block",color:P,textDecoration:"none",borderTop:`1px solid ${LINE}`,padding:"17px 0",fontSize:14,fontWeight:900} as const
-export default function StartHomeV2(d:StartData){const winrate=d.played?Math.round(d.wins/d.played*100):0;return <><main style={{minHeight:"100vh",background:B,color:P,paddingBottom:110}}><div style={{maxWidth:520,margin:"0 auto"}}><PendingConfirmBanner/>
-<section style={{minHeight:390,position:"relative",display:"flex",alignItems:"flex-end",padding:"24px 20px 34px",backgroundImage:`linear-gradient(180deg,rgba(0,0,0,.05),rgba(8,8,8,.18) 45%,${B} 100%),url('/ppl-training.png')`,backgroundSize:"cover",backgroundPosition:"center"}}><div style={{position:"absolute",top:20,left:20,fontSize:12,fontWeight:900,letterSpacing:".1em"}}>PPL<span style={{color:V}}>.</span> <span style={{color:V}}>PLAYER</span></div><div><div style={{fontSize:10,fontWeight:900,letterSpacing:".18em",marginBottom:24,opacity:.75}}>HOME</div><h1 style={{fontFamily:"var(--font-anton), Impact, 'Arial Narrow', sans-serif",fontSize:64,fontWeight:400,lineHeight:.9,margin:0}}>READY<br/>TO PLAY?</h1><div style={{width:72,height:4,background:V,marginTop:18}}/></div></section>
-<section style={{padding:"4px 20px 30px"}}><div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",borderBottom:`1px solid ${LINE}`,padding:"18px 0 22px"}}>{[["RATING",String(d.elo),`Level ${d.lvl}`],["SCHWEIZ",`#${d.rank}`,"National"],["SPIELE",String(d.played),`${winrate}% Siege`]].map(([a,b,c])=><div key={a}><div style={{color:MUT,fontSize:9,fontWeight:800,letterSpacing:".1em"}}>{a}</div><strong style={{display:"block",fontSize:26,marginTop:5}}>{b}</strong><span style={{color:"#b991ff",fontSize:10}}>{c}</span></div>)}</div><Link href="/match" style={{display:"block",color:P,textDecoration:"none",borderTop:`1px solid ${P}`,borderBottom:`1px solid ${P}`,padding:"18px 0",fontSize:23,fontWeight:900,marginTop:28}}>SPIEL FINDEN <span style={{float:"right",color:V}}>→</span></Link><Link href="/match/create" style={{display:"block",color:"#aaa",textDecoration:"none",padding:"16px 0",fontSize:13,fontWeight:800}}>OPEN GAME ERSTELLEN <span style={{float:"right",color:V}}>→</span></Link></section>
-{d.nextGame&&<section style={{background:P,color:B,padding:"28px 20px"}}><div style={{fontSize:10,fontWeight:900,letterSpacing:".14em",marginBottom:12}}>DEIN NÄCHSTES SPIEL</div><Link href={d.nextGame.href} style={{display:"block",color:B,textDecoration:"none",borderTop:"1px solid rgba(0,0,0,.2)",padding:"16px 0"}}><strong style={{fontSize:20}}>{d.nextGame.location}</strong><span style={{float:"right",color:"#6425b8",fontWeight:900}}>→</span><div style={{fontSize:12,opacity:.6,marginTop:5}}>{d.nextGame.when}</div></Link></section>}
-<section style={{padding:"30px 20px"}}><div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:8}}><h2 style={{fontFamily:"var(--font-anton), Impact, 'Arial Narrow', sans-serif",fontSize:28,fontWeight:400,margin:0}}>OFFENE SPIELE</h2><Link href="/match" style={{color:V,fontSize:11,fontWeight:900,textDecoration:"none"}}>ALLE →</Link></div>{d.games.length===0?<div style={{borderTop:`1px solid ${LINE}`,padding:"18px 0",color:"#888"}}>Aktuell keine offenen Spiele.</div>:d.games.slice(0,3).map(g=><Link key={g.id} href={g.href} style={{display:"grid",gridTemplateColumns:"64px 1fr auto",gap:12,color:P,textDecoration:"none",borderTop:`1px solid ${LINE}`,padding:"16px 0",opacity:g.full?.5:1}}><div><b style={{color:V,fontSize:11}}>{g.day}</b><div style={{fontSize:19,fontWeight:900}}>{g.time}</div></div><div><strong>{g.title}</strong><div style={{fontSize:11,color:"#888",marginTop:4}}>{g.full?"Ausgebucht":`${g.frei} ${g.frei===1?"Platz":"Plätze"} frei`}</div></div><b style={{color:V}}>→</b></Link>)}</section>
-<section style={{padding:"30px 20px",borderTop:`1px solid ${LINE}`}}><div style={{fontSize:10,fontWeight:900,letterSpacing:".14em",color:V}}>COMMUNITY</div><h2 style={{fontFamily:"var(--font-anton), Impact, 'Arial Narrow', sans-serif",fontSize:34,fontWeight:400,lineHeight:.95,margin:"8px 0 18px"}}>SPIELER. MATCHES.<br/>DEINE LEUTE.</h2><p style={{fontSize:13,lineHeight:1.5,color:"#aaa",margin:"0 0 18px"}}>Finde Spieler, verfolge Resultate und bleib mit deiner Ping-Pong-Community verbunden.</p><Link href="/freunde" style={darkRow}>SPIELER & FREUNDE <span style={{float:"right",color:V}}>→</span></Link><Link href="/feed" style={darkRow}>MATCH-FEED <span style={{float:"right",color:V}}>→</span></Link><Link href="/benachrichtigungen" style={darkRow}>BENACHRICHTIGUNGEN <span style={{float:"right",color:V}}>→</span></Link></section>
-<section style={{background:P,color:B,padding:"28px 20px 34px"}}><div style={{fontSize:10,fontWeight:900,letterSpacing:".14em",color:"#6425b8"}}>COMPETE</div><h2 style={{fontFamily:"var(--font-anton), Impact, 'Arial Narrow', sans-serif",fontSize:34,fontWeight:400,lineHeight:.95,margin:"10px 0 18px"}}>MISS DICH MIT ANDEREN.</h2><Link href="/turniere" style={{display:"block",color:B,textDecoration:"none",borderTop:"1px solid rgba(0,0,0,.2)",padding:"16px 0",fontWeight:900}}>TURNIERE <span style={{float:"right",color:"#6425b8"}}>→</span></Link><Link href="/liga" style={{display:"block",color:B,textDecoration:"none",borderTop:"1px solid rgba(0,0,0,.2)",padding:"16px 0",fontWeight:900}}>LIGA & HERAUSFORDERUNGEN <span style={{float:"right",color:"#6425b8"}}>→</span></Link></section>
-</div></main><BottomNav/></>}
+export type Game = { id: string; href: string; day: string; time: string; title: string; sub: string; frei: number; full: boolean; ratio: string }
+export type Aktivitaet = { art: "forderung" | "neu"; id: string; spielerId: string; name: string; avatar: string | null; text: string }
+export type StartData = {
+  firstName: string; initials: string; avatarUrl?: string | null; canton?: string | null
+  lvl: string; rank: number; elo: number; pct: number; nextLabel: string
+  ppBalance: number; wins: number; played: number; games: Game[]
+  season: { has: boolean; label: string; city: string; leagueRank: number }
+  tour: { name: string; dateLabel: string; formatLabel: string } | null
+  nextGame?: { href: string; when: string; location: string } | null
+  aktivitaet?: Aktivitaet[]
+}
+
+const breit: React.CSSProperties = { maxWidth: 620, margin: "0 auto", padding: "0 22px" }
+
+export default function StartHomeV2(d: StartData) {
+  const winrate = d.played ? Math.round((d.wins / d.played) * 100) : 0
+  const aktiv = d.aktivitaet || []
+
+  const stat = (wert: string | number, label: string, akzent = false) => (
+    <div key={label} style={{ minWidth: 0 }}>
+      <strong style={{
+        display: "block", fontFamily: ANTON, fontWeight: 400,
+        fontSize: "clamp(30px,8.5vw,46px)", lineHeight: .95,
+        color: akzent ? VIOLETT : SCHWARZ, fontVariantNumeric: "tabular-nums",
+      }}>{wert}</strong>
+      <small style={{
+        display: "block", fontFamily: INTER, fontSize: 12, fontWeight: 800,
+        letterSpacing: ".13em", textTransform: "uppercase",
+        color: "rgba(8,8,8,.55)", marginTop: 7,
+      }}>{label}</small>
+    </div>
+  )
+
+  return (
+    <>
+      <main style={{ minHeight: "100dvh", background: SCHWARZ, color: CREME, fontFamily: INTER, paddingBottom: 96 }}>
+        <div style={breit}><PendingConfirmBanner /></div>
+
+        {/* ══ SCHWARZER HERO ══════════════════════════════════════════ */}
+        <header style={{ ...breit, paddingTop: 20, paddingBottom: 34 }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 16 }}>
+            <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 900, letterSpacing: ".1em" }}>
+              PPL<span style={{ color: VIOLETT }}>.</span> <span style={{ color: VIOLETT }}>PLAYER</span>
+            </span>
+            <Neon text="Your turn" />
+          </div>
+
+          <div style={{ marginTop: 30 }}>
+            <h1 style={{
+              fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(52px,15vw,86px)",
+              lineHeight: .88, textTransform: "uppercase", margin: 0, letterSpacing: ".005em",
+            }}>Ready<br />to play?</h1>
+            <p style={{ fontFamily: INTER, fontSize: 16, color: MUT, margin: "16px 0 0", maxWidth: "42ch", lineHeight: 1.5 }}>
+              Dein nächstes Match, dein Ranking und deine Community — auf einen Blick.
+            </p>
+          </div>
+
+          {/* Der Mensch: Avatar, Name, Einordnung */}
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginTop: 30 }}>
+            <ProfilAvatar src={d.avatarUrl} name={d.firstName} groesse={72} />
+            <div style={{ minWidth: 0 }}>
+              <strong style={{
+                display: "block", fontFamily: ANTON, fontWeight: 400,
+                fontSize: "clamp(26px,7vw,38px)", lineHeight: 1, textTransform: "uppercase",
+              }}>{d.firstName}</strong>
+              <span style={{ display: "block", fontFamily: INTER, fontSize: 15, color: MUT, marginTop: 7 }}>
+                Level {d.lvl}{d.canton ? ` · ${d.canton}` : ""} · {d.elo} Rating
+              </span>
+            </div>
+          </div>
+
+          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 24 }}>
+            <Link href="/match" style={{ ...knopfPrimaer, flex: "1 1 170px" }}>Match finden</Link>
+            <Link href="/profil" style={{ ...knopfOutline, flex: "1 1 130px" }}>Profil</Link>
+          </div>
+        </header>
+
+        {/* ══ OFF-WHITE: HEUTE WICHTIG ════════════════════════════════ */}
+        <KanteZuHell />
+        <section style={{ background: CREME, color: SCHWARZ }}>
+          <div style={{ maxWidth: 620, margin: "0 auto", padding: "28px 22px 34px" }}>
+            <Etikett text="Auf einen Blick" hell />
+            <h2 style={{
+              fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(30px,8vw,42px)",
+              lineHeight: .94, textTransform: "uppercase", margin: "8px 0 26px", color: SCHWARZ,
+            }}>Heute wichtig</h2>
+
+            {/* Zahlen stehen direkt auf der Flaeche — keine Karten. */}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 0 }}>
+              {[
+                { w: d.elo, l: "Rating", a: false },
+                { w: d.season.has && d.season.leagueRank ? `#${d.season.leagueRank}` : `#${d.rank}`, l: d.season.has && d.season.leagueRank ? "Liga" : "Schweiz", a: true },
+                { w: d.played, l: "Matches", a: false },
+                { w: `${winrate}%`, l: "Win Rate", a: false },
+              ].map((x, i) => (
+                <div key={x.l} style={{
+                  paddingLeft: i === 0 ? 0 : 14,
+                  borderLeft: i === 0 ? "none" : "1px solid rgba(8,8,8,.14)", minWidth: 0,
+                }}>{stat(x.w, x.l, x.a)}</div>
+              ))}
+            </div>
+
+            {/* Naechstes Match — nur wenn es eines gibt. */}
+            <div style={{ marginTop: 30, borderTop: "1px solid rgba(8,8,8,.16)", paddingTop: 22 }}>
+              <Etikett text="Nächstes Match" hell />
+              {d.nextGame ? (
+                <>
+                  <strong style={{
+                    display: "block", fontFamily: ANTON, fontWeight: 400,
+                    fontSize: "clamp(26px,7vw,38px)", lineHeight: 1,
+                    textTransform: "uppercase", margin: "10px 0 6px", color: SCHWARZ,
+                  }}>{d.nextGame.location}</strong>
+                  <div style={{ fontFamily: INTER, fontSize: 16, color: "rgba(8,8,8,.66)" }}>{d.nextGame.when}</div>
+                  <Link href={d.nextGame.href} style={{ ...knopfOutlineHell, marginTop: 18 }}>Details</Link>
+                </>
+              ) : (
+                <>
+                  <div style={{ fontFamily: INTER, fontSize: 16, color: "rgba(8,8,8,.66)", margin: "10px 0 0" }}>
+                    Kein Spiel eingetragen.
+                  </div>
+                  <Link href="/match" style={{ ...knopfOutlineHell, marginTop: 18 }}>Open Game suchen</Link>
+                </>
+              )}
+            </div>
+
+            {/* Liga-Fortschritt: der eine Satz, der sagt, wie weit es noch ist. */}
+            {d.nextLabel && (
+              <div style={{ marginTop: 26, borderTop: "1px solid rgba(8,8,8,.16)", paddingTop: 20 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: 12, fontFamily: INTER, fontSize: 15, color: "rgba(8,8,8,.66)" }}>
+                  <span>{d.nextLabel}</span>
+                  <b style={{ color: SCHWARZ }}>{d.pct}%</b>
+                </div>
+                <div style={{ height: 6, borderRadius: 100, background: "rgba(8,8,8,.12)", marginTop: 10, overflow: "hidden" }}>
+                  <div style={{ height: "100%", width: `${d.pct}%`, background: VIOLETT, borderRadius: 100 }} />
+                </div>
+              </div>
+            )}
+          </div>
+        </section>
+        <KanteZuDunkel />
+
+        {/* ══ SCHWARZ: WAS LÄUFT ══════════════════════════════════════ */}
+        <section style={{ ...breit, paddingTop: 30 }}>
+          <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 14 }}>
+            <div>
+              <Etikett text="Community" />
+              <Titel>Was läuft</Titel>
+            </div>
+            <Link href="/feed" style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: CREME, textDecoration: "none", whiteSpace: "nowrap", paddingBottom: 4 }}>Feed →</Link>
+          </div>
+
+          {/* Ein echtes PPL-Bild traegt die Stimmung. */}
+          <div style={{ position: "relative", marginTop: 20, borderRadius: 4, overflow: "hidden", aspectRatio: "16 / 9" }}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/ppl-training.png" alt="" aria-hidden style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            <div aria-hidden style={{ position: "absolute", inset: 0, background: `linear-gradient(180deg, rgba(8,8,8,.10) 0%, rgba(8,8,8,.30) 55%, rgba(8,8,8,.86) 100%)` }} />
+            <div style={{ position: "absolute", left: 16, bottom: 14 }}><Neon text="Game on" groesse={14} kippen={-2} /></div>
+          </div>
+
+          <div style={{ marginTop: 22 }}>
+            {aktiv.length ? aktiv.map(a => (
+              <div key={`${a.art}-${a.id}`} style={{
+                display: "flex", alignItems: "center", gap: 13,
+                padding: "14px 0", borderTop: `1px solid ${LINE}`,
+              }}>
+                <ProfilAvatar src={a.avatar} name={a.name} groesse={44} />
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <Link href={`/spieler/${a.spielerId}`} style={{ display: "block", fontFamily: INTER, fontSize: 16, fontWeight: 700, color: CREME, textDecoration: "none" }}>{a.name}</Link>
+                  <span style={{ display: "block", fontFamily: INTER, fontSize: 14, color: MUT, marginTop: 2 }}>{a.text}</span>
+                </span>
+                <Link href={a.art === "forderung" ? "/liga" : `/spieler/${a.spielerId}`} style={{
+                  fontFamily: INTER, fontSize: 12, fontWeight: 900, letterSpacing: ".08em",
+                  textTransform: "uppercase", textDecoration: "none", whiteSpace: "nowrap",
+                  padding: "10px 16px", borderRadius: 100,
+                  background: a.art === "forderung" ? VIOLETT : "transparent",
+                  color: CREME, border: a.art === "forderung" ? "none" : `1.5px solid rgba(244,241,235,.30)`,
+                }}>{a.art === "forderung" ? "Annehmen" : "Profil"}</Link>
+              </div>
+            )) : (
+              <p style={{ fontFamily: INTER, fontSize: 16, color: MUT, padding: "14px 0", borderTop: `1px solid ${LINE}`, margin: 0 }}>
+                Zurzeit keine offenen Forderungen. Fordere jemanden in der Liga.
+              </p>
+            )}
+          </div>
+
+          {/* Offene Spiele — bestehende Liste, neu gesetzt. */}
+          {d.games.length > 0 && (
+            <div style={{ marginTop: 30 }}>
+              <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 14, marginBottom: 6 }}>
+                <Etikett text="Offene Spiele" />
+                <Link href="/match" style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: CREME, textDecoration: "none" }}>Alle →</Link>
+              </div>
+              {d.games.slice(0, 4).map(g => (
+                <Link key={g.id} href={g.href} style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "14px 0", borderTop: `1px solid ${LINE}`, textDecoration: "none", color: CREME,
+                }}>
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <b style={{ display: "block", fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{g.title}</b>
+                    <span style={{ display: "block", fontFamily: INTER, fontSize: 14, color: MUT, marginTop: 2 }}>{g.day} {g.time} · {g.sub}</span>
+                  </span>
+                  <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: g.full ? MUT : VIOLETT, whiteSpace: "nowrap" }}>
+                    {g.full ? "voll" : `${g.frei} frei`}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {/* Naechstes Turnier — nur wenn es eines gibt. */}
+          {d.tour && (
+            <div style={{ marginTop: 30 }}>
+              <Etikett text="Nächstes Turnier" />
+              <Link href="/turniere" style={{
+                display: "flex", alignItems: "center", gap: 12,
+                padding: "14px 0", borderTop: `1px solid ${LINE}`, marginTop: 6,
+                textDecoration: "none", color: CREME,
+              }}>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <b style={{ display: "block", fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{d.tour.name}</b>
+                  <span style={{ display: "block", fontFamily: INTER, fontSize: 14, color: MUT, marginTop: 2 }}>{d.tour.dateLabel} · {d.tour.formatLabel}</span>
+                </span>
+                <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: VIOLETT }}>→</span>
+              </Link>
+            </div>
+          )}
+        </section>
+      </main>
+      <BottomNav />
+    </>
+  )
+}

@@ -4,10 +4,10 @@ import BottomNav from "@/app/components/BottomNav"
 import { SELF_RATINGS } from "@/lib/tournaments"
 import { campPrice, CAMP_SESSIONS } from "@/lib/camp"
 
-const BG = "#12151A", CARD = "#2A2F39", CELL = "#353B46", W = "#FFFFFF"
+const BG = "#0E0E10", CARD = "#1A1A1E", CELL = "#1A1A1E", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.9)", MUT = "rgba(255,255,255,.82)", FAINT = "rgba(255,255,255,.55)"
 const LINE = "rgba(255,255,255,.07)", CREAM = "#FFF9F3", DARK = "#171A20"
-const GRAD = "linear-gradient(135deg,#FF00C8,#FF5CDC)"
+const GRAD = "linear-gradient(135deg,#8C3DFF,#C9A8FF)"
 
 type Session = { id: string; date: string; part: "vm" | "nm"; label: string; start: string; end: string; frei: number; belegt: number; max: number }
 const DAY_LABEL: Record<string, string> = {
@@ -105,7 +105,7 @@ export default function TrainingscampPage() {
         {/* STEP 1 — DETAIL */}
         {step === 1 && (<>
           <div style={{ position: "relative" }}>
-            <div style={{ height: 172, background: "repeating-linear-gradient(135deg,#232833 0 22px,#1c212a 22px 44px)", display: "flex", alignItems: "center", justifyContent: "center", color: FAINT, fontSize: 11, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase" }}>Camp-Foto</div>
+            <div style={{ height: 172, background: "repeating-linear-gradient(135deg,#1A1A1E 0 22px,#1c212a 22px 44px)", display: "flex", alignItems: "center", justifyContent: "center", color: FAINT, fontSize: 11, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase" }}>Camp-Foto</div>
             <div style={{ background: DARK, padding: "15px 18px 16px" }}>
               <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block" }}>13.–16. August · PPL24 Glattbrugg</div>
               <h1 style={{ ...H1, marginTop: 5 }}>Trainings-<br />camp</h1>

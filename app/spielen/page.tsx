@@ -164,7 +164,7 @@ function SpielenInner() {
       <div style={{ ...cardPad, padding: "28px 20px", textAlign: "center", marginBottom: "16px" }}>
         <div style={{
           width: 140, height: 140, margin: "0 auto 16px", borderRadius: "50%",
-          background: "#353B46", display: "flex", flexDirection: "column",
+          background: "#1A1A1E", display: "flex", flexDirection: "column",
           alignItems: "center", justifyContent: "center",
           boxShadow: `0 0 28px ${lvColor(level.name)}33`,
         }}>
