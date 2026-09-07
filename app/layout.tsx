@@ -49,7 +49,7 @@ export const viewport = { themeColor: "#080808" }
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="de" className={`${anton.variable} ${inter.variable}`}>
-      <body style={{ margin: 0, background: "#080808", color: "#F4F1EB", fontFamily: "var(--font-league-spartan), system-ui, sans-serif", minHeight: "100vh" }}>
+      <body style={{ margin: 0, background: "#080808", color: "#F4F1EB", fontFamily: "var(--font-inter), system-ui, sans-serif", minHeight: "100vh" }}>
         <SplashScreen />
         <AppHeader />
         {children}

@@ -130,7 +130,7 @@ export default function SplashScreen() {
               fontSize: 34,
               fontWeight: 900,
               letterSpacing: ".18em",
-              fontFamily: "system-ui, sans-serif",
+              fontFamily: "var(--font-inter), system-ui, sans-serif",
               ...gt,
               opacity: i < letterIndex ? 1 : 0,
               transform: i < letterIndex ? "translateY(0)" : "translateY(10px)",

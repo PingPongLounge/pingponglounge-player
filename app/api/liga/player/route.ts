@@ -20,8 +20,10 @@ type Match = {
 
 export async function GET(req: NextRequest) {
   const sb = await createClient()
+  // Oeffentlich lesbar (07.09.2026): alles hier kommt aus public_profiles und
+  // bestaetigten Liga-Spielen. Nur der direkte Vergleich braucht ein Konto —
+  // ohne Anmeldung bleibt er leer.
   const { data: { user } } = await sb.auth.getUser()
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const playerId = req.nextUrl.searchParams.get("id") || ""
   const seasonId = req.nextUrl.searchParams.get("season_id") || ""
@@ -71,19 +73,19 @@ export async function GET(req: NextRequest) {
 
   // Direkter Vergleich mit dem eingeloggten Spieler
   let head: { played: number; myWins: number; theirWins: number; rankedLeft: number } | null = null
-  if (playerId !== user.id && seasonId) {
+  if (user && playerId !== user.id && seasonId) {
     const { data: h2h } = await admin
       .from("league_matches")
       .select("winner_id,ranked,status")
       .eq("season_id", seasonId)
       .in("status", ["p1_entered", "confirmed"])
-      .or(`and(p1_id.eq.${user.id},p2_id.eq.${playerId}),and(p1_id.eq.${playerId},p2_id.eq.${user.id})`)
+      .or(`and(p1_id.eq.${user!.id},p2_id.eq.${playerId}),and(p1_id.eq.${playerId},p2_id.eq.${user!.id})`)
 
     const all = h2h || []
     const rankedCount = all.filter(m => m.ranked !== false).length
     head = {
       played: all.filter(m => m.status === "confirmed").length,
-      myWins: all.filter(m => m.status === "confirmed" && m.winner_id === user.id).length,
+      myWins: all.filter(m => m.status === "confirmed" && m.winner_id === user!.id).length,
       theirWins: all.filter(m => m.status === "confirmed" && m.winner_id === playerId).length,
       rankedLeft: Math.max(0, MAX_RANKED_PER_OPPONENT - rankedCount),
     }

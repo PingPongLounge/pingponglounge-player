@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from "next/server"
 
 export async function GET() {
   const sb = await createClient()
+  // Oeffentlich lesbar (07.09.2026): welche Saisons laufen und wie voll sie
+  // sind, darf jeder sehen. "Bin ich angemeldet?" nur mit Konto.
   const { data: { user } } = await sb.auth.getUser()
-  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const admin = createAdminClient()
 
@@ -23,7 +24,7 @@ export async function GET() {
   if (!seasonIds.length) return NextResponse.json({ seasons: [] })
 
   const [{ data: myRegs }, { data: allRegs }] = await Promise.all([
-    admin.from("league_registrations").select("season_id").eq("player_id", user.id).in("season_id", seasonIds),
+    user ? admin.from("league_registrations").select("season_id").eq("player_id", user.id).in("season_id", seasonIds) : Promise.resolve({ data: [] }),
     admin.from("league_registrations").select("season_id").in("season_id", seasonIds),
   ])
 
@@ -34,7 +35,8 @@ export async function GET() {
   const joinedIds = seasonIds.filter(id => mine.has(id))
   const assignmentsBySeason = new Map<string, any[]>()
 
-  if (joinedIds.length) {
+  // Ohne Konto ist joinedIds leer — der Block laeuft dann gar nicht erst.
+  if (user && joinedIds.length) {
     const { data: matches } = await admin
       .from("league_matches")
       .select("id,season_id,p1_id,p2_id,round,status,deadline,confirmed_at,ranked,entered_by,sets,winner_id")

@@ -4,17 +4,27 @@ import { NextResponse, type NextRequest } from 'next/server'
 // Entdecken ohne Konto: Liste UND Detailseite. Der Vergleich war vorher exakt
 // (pathname === p), darum lief /turniere/<id> — also genau der Link von der
 // Webseite — in die Login-Wand.
+// 07.09.2026 (Oliver): PLAYER ist oeffentlich browsbar. Lesen braucht kein
+// Konto — Liga und Saison, Community-Feed, oeffentliche Spielerprofile,
+// Trainings und Camps kommen dazu. Das Konto verlangt erst, wer etwas TUT:
+// fordern, erstellen, beitreten, eintragen, reagieren (siehe GESCHUETZT).
 const PUBLIC_PATHS = ['/', '/login', '/onboarding', '/auth', '/spielen', '/entdecken',
-  '/turniere', '/rangliste', '/match', '/single-night']
+  '/turniere', '/rangliste', '/match', '/single-night',
+  '/liga', '/feed', '/spieler', '/training', '/trainingscamp']
 
 // Diese Unterseiten brauchen trotzdem ein Konto: erstellen, mitspielen, eintragen.
-const GESCHUETZT = ['/match/create', '/match/erstellen', '/erstellen']
+const GESCHUETZT = ['/match/create', '/match/erstellen', '/erstellen',
+  '/liga/join', '/turniere/neu', '/trainingscamp/storno', '/single-night/storno']
 
 // Oeffentlich lesbare API-Routen — ausschliesslich GET. Ohne diese Zeilen
 // antwortete die API einem ausgeloggten Besucher mit 401; die Seite zeigte
 // daraufhin "0 offene Turniere" und "0 Spieler", waehrend die Webseite zwei
 // Turniere und 22 Spieler auswies. Kein Datenproblem — ein Zugriffsproblem.
-const PUBLIC_API_GET = ['/api/turniere', '/api/rangliste', '/api/match', '/api/single-night']
+// Nur GET. Die Pruefung unten verlangt request.method === 'GET', Schreiben
+// bleibt also in jedem Fall angemeldet.
+const PUBLIC_API_GET = ['/api/turniere', '/api/rangliste', '/api/match', '/api/single-night',
+  '/api/feed', '/api/liga/player', '/api/liga/season', '/api/liga/gewertet',
+  '/api/training', '/api/trainingscamp']
 
 // Routen, die bewusst OHNE Login funktionieren müssen:
 // - confirm-email: der Ein-Klick-Link aus der Bestätigungs-Mail (signiert, prüft sich selbst)
