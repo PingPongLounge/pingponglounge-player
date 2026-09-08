@@ -282,7 +282,10 @@ export default function CreateMatchPage() {
           </>
         )}
 
-        {/* ---------- SCHRITT 3b · Tischbuchung (Planyo) ---------- */}
+        {/* ---------- SCHRITT 3b · Tischbuchung ----------
+            08.09.2026: Der Knopf hiess "Tisch in Planyo buchen". Der Name des
+            Buchungssystems gehoert nicht in die Oberflaeche — gebucht wird
+            bei der Ping Pong Lounge. */}
         {step === 3 && created && (
           <>
             <h1 style={bigTitle}>Fast fertig!</h1>
@@ -300,7 +303,7 @@ export default function CreateMatchPage() {
             </div>
             {error && <p style={{ color: DANGER, fontSize: 13, marginBottom: 12 }}>{error}</p>}
             <div style={{ flex: 1 }} />
-            <button onClick={() => window.open(created.bookingUrl, "_blank", "noopener")} style={btnOutline}>Tisch in Planyo buchen</button>
+            <button onClick={() => window.open(created.bookingUrl, "_blank", "noopener")} style={btnOutline}>Jetzt Tisch buchen</button>
             <button onClick={publish} disabled={loading} style={{ ...btn, marginTop: 10, opacity: loading ? .6 : 1 }}>
               {loading ? "…" : "Tisch gebucht — veröffentlichen"}
             </button>
