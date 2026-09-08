@@ -72,7 +72,7 @@ export default function RanglistePage() {
           <div style={{ marginTop: me ? 26 : 0 }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 14, marginBottom: 12 }}>
               <h2 style={{ fontFamily: INTER, fontSize: 12.5, fontWeight: 900, letterSpacing: ".14em", textTransform: "uppercase", margin: 0, color: SCHWARZ }}>
-                Rangliste · {canton || "Schweiz"}
+                {canton ? `Rangliste · ${canton}` : "Rangliste"}
               </h2>
               <select value={canton} onChange={e => setCanton(e.target.value)} style={{
                 fontFamily: INTER, fontSize: 13, fontWeight: 700, color: SCHWARZ, background: "#FFFFFF",

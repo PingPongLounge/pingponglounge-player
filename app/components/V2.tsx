@@ -206,9 +206,12 @@ export function ListenZeile({ links, titel, unter, meta, rechts, erste = false, 
     }}>
       {links}
       <div style={{ flex: 1, minWidth: 0 }}>
+        {/* Zwei Zeilen statt Abschneiden: "PPL Cup Glattbrugg" wurde neben
+            dem ANMELDEN-Knopf zu "PPL Cup Glattbr…" — der Ort, also genau
+            das Unterscheidende, fiel weg. */}
         <div style={{
           fontFamily: INTER, fontSize: 15, fontWeight: 700, lineHeight: 1.25, color: SCHWARZ,
-          overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap",
+          display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
         }}>{titel}</div>
         {unter && <div style={{ fontFamily: INTER, fontSize: 13, color: TEXT_LEISE, marginTop: 3, lineHeight: 1.35 }}>{unter}</div>}
         {meta && <div style={{ fontFamily: INTER, fontSize: 13, color: TEXT_LEISE, marginTop: 1, lineHeight: 1.35 }}>{meta}</div>}
