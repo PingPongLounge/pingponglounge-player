@@ -58,7 +58,7 @@ export async function belegung(admin: SupabaseClient, tournamentId: string, maxP
   const jetzt = new Date().toISOString()
   const { data } = await admin
     .from("tournament_registrations")
-    .select("id,payment_status,reserved_until,waitlist")
+    .select("id,payment_status,reserved_until,waitlist,begleitung")
     .eq("tournament_id", tournamentId)
     .eq("status", "active")
     .eq("waitlist", false)
@@ -68,7 +68,12 @@ export async function belegung(admin: SupabaseClient, tournamentId: string, maxP
     if (["paid", "free"].includes(r.payment_status)) return true
     if (["reserved", "pending"].includes(r.payment_status) && r.reserved_until && r.reserved_until > jetzt) return true
     return false
-  }).length
+  })
+    // Eine Anmeldung mit Begleitung sind zwei Personen im Raum — also zwei
+    // Plaetze, auch wenn dafuer nur ein Ticket bezahlt wurde (Single Night,
+    // "2 fuer 1"). Bei Turnieren ist begleitung immer null, dort aendert
+    // sich nichts.
+    .reduce((summe, r) => summe + (r.begleitung ? 2 : 1), 0)
   const frei = Math.max(0, maxPlayers - belegt)
   return { max: maxPlayers, belegt, frei, voll: frei <= 0 }
 }

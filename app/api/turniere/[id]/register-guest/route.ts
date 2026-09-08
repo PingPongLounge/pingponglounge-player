@@ -20,16 +20,52 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const self = String(body.self_rating || "")
   const consent = body.consent === true
 
+  // Single Nights: Geschlecht ist Pflicht, und eine Frau muss sagen, ob sie
+  // alleine kommt oder eine zweite Frau mitbringt. Kommt sie zu zweit, ist
+  // die zweite Person mit Name, E-Mail und Telefon anzugeben — sonst steht
+  // am Abend jemand da, den niemand auf der Liste hat.
+  const geschlecht = String(body.geschlecht || "").trim().toLowerCase()
+  const roh = (body.begleitung ?? null) as Record<string, unknown> | null
+  const gBegleitung = roh && typeof roh === "object" ? {
+    first_name: String(roh.first_name || "").trim().slice(0, 60),
+    last_name: String(roh.last_name || "").trim().slice(0, 60),
+    email: String(roh.email || "").trim().toLowerCase().slice(0, 120),
+    phone: String(roh.phone || "").trim().slice(0, 40),
+  } : null
+
   if (!first || !last) return NextResponse.json({ error: "Vor- und Nachname nötig" }, { status: 400 })
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return NextResponse.json({ error: "Gültige E-Mail nötig" }, { status: 400 })
   if (!SELF_RATINGS.some(r => r.key === self)) return NextResponse.json({ error: "Bitte Spielstärke wählen" }, { status: 400 })
   if (!consent) return NextResponse.json({ error: "Bitte den Bedingungen zustimmen" }, { status: 400 })
+  if (geschlecht && !["frau", "mann", "divers"].includes(geschlecht))
+    return NextResponse.json({ error: "Ungültige Angabe" }, { status: 400 })
 
   const admin = createAdminClient()
   const { data: t } = await admin.from("player_tournaments")
-    .select("id,name,date,start_time,end_time,city,status,max_players,payment_mode,entry_fee_chf,registration_deadline,published_web")
+    .select("id,name,date,start_time,end_time,city,status,max_players,payment_mode,entry_fee_chf,registration_deadline,published_web,format")
     .eq("id", id).single()
   if (!t) return NextResponse.json({ error: "Turnier nicht gefunden" }, { status: 404 })
+
+  const istSingleNight = t.format === "single_night"
+  if (istSingleNight) {
+    if (!geschlecht) return NextResponse.json({ error: "Bitte wählen, wie du kommst" }, { status: 400 })
+    if (geschlecht === "frau" && body.begleitung === undefined)
+      return NextResponse.json({ error: "Bitte angeben, ob du alleine oder zu zweit kommst" }, { status: 400 })
+  }
+  if (gBegleitung) {
+    // "2 fuer 1" gilt nur an Single Nights. Bei einem Turnier zahlt jede
+    // Person ihr eigenes Startgeld — dort gibt es keine Begleitung.
+    if (!istSingleNight)
+      return NextResponse.json({ error: "Eine zweite Person ist nur an Single Nights möglich" }, { status: 400 })
+    if (!gBegleitung.first_name || !gBegleitung.last_name)
+      return NextResponse.json({ error: "Vor- und Nachname der zweiten Person nötig" }, { status: 400 })
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(gBegleitung.email))
+      return NextResponse.json({ error: "Gültige E-Mail der zweiten Person nötig" }, { status: 400 })
+    if (gBegleitung.phone.replace(/\D/g, "").length < 7)
+      return NextResponse.json({ error: "Telefonnummer der zweiten Person nötig" }, { status: 400 })
+    if (gBegleitung.email === email)
+      return NextResponse.json({ error: "Die zweite Person braucht eine eigene E-Mail" }, { status: 400 })
+  }
   if (!t.published_web) return NextResponse.json({ error: "Turnier nicht für Gäste geöffnet" }, { status: 403 })
   if (!["open", "published", "registration_open"].includes(t.status))
     return NextResponse.json({ error: "Anmeldung nicht möglich" }, { status: 400 })
@@ -58,6 +94,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     reg_type: "guest", source: "ppl_web",
     first_name: first, last_name: last, email, phone,
     self_rating: self, consent: true,
+    geschlecht: geschlecht || null,
+    begleitung: gBegleitung,
     seeding_value: seedWert({ reg_type: "guest", self_rating: self }) ?? selfRatingElo(self),
     payment_status: aufWarteliste ? "none" : (bezahltNoetig ? "none" : "free"),
     amount_chf: bezahltNoetig ? t.entry_fee_chf : 0,
