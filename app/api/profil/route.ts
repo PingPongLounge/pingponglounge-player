@@ -21,14 +21,22 @@ export async function GET() {
     .order("created_at", { ascending: true })
     .limit(20)
 
-  // Letzte 5 Matches für Profil-Vorschau
+  /* Letzte 5 Matches fuer die Profil-Vorschau.
+
+     08.09.2026: Hier stand ein eingebetteter Join auf "profiles" fuer p1
+     und p2. Der konnte nie funktionieren: auf profiles greift RLS mit
+     "auth.uid() = id" — man liest ausschliesslich die eigene Zeile. Der
+     Join lieferte fuer den GEGNER also immer null, und im Profil stand
+     "vs." ohne Namen. Aufgefallen ist es niemandem, weil der eigene Name
+     ja kam.
+
+     Die Namen kommen jetzt aus public_profiles — der Sicht, die genau
+     dafuer da ist und die der Rest der App ohnehin benutzt. */
   const { data: recentMatches } = await sb
     .from("league_matches")
     .select(`
       id,sets,winner_id,confirmed_at,season_id,
       p1_id,p2_id,
-      p1:profiles!league_matches_p1_id_fkey(name),
-      p2:profiles!league_matches_p2_id_fkey(name),
       season:league_seasons!league_matches_season_id_fkey(name,city)
     `)
     .eq("status", "confirmed")
@@ -36,5 +44,23 @@ export async function GET() {
     .order("confirmed_at", { ascending: false })
     .limit(5)
 
-  return NextResponse.json({ profile, eloHistory: eloHistory || [], recentMatches: recentMatches || [] })
+  type Zeile = { p1_id: string; p2_id: string }
+  const roh = (recentMatches || []) as unknown as Zeile[]
+  const gegnerIds = [...new Set(roh.map(m => (m.p1_id === user.id ? m.p2_id : m.p1_id)))]
+  const { data: gegner } = gegnerIds.length
+    ? await sb.from("public_profiles").select("id,name,avatar_url").in("id", gegnerIds)
+    : { data: [] as Array<{ id: string; name: string; avatar_url: string | null }> }
+  const nameVon = (id: string) => (gegner || []).find(g => g.id === id)?.name || null
+  const bildVon = (id: string) => (gegner || []).find(g => g.id === id)?.avatar_url || null
+
+  // Form beibehalten (p1/p2 als Objekt mit name), damit die Seiten
+  // unveraendert weiterlaufen — nur gefuellt statt leer.
+  const angereichert = roh.map(m => ({
+    ...m,
+    p1: { name: m.p1_id === user.id ? (profile?.name || "Du") : (nameVon(m.p1_id) || "Spieler") },
+    p2: { name: m.p2_id === user.id ? (profile?.name || "Du") : (nameVon(m.p2_id) || "Spieler") },
+    gegnerAvatar: bildVon(m.p1_id === user.id ? m.p2_id : m.p1_id),
+  }))
+
+  return NextResponse.json({ profile, eloHistory: eloHistory || [], recentMatches: angereichert })
 }

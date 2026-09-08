@@ -486,7 +486,7 @@ export default function LigaPage(){
       <div className="ppl-huelle">
         {/* ══ HERO nach Referenz-Mockup ══════════════════════════════ */}
         <Hero
-          bild="/ppl-rangliste.jpg" pos="56% 40%"
+          bild="/ppl-spielen.jpg" pos="74% 38%"
           kopf={<HeroKopf/>}
           etikett="PPL League"
           titel={sel?.is_private?sel.name:<>Climb<br/>the ranks.</>}

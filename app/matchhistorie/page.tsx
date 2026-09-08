@@ -47,16 +47,31 @@ export default function MatchHistoriePage(){
     if(!user){setLoading(false);return}
     setUserId(user.id)
 
+    /* 08.09.2026: Der eingebettete Join auf "profiles" lieferte den
+       Gegnernamen nie — RLS dort erlaubt nur die eigene Zeile, also kam
+       null zurueck und in der Liste stand "vs." ohne Namen. Die Namen
+       kommen jetzt aus public_profiles. */
     const {data:m}=await sb
       .from("league_matches")
-      .select("id,sets,winner_id,confirmed_at,p1_id,p2_id,p1:profiles!league_matches_p1_id_fkey(name),p2:profiles!league_matches_p2_id_fkey(name),season:league_seasons!league_matches_season_id_fkey(name,city,skill_class)")
+      .select("id,sets,winner_id,confirmed_at,p1_id,p2_id,season:league_seasons!league_matches_season_id_fkey(name,city,skill_class)")
       .eq("status","confirmed")
       .or(`p1_id.eq.${user.id},p2_id.eq.${user.id}`)
       .order("confirmed_at",{ascending:false})
       .limit(200)
 
+    const roh=(m||[]) as Array<{p1_id:string;p2_id:string}>
+    const gegnerIds=[...new Set(roh.map(x=>x.p1_id===user.id?x.p2_id:x.p1_id))]
+    const {data:gg}=gegnerIds.length
+      ? await sb.from("public_profiles").select("id,name").in("id",gegnerIds)
+      : {data:[] as Array<{id:string;name:string}>}
+    const nameVon=(id:string)=>(gg||[]).find(g=>g.id===id)?.name||"Spieler"
+    const meinName=(await sb.from("public_profiles").select("name").eq("id",user.id).maybeSingle()).data?.name||"Du"
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    setMatches((m||[]) as any)
+    setMatches(roh.map(x=>({...x,
+      p1:{name:x.p1_id===user.id?meinName:nameVon(x.p1_id)},
+      p2:{name:x.p2_id===user.id?meinName:nameVon(x.p2_id)},
+    })) as any)
 
     const {data:eh}=await sb
       .from("elo_history")

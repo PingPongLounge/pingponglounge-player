@@ -43,7 +43,7 @@ export default function RanglistePage() {
       <main style={{ minHeight: "100dvh", background: FLAECHE, color: SCHWARZ, fontFamily: INTER }}>
 
         <Hero
-          bild="/ppl-spielen.jpg" pos="70% 44%"
+          bild="/ppl-rangliste.jpg" pos="60% 40%"
           kopf={<HeroKopf />}
           etikett="Ranking"
           titel={<>Your<br />rank.</>}

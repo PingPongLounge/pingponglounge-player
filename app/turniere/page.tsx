@@ -59,7 +59,7 @@ export default function TurnierePage() {
       <main style={{ minHeight: "100dvh", background: FLAECHE, color: SCHWARZ, fontFamily: INTER }}>
 
         <Hero
-          bild="/ppl-events.jpg" pos="46% 34%"
+          bild="/ppl-lachen.jpg" pos="62% 46%"
           kopf={<HeroKopf />}
           etikett="Events"
           titel={<>Play.<br />Meet.<br />Repeat.</>}
