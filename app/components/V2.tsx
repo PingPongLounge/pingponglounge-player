@@ -66,7 +66,11 @@ export function Hero({
 
         <h1 className="ppl-hero-titel" style={{
           fontFamily: ANTON, fontWeight: 400, textTransform: "uppercase",
-          letterSpacing: ".002em", lineHeight: .87, color: "#FFFFFF", margin: 0,
+          /* 08.09.2026: lineHeight stand auf .87. Anton ist so eng gebaut,
+             dass sich die Zeilen bei mehrzeiligen Titeln beruehrt haben —
+             "PLAY. MEET. REPEAT." klebte aufeinander. .96 laesst Luft,
+             ohne dass der Block auseinanderfaellt. */
+          letterSpacing: ".002em", lineHeight: .96, color: "#FFFFFF", margin: 0,
         }}>{titel}</h1>
 
         {subline && (
