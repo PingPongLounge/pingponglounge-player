@@ -44,7 +44,7 @@ export default function StartHomeV2(d: StartData) {
       <main style={{ minHeight: "100dvh", background: FLAECHE, color: SCHWARZ, fontFamily: INTER }}>
 
         <Hero
-          bild="/ppl-start.jpg" pos="78% 44%"
+          bild="/ppl-events.jpg" pos="46% 38%"
           kopf={<HeroKopf />}
           etikett="Home"
           titel={<>Your<br />game.</>}

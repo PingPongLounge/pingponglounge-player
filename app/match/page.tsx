@@ -80,7 +80,7 @@ export default function MatchPage() {
       <main style={{ minHeight: "100dvh", background: FLAECHE, color: SCHWARZ, fontFamily: INTER }}>
 
         <Hero
-          bild="/ppl-weapon.jpg" pos="30% 62%"
+          bild="/ppl-tisch.jpg" pos="52% 58%"
           kopf={<HeroKopf />}
           etikett="Spielen"
           titel={<>Just<br />play.</>}

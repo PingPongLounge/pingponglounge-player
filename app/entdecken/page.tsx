@@ -110,7 +110,7 @@ export default async function EntdeckenPage() {
         {/* Kopf nach Referenz-Mockup: Foto, Etikett, sehr grosse Anton-Zeile,
             zwei Zeilen Erklaerung. Darunter die Aktionen. */}
         <Hero
-          bild="/ppl-start.jpg" pos="78% 44%"
+          bild="/ppl-events.jpg" pos="46% 38%"
           etikett="Player"
           titel={<>Ping Pong<br />spielen.</>}
           subline="Rating, Ranking, Liga und Community — vom ersten Ballwechsel bis zur Saison."

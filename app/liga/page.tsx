@@ -486,7 +486,7 @@ export default function LigaPage(){
       <div className="ppl-huelle">
         {/* ══ HERO nach Referenz-Mockup ══════════════════════════════ */}
         <Hero
-          bild="/ppl-spielen.jpg" pos="74% 38%"
+          bild="/hero-pokal.jpg" pos="58% 42%"
           kopf={<HeroKopf/>}
           etikett="PPL League"
           titel={sel?.is_private?sel.name:<>Climb<br/>the ranks.</>}
@@ -1066,13 +1066,13 @@ export default function LigaPage(){
           bisher komplett verdeckt. Man sah es schlicht nicht. */}
       {chatOpen&&(
         <div onClick={()=>setChatOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.4)",zIndex:130,display:"flex",justifyContent:"flex-end"}}>
-          <div onClick={e=>e.stopPropagation()} style={{background:BG,borderLeft:`1px solid ${B}`,height:"100%",width:"83%",maxWidth:380,display:"flex",flexDirection:"column",boxShadow:"-22px 0 50px rgba(0,0,0,.55)"}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"15px 16px",borderBottom:`1px solid ${B}`}}>
-              <span style={{fontSize:15,fontWeight:600,color:W}}>Liga-Chat</span>
-              <button onClick={()=>setChatOpen(false)} style={{background:"none",color:M,fontSize:18,cursor:"pointer"}}>✕</button>
+          <div onClick={e=>e.stopPropagation()} style={{background:FLAECHE,borderLeft:"1px solid rgba(8,8,8,.10)",height:"100%",width:"83%",maxWidth:380,display:"flex",flexDirection:"column",boxShadow:"-22px 0 50px rgba(0,0,0,.35)"}}>
+            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"15px 16px",borderBottom:"1px solid rgba(8,8,8,.10)",background:"#FFFFFF"}}>
+              <span style={{fontFamily:INTER,fontSize:12.5,fontWeight:900,letterSpacing:".14em",textTransform:"uppercase",color:SCHWARZ}}>Liga-Chat</span>
+              <button onClick={()=>setChatOpen(false)} style={{background:"none",color:TEXT_LEISE,fontSize:18,cursor:"pointer"}}>✕</button>
             </div>
             <div style={{flex:1,overflowY:"auto",padding:14,display:"flex",flexDirection:"column",gap:10}}>
-              {msgs.length===0?<p style={{textAlign:"center",color:MUT,fontSize:13,marginTop:20}}>Noch keine Nachrichten — schreib die erste 👋</p>:msgs.filter(m=>!m.parent_id).map(m=>{
+              {msgs.length===0?<p style={{textAlign:"center",color:TEXT_LEISE,fontSize:13.5,marginTop:20}}>Noch keine Nachrichten — schreib die erste 👋</p>:msgs.filter(m=>!m.parent_id).map(m=>{
                 const kommentare=msgs.filter(k=>k.parent_id===m.id)
                 if(m.kind==="match"){
                   let d:{winner:string,loser:string,wSets:number,lSets:number,detail:string,ranked?:boolean,pending?:boolean,enteredBy?:string}|null=null
@@ -1080,13 +1080,13 @@ export default function LigaPage(){
                   const r=m.reactions
                   return(
                     <div key={m.id} style={{alignSelf:"stretch"}}>
-                      <div style={{background:C,borderRadius:14,padding:"11px 14px"}}>
-                        <div style={{fontSize:10,fontWeight:700,color:d?.pending?MUT:d?.ranked===false?MUT:"rgba(57,255,20,.7)",letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>
+                      <div style={{background:"#FFFFFF",borderRadius:14,padding:"11px 14px"}}>
+                        <div style={{fontSize:10,fontWeight:700,color:d?.pending?TEXT_LEISE:d?.ranked===false?TEXT_LEISE:VIOLETT,letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>
                           {d?.pending?"Neues Ergebnis · wartet auf Bestätigung":d?.ranked===false?"Match · zählt nicht":"Match bestätigt"}
                         </div>
                         {d&&<>
-                          <div style={{fontSize:14,fontWeight:800,color:W,marginBottom:2}}>{d.winner} <span style={{color:d.pending?MUT:d.ranked===false?MUT:"rgba(57,255,20,.9)"}}>schlägt</span> {d.loser}</div>
-                          <div style={{fontSize:12,color:MUT,marginBottom:8}}>
+                          <div style={{fontSize:14,fontWeight:800,color:SCHWARZ,marginBottom:2}}>{d.winner} <span style={{color:d.pending?TEXT_LEISE:d.ranked===false?TEXT_LEISE:VIOLETT}}>schlägt</span> {d.loser}</div>
+                          <div style={{fontSize:12,color:TEXT_LEISE,marginBottom:8}}>
                             {d.wSets}:{d.lSets} Sätze{d.detail?` · ${d.detail}`:""}{d.ranked===false?" · ohne Liga-Punkte":""}
                             {d.pending&&d.enteredBy?` · eingetragen von ${d.enteredBy}`:""}
                           </div>
@@ -1097,15 +1097,15 @@ export default function LigaPage(){
                             const cnt=r[type]
                             const active=r.myReacts.includes(type)
                             return(
-                              <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:active?"rgba(255,255,255,.14)":"rgba(255,255,255,.06)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:W,fontFamily:"inherit"}}>
+                              <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:active?"rgba(140,61,255,.14)":"rgba(8,8,8,.05)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:SCHWARZ,fontFamily:"inherit"}}>
                                 <span>{emoji}</span>
-                                {cnt>0&&<span style={{fontSize:11,fontWeight:700,color:active?"#8C3DFF":MUT}}>{cnt}</span>}
+                                {cnt>0&&<span style={{fontSize:11,fontWeight:700,color:active?VIOLETT:TEXT_LEISE}}>{cnt}</span>}
                               </button>
                             )
                           })}
                           {/* Kommentieren — das Spiel selbst ist der Gesprächsanlass */}
                           <button onClick={()=>setCmtOpen(o=>({...o,[m.id]:!o[m.id]}))}
-                            style={{display:"flex",alignItems:"center",gap:5,marginLeft:"auto",background:"rgba(255,255,255,.06)",borderRadius:99,padding:"4px 10px",fontSize:11,fontWeight:700,color:kommentare.length?W:MUT,cursor:"pointer",fontFamily:"inherit"}}>
+                            style={{display:"flex",alignItems:"center",gap:5,marginLeft:"auto",background:"rgba(8,8,8,.05)",borderRadius:99,padding:"4px 10px",fontSize:11,fontWeight:700,color:kommentare.length?SCHWARZ:TEXT_LEISE,cursor:"pointer",fontFamily:"inherit"}}>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
                             {kommentare.length>0?kommentare.length:"Kommentieren"}
                           </button>
@@ -1113,11 +1113,11 @@ export default function LigaPage(){
 
                         {/* Kommentare */}
                         {(kommentare.length>0||cmtOpen[m.id])&&(
-                          <div style={{marginTop:11,paddingTop:10,borderTop:"1px solid rgba(255,255,255,.08)",display:"flex",flexDirection:"column",gap:7}}>
+                          <div style={{marginTop:11,paddingTop:10,borderTop:"1px solid rgba(8,8,8,.10)",display:"flex",flexDirection:"column",gap:7}}>
                             {kommentare.map(k=>(
                               <div key={k.id} style={{display:"flex",gap:7,alignItems:"baseline"}}>
-                                <span style={{fontSize:11,fontWeight:800,color:k.user_id===userId?"rgba(57,255,20,.9)":SUB,flexShrink:0}}>{k.user_id===userId?"Du":k.name}</span>
-                                <span style={{fontSize:12.5,color:W,fontWeight:500,lineHeight:1.45,wordBreak:"break-word"}}>{k.text}</span>
+                                <span style={{fontSize:11,fontWeight:800,color:k.user_id===userId?VIOLETT:TEXT_LEISE,flexShrink:0}}>{k.user_id===userId?"Du":k.name}</span>
+                                <span style={{fontSize:12.5,color:SCHWARZ,fontWeight:500,lineHeight:1.45,wordBreak:"break-word"}}>{k.text}</span>
                               </div>
                             ))}
                             {myReg&&(
@@ -1127,9 +1127,9 @@ export default function LigaPage(){
                                   onChange={e=>setCmt(c=>({...c,[m.id]:e.target.value}))}
                                   onKeyDown={e=>{if(e.key==="Enter")sendComment(m.id)}}
                                   placeholder="Kommentar zum Spiel …"
-                                  style={{flex:1,minWidth:0,background:"rgba(0,0,0,.25)",borderRadius:999,padding:"9px 12px",color:W,fontSize:12.5,outline:"none",fontFamily:"inherit"}}/>
+                                  style={{flex:1,minWidth:0,background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.12)",borderRadius:999,padding:"9px 12px",color:SCHWARZ,fontSize:12.5,outline:"none",fontFamily:"inherit"}}/>
                                 <button onClick={()=>sendComment(m.id)} aria-label="Kommentar senden"
-                                  style={{width:36,flexShrink:0,borderRadius:999,background:GRAD,color:"#FFFFFF",fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>→</button>
+                                  style={{width:36,flexShrink:0,borderRadius:999,background:VIOLETT,color:"#FFFFFF",fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>→</button>
                               </div>
                             )}
                           </div>
@@ -1141,19 +1141,19 @@ export default function LigaPage(){
                 const mine=m.user_id===userId
                 return(
                   <div key={m.id} style={{maxWidth:"80%",alignSelf:mine?"flex-end":"flex-start"}}>
-                    {!mine&&<div style={{fontSize:10,color:MUT,margin:"0 0 3px 4px"}}>{m.name}</div>}
-                    <div style={{background:C,borderRadius:14,padding:"9px 12px",fontSize:13,fontWeight:500,color:W}}>{m.text}</div>
+                    {!mine&&<div style={{fontSize:10.5,color:TEXT_LEISE,margin:"0 0 3px 4px"}}>{m.name}</div>}
+                    <div style={{background:mine?VIOLETT:"#FFFFFF",borderRadius:14,padding:"9px 12px",fontSize:13.5,fontWeight:500,color:mine?"#FFFFFF":SCHWARZ}}>{m.text}</div>
                   </div>
                 )
               })}
             </div>
             {myReg?(
-              <div style={{display:"flex",gap:8,padding:"12px 14px",borderTop:`1px solid ${B}`}}>
-                <input value={msg} onChange={e=>setMsg(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")send()}} placeholder="Nachricht an die Liga …" style={{flex:1,background:C,borderRadius:999,padding:"11px 14px",color:W,fontSize:13,outline:"none"}}/>
-                <button onClick={send} style={{width:42,borderRadius:999,background:GRAD,color:"#FFFFFF",fontWeight:800,cursor:"pointer"}}>→</button>
+              <div style={{display:"flex",gap:8,padding:"12px 14px",borderTop:"1px solid rgba(8,8,8,.10)",background:"#FFFFFF"}}>
+                <input value={msg} onChange={e=>setMsg(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")send()}} placeholder="Nachricht an die Liga …" style={{flex:1,background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.12)",borderRadius:999,padding:"11px 14px",color:SCHWARZ,fontSize:13.5,outline:"none",fontFamily:"inherit"}}/>
+                <button onClick={send} style={{width:42,borderRadius:999,background:VIOLETT,color:"#FFFFFF",fontWeight:800,cursor:"pointer"}}>→</button>
               </div>
             ):(
-              <p style={{padding:"14px",textAlign:"center",color:M,fontSize:12}}>Tritt der Liga bei, um mitzuschreiben.</p>
+              <p style={{padding:"14px",textAlign:"center",color:TEXT_LEISE,fontSize:13}}>Tritt der Liga bei, um mitzuschreiben.</p>
             )}
           </div>
         </div>

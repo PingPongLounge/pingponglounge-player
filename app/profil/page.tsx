@@ -24,7 +24,7 @@ return <>
 
     {/* Kein weiteres Actionbild: PROFIL bekommt das ruhige Still-Life. */}
     <Hero
-      bild="/ppl-profil.jpg" pos="34% 46%"
+      bild="/ppl-equipment.jpg" pos="50% 52%"
       kopf={<HeroKopf rechts={<Link href="#einstellungen" aria-label="Einstellungen" style={{display:"inline-flex",width:38,height:38,borderRadius:"50%",border:"1px solid rgba(244,241,235,.22)",alignItems:"center",justifyContent:"center",color:P,textDecoration:"none"}}><Symbol art="zahnrad" groesse={18}/></Link>}/>}
       etikett="Player"
       titel={<>This<br/>is you.</>}

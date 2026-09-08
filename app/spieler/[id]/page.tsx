@@ -79,7 +79,7 @@ export default async function SpielerSeite({ params }: { params: Promise<{ id: s
     <main style={{ minHeight: "100dvh", background: FLAECHE, color: SCHWARZ, fontFamily: INTER }}>
 
       <Hero
-        bild="/ppl-profil.jpg" pos="34% 46%"
+        bild="/ppl-equipment.jpg" pos="50% 52%"
         etikett="Player"
         titel={p.name}
         subline={`Level ${p.level}${p.canton ? ` · ${p.canton}` : ""}`}
