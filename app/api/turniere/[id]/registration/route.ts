@@ -4,7 +4,7 @@ import { getRechte, darfStandort } from "@/lib/roles"
 import { nachruecken } from "@/lib/tournaments"
 import { notify } from "@/lib/notify"
 import { NextRequest, NextResponse } from "next/server"
-import { sendTournamentWaitlistUp } from "@/lib/email"
+import { melde, sendTournamentWaitlistUp } from "@/lib/email"
 
 // TEILNEHMER VERWALTEN (nur Veranstalter)
 // PATCH: Status/Zahlung/Check-in/manuelle Einstufung/Notiz ändern.
@@ -86,7 +86,10 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
     // App-Benachrichtigung — sie erfuhren vom Nachrücken bisher gar nichts.
     const { data: t } = await admin.from("player_tournaments")
       .select("name,date").eq("id", tid).maybeSingle()
-    await sendTournamentWaitlistUp({
+    await melde(
+      "turnier_nachgerueckt",
+      { to: rueck.email, turnierId: tid },
+      sendTournamentWaitlistUp({
       to: rueck.email,
       name: (rueck as { first_name?: string }).first_name || "zusammen",
       turnier: t?.name || "Turnier",
@@ -94,7 +97,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
         ? new Date(`${t.date}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })
         : "Termin folgt",
       turnierUrl: `https://pingponglounge.ch/turniere/${tid}`,
-    }).catch(() => { /* Abmeldung darf nie am Mailversand scheitern */ })
+      }),
+    ) // wirft nie — Abmeldung darf nie am Mailversand scheitern
   }
   return NextResponse.json({ ok: true, nachgerueckt: rueck?.id ?? null })
 }

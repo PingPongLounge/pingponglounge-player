@@ -3,8 +3,9 @@ import Stripe from "stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { PP_CONFIG } from "@/lib/rewards"
 import { sessionUuid } from "@/lib/stripe-util"
-import { sendBookingConfirm, sendEmail, sendTournamentConfirm } from "@/lib/email"
+import { melde, sendBookingConfirm, sendEmail, sendTournamentConfirm, sendTournamentStaffNotice } from "@/lib/email"
 import { entryQrFor, weekdayOf, SINGLE_NIGHT_PLAETZE } from "@/lib/opengames"
+import { belegung, SELF_RATINGS } from "@/lib/tournaments"
 import { CAMP_MAX_PER_SESSION } from "@/lib/camp"
 import { campBelegung } from "@/lib/camp-server"
 
@@ -133,20 +134,29 @@ export async function POST(req: NextRequest) {
     // TURNIER: Zahlung eingegangen → Platz endgültig bestätigt, Bestätigung raus.
     if (s.payment_status === "paid" && s.metadata?.type === "tournament" && s.metadata.registration_id) {
       const admin = createAdminClient()
+      // IDEMPOTENZ: Stripe stellt mindestens einmal zu und wiederholt bei
+      // jeder Nicht-2xx-Antwort. Ohne Filter lief das Update jedes Mal durch,
+      // lieferte eine Zeile zurueck und schickte eine WEITERE Bestaetigung.
+      // Mit .neq("payment_status","paid") trifft die Wiederholung keine Zeile
+      // mehr -> reg ist null -> keine zweite Mail. Bezahlt bleibt bezahlt.
       const { data: reg } = await admin.from("tournament_registrations")
         .update({ payment_status: "paid", reserved_until: null })
         .eq("id", s.metadata.registration_id)
-        .select("email,first_name,amount_chf,tournament_id")
+        .neq("payment_status", "paid")
+        .select("email,first_name,last_name,phone,self_rating,amount_chf,tournament_id,waitlist,waitlist_pos")
         .maybeSingle()
 
       // Bisher endete der Vorgang hier — der Gast zahlte und bekam nichts.
       if (reg?.email) {
         const { data: t } = await admin.from("player_tournaments")
-          .select("name,date,start_time,end_time,city").eq("id", reg.tournament_id).maybeSingle()
+          .select("name,date,start_time,end_time,city,max_players").eq("id", reg.tournament_id).maybeSingle()
         const datumLabel = t?.date
           ? new Date(`${t.date}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })
           : "Termin folgt"
-        await sendTournamentConfirm({
+        await melde(
+          "turnier_bezahlt",
+          { to: reg.email, turnierId: reg.tournament_id },
+          sendTournamentConfirm({
           to: reg.email,
           name: reg.first_name || "zusammen",
           turnier: t?.name || "Turnier",
@@ -156,7 +166,32 @@ export async function POST(req: NextRequest) {
           startgeldChf: Number(reg.amount_chf) || 0,
           bezahlt: true,
           turnierUrl: `https://pingponglounge.ch/turniere/${reg.tournament_id}`,
-        }).catch(() => { /* Zahlung darf nie am Mailversand scheitern */ })
+          }),
+        ) // wirft nie — Zahlung darf nie am Mailversand scheitern
+
+        // Interne Meldung. Hier und NUR hier fuer onlinebezahlte Anmeldungen —
+        // register-guest haelt sich in genau diesem Fall zurueck. Weil dieser
+        // Zweig durch .neq("payment_status","paid") nur beim ERSTEN Mal
+        // erreicht wird, meldet auch eine Webhook-Wiederholung nicht nochmals.
+        const staffBel = t ? await belegung(admin, reg.tournament_id, t.max_players ?? 32) : null
+        await melde(
+          "turnier_staff",
+          { to: "STAFF", turnierId: reg.tournament_id },
+          sendTournamentStaffNotice({
+            turnier: t?.name || "Turnier",
+            datumLabel,
+            ort: t?.city,
+            vorname: reg.first_name || "", nachname: reg.last_name || "",
+            email: reg.email, telefon: reg.phone,
+            spielstaerke: SELF_RATINGS.find(r => r.key === reg.self_rating)?.label ?? reg.self_rating,
+            zahlungsstatus: `bezahlt · CHF ${Number(reg.amount_chf) || 0}`,
+            warteliste: !!reg.waitlist,
+            wartelistenPos: reg.waitlist_pos,
+            belegt: staffBel?.belegt ?? null,
+            max: t?.max_players ?? null,
+            turnierId: reg.tournament_id,
+          }),
+        ) // wirft nie
       }
       return NextResponse.json({ received: true })
     }
@@ -203,12 +238,31 @@ export async function POST(req: NextRequest) {
           })
 
           if (insErr) {
-            // Der Spieler ist schon drin (Doppelzahlung, z.B. zwei Tabs): der
-            // Unique-Index (game_id,user_id) verhindert den zweiten Platz.
-            // Ohne Refund bliebe die zweite Zahlung einbehalten — also erstatten.
-            try {
-              if (s.payment_intent) await getStripe().refunds.create({ payment_intent: String(s.payment_intent) })
-            } catch (e) { console.error("Refund bei Doppelzahlung fehlgeschlagen:", e) }
+            // Der Spieler ist schon drin. Zwei Faelle sehen an dieser Stelle
+            // gleich aus, brauchen aber das Gegenteil voneinander:
+            //
+            //   a) ECHTE DOPPELZAHLUNG (zwei Tabs, zwei Stripe-Sessions):
+            //      der zweite Platz entsteht dank Unique-Index nicht, die
+            //      zweite Zahlung muss zurueck.
+            //   b) WIEDERHOLUNG DESSELBEN WEBHOOKS (Stripe liefert mindestens
+            //      einmal und wiederholt bei jeder Nicht-2xx-Antwort): es gab
+            //      nur EINE Zahlung. Frueher landete auch dieser Fall im
+            //      Refund — der Spieler behielt seinen Platz und bekam sein
+            //      Geld zurueck.
+            //
+            // Unterschieden wird an der Session-ID der bereits gespeicherten
+            // Zeile: ist es dieselbe Session, war es dieselbe Zahlung.
+            const { data: vorhanden } = await admin.from("open_game_players")
+              .select("stripe_session_id")
+              .eq("game_id", gameId).eq("user_id", userId).maybeSingle()
+
+            if (vorhanden?.stripe_session_id === s.id) {
+              console.log("Open Game: Webhook-Wiederholung fuer dieselbe Session, nichts zu tun —", s.id)
+            } else {
+              try {
+                if (s.payment_intent) await getStripe().refunds.create({ payment_intent: String(s.payment_intent) })
+              } catch (e) { console.error("Refund bei Doppelzahlung fehlgeschlagen:", e) }
+            }
           } else {
             await admin.from("open_games").update({
               current_players: (game.current_players ?? 0) + 1,

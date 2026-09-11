@@ -1,7 +1,7 @@
 import { createAdminClient } from "@/lib/supabase/admin"
 import { belegung, naechsteWartelistenPos, seedWert, selfRatingElo, SELF_RATINGS } from "@/lib/tournaments"
 import { NextRequest, NextResponse } from "next/server"
-import { sendTournamentConfirm } from "@/lib/email"
+import { melde, sendTournamentConfirm, sendTournamentStaffNotice } from "@/lib/email"
 
 // ANMELDUNG ÜBER PING PONG LOUNGE (Gast, ohne Player-Konto)
 // KEIN Login nötig. Gast gibt Name, E-Mail und eine verständliche
@@ -110,7 +110,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     const datumLabel = t.date
       ? new Date(`${t.date}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })
       : "Termin folgt"
-    await sendTournamentConfirm({
+    await melde(
+      aufWarteliste ? "turnier_warteliste" : "turnier_bestaetigung",
+      { to: email, turnierId: id },
+      sendTournamentConfirm({
       to: email,
       name: first,
       turnier: t.name || "Turnier",
@@ -121,7 +124,37 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       bezahlt: false,
       warteliste: aufWarteliste,
       turnierUrl: `https://pingponglounge.ch/turniere/${id}`,
-    }).catch(() => { /* Anmeldung darf nie am Mailversand scheitern */ })
+      }),
+    ) // wirft nie — Anmeldung darf nie am Mailversand scheitern
+  }
+
+  // ── Interne Meldung an das Team ─────────────────────────────────────────
+  // Genau dieselbe Bedingung wie oben bei der Gastmail: steht noch eine
+  // Onlinezahlung aus, meldet erst der Webhook nach Zahlungseingang. So kann
+  // die Staff-Mail weder doppelt kommen noch eine Anmeldung melden, die nie
+  // bezahlt wird.
+  if (!(bezahltNoetig && !aufWarteliste)) {
+    const datumLabel = t.date
+      ? new Date(`${t.date}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })
+      : "Termin folgt"
+    await melde(
+      "turnier_staff",
+      { to: "STAFF", turnierId: id },
+      sendTournamentStaffNotice({
+        turnier: t.name || "Turnier",
+        datumLabel,
+        ort: t.city,
+        vorname: first, nachname: last, email, telefon: phone,
+        spielstaerke: SELF_RATINGS.find(r => r.key === self)?.label ?? self,
+        zahlungsstatus: aufWarteliste ? "Warteliste, keine Zahlung"
+          : bezahltNoetig ? "offen (online)"
+          : Number(t.entry_fee_chf) > 0 ? `CHF ${t.entry_fee_chf} vor Ort` : "gratis",
+        warteliste: aufWarteliste,
+        wartelistenPos: wlPos,
+        belegt: b.belegt, max: t.max_players,
+        turnierId: id,
+      }),
+    ) // wirft nie — die Anmeldung steht bereits in der Datenbank
   }
 
   return NextResponse.json({

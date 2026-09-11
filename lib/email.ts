@@ -10,6 +10,37 @@ const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
 
 const G = "#8C3DFF"
 
+/** Mailversand protokollieren, ohne den Aufrufer scheitern zu lassen.
+ *
+ *  Frueher stand an jeder Aufrufstelle `.catch(() => {})` — und weil sendEmail
+ *  Fehler NICHT wirft, sondern als {ok:false} zurueckgibt, wurde der
+ *  Rueckgabewert einfach weggeworfen. Ein fehlender RESEND_API_KEY oder eine
+ *  nicht verifizierte Absenderdomain fiel damit niemandem auf: die Anmeldung
+ *  lief durch, die Mail kam nie, und es stand nirgends etwas.
+ *
+ *  Diese Huelle aendert am Verhalten nichts — sie wirft weiterhin nie — sie
+ *  schreibt nur eine Zeile ins Serverlog. Geloggt werden Mailtyp, Empfaenger,
+ *  Turnier-ID und der Fehlertext. NIE ein Schluessel oder ein Secret.
+ */
+export async function melde(
+  art: string,
+  ziel: { to?: string | null; turnierId?: string | null },
+  versand: Promise<{ ok: boolean; skipped?: boolean; error?: string }>,
+): Promise<void> {
+  const wo = [
+    `typ=${art}`,
+    ziel.to ? `an=${ziel.to}` : null,
+    ziel.turnierId ? `turnier=${ziel.turnierId}` : null,
+  ].filter(Boolean).join(" ")
+  try {
+    const r = await versand
+    if (r.skipped) console.error(`[mail] NICHT VERSCHICKT ${wo} grund=RESEND_API_KEY nicht gesetzt`)
+    else if (!r.ok) console.error(`[mail] FEHLER ${wo} grund=${r.error || "unbekannt"}`)
+  } catch (e) {
+    console.error(`[mail] AUSNAHME ${wo} grund=${e instanceof Error ? e.message : String(e)}`)
+  }
+}
+
 export async function sendEmail(opts: { to: string; subject: string; html: string }): Promise<{ ok: boolean; skipped?: boolean; error?: string }> {
   const key = process.env.RESEND_API_KEY
   if (!key) return { ok: false, skipped: true }
@@ -430,6 +461,76 @@ export async function sendTournamentConfirm(opts: {
     subject: `${titel} — ${opts.turnier}, ${opts.datumLabel}`,
     html: shell(inner),
   })
+}
+
+/** Interne Meldung an das PPL-Team, wenn sich jemand fuer ein Turnier oder
+ *  eine Single Night angemeldet hat.
+ *
+ *  AUSLOESER — genau einmal pro Anmeldung, an der Stelle, an der die Anmeldung
+ *  endgueltig gilt:
+ *    - gratis oder Zahlung vor Ort  -> sofort in register-guest
+ *    - Warteliste                   -> sofort in register-guest
+ *    - Onlinezahlung                -> NICHT bei der Anmeldung, sondern erst
+ *                                      im Stripe-Webhook nach Zahlungseingang
+ *  Damit kann sie nicht doppelt kommen: die beiden Wege schliessen einander
+ *  aus, genau wie bei der Bestaetigungsmail an den Gast.
+ *
+ *  Geht an alle STAFF_EMAILS. Blockiert nie — der Aufrufer verpackt sie in
+ *  melde(), Fehler landen im Serverlog.
+ */
+export async function sendTournamentStaffNotice(opts: {
+  turnier: string
+  datumLabel: string
+  ort?: string | null
+  vorname: string
+  nachname: string
+  email: string
+  telefon?: string | null
+  spielstaerke?: string | null
+  zahlungsstatus: string
+  warteliste: boolean
+  wartelistenPos?: number | null
+  belegt?: number | null
+  max?: number | null
+  turnierId?: string | null
+}) {
+  const zeile = (label: string, wert: string) => `
+    <tr>
+      <td style="padding:6px 0;font-size:13px;color:rgba(255,255,255,.55);white-space:nowrap;vertical-align:top">${label}</td>
+      <td style="padding:6px 0 6px 16px;font-size:14px;color:#ffffff">${wert}</td>
+    </tr>`
+
+  const stand = opts.belegt != null && opts.max != null ? `${opts.belegt} / ${opts.max} Teilnehmer` : null
+  const kopf = opts.warteliste ? "Neue Anmeldung — Warteliste" : "Neue Anmeldung"
+
+  const inner = `
+    <div style="font-size:12px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;color:${G};margin-bottom:6px">Intern</div>
+    <h1 style="font-size:22px;font-weight:900;color:#ffffff;margin:0 0 4px">${kopf}</h1>
+    <p style="font-size:15px;color:rgba(255,255,255,.85);margin:0 0 18px">${opts.turnier} · ${opts.datumLabel}${opts.ort ? ` · ${opts.ort}` : ""}</p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:${CARD};border-radius:16px">
+      <tr><td style="padding:14px 18px;font-family:system-ui,sans-serif">
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
+          ${zeile("Name", `${opts.vorname} ${opts.nachname}`)}
+          ${zeile("E-Mail", `<a href="mailto:${opts.email}" style="color:#C9A8FF">${opts.email}</a>`)}
+          ${opts.telefon ? zeile("Telefon", `<a href="tel:${opts.telefon}" style="color:#C9A8FF">${opts.telefon}</a>`) : ""}
+          ${opts.spielstaerke ? zeile("Spielstärke", opts.spielstaerke) : ""}
+          ${zeile("Zahlung", opts.zahlungsstatus)}
+          ${zeile("Warteliste", opts.warteliste ? `ja${opts.wartelistenPos ? ` · Position ${opts.wartelistenPos}` : ""}` : "nein")}
+          ${stand ? zeile("Stand", stand) : ""}
+        </table>
+      </td></tr>
+    </table>
+    ${opts.turnierId ? outlineButton(`https://pingponglounge.ch/turniere/${opts.turnierId}`, "Turnier ansehen") : ""}`
+
+  // An alle Staff-Adressen. Ein Versand je Adresse, damit eine ungueltige
+  // Adresse die anderen nicht mitreisst.
+  const ergebnisse = await Promise.all(STAFF_EMAILS.map(adresse => sendEmail({
+    to: adresse,
+    subject: `${opts.warteliste ? "Warteliste" : "Anmeldung"}: ${opts.vorname} ${opts.nachname} — ${opts.turnier}`,
+    html: shell(inner),
+  })))
+  const schlecht = ergebnisse.find(r => !r.ok)
+  return schlecht ?? { ok: true }
 }
 
 /** Nachricht an Gäste, die von der Warteliste nachrücken. In der App bekommen

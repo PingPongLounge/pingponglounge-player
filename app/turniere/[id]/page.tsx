@@ -52,7 +52,7 @@ function BracketMatch({m,userId,onResult}:{m:TMatch,userId:string|null,onResult:
 export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}){
   const {id:tournamentId}=use(params)
   const router=useRouter()
-  const [data,setData]=useState<{tournament:Tournament,registrations:Reg[],matches:TMatch[],isRegistered:boolean,userId:string|null}|null>(null)
+  const [data,setData]=useState<{tournament:Tournament,registrations:Reg[],matches:TMatch[],isRegistered:boolean,userId:string|null,canManage?:boolean}|null>(null)
   const [loading,setLoading]=useState(true)
   const [registering,setRegistering]=useState(false)
   const [regError,setRegError]=useState("")
@@ -157,7 +157,15 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
   return(
     <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
       <div style={{maxWidth:700,margin:"0 auto"}}>
-        <Link href="/turniere" style={backLink}>← Turniere</Link>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
+          <Link href="/turniere" style={backLink}>← Turniere</Link>
+          {data?.canManage&&(
+            <Link href={`/turniere/${tournamentId}/teilnehmer`}
+              style={{...btnGhost,textDecoration:"none",fontSize:12,padding:"9px 16px"}}>
+              Teilnehmer verwalten
+            </Link>
+          )}
+        </div>
 
         {/* Header */}
         <div style={{margin:"20px 0 20px"}}>
