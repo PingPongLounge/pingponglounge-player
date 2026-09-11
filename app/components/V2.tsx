@@ -210,8 +210,8 @@ export function ListenZeile({ links, titel, unter, meta, rechts, erste = false, 
     }}>
       {links}
       <div style={{ flex: 1, minWidth: 0 }}>
-        {/* Zwei Zeilen statt Abschneiden: "PPL Cup Glattbrugg" wurde neben
-            dem ANMELDEN-Knopf zu "PPL Cup Glattbr…" — der Ort, also genau
+        {/* Zwei Zeilen statt Abschneiden: "Ping Pong Lounge Open Glattbrugg" wurde neben
+            dem ANMELDEN-Knopf abgeschnitten — der Ort, also genau
             das Unterscheidende, fiel weg. */}
         <div style={{
           fontFamily: INTER, fontSize: 15, fontWeight: 700, lineHeight: 1.25, color: SCHWARZ,

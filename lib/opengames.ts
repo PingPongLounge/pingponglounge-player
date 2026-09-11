@@ -105,8 +105,8 @@ export const OG_STANDORTE: OgStandort[] = [
 // BLACKOUT-TAGE: an diesen Tagen werden für den Standort KEINE Open Games
 // angelegt (z.B. weil ein Turnier die Tische belegt). Format YYYY-MM-DD.
 export const OG_BLACKOUT: Record<string, string[]> = {
-  glattbrugg: ["2026-09-12"], // PPL Cup Glattbrugg
-  stgallen: ["2026-09-26"],   // PPL Cup St. Gallen
+  glattbrugg: ["2026-09-12"], // Ping Pong Lounge Open Glattbrugg
+  stgallen: ["2026-09-26"],   // Ping Pong Lounge Open St. Gallen
 }
 
 // ZUTRITTS-QR pro Standort. Nur Glattbrugg hat eine verschlossene Tür, die den

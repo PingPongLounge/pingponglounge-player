@@ -63,7 +63,7 @@ export default function NeuesTurnierPage(){
 
         <Section n="1" title="Eckdaten">
           <Label>Name</Label>
-          <input value={name} onChange={e=>setName(e.target.value)} placeholder="z. B. Friday Night Cup" style={{...inputStyle,marginBottom:14}}/>
+          <input value={name} onChange={e=>setName(e.target.value)} placeholder="z. B. Ping Pong Lounge Open Oerlikon" style={{...inputStyle,marginBottom:14}}/>
           <Label>Standort</Label>
           <div style={{display:"flex",gap:8,flexWrap:"wrap",marginBottom:14}}>
             {CITIES.map(c=><Chip key={c} active={city===c} onClick={()=>setCity(c)}>{c}</Chip>)}
