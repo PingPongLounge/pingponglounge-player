@@ -44,6 +44,19 @@ async function belegtePersonen(admin: ReturnType<typeof createAdminClient>, even
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({} as Record<string, unknown>))
   const eventId = String(body?.event_id || "")
+  /* 11.09.: Wohin nach der Zahlung? Bisher fuehrte Stripe IMMER auf
+     playerapp.ch zurueck — auch wenn der Gast auf pingponglounge.ch gebucht
+     hatte. Damit landete er nach dem Bezahlen in einer fremden App.
+     Genau dieselbe Loesung wie beim Turnier-Checkout: Pfad und Basis
+     getrennt, Basis gegen eine feste Liste geprueft (kein Open-Redirect),
+     ohne Angabe bleibt alles wie bisher. */
+  const successPath = typeof body?.success_path === "string" && body.success_path.startsWith("/")
+    ? body.success_path : "/single-night?bezahlt=1"
+  const cancelPath = typeof body?.cancel_path === "string" && body.cancel_path.startsWith("/")
+    ? body.cancel_path : "/single-night?abgebrochen=1"
+  const returnBase = typeof body?.return_base === "string"
+    && /^https:\/\/(www\.)?pingponglounge\.ch$/.test(body.return_base)
+    ? body.return_base : BASE_URL
   const ticket = snTicket(String(body?.ticket_type || ""))
   const guest = (body?.guest ?? null) as { name?: string; email?: string; phone?: string } | null
   if (!eventId || !ticket) return NextResponse.json({ error: "Ungültige Auswahl" }, { status: 400 })
@@ -135,8 +148,8 @@ export async function POST(req: NextRequest) {
     }],
     metadata: { type: "single_night", booking_id: booking.id },
     expires_at: Math.floor(reservedUntil.getTime() / 1000),
-    success_url: `${BASE_URL}/single-night?bezahlt=1`,
-    cancel_url: `${BASE_URL}/single-night?abgebrochen=1`,
+    success_url: `${returnBase}${successPath}`,
+    cancel_url: `${returnBase}${cancelPath}`,
   })
 
   await admin.from("single_night_bookings").update({ stripe_session_id: stripeSession.id }).eq("id", booking.id)

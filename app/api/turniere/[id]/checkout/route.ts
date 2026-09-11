@@ -45,6 +45,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { data: t } = await admin.from("player_tournaments")
     .select("id,name,entry_fee_chf,payment_mode,max_players,status,date,start_time").eq("id", id).single()
   if (!t) return NextResponse.json({ error: "Turnier nicht gefunden" }, { status: 404 })
+  // 11.09.: Der Status wurde zwar geladen, aber nie geprueft. register-guest
+  // blockiert abgesagte Turniere seit jeher; diese Route nicht — wer eine
+  // registration_id aus einer frueheren Anmeldung hatte, konnte fuer ein
+  // abgesagtes Turnier noch eine Stripe-Session oeffnen und bezahlen.
+  // Dieselbe Liste wie in register-guest, damit es nur EINE Regel gibt.
+  if (!["open", "published", "registration_open"].includes(t.status))
+    return NextResponse.json({ error: "Für dieses Turnier ist keine Zahlung mehr möglich" }, { status: 400 })
   if (t.payment_mode !== "online" || Number(t.entry_fee_chf) <= 0)
     return NextResponse.json({ error: "Für dieses Turnier ist keine Online-Zahlung nötig" }, { status: 400 })
 
