@@ -149,6 +149,42 @@ export function gruppeFuerLevel(level: string | number | null | undefined): "ein
   return l >= 4 ? "pro" : "einstieg"
 }
 
+/** Welche Gruppe ein ABEND verlangt — oder null, wenn er allen offensteht.
+ *
+ *  11.09.: Die Regel stand als Einzeiler im Checkout und lautete
+ *  `game.level === "4-7" ? "pro" : "einstieg"`. Das heisst: JEDER Wert ausser
+ *  "4-7" gilt als Einstieg-Abend — auch "alle". Alle acht kommenden Open
+ *  Games stehen aber auf level="alle", und damit wurde jeder Spieler ab
+ *  Level 4 abgewiesen: "Dieser Abend ist fuer Level 1-3 — du bist Level 5".
+ *  Ein Abend fuer alle darf niemanden ausschliessen.
+ *
+ *  Die Funktion steht hier und nicht im Checkout, damit Website-Gast und
+ *  Player durch dieselbe Regel laufen. */
+export function gruppeDesAbends(level: string | null | undefined): "einstieg" | "pro" | null {
+  if (!level || level === "alle") return null
+  if (level === "4-7") return "pro"
+  if (level === "1-3") return "einstieg"
+  // Einzelnes Level ("5") — ueber dieselbe Abbildung wie beim Spieler.
+  return gruppeFuerLevel(level)
+}
+
+/** Selbsteinschaetzung fuer Gaeste auf pingponglounge.ch.
+ *
+ *  Ein Gast hat kein Profil und damit kein Level. Statt ihm sieben technische
+ *  Stufen vorzulegen, waehlt er eine von zwei Beschreibungen — und die laeuft
+ *  durch GENAU DIESELBE Abbildung wie das Level eines Spielers
+ *  (gruppeFuerLevel). Es gibt also keine zweite Gruppenlogik, nur einen
+ *  zweiten Weg zu derselben. */
+export type OgGastStaerke = { key: string; label: string; beschreibung: string; level: number }
+export const OG_GAST_STAERKEN: OgGastStaerke[] = [
+  { key: "einstieg", label: "Anfänger / Freizeit", beschreibung: "Spielt selten bis gelegentlich, ohne Wettkampferfahrung.", level: 2 },
+  { key: "fortgeschritten", label: "Fortgeschritten", beschreibung: "Sichere Grundschläge, längere Ballwechsel, Verein oder Turniere.", level: 5 },
+]
+export function gastGruppe(key: string | null | undefined): "einstieg" | "pro" | null {
+  const s = OG_GAST_STAERKEN.find(x => x.key === key)
+  return s ? gruppeFuerLevel(s.level) : null
+}
+
 function iso(d: Date): string {
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`
 }

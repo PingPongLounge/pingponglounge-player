@@ -200,10 +200,16 @@ export async function POST(req: NextRequest) {
     // Zahlung. Wer die Kasse abbricht, hat nie einen Platz belegt.
     if (s.payment_status === "paid" && s.metadata?.type === "open_game") {
       const gameId = s.metadata.game_id
-      const userId = s.metadata.user_id
+      /* 11.09.: Ein Platz kann jetzt einem Player ODER einem Gast von
+         pingponglounge.ch gehoeren. Alles andere in diesem Zweig — Kapazitaet,
+         Ueberbuchungs-Refund, Idempotenz, Zaehler, Mail — bleibt gleich.
+         Nur PingPoints gibt es weiterhin ausschliesslich fuer Konten. */
+      const userId = s.metadata.user_id || ""
+      const gastEmail = (s.metadata.guest_email || "").trim().toLowerCase()
+      const istGast = !userId && !!gastEmail
       const admin = createAdminClient()
 
-      if (gameId && userId) {
+      if (gameId && (userId || gastEmail)) {
         const { data: game } = await admin
           .from("open_games")
           .select("id,max_players,current_players,status,location_name,price_per_player,date,start_hour,kind")
@@ -222,19 +228,27 @@ export async function POST(req: NextRequest) {
             console.error("Rückerstattung nach Überbuchung fehlgeschlagen:", e)
           }
         } else {
-          const { data: prof } = await admin.from("profiles").select("name").eq("id", userId).maybeSingle()
+          const { data: prof } = userId
+            ? await admin.from("profiles").select("name").eq("id", userId).maybeSingle()
+            : { data: null as { name?: string } | null }
 
-          // Der Unique-Index (game_id, user_id) macht das idempotent: feuert der
-          // Webhook zweimal, entsteht kein zweiter Platz.
+          /* Idempotent ueber einen Unique-Index — beim Player (game_id,
+             user_id), beim Gast (game_id, lower(guest_email)). Feuert der
+             Webhook zweimal, entsteht in beiden Faellen kein zweiter Platz. */
           const { error: insErr } = await admin.from("open_game_players").insert({
             game_id: gameId,
-            user_id: userId,
-            display_name: prof?.name || s.metadata.player_name || "Spieler",
+            user_id: userId || null,
+            display_name: prof?.name || s.metadata.player_name || (istGast ? "Gast" : "Spieler"),
             status: "confirmed",
             paid: true,
             amount_chf: game.price_per_player ?? null,
             stripe_session_id: s.id,
             stripe_payment_intent: s.payment_intent ? String(s.payment_intent) : null,
+            source: istGast ? "ppl_web" : "player",
+            guest_name: istGast ? (s.metadata.guest_name || null) : null,
+            guest_email: istGast ? gastEmail : null,
+            guest_phone: istGast ? (s.metadata.guest_phone || null) : null,
+            guest_level: istGast ? (s.metadata.guest_level || null) : null,
           })
 
           if (insErr) {
@@ -252,9 +266,11 @@ export async function POST(req: NextRequest) {
             //
             // Unterschieden wird an der Session-ID der bereits gespeicherten
             // Zeile: ist es dieselbe Session, war es dieselbe Zahlung.
-            const { data: vorhanden } = await admin.from("open_game_players")
-              .select("stripe_session_id")
-              .eq("game_id", gameId).eq("user_id", userId).maybeSingle()
+            const vorhandenQuery = admin.from("open_game_players")
+              .select("stripe_session_id").eq("game_id", gameId)
+            const { data: vorhanden } = await (istGast
+              ? vorhandenQuery.ilike("guest_email", gastEmail)
+              : vorhandenQuery.eq("user_id", userId)).maybeSingle()
 
             if (vorhanden?.stripe_session_id === s.id) {
               console.log("Open Game: Webhook-Wiederholung fuer dieselbe Session, nichts zu tun —", s.id)
@@ -270,25 +286,35 @@ export async function POST(req: NextRequest) {
               updated_at: new Date().toISOString(),
             }).eq("id", gameId)
 
-            // PingPoints für die bezahlte Buchung — idempotent über die Session-ID
-            const refId = sessionUuid(s.id)
-            const { data: schon } = await admin.from("ping_points_transactions")
-              .select("id").eq("player_id", userId).eq("ref_id", refId).maybeSingle()
-            if (!schon) {
-              await admin.from("ping_points_transactions").insert({
-                player_id: userId,
-                amount: PP_CONFIG.perPaidBooking,
-                source: "booking_paid",
-                description: `Open Game${game.location_name ? ` — ${game.location_name}` : ""}`,
-                ref_id: refId,
-              })
+            // PingPoints für die bezahlte Buchung — idempotent über die
+            // Session-ID. Nur mit Konto: Punkte gehoeren einem Spielerprofil,
+            // ein Gast hat keins.
+            if (userId) {
+              const refId = sessionUuid(s.id)
+              const { data: schon } = await admin.from("ping_points_transactions")
+                .select("id").eq("player_id", userId).eq("ref_id", refId).maybeSingle()
+              if (!schon) {
+                await admin.from("ping_points_transactions").insert({
+                  player_id: userId,
+                  amount: PP_CONFIG.perPaidBooking,
+                  source: "booking_paid",
+                  description: `Open Game${game.location_name ? ` — ${game.location_name}` : ""}`,
+                  ref_id: refId,
+                })
+              }
             }
 
             // Bestätigungsmail mit Zutritts-QR (falls Standort/Tag einen hat).
             // Fehler beim Mailen dürfen die Buchung nie scheitern lassen.
             try {
-              const { data: authU } = await admin.auth.admin.getUserById(userId)
-              const email = authU?.user?.email
+              // Player: Adresse aus dem Konto. Gast: die, mit der er gebucht hat.
+              let email: string | undefined
+              if (userId) {
+                const { data: authU } = await admin.auth.admin.getUserById(userId)
+                email = authU?.user?.email
+              } else {
+                email = gastEmail || undefined
+              }
               if (email) {
                 const wt = game.date ? weekdayOf(game.date) : -1
                 const hatZutritt = !!(game.date && entryQrFor(game.location_name, wt))
@@ -297,13 +323,17 @@ export async function POST(req: NextRequest) {
                 const zeit = `${String(game.start_hour ?? 19).padStart(2, "0")}:00`
                 await sendBookingConfirm({
                   to: email,
-                  name: prof?.name || s.metadata.player_name || "Spieler",
+                  name: prof?.name || s.metadata.player_name || (istGast ? "Gast" : "Spieler"),
                   isTraining,
                   location: game.location_name || "",
                   whenLabel: `${d}${d ? " · " : ""}${zeit}${isTraining ? "–20:30" : ""}`,
                   priceChf: Number(game.price_per_player ?? 0),
                   hatZutritt,
-                  appUrl: `https://playerapp.ch/match/${gameId}`,
+                  // Ein Gast hat kein Player-Konto — ihn in die App zu
+                  // schicken, hiesse ihn vor eine Anmeldemaske zu stellen.
+                  appUrl: istGast
+                    ? "https://pingponglounge.ch/events/open-games"
+                    : `https://playerapp.ch/match/${gameId}`,
                 })
               }
             } catch (e) {
