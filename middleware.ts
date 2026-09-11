@@ -41,12 +41,24 @@ const PUBLIC_API_GET = ['/api/turniere', '/api/rangliste', '/api/match', '/api/s
 //   Die Middleware hat sie mit 401 abgewiesen, BEVOR die Route lief: die
 //   Gastanmeldung fuer Turniere auf pingponglounge.ch funktionierte dadurch gar
 //   nicht, obwohl beide Routen bewusst auth-frei gebaut sind (18.08.).
+// - single-night/checkout + match/<id>/checkout: dasselbe noch einmal, 11.09.
+//   Die Webseite bucht Single Nights und Open Games jetzt selbst und ruft diese
+//   beiden Routen SERVERSEITIG von pingponglounge.ch auf — ohne Cookies, also
+//   ohne Session. Die Middleware hat sie mit 401 abgewiesen, BEVOR die Route
+//   lief; im Formular stand woertlich "Unauthorized". Beide Routen sind
+//   bewusst auth-frei gebaut und pruefen sich selbst: ohne Session verlangen
+//   sie einen vollstaendigen Gastblock (Name, gueltige E-Mail, beim Open Game
+//   zusaetzlich die Selbsteinschaetzung), sie sind fuer Gaeste
+//   ratenbegrenzt, und der Preis kommt in beiden Faellen ausschliesslich
+//   serverseitig aus lib/opengames. Ein eingeloggter Spieler kam hier immer
+//   durch — er hat eine Session; betroffen war nur der Gast.
 const PUBLIC_API = [
   '/api/liga/confirm-email',
   '/api/booking/webhook',
   '/api/spielen/preview',
   '/api/cron/daily',
   '/api/liga/inactivity',
+  '/api/single-night/checkout',
 ]
 
 // Routen mit dynamischem Segment, die ebenfalls ohne Login erreichbar sein
@@ -54,6 +66,7 @@ const PUBLIC_API = [
 const PUBLIC_API_PATTERNS = [
   /^\/api\/turniere\/[^/]+\/register-guest$/,
   /^\/api\/turniere\/[^/]+\/checkout$/,
+  /^\/api\/match\/[^/]+\/checkout$/,
 ]
 
 // Kanonische Domain: playerapp.ch. Die alten *.vercel.app-Adressen sind
