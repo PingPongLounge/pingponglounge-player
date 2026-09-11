@@ -5,7 +5,13 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 // Diese Datei kapselt die Regeln, damit sie NICHT in jeder Route neu (und
 // womöglich unterschiedlich) implementiert werden.
 
-export const RESERVE_MINUTES = 20   // so lange ist ein Platz bei Online-Zahlung reserviert
+// 11.09.: 20 Minuten waren zu kurz — nicht fuer den Gast, sondern fuer Stripe.
+// checkout.sessions.create nimmt expires_at nur zwischen 30 Minuten und 24
+// Stunden in der Zukunft an; 20 Minuten quittiert Stripe mit
+// invalid_request_error. Damit scheiterte JEDE Online-Zahlung, und der Gast
+// las "Zahlung konnte nicht gestartet werden", obwohl an seiner Anmeldung
+// nichts falsch war. 30 Minuten sind der kleinste Wert, den Stripe erlaubt.
+export const RESERVE_MINUTES = 30   // so lange ist ein Platz bei Online-Zahlung reserviert
 
 // ─── SELBSTEINSCHÄTZUNG DER GÄSTE ────────────────────────────────────────────
 // Gäste (ohne Player-Konto) wählen eine verständliche Kategorie. Das ist KEIN

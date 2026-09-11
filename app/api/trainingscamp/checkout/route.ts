@@ -13,7 +13,13 @@ import { rateLimited, clientIp } from "@/lib/ratelimit"
 // bezahlter Zahlung endgültig — hier nur reserviert (Frist 20 Min).
 export const runtime = "nodejs"
 
-const RESERVE_MINUTES = 20
+// 11.09.: 20 Minuten waren zu kurz — nicht fuer den Gast, sondern fuer Stripe.
+// checkout.sessions.create nimmt expires_at nur zwischen 30 Minuten und 24
+// Stunden in der Zukunft an; 20 Minuten quittiert Stripe mit
+// invalid_request_error. Damit scheiterte JEDE Online-Zahlung, und der Gast
+// las "Zahlung konnte nicht gestartet werden", obwohl an seiner Anmeldung
+// nichts falsch war. 30 Minuten sind der kleinste Wert, den Stripe erlaubt.
+const RESERVE_MINUTES = 30
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
 
 function getStripe() {
