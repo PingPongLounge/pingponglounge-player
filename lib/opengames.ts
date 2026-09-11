@@ -44,6 +44,7 @@ export const SINGLE_NIGHT_END = 22
 export type SnTermin = { datum: string; ortId: string; ortName: string }
 export const SINGLE_NIGHT_DATES: SnTermin[] = [
   { datum: "2026-10-30", ortId: "oerlikon", ortName: "Oerlikon" },
+  { datum: "2026-11-13", ortId: "oerlikon", ortName: "Oerlikon" },
   { datum: "2027-01-29", ortId: "oerlikon", ortName: "Oerlikon" },
 ]
 
