@@ -82,7 +82,7 @@ export default function SingleNightPage() {
           <>
             <div style={{ background: CARD, border: `1px solid ${LINE}`, borderRadius: 16, padding: "14px 16px", marginBottom: 4 }}>
               <div style={{ fontSize: 16, fontWeight: 700, color: W }}>{dateLabel(ev.date)} · {String(ev.start_hour ?? 19).padStart(2, "0")}:00</div>
-              <div style={{ color: MUT, fontSize: 13, marginTop: 2 }}>PPL24 {ev.location_name} · {ev.frei > 0 ? `${ev.frei} Plätze frei` : "ausgebucht"}</div>
+              <div style={{ color: MUT, fontSize: 13, marginTop: 2 }}>{ev.location_name} · {ev.frei > 0 ? `${ev.frei} Plätze frei` : "ausgebucht"}</div>
             </div>
 
             <div style={lbl}>ABLAUF</div>

@@ -34,12 +34,18 @@ export const OG_TRAININGS: OgTraining[] = [
 export const SINGLE_NIGHT_PLAETZE = 32          // Gesamtkapazität (Personen)
 export const SINGLE_NIGHT_MIN = 16              // Durchführung erst ab so vielen Personen
 export const SINGLE_NIGHT_STORNO_STUNDEN = 24   // Gratis-Storno bis 24 h vorher → Geld zurück
-export const SINGLE_NIGHT_LOCATION = { id: "glattbrugg", name: "Glattbrugg" }
 export const SINGLE_NIGHT_START = 19            // 19:00
 export const SINGLE_NIGHT_END = 22
 
-// Termine (YYYY-MM-DD) — hier pflegt PPL die nächsten Single Nights.
-export const SINGLE_NIGHT_DATES: string[] = ["2026-08-26"]
+// Termine — hier pflegt PPL die nächsten Single Nights.
+// 11.09. (Oliver): Der Standort haengt jetzt am einzelnen Termin. Vorher stand
+// er als SINGLE_NIGHT_LOCATION fest auf Glattbrugg; die Abende finden aber an
+// wechselnden Standorten statt. Ein Datum ohne Standort gibt es nicht mehr.
+export type SnTermin = { datum: string; ortId: string; ortName: string }
+export const SINGLE_NIGHT_DATES: SnTermin[] = [
+  { datum: "2026-10-30", ortId: "oerlikon", ortName: "Oerlikon" },
+  { datum: "2027-01-29", ortId: "oerlikon", ortName: "Oerlikon" },
+]
 
 // Ticket-Typen. persons = wie viele Personen ein Ticket einlässt.
 export type SnTicket = { key: string; label: string; price: number; persons: number; hint?: string }
@@ -105,7 +111,14 @@ export const OG_STANDORTE: OgStandort[] = [
 // BLACKOUT-TAGE: an diesen Tagen werden für den Standort KEINE Open Games
 // angelegt (z.B. weil ein Turnier die Tische belegt). Format YYYY-MM-DD.
 export const OG_BLACKOUT: Record<string, string[]> = {
-  glattbrugg: ["2026-09-12"], // Ping Pong Lounge Open Glattbrugg
+  glattbrugg: [
+    "2026-09-12",  // Turnier abgesagt (11.09.), Tag bleibt gesperrt
+    // 11.09. (Oliver): Die monatlichen Glattbrugg-Open-Games stehen als
+    // eigene Termine in der Datenbank — 18-22 Uhr, 16 Plaetze, alle Level.
+    // Ohne diese Sperre wuerde der Wochengenerator am selben Samstag
+    // zusaetzlich zwei Gruppen-Termine anlegen; der Abend erschiene dreimal.
+    "2026-10-24", "2026-11-28", "2026-12-12", "2027-01-09",
+  ],
   stgallen: ["2026-09-26"],   // Ping Pong Lounge Open St. Gallen
 }
 
@@ -214,15 +227,19 @@ export async function ensureOpenGames(admin: SupabaseClient): Promise<number> {
   // Single Nights (feste Termine) — offizielle Ticket-Events, kind=single_night.
   // Preis pro Person = 0, weil die Preise ticketbasiert im Checkout berechnet werden.
   const heuteIso = iso(heute)
-  for (const ds of SINGLE_NIGHT_DATES) {
-    if (ds < heuteIso || ds > OG_BIS_DATUM) continue
+  for (const t of SINGLE_NIGHT_DATES) {
+    const ds = t.datum
+    // OG_BIS_DATUM begrenzt bewusst nur die automatisch erzeugten Wochentermine.
+    // Single Nights sind von Hand gesetzte Einzeltermine — sie sollen auch
+    // weiter im Voraus entstehen duerfen.
+    if (ds < heuteIso) continue
     neue.push({
       series_key: `singlenight-${ds}`,
       is_official: true,
       kind: "single_night",
       created_by: null,
-      location_id: SINGLE_NIGHT_LOCATION.id,
-      location_name: SINGLE_NIGHT_LOCATION.name,
+      location_id: t.ortId,
+      location_name: t.ortName,
       date: ds,
       start_hour: SINGLE_NIGHT_START,
       end_hour: SINGLE_NIGHT_END,
