@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { OG_PREIS_CHF, OG_GAST_STAERKEN, gastGruppe, gruppeDesAbends, gruppeFuerLevel, startZeit } from "@/lib/opengames"
 import { PP_CHF, PP_CONFIG, SIGNUP_BONUS_LOCKED_UNTIL_FIRST_PAYMENT } from "@/lib/rewards"
+import { erlaubteBasis, erlaubterPfad } from "@/lib/return-base"
 
 // Einen Platz in einem offiziellen Open Game kaufen.
 // Der Preis kommt NIE vom Client — er steht serverseitig in lib/opengames.ts.
@@ -46,13 +47,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   // Wohin nach der Zahlung? Gleiche Absicherung wie bei Turnier und Single
   // Night: nur eigene Pfade, Basis gegen eine feste Liste — kein Open-Redirect.
-  const successPath = typeof body?.success_path === "string" && body.success_path.startsWith("/")
-    ? body.success_path : `/match/${id}?bezahlt=1`
-  const cancelPath = typeof body?.cancel_path === "string" && body.cancel_path.startsWith("/")
-    ? body.cancel_path : `/match/${id}?abgebrochen=1`
-  const returnBase = typeof body?.return_base === "string"
-    && /^https:\/\/(www\.)?pingponglounge\.ch$/.test(body.return_base)
-    ? body.return_base : BASE_URL
+  const successPath = erlaubterPfad(body?.success_path, `/match/${id}?bezahlt=1`)
+  const cancelPath = erlaubterPfad(body?.cancel_path, `/match/${id}?abgebrochen=1`)
+  const returnBase = erlaubteBasis(body?.return_base, BASE_URL)
 
   const sb = await createClient()
   const { data: { user } } = await sb.auth.getUser()

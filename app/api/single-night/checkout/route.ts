@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { snTicket, SINGLE_NIGHT_PLAETZE, startZeit } from "@/lib/opengames"
 import { rateLimited, clientIp } from "@/lib/ratelimit"
+import { erlaubteBasis, erlaubterPfad } from "@/lib/return-base"
 
 // Single-Night-Ticket: Herren (29, 1 Person) oder Damen 2-für-1 (29, 2 Personen).
 // Preis + Personenzahl IMMER serverseitig aus lib/opengames. Platz erst nach
@@ -50,13 +51,9 @@ export async function POST(req: NextRequest) {
      Genau dieselbe Loesung wie beim Turnier-Checkout: Pfad und Basis
      getrennt, Basis gegen eine feste Liste geprueft (kein Open-Redirect),
      ohne Angabe bleibt alles wie bisher. */
-  const successPath = typeof body?.success_path === "string" && body.success_path.startsWith("/")
-    ? body.success_path : "/single-night?bezahlt=1"
-  const cancelPath = typeof body?.cancel_path === "string" && body.cancel_path.startsWith("/")
-    ? body.cancel_path : "/single-night?abgebrochen=1"
-  const returnBase = typeof body?.return_base === "string"
-    && /^https:\/\/(www\.)?pingponglounge\.ch$/.test(body.return_base)
-    ? body.return_base : BASE_URL
+  const successPath = erlaubterPfad(body?.success_path, "/single-night?bezahlt=1")
+  const cancelPath = erlaubterPfad(body?.cancel_path, "/single-night?abgebrochen=1")
+  const returnBase = erlaubteBasis(body?.return_base, BASE_URL)
   const ticket = snTicket(String(body?.ticket_type || ""))
   const guest = (body?.guest ?? null) as { name?: string; email?: string; phone?: string } | null
   if (!eventId || !ticket) return NextResponse.json({ error: "Ungültige Auswahl" }, { status: 400 })

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { belegung, RESERVE_MINUTES } from "@/lib/tournaments"
+import { erlaubteBasis, erlaubterPfad } from "@/lib/return-base"
 
 // TURNIER-ZAHLUNG
 // Der Preis kommt NIE vom Client — er steht am Turnier (entry_fee_chf).
@@ -28,9 +29,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const regId = String(body.registration_id || "")
   // Wohin nach der Zahlung? Player bleibt in der App, Gast kehrt zur Webseite
   // zurück. Nur eigene Pfade/erlaubte Hosts — kein Open-Redirect.
-  const successPath = typeof body.success_path === "string" && body.success_path.startsWith("/") ? body.success_path : `/turniere/${id}?bezahlt=1`
-  const cancelPath = typeof body.cancel_path === "string" && body.cancel_path.startsWith("/") ? body.cancel_path : `/turniere/${id}?abgebrochen=1`
-  const returnBase = typeof body.return_base === "string" && /^https:\/\/(www\.)?pingponglounge\.ch$/.test(body.return_base) ? body.return_base : BASE_URL
+  const successPath = erlaubterPfad(body.success_path, `/turniere/${id}?bezahlt=1`)
+  const cancelPath = erlaubterPfad(body.cancel_path, `/turniere/${id}?abgebrochen=1`)
+  const returnBase = erlaubteBasis(body.return_base, BASE_URL)
 
   if (!regId) return NextResponse.json({ error: "registration_id fehlt" }, { status: 400 })
 
