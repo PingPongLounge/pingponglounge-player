@@ -67,13 +67,47 @@ function levelForElo(elo: number) {
 
 type PendingResult = { elo: number; won?: boolean; sets?: unknown; ort?: string; ts?: number }
 
+// Die offene Saison, wie sie die bestehende Liga-Route liefert. Bewusst nur die
+// Felder, die es in league_seasons wirklich gibt — es gibt dort weder eine
+// Dauer noch ein Enddatum, deshalb steht hier nirgends eine Laufzeit.
+type OffeneSaison = {
+  id: string
+  name: string
+  city: string | null
+  status: string
+  joined: boolean
+  start_date: string | null
+  description: string | null
+  player_count: number
+  max_players: number
+}
+
+function datumLang(v: string | null) {
+  if (!v) return ""
+  try { return new Date(v).toLocaleDateString("de-CH", { day: "numeric", month: "long", year: "numeric" }) }
+  catch { return "" }
+}
+
+// Sucht die aktuell offene, oeffentliche Saison ueber den bestehenden Endpunkt.
+// Keine zweite Liga-Logik: GET /api/liga/season filtert selbst auf
+// is_global=false, is_private=false und status in (open, running).
+async function offeneSaisonSuchen(): Promise<OffeneSaison | null> {
+  try {
+    const r = await fetch("/api/liga/season", { cache: "no-store" })
+    if (!r.ok) return null
+    const j = await r.json()
+    const list = (j.seasons || []) as OffeneSaison[]
+    return list.find(x => x.status === "open" && !x.joined) ?? null
+  } catch { return null }
+}
+
 const inp: React.CSSProperties = { ...inputBase, padding: "14px 16px", fontSize: "15px", boxSizing: "border-box" }
 const primaryBtn = (disabled = false): React.CSSProperties => ({ ...btn, width: "100%", marginTop: "10px", opacity: disabled ? 0.5 : 1, cursor: disabled ? "not-allowed" : "pointer" })
 const optBtn = (sel: boolean): React.CSSProperties => ({ width: "100%", borderRadius: "10px", padding: "14px 16px", fontSize: "14px", color: TEXT, cursor: "pointer", textAlign: "left", marginBottom: "8px", fontWeight: sel ? 700 : 400, fontFamily: "inherit", display: "block", background: sel ? "rgba(255,255,255,.14)" : CELL })
 
 export default function OnboardingPage() {
   const router = useRouter()
-  // Schritte: 0 = Level (drei Karten) · 1 = Quiz (optional) · 2 = Spielername
+  // Schritte: 0 = Level (drei Karten) · 1 = Quiz (optional) · 2 = Spielername · 3 = Saison-Frage
   const [step, setStep] = useState(0)
   const [name, setName] = useState("")
   const [mode, setMode] = useState<"" | "know" | "quiz">("")
@@ -86,6 +120,11 @@ export default function OnboardingPage() {
   const [nicks, setNicks] = useState<string[]>([])
   const [loadingNicks, setLoadingNicks] = useState(false)
   const [pending, setPending] = useState<PendingResult | null>(null)
+  // Schritt 3 (Saison-Frage) — steht im Onboarding, das genau einmal laeuft.
+  const [saison, setSaison] = useState<OffeneSaison | null>(null)
+  const [saisonBusy, setSaisonBusy] = useState(false)
+  const [saisonFehler, setSaisonFehler] = useState("")
+  const [saisonOk, setSaisonOk] = useState(false)
 
   // Pending-Resultat aus dem /spielen Hook-Flow lesen (best-effort).
   // Wer über den QR-Code kommt, hat sein Level schon durchs Spielergebnis —
@@ -142,7 +181,31 @@ export default function OnboardingPage() {
     try { await fetch("/api/credits/signup", { method: "POST" }) } catch { /* ignore */ }
     // Ab jetzt ist jeder automatisch in der Liga — es gibt kein Beitreten mehr.
     try { await fetch("/api/liga/register", { method: "POST", headers: { "Content-Type": "application/json" }, body: "{}" }) } catch { /* ignore */ }
-    router.push("/entdecken")
+    // Zum Schluss die Frage nach der Saison. Sie steht hier und nicht im Login,
+    // weil das Onboarding genau einmal durchlaufen wird. Laeuft gerade keine
+    // offene Saison, entfaellt der Schritt und es geht direkt weiter.
+    const offene = await offeneSaisonSuchen()
+    if (!offene) { router.push("/entdecken"); return }
+    setSaison(offene)
+    setStep(3)
+    setSaving(false)
+  }
+
+  // Beitritt ueber die bestehende Route — hier wird nichts neu gebaut.
+  async function saisonBeitreten() {
+    if (!saison) return
+    setSaisonBusy(true); setSaisonFehler("")
+    try {
+      const r = await fetch("/api/liga/season", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ season_id: saison.id, action: "join" }),
+      })
+      const j = await r.json().catch(() => ({}))
+      if (!r.ok) { setSaisonFehler(j.error || "Der Beitritt hat nicht geklappt."); setSaisonBusy(false); return }
+      setSaisonOk(true)
+    } catch { setSaisonFehler("Der Beitritt hat nicht geklappt.") }
+    setSaisonBusy(false)
   }
 
   function answerQuiz(points: number) {
@@ -284,6 +347,55 @@ export default function OnboardingPage() {
       <p style={{ fontSize: "11.5px", color: MUTED, textAlign: "center", marginTop: "16px", lineHeight: 1.5 }}>
         Echten Namen und Kanton kannst du später im Profil ergänzen.
       </p>
+    </div></div>
+  )
+
+  // ── Schritt 3: Saison. Nur einmal, direkt nach dem Onboarding. ───────────
+  if (step === 3 && saison) return (
+    <div style={wrap}><div style={box}>
+      {saisonOk ? (
+        <>
+          <div style={{ fontSize: "11px", fontWeight: 700, color: G, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "10px" }}>Du bist dabei</div>
+          <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "6px" }}>{saison.name}</h2>
+          <p style={{ fontSize: "14px", color: MUTED, marginBottom: "22px", lineHeight: 1.5 }}>
+            Deine Anmeldung ist gespeichert. Deine Gegner und Resultate findest du auf der Saison-Seite.
+          </p>
+          <button style={primaryBtn()} onClick={() => router.push("/liga/season")}>Zur Saison</button>
+          <button type="button" onClick={() => router.push("/entdecken")}
+            style={{ width: "100%", background: "transparent", padding: "12px", marginTop: "8px", fontSize: "13px", color: MUTED, cursor: "pointer", fontFamily: "inherit", fontWeight: 700 }}>
+            Später ansehen
+          </button>
+        </>
+      ) : (
+        <>
+          <div style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "10px" }}>{saison.name}</div>
+          <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", letterSpacing: ".06em", marginBottom: "6px" }}>Bei der Saison dabei?</h2>
+          <p style={{ fontSize: "14px", color: MUTED, marginBottom: "18px", lineHeight: 1.5 }}>
+            Spiele während der Saison gegen andere PLAYER, sammle Resultate und kämpfe um deine Platzierung.
+          </p>
+
+          <div style={{ background: CARD, borderRadius: "12px", padding: "14px 16px", marginBottom: "20px" }}>
+            <div style={{ fontSize: "12.5px", color: MUTED, lineHeight: 1.6 }}>
+              {saison.city ? <>{saison.city}<br /></> : null}
+              {saison.start_date ? <>Start {datumLang(saison.start_date)}<br /></> : null}
+              {saison.player_count} von {saison.max_players} Plätzen vergeben
+            </div>
+          </div>
+
+          {saisonFehler && <p style={{ fontSize: "13px", color: "#E5484D", margin: "0 0 10px" }}>{saisonFehler}</p>}
+
+          <button style={primaryBtn(saisonBusy)} disabled={saisonBusy} onClick={saisonBeitreten}>
+            {saisonBusy ? "Wird gespeichert…" : "Ja, ich bin dabei"}
+          </button>
+          <button type="button" disabled={saisonBusy} onClick={() => router.push("/entdecken")}
+            style={{ width: "100%", background: CELL, borderRadius: "10px", padding: "14px", marginTop: "8px", fontSize: "14px", color: TEXT, cursor: saisonBusy ? "not-allowed" : "pointer", fontFamily: "inherit", fontWeight: 700 }}>
+            Später
+          </button>
+          <p style={{ fontSize: "11.5px", color: MUTED, textAlign: "center", marginTop: "16px", lineHeight: 1.5 }}>
+            Du kannst später jederzeit beitreten, solange die Saison offen ist.
+          </p>
+        </>
+      )}
     </div></div>
   )
 
