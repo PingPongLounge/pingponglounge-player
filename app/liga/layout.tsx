@@ -19,7 +19,7 @@ export default function LigaLayout({ children }: { children: React.ReactNode }) 
         textDecoration:"none",boxShadow:"0 8px 24px rgba(0,0,0,.35)"
       }}
     >
-      {inSeason ? "RANGLISTE" : "3-MONATS-SEASON"}
+      {inSeason ? "RANGLISTE" : "SAISON"}
     </Link>
   </>
 }
