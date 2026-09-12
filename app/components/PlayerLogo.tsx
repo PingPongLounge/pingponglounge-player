@@ -89,8 +89,12 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
         </g>
       </svg>
 
-      {/* Wortmarke + Tagline: der Block ist exakt so breit wie "PLAYER",
-          die Tagline wird darauf ausgerichtet und läuft nie darüber hinaus. */}
+      {/* Wortmarke + Tagline. Bis 12.09. war die Tagline einzeilig und per
+          justify exakt auf die Breite von "PLAYER" gezogen. Die Positionierung
+          "Die Ping Pong Liga der Schweiz." ist zweizeilig — justify hätte die
+          zweite Zeile auseinandergerissen ("DER        SCHWEIZ."). Deshalb
+          jetzt zentriert unter der Wortmarke. */}
+
       <div style={{ display: "inline-flex", flexDirection: "column", alignItems: "stretch" }}>
         <span style={{
           fontSize: textSize,
@@ -117,10 +121,10 @@ export default function PlayerLogo({ size = "md", showTagline = false }: PlayerL
             color: "rgba(255,255,255,0.6)",
             letterSpacing: "0.08em",
             textTransform: "uppercase" as const,
-            textAlign: "justify" as const,
-            textAlignLast: "justify" as const,
+            textAlign: "center" as const,
+            lineHeight: 1.45,
           }}>
-            Pingpong Next Level
+            Die Ping Pong Liga<br />der Schweiz.
           </span>
         )}
       </div>

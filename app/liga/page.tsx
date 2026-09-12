@@ -489,7 +489,7 @@ export default function LigaPage(){
           bild="/hero-pokal.jpg" pos="58% 42%"
           kopf={<HeroKopf/>}
           etikett="PPL League"
-          titel={sel?.is_private?sel.name:<>Climb<br/>the ranks.</>}
+          titel={sel?.is_private?sel.name:<>Die Ping Pong<br/>Liga der Schweiz.</>}
           subline={<>Steig im Ranking auf und fordere<br/>Spieler auf deinem Niveau heraus.</>}
         />
 

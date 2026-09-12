@@ -18,8 +18,8 @@ const ICON_V = "2"
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
   alternates: { canonical: BASE },
-  title: "PPL Player — Ping Pong spielen",
-  description: "Ping Pong spielen — Rating, Ranking, Liga und Community. Vom Anfänger bis zum Profi.",
+  title: "PLAYER — Die Ping Pong Liga der Schweiz",
+  description: "Sei Teil der Ping-Pong-Bewegung. Finde Matches, spiel Liga, entdecke Turniere und Events und verfolge dein Rating.",
   /* ── FAVICON ───────────────────────────────────────────────────────────
      EINE Quelle, und zwar diese. app/icon.svg ist am 12.09. herausgenommen
      worden: Next.js kennt zwei Wege, ein Favicon zu setzen — die
@@ -49,14 +49,14 @@ export const metadata: Metadata = {
     locale: "de_CH",
     url: BASE,
     siteName: "Player",
-    title: "PPL Player — Ping Pong spielen",
-    description: "Rating, Ranking, Liga und Community.",
-    images: [{ url: "/share-card.jpg", width: 1200, height: 630, alt: "Player — Pingpong Next Level" }],
+    title: "PLAYER — Die Ping Pong Liga der Schweiz",
+    description: "Finde Matches, spiel Liga, entdecke Turniere und Events und verfolge dein Rating.",
+    images: [{ url: "/share-card.jpg", width: 1200, height: 630, alt: "PLAYER — Die Ping Pong Liga der Schweiz" }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "PPL Player — Ping Pong spielen",
-    description: "Rating, Ranking, Liga und Community.",
+    title: "PLAYER — Die Ping Pong Liga der Schweiz",
+    description: "Finde Matches, spiel Liga, entdecke Turniere und Events und verfolge dein Rating.",
     images: ["/share-card.jpg"],
   },
 }

@@ -30,6 +30,11 @@ export default async function EntdeckenPage() {
     // erst, wer etwas TUT; jeder Knopf hier fuehrt auf eine Leseansicht.
     const SCHWARZ = '#0A0A0C', CREME = '#FFF9F3', VIOLETT = '#8C3DFF'
     const FENSTER = '#121214', LEISE = 'rgba(255,249,243,.65)', TRENN = 'rgba(255,249,243,.13)'
+    /* Off-White wie im V2-Bausystem (app/components/V2.tsx). Die oeffentliche
+       Startseite war als einzige Seite durchgehend dunkel — sie folgt jetzt
+       demselben Wechsel aus dunklen und hellen Flaechen wie Liga, Spielen,
+       Ranking und Profil. Jede Flaeche endet mit einer geraden Kante. */
+    const FLAECHE = '#F4F1EB'
     const ANTON = 'var(--font-anton), Impact, sans-serif'
     const INTER = 'var(--font-inter), system-ui, sans-serif'
     const heute = new Date().toISOString().slice(0, 10)
@@ -87,12 +92,26 @@ export default async function EntdeckenPage() {
       { href: '/feed', label: 'Community' },
     ]
 
-    const abschnitt: React.CSSProperties = { paddingTop: 30, paddingBottom: 30, borderTop: `1px solid ${TRENN}` }
     const kopf: React.CSSProperties = { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 14, marginBottom: 16 }
     const etikett: React.CSSProperties = { fontFamily: INTER, fontSize: 12, fontWeight: 900, letterSpacing: '.16em', textTransform: 'uppercase', color: VIOLETT }
-    const mehr: React.CSSProperties = { fontFamily: INTER, fontSize: 13, fontWeight: 700, color: CREME, textDecoration: 'none', whiteSpace: 'nowrap' }
-    const zeile: React.CSSProperties = { display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0', borderTop: `1px solid ${TRENN}`, textDecoration: 'none', color: CREME }
-    const leer: React.CSSProperties = { fontFamily: INTER, fontSize: 15, color: LEISE, padding: '13px 0', borderTop: `1px solid ${TRENN}`, margin: 0 }
+
+    /* Eine Garnitur pro Flaeche. Damit steht nirgends ein heller Text auf
+       hellem Grund — die Farbe kommt aus der Garnitur, nicht aus der Zeile. */
+    function garnitur(hell: boolean) {
+      const text = hell ? SCHWARZ : CREME
+      const leiseF = hell ? 'rgba(10,10,12,.60)' : LEISE
+      const trennF = hell ? 'rgba(10,10,12,.14)' : TRENN
+      return {
+        text, leise: leiseF,
+        abschnitt: { paddingTop: 30, paddingBottom: 30, borderTop: `1px solid ${trennF}` } as React.CSSProperties,
+        titel: { fontFamily: ANTON, fontWeight: 400, fontSize: 32, textTransform: 'uppercase', margin: '6px 0 0', color: text } as React.CSSProperties,
+        mehr: { fontFamily: INTER, fontSize: 13, fontWeight: 700, color: hell ? VIOLETT : CREME, textDecoration: 'none', whiteSpace: 'nowrap' } as React.CSSProperties,
+        zeile: { display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0', borderTop: `1px solid ${trennF}`, textDecoration: 'none', color: text } as React.CSSProperties,
+        leer: { fontFamily: INTER, fontSize: 15, color: leiseF, padding: '13px 0', borderTop: `1px solid ${trennF}`, margin: 0 } as React.CSSProperties,
+      }
+    }
+    const H = garnitur(true)   // helle Flaeche
+    const D = garnitur(false)  // dunkle Flaeche
 
     return (
       <main style={{ minHeight: '100dvh', background: SCHWARZ, fontFamily: INTER }}>
@@ -110,10 +129,10 @@ export default async function EntdeckenPage() {
         {/* Kopf nach Referenz-Mockup: Foto, Etikett, sehr grosse Anton-Zeile,
             zwei Zeilen Erklaerung. Darunter die Aktionen. */}
         <Hero
-          bild="/ppl-events.jpg" pos="46% 38%"
+          bild="/player-one-neon.jpg" pos="36% 48%"
           etikett="Player"
-          titel={<>Ping Pong<br />spielen.</>}
-          subline="Rating, Ranking, Liga und Community — vom ersten Ballwechsel bis zur Saison."
+          titel={<>Die Ping Pong Liga<br />der Schweiz.</>}
+          subline="Sei Teil der Ping-Pong-Bewegung. Zeig deine Skills, spiel gegen andere und steig im Ranking auf."
           kopf={
             <div className="ppl-breit" style={{ display: 'flex', alignItems: 'center', gap: 11, paddingTop: 16 }}>
               <svg width="28" height="28" viewBox="0 0 80 80" fill="none" aria-hidden>
@@ -139,112 +158,134 @@ export default async function EntdeckenPage() {
           {spielerCount ? <div style={{ marginTop: 14, fontFamily: INTER, fontSize: 15, color: LEISE }}>{spielerCount} Spieler sind dabei.</div> : null}
         </div>
 
-        {/* 1 · OPEN GAMES */}
-        <section className="ppl-breit" style={abschnitt}>
-          <div style={kopf}>
-            <div>
-              <div style={etikett}>Open Games</div>
-              <h2 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 32, textTransform: 'uppercase', margin: '6px 0 0', color: CREME }}>Nächste Spiele</h2>
-            </div>
-            <Link href="/match" style={mehr}>Alle →</Link>
+        {/* ── HELL ─────────────────────────────────────────────────────
+            Erst die Botschaft im Hero, dann was man hier konkret tun kann.
+            Ab hier Off-White: Orientierung, Daten, Listen. */}
+        <div style={{ background: FLAECHE, color: SCHWARZ }}>
+          <div className="ppl-breit" style={{ paddingTop: 34, paddingBottom: 2 }}>
+            <h2 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 'clamp(26px,6.5vw,34px)', lineHeight: .98, textTransform: 'uppercase', margin: 0, color: SCHWARZ }}>
+              Play. Compete. Connect.
+            </h2>
+            <p style={{ fontFamily: INTER, fontSize: 16, lineHeight: 1.55, color: H.leise, margin: '10px 0 0', maxWidth: '46ch' }}>
+              Finde Matches, spiel Liga, entdecke Turniere und Events und verfolge dein Rating.
+            </p>
           </div>
-          {games.length ? games.map(g => {
-            const frei = Math.max(0, (g.max_players || 2) - (g.current_players || 1))
-            return (
-              <Link key={g.id} href={`/match/${g.id}`} style={zeile}>
-                <span style={{ flex: 1, minWidth: 0 }}>
-                  <b style={{ display: 'block', fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{g.location_name || 'Open Game'}</b>
-                  <span style={{ display: 'block', fontFamily: INTER, fontSize: 14, color: LEISE, marginTop: 2 }}>{tag(g.date)} {uhr(g.start_hour)} · {g.level || 'Alle Level'}</span>
-                </span>
-                <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: frei > 0 ? VIOLETT : LEISE, whiteSpace: 'nowrap' }}>{frei > 0 ? `${frei} frei` : 'voll'}</span>
-              </Link>
-            )
-          }) : <p style={leer}>Zurzeit kein offenes Spiel ausgeschrieben.</p>}
-        </section>
 
-        {/* 2 · RANKING */}
-        <section className="ppl-breit" style={abschnitt}>
-          <div style={kopf}>
-            <div>
-              <div style={etikett}>Ranking</div>
-              <h2 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 32, textTransform: 'uppercase', margin: '6px 0 0', color: CREME }}>Top-Spieler</h2>
-            </div>
-            <Link href="/rangliste" style={mehr}>Rangliste →</Link>
-          </div>
-          {top.length ? top.map((p, i) => (
-            <Link key={p.id} href={`/spieler/${p.id}`} style={zeile}>
-              <span style={{ fontFamily: ANTON, fontSize: 22, width: 34, color: i < 3 ? VIOLETT : LEISE }}>{i + 1}</span>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <b style={{ display: 'block', fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{p.name}</b>
-                <span style={{ display: 'block', fontFamily: INTER, fontSize: 14, color: LEISE, marginTop: 2 }}>Level {p.level} · {p.matches_played} Matches</span>
-              </span>
-              <span style={{ fontFamily: ANTON, fontSize: 22, color: CREME }}>{p.elo ?? 1000}</span>
-            </Link>
-          )) : <p style={leer}>Noch keine gewerteten Spiele.</p>}
-        </section>
-
-        {/* 3 · LIGA */}
-        <section className="ppl-breit" style={abschnitt}>
-          <div style={kopf}>
-            <div>
-              <div style={etikett}>Liga</div>
-              <h2 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 32, textTransform: 'uppercase', margin: '6px 0 0', color: CREME }}>Saisons</h2>
-            </div>
-            <Link href="/liga" style={mehr}>Liga ansehen →</Link>
-          </div>
-          {seasons.length ? seasons.map(s => (
-            <Link key={s.id} href="/liga" style={zeile}>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <b style={{ display: 'block', fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{s.name}</b>
-                <span style={{ display: 'block', fontFamily: INTER, fontSize: 14, color: LEISE, marginTop: 2 }}>{s.city} · Start {tag(s.start_date)}</span>
-              </span>
-              <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: s.status === 'open' ? VIOLETT : LEISE, textTransform: 'uppercase' }}>{s.status === 'open' ? 'offen' : 'läuft'}</span>
-            </Link>
-          )) : <p style={leer}>Zurzeit läuft keine offene Saison.</p>}
-        </section>
-
-        {/* 4 · EVENTS */}
-        <section className="ppl-breit" style={abschnitt}>
-          <div style={kopf}>
-            <div>
-              <div style={etikett}>Events</div>
-              <h2 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 32, textTransform: 'uppercase', margin: '6px 0 0', color: CREME }}>Nächste Turniere</h2>
-            </div>
-            <Link href="/turniere" style={mehr}>Alle Events →</Link>
-          </div>
-          {touren.length ? touren.map(t => (
-            <Link key={t.id} href={`/turniere/${t.id}`} style={zeile}>
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <b style={{ display: 'block', fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{t.name}</b>
-                <span style={{ display: 'block', fontFamily: INTER, fontSize: 14, color: LEISE, marginTop: 2 }}>{tag(t.date)}{t.start_time ? ` · ${String(t.start_time).slice(0, 5)}` : ''}{t.city ? ` · ${t.city}` : ''}</span>
-              </span>
-              {t.entry_fee_chf ? <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: CREME, whiteSpace: 'nowrap' }}>CHF {t.entry_fee_chf}.–</span> : null}
-            </Link>
-          )) : <p style={leer}>Zurzeit kein Turnier ausgeschrieben.</p>}
-        </section>
-
-        {/* 5 · COMMUNITY */}
-        <section className="ppl-breit" style={{ ...abschnitt, paddingBottom: 46 }}>
-          <div style={kopf}>
-            <div>
-              <div style={etikett}>Community</div>
-              <h2 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 32, textTransform: 'uppercase', margin: '6px 0 0', color: CREME }}>Wer hat gespielt?</h2>
-            </div>
-            <Link href="/feed" style={mehr}>Feed →</Link>
-          </div>
-          {feed.length ? feed.map(m => {
-            const p1win = m.winner_id === m.p1_id
-            return (
-              <div key={m.id} style={{ ...zeile, cursor: 'default' }}>
-                <span style={{ flex: 1, minWidth: 0, fontFamily: INTER, fontSize: 16 }}>
-                  <b style={{ fontWeight: 700, color: p1win ? VIOLETT : CREME }}>{m.p1?.name || 'Spieler'}</b>
-                  <span style={{ color: LEISE }}> gegen </span>
-                  <b style={{ fontWeight: 700, color: !p1win && m.winner_id ? VIOLETT : CREME }}>{m.p2?.name || 'Spieler'}</b>
-                </span>
+          {/* 1 · OPEN GAMES */}
+          <section className="ppl-breit" style={H.abschnitt}>
+            <div style={kopf}>
+              <div>
+                <div style={etikett}>Open Games</div>
+                <h2 style={H.titel}>Nächste Spiele</h2>
               </div>
-            )
-          }) : <p style={leer}>Noch keine bestätigten Resultate.</p>}
-        </section>
+              <Link href="/match" style={H.mehr}>Alle →</Link>
+            </div>
+            {games.length ? games.map(g => {
+              const frei = Math.max(0, (g.max_players || 2) - (g.current_players || 1))
+              return (
+                <Link key={g.id} href={`/match/${g.id}`} style={H.zeile}>
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <b style={{ display: 'block', fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{g.location_name || 'Open Game'}</b>
+                    <span style={{ display: 'block', fontFamily: INTER, fontSize: 14, color: H.leise, marginTop: 2 }}>{tag(g.date)} {uhr(g.start_hour)} · {g.level || 'Alle Level'}</span>
+                  </span>
+                  <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: frei > 0 ? VIOLETT : H.leise, whiteSpace: 'nowrap' }}>{frei > 0 ? `${frei} frei` : 'voll'}</span>
+                </Link>
+              )
+            }) : <p style={H.leer}>Zurzeit kein offenes Spiel ausgeschrieben.</p>}
+          </section>
+
+          {/* 2 · RANKING */}
+          <section className="ppl-breit" style={{ ...H.abschnitt, paddingBottom: 40 }}>
+            <div style={kopf}>
+              <div>
+                <div style={etikett}>Ranking</div>
+                <h2 style={H.titel}>Top-Spieler</h2>
+              </div>
+              <Link href="/rangliste" style={H.mehr}>Rangliste →</Link>
+            </div>
+            {top.length ? top.map((p, i) => (
+              <Link key={p.id} href={`/spieler/${p.id}`} style={H.zeile}>
+                <span style={{ fontFamily: ANTON, fontSize: 22, width: 34, color: i < 3 ? VIOLETT : H.leise }}>{i + 1}</span>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <b style={{ display: 'block', fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{p.name}</b>
+                  <span style={{ display: 'block', fontFamily: INTER, fontSize: 14, color: H.leise, marginTop: 2 }}>Level {p.level} · {p.matches_played} Matches</span>
+                </span>
+                <span style={{ fontFamily: ANTON, fontSize: 22, color: H.text }}>{p.elo ?? 1000}</span>
+              </Link>
+            )) : <p style={H.leer}>Noch keine gewerteten Spiele.</p>}
+          </section>
+        </div>
+
+        {/* ── DUNKEL ───────────────────────────────────────────────────
+            Liga und Events — das, was terminiert ist und Stimmung hat. */}
+        <div style={{ background: SCHWARZ, color: CREME }}>
+
+          {/* 3 · LIGA */}
+          <section className="ppl-breit" style={{ ...D.abschnitt, borderTop: 'none', paddingTop: 34 }}>
+            <div style={kopf}>
+              <div>
+                <div style={etikett}>Liga</div>
+                <h2 style={D.titel}>Saisons</h2>
+              </div>
+              <Link href="/liga" style={D.mehr}>Liga ansehen →</Link>
+            </div>
+            {seasons.length ? seasons.map(s => (
+              <Link key={s.id} href="/liga" style={D.zeile}>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <b style={{ display: 'block', fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{s.name}</b>
+                  <span style={{ display: 'block', fontFamily: INTER, fontSize: 14, color: D.leise, marginTop: 2 }}>{s.city} · Start {tag(s.start_date)}</span>
+                </span>
+                <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: s.status === 'open' ? VIOLETT : D.leise, textTransform: 'uppercase' }}>{s.status === 'open' ? 'offen' : 'läuft'}</span>
+              </Link>
+            )) : <p style={D.leer}>Zurzeit läuft keine offene Saison.</p>}
+          </section>
+
+          {/* 4 · EVENTS */}
+          <section className="ppl-breit" style={{ ...D.abschnitt, paddingBottom: 40 }}>
+            <div style={kopf}>
+              <div>
+                <div style={etikett}>Events</div>
+                <h2 style={D.titel}>Nächste Turniere</h2>
+              </div>
+              <Link href="/turniere" style={D.mehr}>Alle Events →</Link>
+            </div>
+            {touren.length ? touren.map(t => (
+              <Link key={t.id} href={`/turniere/${t.id}`} style={D.zeile}>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <b style={{ display: 'block', fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{t.name}</b>
+                  <span style={{ display: 'block', fontFamily: INTER, fontSize: 14, color: D.leise, marginTop: 2 }}>{tag(t.date)}{t.start_time ? ` · ${String(t.start_time).slice(0, 5)}` : ''}{t.city ? ` · ${t.city}` : ''}</span>
+                </span>
+                {t.entry_fee_chf ? <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: D.text, whiteSpace: 'nowrap' }}>CHF {t.entry_fee_chf}.–</span> : null}
+              </Link>
+            )) : <p style={D.leer}>Zurzeit kein Turnier ausgeschrieben.</p>}
+          </section>
+        </div>
+
+        {/* ── HELL ─────────────────────────────────────────────────────
+            5 · COMMUNITY */}
+        <div style={{ background: FLAECHE, color: SCHWARZ }}>
+          <section className="ppl-breit" style={{ ...H.abschnitt, borderTop: 'none', paddingTop: 34, paddingBottom: 46 }}>
+            <div style={kopf}>
+              <div>
+                <div style={etikett}>Community</div>
+                <h2 style={H.titel}>Wer hat gespielt?</h2>
+              </div>
+              <Link href="/feed" style={H.mehr}>Feed →</Link>
+            </div>
+            {feed.length ? feed.map(m => {
+              const p1win = m.winner_id === m.p1_id
+              return (
+                <div key={m.id} style={{ ...H.zeile, cursor: 'default' }}>
+                  <span style={{ flex: 1, minWidth: 0, fontFamily: INTER, fontSize: 16 }}>
+                    <b style={{ fontWeight: 700, color: p1win ? VIOLETT : H.text }}>{m.p1?.name || 'Spieler'}</b>
+                    <span style={{ color: H.leise }}> gegen </span>
+                    <b style={{ fontWeight: 700, color: !p1win && m.winner_id ? VIOLETT : H.text }}>{m.p2?.name || 'Spieler'}</b>
+                  </span>
+                </div>
+              )
+            }) : <p style={H.leer}>Noch keine bestätigten Resultate.</p>}
+          </section>
+        </div>
 
         {/* Schluss: erst hier wird ein Konto verlangt. */}
         <section style={{ background: FENSTER }}>

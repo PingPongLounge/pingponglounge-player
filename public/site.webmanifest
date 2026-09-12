@@ -1,7 +1,7 @@
 {
-  "name": "PPL Player — Pingpong Next Level",
+  "name": "PLAYER — Die Ping Pong Liga der Schweiz",
   "short_name": "PPL Player",
-  "description": "Liga, Open Games und Turniere — vom Anfänger bis zum Profi.",
+  "description": "Finde Matches, spiel Liga, entdecke Turniere und Events und verfolge dein Rating.",
   "start_url": "/entdecken",
   "display": "standalone",
   "background_color": "#0A0A0C",

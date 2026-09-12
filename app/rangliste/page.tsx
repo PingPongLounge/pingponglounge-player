@@ -47,7 +47,7 @@ export default function RanglistePage() {
           kopf={<HeroKopf />}
           etikett="Ranking"
           titel={<>Your<br />rank.</>}
-          subline={<>Spiele Matches. Baue dein Rating auf.<br />Finde Spieler auf deinem Niveau.</>}
+          subline={<>Ein Ranking für die ganze Schweiz. Spiele Matches,<br />baue dein Rating auf und finde Spieler auf deinem Niveau.</>}
         />
 
         <Inhalt>

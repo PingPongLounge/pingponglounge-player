@@ -144,7 +144,7 @@ export default function SeasonPage() {
         <div style={{ marginTop: 22, padding: "28px 22px", border: `1px solid ${LINE}`, borderRadius: 24, background: "linear-gradient(145deg,#181818,#0E0E0E)" }}>
           <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: ".16em", color: V }}>OPTIONAL</div>
           <h1 style={{ margin: "8px 0 10px", fontSize: 42, lineHeight: .92, textTransform: "uppercase" }}>Saison</h1>
-          <p style={{ margin: 0, color: MUT, lineHeight: 1.5, fontSize: 15 }}>12 Wochen. Automatische Gegner. Gleiche globale Wertung.</p>
+          <p style={{ margin: 0, color: MUT, lineHeight: 1.5, fontSize: 15 }}>Automatische Gegner. Gleiche globale Wertung.</p>
           <div style={{ marginTop: 18, paddingTop: 16, borderTop: `1px solid ${LINE}`, fontSize: 13, lineHeight: 1.5, color: MUT }}>
             Du musst bei keiner Season mitmachen. Deine globale Rangliste bleibt trotzdem aktiv. Für den Rating-Erhalt zählen weiterhin deine gewerteten Pflichtspiele pro Monat.
           </div>
