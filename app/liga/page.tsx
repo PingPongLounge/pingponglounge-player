@@ -9,7 +9,7 @@ import { MAX_RANKED_PER_OPPONENT, RANKED_WINDOW_MONTHS, MIN_MATCHES_PER_MONTH, M
 import {
   BG, CARD, CELL, W, SUB, MUT, GREEN, LINE,
   gt, GRAD, card, ratingLabel,
-  SCHWARZ, CREME, VIOLETT, ANTON, INTER,
+  SCHWARZ, CREME, VIOLETT, AKZENT_TIEF, ANTON, INTER,
 } from "@/app/theme"
 import HeroKopf from "@/app/components/HeroKopf"
 import {
@@ -536,7 +536,7 @@ export default function LigaPage(){
                 <button onClick={()=>setChatOpen(true)} style={{...knopfOutlineHell,flex:"1 1 130px",position:"relative"}}>
                   Liga-Chat
                   {ungelesen>0&&(
-                    <span style={{marginLeft:9,minWidth:20,height:20,borderRadius:100,background:VIOLETT,color:"#06132E",fontSize:11,fontWeight:900,display:"inline-flex",alignItems:"center",justifyContent:"center",padding:"0 6px"}}>{ungelesen>9?"9+":ungelesen}</span>
+                    <span style={{marginLeft:9,minWidth:20,height:20,borderRadius:100,background:VIOLETT,color:"#06132E",fontSize:11.5,fontWeight:900,display:"inline-flex",alignItems:"center",justifyContent:"center",padding:"0 6px"}}>{ungelesen>9?"9+":ungelesen}</span>
                   )}
                 </button>
               </div>
@@ -568,7 +568,7 @@ export default function LigaPage(){
           {!myReg&&(
             <div style={{padding:"4px 14px 0"}}>
               <div style={{borderRadius:16,padding:20,background:"#FFFFFF"}}>
-                <div style={{fontSize:11.5,fontWeight:900,letterSpacing:".14em",textTransform:"uppercase",color:VIOLETT}}>Neu hier?</div>
+                <div style={{fontSize:11.5,fontWeight:900,letterSpacing:".14em",textTransform:"uppercase",color:AKZENT_TIEF}}>Neu hier?</div>
                 <div style={{fontFamily:ANTON,fontWeight:400,fontSize:26,textTransform:"uppercase",color:SCHWARZ,margin:"8px 0 16px"}}>So funktioniert die Liga</div>
                 {([
                   ["1","Du bist automatisch dabei","Eine Liga für alle — kein Beitreten, keine Klassen. Deine Stufe kommt aus deiner Elo."],
@@ -600,10 +600,10 @@ export default function LigaPage(){
               {/* Filter */}
               <button onClick={()=>setFilterOpen(true)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.14)",borderRadius:100,padding:"11px 16px",cursor:"pointer",fontFamily:INTER,marginBottom:12}}>
                 <span style={{display:"flex",alignItems:"center",gap:9,minWidth:0}}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={filterAktiv?VIOLETT:"rgba(8,8,8,.6)"} strokeWidth="2"><path d="M4 5h16M7 12h10M10 19h4"/></svg>
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={filterAktiv?AKZENT_TIEF:"rgba(8,8,8,.6)"} strokeWidth="2"><path d="M4 5h16M7 12h10M10 19h4"/></svg>
                   <span style={{fontSize:14,fontWeight:700,color:filterAktiv?SCHWARZ:"rgba(8,8,8,.66)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{filterAktiv?filterLabel:"Rangliste filtern"}</span>
                 </span>
-                <span style={{fontSize:12,color:"rgba(8,8,8,.5)",flexShrink:0}}>{filterAktiv?"ändern":"▾"}</span>
+                <span style={{fontSize:12,color:"rgba(8,8,8,.70)",flexShrink:0}}>{filterAktiv?"ändern":"▾"}</span>
               </button>
 
               {/* Sprung-Tabs zu den Stufen */}
@@ -629,8 +629,8 @@ export default function LigaPage(){
               {bands.map(b=>(
                 <div key={b.tier.key} ref={el=>{tierRefs.current[b.tier.key]=el}}>
                   <div style={{display:"flex",alignItems:"center",gap:8,margin:"18px 0 2px"}}>
-                    <span style={{fontFamily:INTER,fontSize:12,fontWeight:900,letterSpacing:".13em",textTransform:"uppercase",color:b.tier.key===meineStufe?.key?VIOLETT:"rgba(8,8,8,.55)"}}>{b.tier.name}</span>
-                    <span style={{fontFamily:INTER,fontSize:13,color:"rgba(8,8,8,.45)"}}>{tierRangeLabel(b.tier.key)} · {b.rows.length}</span>
+                    <span style={{fontFamily:INTER,fontSize:12,fontWeight:900,letterSpacing:".13em",textTransform:"uppercase",color:b.tier.key===meineStufe?.key?AKZENT_TIEF:"rgba(8,8,8,.70)"}}>{b.tier.name}</span>
+                    <span style={{fontFamily:INTER,fontSize:13,color:"rgba(8,8,8,.70)"}}>{tierRangeLabel(b.tier.key)} · {b.rows.length}</span>
                     <div style={{flex:1,height:1,background:"rgba(8,8,8,.16)"}}/>
                   </div>
                   {b.rows.map(r=>{
@@ -638,18 +638,18 @@ export default function LigaPage(){
                     const ini=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                     return(
                       <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:11,padding:"12px 10px",marginLeft:me?-10:0,marginRight:me?-10:0,borderTop:"1px solid rgba(8,8,8,.12)",...(me?{background:"rgba(91,156,255,.13)",borderRadius:10,borderTop:"1px solid rgba(91,156,255,.28)"}:{})}}>
-                        <span style={{width:28,textAlign:"center",flexShrink:0,fontFamily:ANTON,fontSize:20,color:me?VIOLETT:"rgba(8,8,8,.45)",fontVariantNumeric:"tabular-nums"}}>{r.platz}</span>
+                        <span style={{width:28,textAlign:"center",flexShrink:0,fontFamily:ANTON,fontSize:20,color:me?AKZENT_TIEF:"rgba(8,8,8,.70)",fontVariantNumeric:"tabular-nums"}}>{r.platz}</span>
                         <div style={{width:38,height:38,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:"rgba(8,8,8,.10)",display:"grid",placeItems:"center"}}>
                           {r.avatar
                             /* eslint-disable-next-line @next/next/no-img-element */
                             ? <img src={r.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                            : <span style={{fontFamily:INTER,fontSize:13,fontWeight:800,color:"rgba(8,8,8,.5)"}}>{ini}</span>}
+                            : <span style={{fontFamily:INTER,fontSize:13,fontWeight:800,color:"rgba(8,8,8,.70)"}}>{ini}</span>}
                         </div>
                         <button onClick={()=>openPlayer(r.user_id)} style={{flex:1,minWidth:0,background:"none",border:"none",padding:0,textAlign:"left",cursor:"pointer",fontFamily:INTER,overflow:"hidden"}}>
                           <span style={{display:"block",fontSize:17,fontWeight:700,color:SCHWARZ,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{r.name}</span>
-                          <span style={{display:"block",fontSize:13,color:"rgba(8,8,8,.55)",marginTop:2}}>{me?"Du · ":""}{tierForElo(r.elo)?.name||"Ohne Stufe"}</span>
+                          <span style={{display:"block",fontSize:13,color:"rgba(8,8,8,.70)",marginTop:2}}>{me?"Du · ":""}{tierForElo(r.elo)?.name||"Ohne Stufe"}</span>
                         </button>
-                        <span style={{fontFamily:ANTON,fontSize:22,minWidth:56,textAlign:"right",flexShrink:0,color:me?VIOLETT:SCHWARZ,fontVariantNumeric:"tabular-nums"}}>{ratingLabel(r.elo)}</span>
+                        <span style={{fontFamily:ANTON,fontSize:22,minWidth:56,textAlign:"right",flexShrink:0,color:me?AKZENT_TIEF:SCHWARZ,fontVariantNumeric:"tabular-nums"}}>{ratingLabel(r.elo)}</span>
                       </div>
                     )
                   })}
@@ -663,7 +663,7 @@ export default function LigaPage(){
                 <p style={{fontFamily:INTER,fontSize:16,lineHeight:1.55,color:"rgba(8,8,8,.72)",margin:"0 0 10px",maxWidth:"52ch"}}>
                   Fordere Spieler rund um deinen Rang heraus. Jedes bestätigte Spiel verschiebt dein Rating — ein Sieg gegen jemand Stärkeren bringt am meisten, gegen jemand Schwächeren am wenigsten.
                 </p>
-                <p style={{fontFamily:INTER,fontSize:15,lineHeight:1.55,color:"rgba(8,8,8,.58)",margin:0,maxWidth:"52ch"}}>
+                <p style={{fontFamily:INTER,fontSize:15,lineHeight:1.55,color:"rgba(8,8,8,.70)",margin:0,maxWidth:"52ch"}}>
                   Gegen denselben Gegner zählen höchstens {MAX_RANKED_PER_OPPONENT} Spiele pro Jahr für die Wertung. Und wer weniger als {MIN_MATCHES_PER_MONTH} gewertete Spiele im Monat hat, verliert {MONTHLY_PENALTY_ELO} Punkte. Die Stufe ist kein eigener Aufstieg, sondern ein Etikett für deinen Rating-Bereich.
                 </p>
               </div>
@@ -735,7 +735,7 @@ export default function LigaPage(){
               </div>
             ) : (
               <button onClick={()=>setReqOpen(true)}
-                style={{background:"none",color:MUT,fontSize:12.5,fontWeight:600,cursor:"pointer",fontFamily:"inherit",padding:6}}>
+                style={{background:"none",color:AKZENT_TIEF,fontSize:13.5,fontWeight:700,cursor:"pointer",fontFamily:"inherit",padding:"12px 6px",minHeight:44}}>
                 Keine Liga in deiner Stadt? Anfragen →
               </button>
             )}
@@ -796,7 +796,7 @@ export default function LigaPage(){
                 ].map(s=>(
                   <div key={s.l} style={{flex:1,background:CELL,borderRadius:14,padding:"13px 8px",textAlign:"center"}}>
                     <div style={{fontSize:20,fontWeight:900,color:W}}>{s.v}</div>
-                    <div style={{fontSize:10,color:MUT,fontWeight:600,textTransform:"uppercase",letterSpacing:".05em",marginTop:2}}>{s.l}</div>
+                    <div style={{fontSize:11.5,color:MUT,fontWeight:600,textTransform:"uppercase",letterSpacing:".05em",marginTop:2}}>{s.l}</div>
                   </div>
                 ))}
               </div>
@@ -804,7 +804,7 @@ export default function LigaPage(){
               {/* Direkter Vergleich */}
               {pData.head&&(
                 <div style={{background:CELL,borderRadius:14,padding:"14px 15px",marginBottom:16}}>
-                  <div style={{fontSize:10.5,fontWeight:700,color:MUT,textTransform:"uppercase",letterSpacing:".08em",marginBottom:9}}>Ihr beide</div>
+                  <div style={{fontSize:11.5,fontWeight:700,color:MUT,textTransform:"uppercase",letterSpacing:".08em",marginBottom:9}}>Ihr beide</div>
                   {pData.head.played===0
                     ? <div style={{fontSize:13,color:SUB,fontWeight:300}}>Ihr habt diese Saison noch nicht gegeneinander gespielt.</div>
                     : <div style={{display:"flex",alignItems:"baseline",gap:8}}>
@@ -822,16 +822,16 @@ export default function LigaPage(){
               )}
 
               {/* Letzte Spiele */}
-              <div style={{fontSize:10.5,fontWeight:700,color:MUT,textTransform:"uppercase",letterSpacing:".08em",marginBottom:8}}>Letzte Spiele</div>
+              <div style={{fontSize:11.5,fontWeight:700,color:MUT,textTransform:"uppercase",letterSpacing:".08em",marginBottom:8}}>Letzte Spiele</div>
               {pData.recent.length===0
                 ? <div style={{background:CELL,borderRadius:14,padding:"16px 15px",fontSize:13,color:SUB,fontWeight:300}}>Noch keine bestätigten Spiele.</div>
                 : <div style={{background:CELL,borderRadius:14,overflow:"hidden"}}>
                     {pData.recent.map((m,i)=>(
                       <div key={m.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 14px",borderTop:i===0?"none":`1px solid ${LINE}`}}>
-                        <span style={{width:22,height:22,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:900,background:m.won?GRAD:"#0E0E10",color:m.won?"#FFFFFF":MUT}}>{m.won?"S":"N"}</span>
+                        <span style={{width:22,height:22,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11.5,fontWeight:900,background:m.won?GRAD:"#0E0E10",color:m.won?"#FFFFFF":MUT}}>{m.won?"S":"N"}</span>
                         <div style={{flex:1,minWidth:0}}>
                           <div style={{fontSize:13,fontWeight:700,color:W,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.opponent}</div>
-                          {(m.date||!m.ranked)&&<div style={{fontSize:10.5,color:MUT,marginTop:1}}>
+                          {(m.date||!m.ranked)&&<div style={{fontSize:11.5,color:MUT,marginTop:1}}>
                             {m.date?new Date(m.date).toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"2-digit"}):""}
                             {!m.ranked?(m.date?" · ":"")+"ohne Punkte":""}
                           </div>}
@@ -865,7 +865,7 @@ export default function LigaPage(){
 
             {/* Reichweite — Land / Kanton / Stadt. "Weltweit" bewusst weggelassen
                 (kommt später, wenn gebraucht). Nochmal Tippen schaltet wieder ab. */}
-            <div style={{fontSize:10.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"4px 2px 8px"}}>Reichweite</div>
+            <div style={{fontSize:11.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"4px 2px 8px"}}>Reichweite</div>
             <div style={{display:"flex",gap:7,marginBottom:6}}>
               {[["country","Land"],["canton","Kanton"],["city","Stadt"]].map(([k,l])=>(
                 <button key={k} onClick={()=>setFilter(f=>({...f,scope:f.scope===k?"world":k}))} style={{flex:1,fontSize:12.5,fontWeight:700,padding:"9px 4px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",...(filter.scope===k?{background:GRAD,color:"#FFFFFF"}:{background:CELL,color:SUB})}}>{l}</button>
@@ -885,7 +885,7 @@ export default function LigaPage(){
             )}
 
             {/* Freunde + Kategorie */}
-            <div style={{fontSize:10.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"16px 2px 8px"}}>Gruppen</div>
+            <div style={{fontSize:11.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"16px 2px 8px"}}>Gruppen</div>
             <button onClick={()=>setFilter(f=>({...f,friends:!f.friends}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit",marginBottom:8}}>
               <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.friends?{background:GRAD,color:"#FFFFFF"}:{background:"#0E0E10",color:"transparent"})}}>✓</span>
               <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Nur Freunde</span>
@@ -898,7 +898,7 @@ export default function LigaPage(){
 
             {/* Spielstil — kleine gleich große Ja/Nein-Haken. "Beläge" entfällt;
                 Hand und Noppen sind je für sich exklusiv, Anti ist unabhängig. */}
-            <div style={{fontSize:10.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"16px 2px 8px"}}>Spielstil</div>
+            <div style={{fontSize:11.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"16px 2px 8px"}}>Spielstil</div>
             <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
               {([
                 ["hand","left","Links"],["hand","right","Rechts"],
@@ -912,7 +912,7 @@ export default function LigaPage(){
                 })
                 return (
                   <button key={label} onClick={toggle} style={{flex:"1 1 45%",display:"flex",alignItems:"center",gap:8,background:CELL,borderRadius:10,padding:"10px 11px",cursor:"pointer",fontFamily:"inherit"}}>
-                    <span style={{width:17,height:17,borderRadius:5,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11,fontWeight:900,...(on?{background:GRAD,color:"#FFFFFF"}:{background:"#0E0E10",color:"transparent"})}}>✓</span>
+                    <span style={{width:17,height:17,borderRadius:5,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11.5,fontWeight:900,...(on?{background:GRAD,color:"#FFFFFF"}:{background:"#0E0E10",color:"transparent"})}}>✓</span>
                     <span style={{fontSize:12.5,fontWeight:600,color:on?W:SUB}}>{label}</span>
                   </button>
                 )
@@ -954,11 +954,11 @@ export default function LigaPage(){
                 <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Schlag eine Zeit vor — {fTarget.name} bekommt die Anfrage.</div>
                 <div style={{display:"flex",gap:12}}>
                   <div style={{flex:1}}>
-                    <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Datum</div>
+                    <div style={{fontSize:11.5,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Datum</div>
                     <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} style={{width:"100%",background:"#0E0E10",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                   </div>
                   <div style={{flex:1}}>
-                    <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Zeit</div>
+                    <div style={{fontSize:11.5,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Zeit</div>
                     <input type="time" value={fTime} onChange={e=>setFTime(e.target.value)} style={{width:"100%",background:"#0E0E10",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                   </div>
                 </div>
@@ -969,7 +969,7 @@ export default function LigaPage(){
                 <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Schon gespielt? Trag die Sätze ein — {fTarget.name} bestätigt, dann zählt&apos;s für ELO &amp; Rangliste.</div>
 
                 <div style={{marginBottom:18}}>
-                  <div style={{fontSize:11,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Wann gespielt?</div>
+                  <div style={{fontSize:11.5,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Wann gespielt?</div>
                   <input type="date" max={today()} value={fRDate} onChange={e=>setFRDate(e.target.value)} style={{width:"100%",background:"#0E0E10",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                 </div>
 
@@ -979,7 +979,7 @@ export default function LigaPage(){
                       <>
                         {idx===1&&<span style={{fontSize:30,fontWeight:900,color:MUT,paddingBottom:4}}>:</span>}
                         <div key={idx} style={{textAlign:"center"}}>
-                          <div style={{fontSize:11,color:MUT,fontWeight:700,textTransform:"uppercase",marginBottom:9,maxWidth:110,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lab}</div>
+                          <div style={{fontSize:11.5,color:MUT,fontWeight:700,textTransform:"uppercase",marginBottom:9,maxWidth:110,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lab}</div>
                           <div style={{display:"flex",alignItems:"center",gap:9}}>
                             <button onClick={()=>set(Math.max(0,val-1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>−</button>
                             <span style={{fontSize:36,fontWeight:900,width:34,textAlign:"center",...gt}}>{val}</span>
@@ -993,13 +993,13 @@ export default function LigaPage(){
                   /* Genaue Sätze — dann steht in der Historie, was wirklich gespielt wurde */
                   <div>
                     <div style={{display:"flex",gap:10,marginBottom:9,paddingLeft:52}}>
-                      <div style={{flex:1,fontSize:10.5,color:MUT,fontWeight:700,textTransform:"uppercase",textAlign:"center"}}>Du</div>
+                      <div style={{flex:1,fontSize:11.5,color:MUT,fontWeight:700,textTransform:"uppercase",textAlign:"center"}}>Du</div>
                       <div style={{width:10}}/>
-                      <div style={{flex:1,fontSize:10.5,color:MUT,fontWeight:700,textTransform:"uppercase",textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{fTarget.name}</div>
+                      <div style={{flex:1,fontSize:11.5,color:MUT,fontWeight:700,textTransform:"uppercase",textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{fTarget.name}</div>
                     </div>
                     {fSets.map((s,i)=>(
                       <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
-                        <span style={{width:42,flexShrink:0,fontSize:11,color:MUT,fontWeight:700}}>Satz {i+1}</span>
+                        <span style={{width:42,flexShrink:0,fontSize:11.5,color:MUT,fontWeight:700}}>Satz {i+1}</span>
                         <input type="number" inputMode="numeric" min={0} max={30} value={s.p1}
                           onChange={e=>setFSets(v=>v.map((x,j)=>j===i?{...x,p1:e.target.value}:x))}
                           placeholder="11"
@@ -1046,7 +1046,7 @@ export default function LigaPage(){
 
                 {fDone.length>0&&(
                   <div style={{marginTop:16,background:CELL,borderRadius:14,padding:"13px 14px"}}>
-                    <div style={{fontSize:11,fontWeight:700,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:8}}>Eingetragen ({fDone.length})</div>
+                    <div style={{fontSize:11.5,fontWeight:700,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:8}}>Eingetragen ({fDone.length})</div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
                       {fDone.map((s,i)=>(
                         <span key={i} style={{fontSize:13,fontWeight:800,color:W,background:"#0E0E10",borderRadius:8,padding:"5px 10px"}}>{s}</span>
@@ -1081,11 +1081,11 @@ export default function LigaPage(){
                   return(
                     <div key={m.id} style={{alignSelf:"stretch"}}>
                       <div style={{background:"#FFFFFF",borderRadius:14,padding:"11px 14px"}}>
-                        <div style={{fontSize:10,fontWeight:700,color:d?.pending?TEXT_LEISE:d?.ranked===false?TEXT_LEISE:VIOLETT,letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>
+                        <div style={{fontSize:11.5,fontWeight:700,color:d?.pending?TEXT_LEISE:d?.ranked===false?TEXT_LEISE:AKZENT_TIEF,letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>
                           {d?.pending?"Neues Ergebnis · wartet auf Bestätigung":d?.ranked===false?"Match · zählt nicht":"Match bestätigt"}
                         </div>
                         {d&&<>
-                          <div style={{fontSize:14,fontWeight:800,color:SCHWARZ,marginBottom:2}}>{d.winner} <span style={{color:d.pending?TEXT_LEISE:d.ranked===false?TEXT_LEISE:VIOLETT}}>schlägt</span> {d.loser}</div>
+                          <div style={{fontSize:14,fontWeight:800,color:SCHWARZ,marginBottom:2}}>{d.winner} <span style={{color:d.pending?TEXT_LEISE:d.ranked===false?TEXT_LEISE:AKZENT_TIEF}}>schlägt</span> {d.loser}</div>
                           <div style={{fontSize:12,color:TEXT_LEISE,marginBottom:8}}>
                             {d.wSets}:{d.lSets} Sätze{d.detail?` · ${d.detail}`:""}{d.ranked===false?" · ohne Liga-Punkte":""}
                             {d.pending&&d.enteredBy?` · eingetragen von ${d.enteredBy}`:""}
@@ -1099,13 +1099,13 @@ export default function LigaPage(){
                             return(
                               <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:active?"rgba(91,156,255,.14)":"rgba(8,8,8,.05)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:SCHWARZ,fontFamily:"inherit"}}>
                                 <span>{emoji}</span>
-                                {cnt>0&&<span style={{fontSize:11,fontWeight:700,color:active?VIOLETT:TEXT_LEISE}}>{cnt}</span>}
+                                {cnt>0&&<span style={{fontSize:11.5,fontWeight:700,color:active?AKZENT_TIEF:TEXT_LEISE}}>{cnt}</span>}
                               </button>
                             )
                           })}
                           {/* Kommentieren — das Spiel selbst ist der Gesprächsanlass */}
                           <button onClick={()=>setCmtOpen(o=>({...o,[m.id]:!o[m.id]}))}
-                            style={{display:"flex",alignItems:"center",gap:5,marginLeft:"auto",background:"rgba(8,8,8,.05)",borderRadius:99,padding:"4px 10px",fontSize:11,fontWeight:700,color:kommentare.length?SCHWARZ:TEXT_LEISE,cursor:"pointer",fontFamily:"inherit"}}>
+                            style={{display:"flex",alignItems:"center",gap:5,marginLeft:"auto",background:"rgba(8,8,8,.05)",borderRadius:99,padding:"4px 10px",fontSize:11.5,fontWeight:700,color:kommentare.length?SCHWARZ:TEXT_LEISE,cursor:"pointer",fontFamily:"inherit"}}>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
                             {kommentare.length>0?kommentare.length:"Kommentieren"}
                           </button>
@@ -1116,7 +1116,7 @@ export default function LigaPage(){
                           <div style={{marginTop:11,paddingTop:10,borderTop:"1px solid rgba(8,8,8,.10)",display:"flex",flexDirection:"column",gap:7}}>
                             {kommentare.map(k=>(
                               <div key={k.id} style={{display:"flex",gap:7,alignItems:"baseline"}}>
-                                <span style={{fontSize:11,fontWeight:800,color:k.user_id===userId?VIOLETT:TEXT_LEISE,flexShrink:0}}>{k.user_id===userId?"Du":k.name}</span>
+                                <span style={{fontSize:11.5,fontWeight:800,color:k.user_id===userId?AKZENT_TIEF:TEXT_LEISE,flexShrink:0}}>{k.user_id===userId?"Du":k.name}</span>
                                 <span style={{fontSize:12.5,color:SCHWARZ,fontWeight:500,lineHeight:1.45,wordBreak:"break-word"}}>{k.text}</span>
                               </div>
                             ))}
@@ -1141,7 +1141,7 @@ export default function LigaPage(){
                 const mine=m.user_id===userId
                 return(
                   <div key={m.id} style={{maxWidth:"80%",alignSelf:mine?"flex-end":"flex-start"}}>
-                    {!mine&&<div style={{fontSize:10.5,color:TEXT_LEISE,margin:"0 0 3px 4px"}}>{m.name}</div>}
+                    {!mine&&<div style={{fontSize:11.5,color:TEXT_LEISE,margin:"0 0 3px 4px"}}>{m.name}</div>}
                     <div style={{background:mine?VIOLETT:"#FFFFFF",borderRadius:14,padding:"9px 12px",fontSize:13.5,fontWeight:500,color:mine?"#FFFFFF":SCHWARZ}}>{m.text}</div>
                   </div>
                 )

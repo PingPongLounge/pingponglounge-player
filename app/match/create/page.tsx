@@ -21,7 +21,7 @@ function Field({ label, value, placeholder }: { label: string; value?: string; p
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 14, background: CARD, border: `1px solid ${LINE}`, borderRadius: 16, padding: "14px 16px" }}>
       <div style={{ flex: 1 }}>
-        <div style={{ color: GREEN, fontSize: 11, fontWeight: 700, letterSpacing: ".08em" }}>{label}</div>
+        <div style={{ color: GREEN, fontSize:11.5, fontWeight: 700, letterSpacing: ".08em" }}>{label}</div>
         {value ? <div style={{ fontSize: 16, fontWeight: 700, color: W }}>{value}</div>
                : <div style={{ fontSize: 15, color: MUT }}>{placeholder}</div>}
       </div>

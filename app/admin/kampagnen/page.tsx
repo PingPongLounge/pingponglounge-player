@@ -82,7 +82,7 @@ export default function KampagnenAdmin() {
           <div key={c.id} style={{ background: CARD, border: `1px solid ${LINE}`, borderRadius: 14, padding: 14, marginBottom: 10 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
               <span style={{ flex: 1, fontSize: 15, fontWeight: 700, color: W }}>{c.title}</span>
-              <span style={{ fontSize: 11, fontWeight: 700, color: c.active ? GREEN : MUT, border: `1px solid ${c.active ? GREEN : LINE}`, borderRadius: 8, padding: "2px 8px" }}>{c.active ? "aktiv" : "aus"}</span>
+              <span style={{ fontSize:11.5, fontWeight: 700, color: c.active ? GREEN : MUT, border: `1px solid ${c.active ? GREEN : LINE}`, borderRadius: 8, padding: "2px 8px" }}>{c.active ? "aktiv" : "aus"}</span>
             </div>
             <div style={{ color: MUT, fontSize: 12, marginTop: 4 }}>{c.surface} · Prio {c.priority}{c.cta_url ? ` · ${c.cta_url}` : ""}</div>
             <div style={{ display: "flex", gap: 8, marginTop: 10 }}>

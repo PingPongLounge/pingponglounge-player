@@ -58,7 +58,7 @@ export function Hero({
         /* 16.09.2026: unten deckender. Der Text steht im unteren Drittel —
            dort darf vom Motiv nichts mehr durchkommen, sonst liegt Schrift
            auf Schrift (Neonzeichen, Tischaufdrucke, Markennamen). */
-        background: "linear-gradient(to bottom, rgba(8,8,8,.58) 0%, rgba(8,8,8,.20) 26%, rgba(8,8,8,.56) 52%, rgba(8,8,8,.92) 76%, rgba(8,8,8,.98) 100%)",
+        background: "linear-gradient(to bottom, rgba(8,8,8,.62) 0%, rgba(8,8,8,.42) 24%, rgba(8,8,8,.74) 50%, rgba(8,8,8,.94) 74%, rgba(8,8,8,.98) 100%)",
       }} />
 
       {kopf && <div style={{ position: "relative", zIndex: 2 }}>{kopf}</div>}

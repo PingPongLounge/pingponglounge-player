@@ -143,7 +143,7 @@ export default function AvatarPage() {
         </div>
 
         {/* Stil-Auswahl */}
-        <p style={{ ...label, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em" }}>Stil</p>
+        <p style={{ ...label, fontSize:11.5, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em" }}>Stil</p>
         <div style={{ display:"flex", gap:8, marginBottom:20, flexWrap:"wrap" }}>
           {STYLES.map(s => (
             <button key={s.id} onClick={() => { setStyle(s.id); setResult(null); setSaved(false) }} style={{
@@ -155,7 +155,7 @@ export default function AvatarPage() {
         </div>
 
         {/* Foto Upload */}
-        <p style={{ ...label, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em" }}>Dein Foto</p>
+        <p style={{ ...label, fontSize:11.5, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em" }}>Dein Foto</p>
         <div
           onClick={() => fileRef.current?.click()}
           onDrop={e => { e.preventDefault(); const f=e.dataTransfer.files[0]; if(f) handleFile(f) }}
@@ -173,7 +173,7 @@ export default function AvatarPage() {
             <div style={{ textAlign:"center", padding:24 }}>
               <div style={{ fontSize:40, marginBottom:8 }}>📸</div>
               <p style={{ fontSize:14, color:M }}>Foto hochladen oder hierher ziehen</p>
-              <p style={{ fontSize:11, color:"rgba(255,255,255,0.45)", marginTop:4 }}>Gesicht gut sichtbar → bestes Resultat</p>
+              <p style={{ fontSize:11.5, color:"rgba(255,255,255,0.45)", marginTop:4 }}>Gesicht gut sichtbar → bestes Resultat</p>
             </div>
           )}
           <input ref={fileRef} type="file" accept="image/*" style={{ display:"none" }}
@@ -189,7 +189,7 @@ export default function AvatarPage() {
             </button>
             <div style={{ display:"flex", alignItems:"center", gap:12, margin:"14px 0" }}>
               <div style={{ flex:1, height:1, background:"rgba(255,255,255,.1)" }} />
-              <span style={{ fontSize:11, color:M, textTransform:"uppercase", letterSpacing:".08em", fontWeight:700 }}>oder</span>
+              <span style={{ fontSize:11.5, color:M, textTransform:"uppercase", letterSpacing:".08em", fontWeight:700 }}>oder</span>
               <div style={{ flex:1, height:1, background:"rgba(255,255,255,.1)" }} />
             </div>
           </>
@@ -214,7 +214,7 @@ export default function AvatarPage() {
         {/* Resultat */}
         {result && !loading && (
           <div style={{ marginBottom:16 }}>
-            <p style={{ ...label, fontSize:11, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em" }}>Dein Avatar</p>
+            <p style={{ ...label, fontSize:11.5, fontWeight:700, textTransform:"uppercase", letterSpacing:"0.1em" }}>Dein Avatar</p>
 
             {/* Vorschau: Ganzkörper + Kopf-Preview */}
             <div style={{ display:"flex", gap:12, marginBottom:14, alignItems:"flex-start" }}>
@@ -226,12 +226,12 @@ export default function AvatarPage() {
                 <div style={{ width:72, height:72, borderRadius:"50%", overflow:"hidden", background:C }}>
                   <img src={result} alt="Avatar Kopf" style={{ width:"100%", height:"200%", objectFit:"cover", objectPosition:"top center" }} />
                 </div>
-                <p style={{ fontSize:10, color:M, textAlign:"center", margin:0 }}>Profilbild</p>
+                <p style={{ fontSize:11.5, color:M, textAlign:"center", margin:0 }}>Profilbild</p>
                 {/* Quadrat-Preview */}
                 <div style={{ width:72, height:72, borderRadius:10, overflow:"hidden", background:C }}>
                   <img src={result} alt="Avatar Square" style={{ width:"100%", height:"200%", objectFit:"cover", objectPosition:"top center" }} />
                 </div>
-                <p style={{ fontSize:10, color:M, textAlign:"center", margin:0 }}>Karte</p>
+                <p style={{ fontSize:11.5, color:M, textAlign:"center", margin:0 }}>Karte</p>
               </div>
             </div>
 
@@ -256,7 +256,7 @@ export default function AvatarPage() {
 
         {error && <p style={{ color:"#f87171", fontSize:13, marginTop:12 }}>{error}</p>}
 
-        <p style={{ fontSize:11, color:M, marginTop:20, textAlign:"center" }}>
+        <p style={{ fontSize:11.5, color:M, marginTop:20, textAlign:"center" }}>
           3 Generierungen pro Stunde · ~30–60 Sek. pro Avatar
         </p>
       </div>

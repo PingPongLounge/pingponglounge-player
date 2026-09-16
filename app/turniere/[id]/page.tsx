@@ -32,16 +32,16 @@ function BracketMatch({m,userId,onResult}:{m:TMatch,userId:string|null,onResult:
   return(
     <div style={{...cell,padding:"10px 12px",minWidth:160,flex:"0 0 160px",...(confirmed?{background:"rgba(255,255,255,.14)"}:{})}}>
       <div style={{display:"flex",alignItems:"center",position:"relative",marginBottom:4}}>
-        <span style={{fontSize:11,fontWeight:m.winner_id===m.p1_id?600:400,color:m.winner_id===m.p1_id?G:W,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p1}</span>
-        {confirmed&&m.sets&&<span style={{fontSize:10,color:M,marginLeft:4}}>{m.sets.filter(s=>s.p1>s.p2).length}</span>}
+        <span style={{fontSize:11.5,fontWeight:m.winner_id===m.p1_id?600:400,color:m.winner_id===m.p1_id?G:W,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p1}</span>
+        {confirmed&&m.sets&&<span style={{fontSize:11.5,color:M,marginLeft:4}}>{m.sets.filter(s=>s.p1>s.p2).length}</span>}
       </div>
       <div style={{borderTop:`1px solid ${B}`,margin:"4px 0"}}/>
       <div style={{display:"flex",alignItems:"center",position:"relative"}}>
-        <span style={{fontSize:11,fontWeight:m.winner_id===m.p2_id?600:400,color:m.winner_id===m.p2_id?G:W,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p2==="?"?"TBD":p2}</span>
-        {confirmed&&m.sets&&<span style={{fontSize:10,color:M,marginLeft:4}}>{m.sets.filter(s=>s.p2>s.p1).length}</span>}
+        <span style={{fontSize:11.5,fontWeight:m.winner_id===m.p2_id?600:400,color:m.winner_id===m.p2_id?G:W,flex:1,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{p2==="?"?"TBD":p2}</span>
+        {confirmed&&m.sets&&<span style={{fontSize:11.5,color:M,marginLeft:4}}>{m.sets.filter(s=>s.p2>s.p1).length}</span>}
       </div>
       {isMe&&!confirmed&&m.p1_id&&m.p2_id&&(
-        <button onClick={()=>onResult(m)} style={{...btnInCard,display:"block",width:"100%",textAlign:"center",marginTop:8,borderRadius:6,padding:"6px",fontSize:10}}>
+        <button onClick={()=>onResult(m)} style={{...btnInCard,display:"block",width:"100%",textAlign:"center",marginTop:8,borderRadius:6,padding:"6px",fontSize:11.5}}>
           {pending?"Bestätigen →":"Resultat →"}
         </button>
       )}
@@ -182,7 +182,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
             Man gewann ein Turnier und sah es schlicht nicht. */}
         {t.status==="finished"&&t.champion_id&&(
           <div style={{...cardPad,padding:"22px 20px",marginBottom:16,textAlign:"center"}}>
-            <p style={{fontSize:11,fontWeight:800,letterSpacing:".14em",textTransform:"uppercase",color:M,marginBottom:8}}>Turniersieger</p>
+            <p style={{fontSize:11.5,fontWeight:800,letterSpacing:".14em",textTransform:"uppercase",color:M,marginBottom:8}}>Turniersieger</p>
             <p style={{fontSize:26,fontWeight:900,color:G}}>{(registrations as Reg[]).find(r=>r.player_id===t.champion_id)?.profiles?.name||"Champion"}</p>
             <p style={{...body,marginTop:6}}>+100 PingPoints</p>
           </div>
@@ -222,7 +222,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
             <button onClick={startBracket} disabled={starting||registrations.length<2} style={{...btn,width:"100%",padding:14,fontSize:14,opacity:registrations.length<2?0.5:1,cursor:registrations.length<2?"default":"pointer"}}>
               {starting?"Bracket wird erstellt …":registrations.length<2?"Mind. 2 Spieler nötig":"⚔️ Bracket erstellen & starten"}
             </button>
-            <p style={{...body,textAlign:"center",marginTop:8,fontSize:11}}>Setzliste automatisch nach Elo · danach läuft das Turnier</p>
+            <p style={{...body,textAlign:"center",marginTop:8,fontSize:11.5}}>Setzliste automatisch nach Elo · danach läuft das Turnier</p>
             {startError&&<p style={{fontSize:12,color:DANGER,textAlign:"center",marginTop:6}}>{startError}</p>}
             {/* Absagen war bisher unmöglich — ein Turnier ohne Teilnehmer blockierte
                 den Ersteller dauerhaft ("beende oder lösche zuerst eines"). */}
@@ -254,7 +254,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
               <div style={{display:"flex",gap:20,alignItems:"flex-start",minWidth:"fit-content"}}>
                 {rounds.map(round=>(
                   <div key={round} style={{display:"flex",flexDirection:"column",gap:12}}>
-                    <p style={{fontSize:10,fontWeight:600,color:M,letterSpacing:"0.04em",textTransform:"uppercase",marginBottom:4,textAlign:"center"}}>{roundLabel(round,maxRound)}</p>
+                    <p style={{fontSize:11.5,fontWeight:600,color:M,letterSpacing:"0.04em",textTransform:"uppercase",marginBottom:4,textAlign:"center"}}>{roundLabel(round,maxRound)}</p>
                     {matches.filter(m=>m.round===round).map(m=>(
                       <BracketMatch key={m.id} m={m} userId={userId} onResult={setResultMatch}/>
                     ))}

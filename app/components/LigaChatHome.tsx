@@ -42,7 +42,7 @@ export default function LigaChatHome({
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "14px 18px", borderBottom: `1px solid ${LINE}` }}>
         <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#5B9CFF", boxShadow: "0 0 8px #5B9CFF" }} />
         <span style={{ fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: W }}>{seasonLabel}</span>
-        <span style={{ marginLeft: "auto", fontSize: 11, color: MUT, fontWeight: 500 }}>{playerCount} Spieler</span>
+        <span style={{ marginLeft: "auto", fontSize:11.5, color: MUT, fontWeight: 500 }}>{playerCount} Spieler</span>
       </div>
 
       <div ref={boxRef} style={{ height: 210, overflowY: "auto", padding: "14px 16px", display: "flex", flexDirection: "column", gap: 11 }}>
@@ -55,7 +55,7 @@ export default function LigaChatHome({
           const me = m.user_id === meId
           return (
             <div key={m.id} style={{ maxWidth: "80%", alignSelf: me ? "flex-end" : "flex-start" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: MUT, margin: me ? "0 11px 3px 0" : "0 0 3px 11px", textAlign: me ? "right" : "left" }}>{me ? "Du" : m.name}</div>
+              <div style={{ fontSize:11.5, fontWeight: 700, color: MUT, margin: me ? "0 11px 3px 0" : "0 0 3px 11px", textAlign: me ? "right" : "left" }}>{me ? "Du" : m.name}</div>
               {/* Eigene Nachricht: einfach graues Kästchen (rechtsbündig genügt zur
                   Unterscheidung) — kein Grün. */}
               <div style={{

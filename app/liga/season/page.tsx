@@ -142,7 +142,7 @@ export default function SeasonPage() {
         <Link href="/liga" style={{ color: MUT, textDecoration: "none", fontSize: 13 }}>← Liga</Link>
 
         <div style={{ marginTop: 22, padding: "28px 22px", border: `1px solid ${LINE}`, borderRadius: 24, background: "linear-gradient(145deg,#181818,#0E0E0E)" }}>
-          <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: ".16em", color: V }}>OPTIONAL</div>
+          <div style={{ fontSize:11.5, fontWeight: 900, letterSpacing: ".16em", color: V }}>OPTIONAL</div>
           <h1 style={{ margin: "8px 0 10px", fontSize: 42, lineHeight: .92, textTransform: "uppercase" }}>Saison</h1>
           <p style={{ margin: 0, color: MUT, lineHeight: 1.5, fontSize: 15 }}>Automatische Gegner. Gleiche globale Wertung.</p>
           <div style={{ marginTop: 18, paddingTop: 16, borderTop: `1px solid ${LINE}`, fontSize: 13, lineHeight: 1.5, color: MUT }}>
@@ -161,23 +161,23 @@ export default function SeasonPage() {
             return <section key={s.id} style={{ marginTop: 18, padding: 18, borderRadius: 22, background: CARD, border: `1px solid ${LINE}` }}>
               <div style={{ display: "flex", justifyContent: "space-between", gap: 12, alignItems: "flex-start" }}>
                 <div>
-                  <div style={{ color: V, fontSize: 11, fontWeight: 900, letterSpacing: ".12em" }}>DEINE SEASON</div>
+                  <div style={{ color: V, fontSize:11.5, fontWeight: 900, letterSpacing: ".12em" }}>DEINE SEASON</div>
                   <h2 style={{ margin: "5px 0 4px", fontSize: 27 }}>{s.name}</h2>
                   <div style={{ color: MUT, fontSize: 13 }}>{s.city} · {s.player_count} Spieler</div>
                 </div>
                 <div style={{ textAlign: "right" }}>
                   <div style={{ fontSize: 26, fontWeight: 900 }}>{done}/{total || "–"}</div>
-                  <div style={{ color: MUT, fontSize: 11 }}>gespielt</div>
+                  <div style={{ color: MUT, fontSize:11.5 }}>gespielt</div>
                 </div>
               </div>
 
               {total > 0 && <div style={{ marginTop: 16, height: 5, borderRadius: 99, background: "rgba(255,255,255,.08)", overflow: "hidden" }}><div style={{ height: "100%", width: `${Math.round((done / total) * 100)}%`, background: V }} /></div>}
 
               {next && <div style={{ marginTop: 16, padding: 14, borderRadius: 16, background: "#0B0B0B", border: `1px solid ${LINE}` }}>
-                <div style={{ fontSize: 10, fontWeight: 900, letterSpacing: ".13em", color: V }}>ALS NÄCHSTES</div>
+                <div style={{ fontSize:11.5, fontWeight: 900, letterSpacing: ".13em", color: V }}>ALS NÄCHSTES</div>
                 <div style={{ marginTop: 6, display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
                   <div><div style={{ fontSize: 19, fontWeight: 900 }}>{next.opponent_name}</div><div style={{ color: MUT, fontSize: 12, marginTop: 3 }}>Runde {next.round}{next.deadline ? ` · bis ${fmtDate(next.deadline)}` : ""}</div></div>
-                  {next.can_confirm ? <button onClick={() => confirmResult(next)} disabled={busy === next.id} style={{ background: V, color: "#06132E", border: 0, borderRadius: 11, padding: "10px 12px", fontSize: 11, fontWeight: 900, cursor: "pointer" }}>{busy === next.id ? "…" : `BESTÄTIGEN ${next.score_line || ""}`}</button> : next.status === "p1_entered" ? <span style={{ color: MUT, fontSize: 11, fontWeight: 800, textAlign: "right" }}>WARTET AUF<br/>GEGNER</span> : <button onClick={() => openResult(next)} style={{ background: V, color: "#06132E", border: 0, borderRadius: 11, padding: "10px 12px", fontSize: 11, fontWeight: 900, cursor: "pointer" }}>RESULTAT</button>}
+                  {next.can_confirm ? <button onClick={() => confirmResult(next)} disabled={busy === next.id} style={{ background: V, color: "#06132E", border: 0, borderRadius: 11, padding: "10px 12px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>{busy === next.id ? "…" : `BESTÄTIGEN ${next.score_line || ""}`}</button> : next.status === "p1_entered" ? <span style={{ color: MUT, fontSize:11.5, fontWeight: 800, textAlign: "right" }}>WARTET AUF<br/>GEGNER</span> : <button onClick={() => openResult(next)} style={{ background: V, color: "#06132E", border: 0, borderRadius: 11, padding: "10px 12px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>RESULTAT</button>}
                 </div>
               </div>}
 
@@ -187,7 +187,7 @@ export default function SeasonPage() {
               </div>}
 
               {rounds.map(round => <div key={round} style={{ marginTop: 18 }}>
-                <div style={{ fontSize: 11, color: MUT, fontWeight: 900, letterSpacing: ".12em", marginBottom: 8 }}>RUNDE {round}</div>
+                <div style={{ fontSize:11.5, color: MUT, fontWeight: 900, letterSpacing: ".12em", marginBottom: 8 }}>RUNDE {round}</div>
                 {s.assignments.filter(a => a.round === round).map(a => {
                   const finished = a.status === "confirmed"
                   const waiting = a.status === "p1_entered"
@@ -199,17 +199,17 @@ export default function SeasonPage() {
                       <div style={{ fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.opponent_name}</div>
                       <div style={{ color: MUT, fontSize: 12, marginTop: 2 }}>{a.opponent_elo ? `ELO ${a.opponent_elo} · ` : ""}{a.deadline ? `bis ${fmtDate(a.deadline)}` : ""}{a.score_line ? ` · ${a.score_line}` : ""}</div>
                     </div>
-                    {finished ? <span style={{ color: "#7EE787", fontSize: 12, fontWeight: 900 }}>✓ DONE</span> : a.can_confirm ? <button onClick={() => confirmResult(a)} disabled={busy === a.id} style={{ background: V, color: "#06132E", border: 0, borderRadius: 11, padding: "10px 11px", fontSize: 11, fontWeight: 900, cursor: "pointer" }}>{busy === a.id ? "…" : "BESTÄTIGEN"}</button> : waiting ? <span style={{ color: MUT, fontSize: 11, fontWeight: 800, textAlign: "right" }}>WARTET AUF<br/>BESTÄTIGUNG</span> : <button onClick={() => openResult(a)} style={{ background: V, color: "#06132E", border: 0, borderRadius: 11, padding: "10px 11px", fontSize: 11, fontWeight: 900, cursor: "pointer" }}>RESULTAT</button>}
+                    {finished ? <span style={{ color: "#7EE787", fontSize: 12, fontWeight: 900 }}>✓ DONE</span> : a.can_confirm ? <button onClick={() => confirmResult(a)} disabled={busy === a.id} style={{ background: V, color: "#06132E", border: 0, borderRadius: 11, padding: "10px 11px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>{busy === a.id ? "…" : "BESTÄTIGEN"}</button> : waiting ? <span style={{ color: MUT, fontSize:11.5, fontWeight: 800, textAlign: "right" }}>WARTET AUF<br/>BESTÄTIGUNG</span> : <button onClick={() => openResult(a)} style={{ background: V, color: "#06132E", border: 0, borderRadius: 11, padding: "10px 11px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>RESULTAT</button>}
                   </div>
                 })}
               </div>)}
 
-              {total > 0 && done === total && <div style={{ marginTop: 18, padding: 16, borderRadius: 16, background: "rgba(91,156,255,.12)", border: "1px solid rgba(91,156,255,.35)" }}><div style={{ color: V, fontSize: 11, fontWeight: 900, letterSpacing: ".12em" }}>SEASON ABGESCHLOSSEN</div><div style={{ marginTop: 6, fontSize: 20, fontWeight: 900 }}>Alle Matches gespielt.</div><div style={{ color: MUT, fontSize: 12, marginTop: 4 }}>Deine Resultate sind bereits in deiner globalen ELO enthalten.</div></div>}
+              {total > 0 && done === total && <div style={{ marginTop: 18, padding: 16, borderRadius: 16, background: "rgba(91,156,255,.12)", border: "1px solid rgba(91,156,255,.35)" }}><div style={{ color: V, fontSize:11.5, fontWeight: 900, letterSpacing: ".12em" }}>SEASON ABGESCHLOSSEN</div><div style={{ marginTop: 6, fontSize: 20, fontWeight: 900 }}>Alle Matches gespielt.</div><div style={{ color: MUT, fontSize: 12, marginTop: 4 }}>Deine Resultate sind bereits in deiner globalen ELO enthalten.</div></div>}
             </section>
           })}
 
           {open.length > 0 && <section style={{ marginTop: 22 }}>
-            <div style={{ fontSize: 11, color: MUT, fontWeight: 900, letterSpacing: ".14em", marginBottom: 8 }}>NÄCHSTE SEASON</div>
+            <div style={{ fontSize:11.5, color: MUT, fontWeight: 900, letterSpacing: ".14em", marginBottom: 8 }}>NÄCHSTE SEASON</div>
             {open.map(s => <div key={s.id} style={{ padding: 18, marginBottom: 10, borderRadius: 20, background: CARD, border: `1px solid ${LINE}` }}>
               <h3 style={{ margin: 0, fontSize: 23 }}>{s.name}</h3>
               <div style={{ color: MUT, fontSize: 13, marginTop: 4 }}>{s.city}{s.start_date ? ` · Start ${fmtDate(s.start_date)}` : ""}</div>
@@ -228,13 +228,13 @@ export default function SeasonPage() {
 
       {resultFor && <div onClick={() => setResultFor(null)} style={{ position: "fixed", inset: 0, zIndex: 40, background: "rgba(0,0,0,.76)", display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
         <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 620, background: "#141414", borderRadius: "24px 24px 0 0", padding: 20, border: `1px solid ${LINE}` }}>
-          <div style={{ color: V, fontSize: 11, fontWeight: 900, letterSpacing: ".12em" }}>RESULTAT</div>
+          <div style={{ color: V, fontSize:11.5, fontWeight: 900, letterSpacing: ".12em" }}>RESULTAT</div>
           <h3 style={{ margin: "6px 0 4px", fontSize: 25 }}>gegen {resultFor.opponent_name}</h3>
           <p style={{ color: MUT, fontSize: 13, margin: "0 0 18px" }}>Gewonnene Sätze eintragen. Der Gegner bestätigt danach.</p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 12, alignItems: "center" }}>
-            <div><label style={{ display: "block", color: MUT, fontSize: 11, marginBottom: 5 }}>DU</label><input type="number" min={0} max={4} value={mySets} onChange={e => setMySets(Math.max(0, Math.min(4, Number(e.target.value))))} style={{ width: "100%", background: "#080808", color: W, border: `1px solid ${LINE}`, borderRadius: 12, padding: 14, fontSize: 24, fontWeight: 900, textAlign: "center" }} /></div>
+            <div><label style={{ display: "block", color: MUT, fontSize:11.5, marginBottom: 5 }}>DU</label><input type="number" min={0} max={4} value={mySets} onChange={e => setMySets(Math.max(0, Math.min(4, Number(e.target.value))))} style={{ width: "100%", background: "#080808", color: W, border: `1px solid ${LINE}`, borderRadius: 12, padding: 14, fontSize: 24, fontWeight: 900, textAlign: "center" }} /></div>
             <span style={{ color: MUT, fontWeight: 900, marginTop: 18 }}>:</span>
-            <div><label style={{ display: "block", color: MUT, fontSize: 11, marginBottom: 5 }}>GEGNER</label><input type="number" min={0} max={4} value={oppSets} onChange={e => setOppSets(Math.max(0, Math.min(4, Number(e.target.value))))} style={{ width: "100%", background: "#080808", color: W, border: `1px solid ${LINE}`, borderRadius: 12, padding: 14, fontSize: 24, fontWeight: 900, textAlign: "center" }} /></div>
+            <div><label style={{ display: "block", color: MUT, fontSize:11.5, marginBottom: 5 }}>GEGNER</label><input type="number" min={0} max={4} value={oppSets} onChange={e => setOppSets(Math.max(0, Math.min(4, Number(e.target.value))))} style={{ width: "100%", background: "#080808", color: W, border: `1px solid ${LINE}`, borderRadius: 12, padding: 14, fontSize: 24, fontWeight: 900, textAlign: "center" }} /></div>
           </div>
           <button onClick={submitResult} disabled={busy === resultFor.id || mySets === oppSets || (mySets === 0 && oppSets === 0)} style={{ width: "100%", marginTop: 16, background: V, color: "#06132E", border: 0, borderRadius: 13, padding: 15, fontWeight: 900, cursor: "pointer", opacity: mySets === oppSets ? .45 : 1 }}>{busy === resultFor.id ? "…" : "RESULTAT SENDEN"}</button>
         </div>

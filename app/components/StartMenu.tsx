@@ -62,7 +62,7 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
         }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={open ? AN : AUS}
             strokeWidth="1.8" strokeLinecap="round" aria-hidden><path d="M4 7h16M4 12h16M4 17h16"/></svg>
-          <span style={{ fontSize: 10.5, fontWeight: open ? 900 : 700, letterSpacing: ".07em", textTransform: "uppercase" }}>Menü</span>
+          <span style={{ fontSize:11.5, fontWeight: open ? 900 : 700, letterSpacing: ".07em", textTransform: "uppercase" }}>Menü</span>
         </button>
       ) : avatar ? (
         <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#5B9CFF,#A9C9FF)", color: "#FFFFFF", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
@@ -93,7 +93,7 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
               </span>
               <span style={{ flex: 1 }}>
                 <span style={{ display: "block", fontSize: 16, fontWeight: 500, color: W }}>{name}</span>
-                <span style={{ display: "block", fontSize: 11, color: M, marginTop: 2 }}>{sub || "profil ansehen"}</span>
+                <span style={{ display: "block", fontSize:11.5, color: M, marginTop: 2 }}>{sub || "profil ansehen"}</span>
               </span>
               <span style={{ color: "#5B9CFF", fontSize: 18 }}>›</span>
             </Link>
@@ -116,7 +116,7 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
               <Link2 href="/shop" label="shop" icon={<Icon d='<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2l2.2 12.2a1.5 1.5 0 0 0 1.5 1.3h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6"/>' />} />
             </div>
 
-            <div style={{ fontSize: 11, color: "rgba(255,255,255,.82)", textTransform: "uppercase", letterSpacing: ".06em", margin: "22px 4px 8px" }}>spielen &amp; buchen</div>
+            <div style={{ fontSize:11.5, color: "rgba(255,255,255,.82)", textTransform: "uppercase", letterSpacing: ".06em", margin: "22px 4px 8px" }}>spielen &amp; buchen</div>
             <div style={{ background: C, borderRadius: 16, overflow: "hidden" }}>
               <Link2 href="/liga" label="liga" icon={<Icon d='<path d="M5 20v-4M12 20v-8M19 20v-12"/><circle cx="19" cy="4.6" r="1.6" fill="#fff" stroke="none"/>' />} />
               <Link2 href="/match" label="open game" icon={<Icon d='<g transform="translate(2.2 0)"><ellipse cx="10" cy="9.8" rx="6" ry="5.2" transform="rotate(-42 10 9.8)"/><path d="M14 13.6 18 17.6" stroke-width="3.4"/><circle cx="18.6" cy="5.7" r="1.6" fill="#fff" stroke="none"/></g>' />} />

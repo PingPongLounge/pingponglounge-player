@@ -118,7 +118,7 @@ export default function AchievementsPage() {
 
                   <div style={{ fontSize: 28, marginBottom: 8 }}>{b.icon}</div>
                   <p style={{ fontSize: 13, fontWeight: 800, color: b.earned ? W : MUT, marginBottom: 4, lineHeight: 1.2 }}>{b.title}</p>
-                  <p style={{ ...meta, fontSize: 11, lineHeight: 1.4 }}>{b.description}</p>
+                  <p style={{ ...meta, fontSize:11.5, lineHeight: 1.4 }}>{b.description}</p>
 
                   <div style={{ marginTop: 8, display: "flex", alignItems: "center", gap: 6 }}>
                     <span style={{ fontSize: 9, fontWeight: 700, color: tc, background: `${tc}15`, borderRadius: 999, padding: "1px 7px", textTransform: "uppercase" }}>{b.tier}</span>

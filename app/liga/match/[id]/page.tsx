@@ -235,7 +235,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
       {askComment&&(
         <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:140,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
           <div style={{width:"100%",maxWidth:400,background:CARD,borderRadius:24,padding:"24px 20px",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
-            <div style={{fontSize:11,fontWeight:800,letterSpacing:".12em",textTransform:"uppercase",color:GREEN,marginBottom:6}}>✓ Bestätigt</div>
+            <div style={{fontSize:11.5,fontWeight:800,letterSpacing:".12em",textTransform:"uppercase",color:GREEN,marginBottom:6}}>✓ Bestätigt</div>
             {/* Ansporn direkt nach dem Spiel: Serie feiern oder aufmuntern. */}
             <div style={{marginBottom:14}}><StreakBanner/></div>
             <div style={{fontSize:21,fontWeight:900,color:W,marginBottom:5}}>Spiel kommentieren?</div>

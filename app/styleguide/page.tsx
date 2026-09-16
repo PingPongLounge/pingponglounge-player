@@ -10,8 +10,8 @@ const sec: React.CSSProperties = { margin: '28px 0 10px', fontSize: 13, fontWeig
 const swatch = (c: string, name: string) => (
   <div style={{ textAlign: 'center' }}>
     <div style={{ width: '100%', height: 54, borderRadius: 12, background: c }} />
-    <div style={{ fontSize: 11, color: SUB, marginTop: 6, fontWeight: 600 }}>{name}</div>
-    <div style={{ fontSize: 10, color: MUT }}>{c}</div>
+    <div style={{ fontSize:11.5, color: SUB, marginTop: 6, fontWeight: 600 }}>{name}</div>
+    <div style={{ fontSize:11.5, color: MUT }}>{c}</div>
   </div>
 )
 
@@ -19,7 +19,7 @@ export default function StyleguidePage() {
   return (
     <main style={{ minHeight: '100vh', background: BG, padding: '20px 16px 100px' }}>
       <div style={{ maxWidth: 480, margin: '0 auto' }}>
-        <div style={{ fontSize: 11, color: MUT, fontWeight: 700, letterSpacing: '.22em', textTransform: 'uppercase' }}>PPL Player</div>
+        <div style={{ fontSize:11.5, color: MUT, fontWeight: 700, letterSpacing: '.22em', textTransform: 'uppercase' }}>PPL Player</div>
         <h1 style={{ ...h1, marginTop: 6 }}>Styleguide</h1>
         <p style={{ ...body, marginTop: 8 }}>Verbindliche Bausteine. Alle Seiten nutzen diese Tokens aus <code style={{ color: SUB }}>app/theme.ts</code> — so sehen Kästchen überall gleich aus.</p>
 
@@ -29,7 +29,7 @@ export default function StyleguidePage() {
           {swatch(BG, 'BG')}{swatch(CARD, 'Karte')}{swatch(CELL, 'Zelle')}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 10 }}>
-          <div style={{ textAlign: 'center' }}><div style={{ height: 54, borderRadius: 12, background: GRAD }} /><div style={{ fontSize: 11, color: SUB, marginTop: 6, fontWeight: 600 }}>Verlauf (nur Logo + Rang)</div></div>
+          <div style={{ textAlign: 'center' }}><div style={{ height: 54, borderRadius: 12, background: GRAD }} /><div style={{ fontSize:11.5, color: SUB, marginTop: 6, fontWeight: 600 }}>Verlauf (nur Logo + Rang)</div></div>
           <div style={{ display: 'flex', gap: 10 }}>{swatch(GREEN, 'Grün')}{swatch(CYAN, 'Cyan')}</div>
         </div>
 
@@ -55,7 +55,7 @@ export default function StyleguidePage() {
         <div style={sec}>Typografie</div>
         <div style={{ ...cardPad }}>
           <div style={{ fontSize: 40, fontWeight: 900, ...gt }}>#7</div>
-          <div style={{ fontSize: 11, color: MUT }}>Rang-Zahl — der einzige Verlauf-Text</div>
+          <div style={{ fontSize:11.5, color: MUT }}>Rang-Zahl — der einzige Verlauf-Text</div>
           <h2 style={{ ...h2, marginTop: 14 }}>Überschrift</h2>
           <p style={{ ...body, marginTop: 6 }}>Fliesstext leicht (300) aber weiss. Überschriften extra fett (900), GROSS.</p>
           <div style={{ ...eyebrow, marginTop: 10 }}>Eyebrow / Datum</div>

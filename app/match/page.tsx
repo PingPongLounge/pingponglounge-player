@@ -144,7 +144,7 @@ export default function MatchPage() {
                             <span key={p.user_id} style={{
                               width: 32, height: 32, borderRadius: "50%", background: "rgba(8,8,8,.08)",
                               border: "2px solid #FFFFFF", marginLeft: k ? -11 : 0,
-                              display: "grid", placeItems: "center", fontSize: 11, fontWeight: 800, color: TEXT_LEISE,
+                              display: "grid", placeItems: "center", fontSize:11.5, fontWeight: 800, color: TEXT_LEISE,
                             }}>{initialen(p.name)}</span>
                           ))}
                           {!g.players?.length && (

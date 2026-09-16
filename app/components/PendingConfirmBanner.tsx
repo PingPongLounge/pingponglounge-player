@@ -50,7 +50,7 @@ export default function PendingConfirmBanner() {
         <span style={{ display: "block", fontSize: 12.5, fontWeight: 500, color: "rgba(255,255,255,.72)", marginTop: 1 }}>{sub}</span>
       </span>
       <span style={{
-        flexShrink: 0, fontSize: 11, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".04em",
+        flexShrink: 0, fontSize:11.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".04em",
         color: "#FFFFFF", background: GRAD, borderRadius: 9, padding: "9px 13px",
       }}>Bestätigen</span>
     </button>

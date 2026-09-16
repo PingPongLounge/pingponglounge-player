@@ -150,7 +150,7 @@ export default function HauptMenu() {
                   color: an ? VIOLETT : CREME, textDecoration: "none",
                 }}>
                   <span style={{
-                    fontFamily: INTER, fontSize: 11, fontWeight: 900, letterSpacing: ".16em",
+                    fontFamily: INTER, fontSize:11.5, fontWeight: 900, letterSpacing: ".16em",
                     color: VIOLETT, minWidth: 26,
                   }}>{String(i + 1).padStart(2, "0")}</span>
                   {it.label}

@@ -63,7 +63,7 @@ export default function TrainingPage() {
         <a href="/trainingscamp"
           style={{ display: "block", textDecoration: "none", margin: "16px 0 8px", borderRadius: 22, overflow: "hidden", background: CARD, boxShadow: "0 4px 18px rgba(0,0,0,.4)" }}>
           <div style={{ background: GRAD, padding: "18px 18px 16px" }}>
-            <div style={{ fontSize: 10.5, fontWeight: 900, letterSpacing: ".14em", color: "#FFFFFF", textTransform: "uppercase" }}>Trainingscamp · 13.–16. August</div>
+            <div style={{ fontSize:11.5, fontWeight: 900, letterSpacing: ".14em", color: "#FFFFFF", textTransform: "uppercase" }}>Trainingscamp · 13.–16. August</div>
             <div style={{ fontSize: 27, fontWeight: 900, color: "#FFFFFF", lineHeight: 1, marginTop: 4, textTransform: "uppercase", letterSpacing: "-.01em" }}>4 Tage mit Profis</div>
           </div>
           <div style={{ padding: "14px 18px 16px" }}>
@@ -105,9 +105,9 @@ export default function TrainingPage() {
                       <span style={{ display: "block", fontSize: 13, color: MUT, marginTop: 2 }}>{t.location_name} · {frei} von {t.max_players} frei</span>
                     </span>
                     {frei === 0 ? (
-                      <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: MUT, width: 96, textAlign: "center", flexShrink: 0 }}>Ausgebucht</span>
+                      <span style={{ fontSize:11.5, fontWeight: 800, textTransform: "uppercase", color: MUT, width: 96, textAlign: "center", flexShrink: 0 }}>Ausgebucht</span>
                     ) : (
-                      <span style={{ fontSize: 11, fontWeight: 800, textTransform: "uppercase", color: "#FFFFFF", background: GRAD, borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", flexShrink: 0 }}>Mitmachen</span>
+                      <span style={{ fontSize:11.5, fontWeight: 800, textTransform: "uppercase", color: "#FFFFFF", background: GRAD, borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", flexShrink: 0 }}>Mitmachen</span>
                     )}
                   </Link>
 
@@ -133,7 +133,7 @@ export default function TrainingPage() {
         <div onClick={campSchliessen} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.7)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
           <div onClick={e => e.stopPropagation()} style={{ width: "100%", maxWidth: 380, background: CARD, borderRadius: 22, overflow: "hidden", boxShadow: "0 30px 80px rgba(0,0,0,.6)" }}>
             <div style={{ background: GRAD, padding: "20px 20px 16px" }}>
-              <div style={{ fontSize: 11, fontWeight: 900, letterSpacing: ".14em", color: "#FFFFFF", textTransform: "uppercase" }}>Trainingscamp · 13.–16. August</div>
+              <div style={{ fontSize:11.5, fontWeight: 900, letterSpacing: ".14em", color: "#FFFFFF", textTransform: "uppercase" }}>Trainingscamp · 13.–16. August</div>
               <div style={{ fontSize: 26, fontWeight: 900, color: "#FFFFFF", lineHeight: 1, marginTop: 5, textTransform: "uppercase" }}>4 Tage mit Profis</div>
             </div>
             <div style={{ padding: "16px 20px 20px" }}>

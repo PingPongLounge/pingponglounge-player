@@ -67,7 +67,7 @@ export function SectionStat({ big, label, sub }: { big: string; label: string; s
     <div style={{ display: "flex", alignItems: "center", gap: 16, padding: "16px 20px", borderTop: `1px solid ${LINE}` }}>
       <div style={{ fontSize: 40, fontWeight: 900, lineHeight: .85, letterSpacing: "-.03em", flexShrink: 0, ...gt }}>{big}</div>
       <div style={{ flex: 1, minWidth: 0 }}>
-        <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: MUT }}>{label}</div>
+        <div style={{ fontSize:11.5, fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: MUT }}>{label}</div>
         {sub && <div style={{ fontSize: 13, color: SUB, fontWeight: 400, marginTop: 3 }}>{sub}</div>}
       </div>
     </div>
@@ -106,7 +106,7 @@ export function SectionHero({ eyebrow, title, subtitle, img = "/gl-tische.jpg", 
           : "linear-gradient(180deg,rgba(20,23,30,.15) 0%,rgba(20,23,30,.55) 55%,rgba(20,23,30,.9) 100%)",
       }} />
       <div style={{ position: "absolute", left: right ? "auto" : 22, right: 22, bottom: 18, maxWidth: right ? "58%" : "auto", textAlign: right ? "right" : "left" }}>
-        <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".22em", textTransform: "uppercase", color: SUB }}>{eyebrow}</div>
+        <div style={{ fontSize:11.5, fontWeight: 800, letterSpacing: ".22em", textTransform: "uppercase", color: SUB }}>{eyebrow}</div>
         <div style={{ fontSize: 42, fontWeight: 900, lineHeight: .88, textTransform: "uppercase", letterSpacing: "-.02em", color: W, marginTop: 5 }}>{title}</div>
         <div style={{ fontSize: 13, color: SUB, fontWeight: 300, marginTop: 7 }}>{subtitle}</div>
       </div>
@@ -122,7 +122,7 @@ export function SectionIntro({ storageKey, title, steps, cta }: { storageKey: st
   return (
     <div style={{ position: "relative", marginTop: 16, borderRadius: 24, padding: 22, boxShadow: SHADOW, background: CARD }}>
       <button onClick={dismiss} aria-label="Ausblenden" style={{ position: "absolute", top: 14, right: 14, background: "none", color: MUT, fontSize: 16, cursor: "pointer", lineHeight: 1 }}>✕</button>
-      <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", ...gt }}>Neu hier?</div>
+      <div style={{ fontSize:11.5, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", ...gt }}>Neu hier?</div>
       <div style={{ fontSize: 22, fontWeight: 900, color: W, margin: "6px 0 16px", paddingRight: 20 }}>{title}</div>
       {steps.map(([n, t, d]) => (
         <div key={n} style={{ display: "flex", gap: 13, alignItems: "flex-start", marginBottom: 14 }}>

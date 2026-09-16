@@ -29,6 +29,10 @@ export default async function EntdeckenPage() {
     // Open Games, Rangliste, Liga, Events, Community. Angemeldet werden muss
     // erst, wer etwas TUT; jeder Knopf hier fuehrt auf eine Leseansicht.
     const SCHWARZ = '#0A0A0C', CREME = '#FFF9F3', VIOLETT = '#5B9CFF'
+    /* Akzent fuer die HELLEN Flaechen. Das helle Blau erreicht auf Creme nur
+       2,4:1 — auf dieser Seite wechseln sich dunkle und helle Baender ab,
+       also braucht es beide Werte. */
+    const AKZENT_HELL = '#1447E6'
     const FENSTER = '#121214', LEISE = 'rgba(255,249,243,.65)', TRENN = 'rgba(255,249,243,.13)'
     /* Off-White wie im V2-Bausystem (app/components/V2.tsx). Die oeffentliche
        Startseite war als einzige Seite durchgehend dunkel — sie folgt jetzt
@@ -85,7 +89,9 @@ export default async function EntdeckenPage() {
     const uhr = (h?: number | null) => h != null ? `${String(h).padStart(2, '0')}:00` : ''
 
     const kopf: React.CSSProperties = { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 14, marginBottom: 16 }
-    const etikett: React.CSSProperties = { fontFamily: INTER, fontSize: 12, fontWeight: 900, letterSpacing: '.16em', textTransform: 'uppercase', color: VIOLETT }
+    /* etikett steht auf hellem Grund, etikettD auf dunklem. */
+    const etikett: React.CSSProperties = { fontFamily: INTER, fontSize: 12, fontWeight: 900, letterSpacing: '.16em', textTransform: 'uppercase', color: AKZENT_HELL }
+    const etikettD: React.CSSProperties = { ...etikett, color: VIOLETT }
 
     /* Eine Garnitur pro Flaeche. Damit steht nirgends ein heller Text auf
        hellem Grund — die Farbe kommt aus der Garnitur, nicht aus der Zeile. */
@@ -97,7 +103,7 @@ export default async function EntdeckenPage() {
         text, leise: leiseF,
         abschnitt: { paddingTop: 30, paddingBottom: 30, borderTop: `1px solid ${trennF}` } as React.CSSProperties,
         titel: { fontFamily: ANTON, fontWeight: 400, fontSize: 32, textTransform: 'uppercase', margin: '6px 0 0', color: text } as React.CSSProperties,
-        mehr: { fontFamily: INTER, fontSize: 13, fontWeight: 700, color: hell ? VIOLETT : CREME, textDecoration: 'none', whiteSpace: 'nowrap' } as React.CSSProperties,
+        mehr: { fontFamily: INTER, fontSize: 14, fontWeight: 700, color: hell ? AKZENT_HELL : CREME, textDecoration: 'none', whiteSpace: 'nowrap', padding: '12px 8px', margin: '-12px -8px' } as React.CSSProperties,
         zeile: { display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0', borderTop: `1px solid ${trennF}`, textDecoration: 'none', color: text } as React.CSSProperties,
         leer: { fontFamily: INTER, fontSize: 15, color: leiseF, padding: '13px 0', borderTop: `1px solid ${trennF}`, margin: 0 } as React.CSSProperties,
       }
@@ -174,7 +180,7 @@ export default async function EntdeckenPage() {
                     <b style={{ display: 'block', fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{g.location_name || 'Open Game'}</b>
                     <span style={{ display: 'block', fontFamily: INTER, fontSize: 14, color: H.leise, marginTop: 2 }}>{tag(g.date)} {uhr(g.start_hour)} · {g.level || 'Alle Level'}</span>
                   </span>
-                  <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: frei > 0 ? VIOLETT : H.leise, whiteSpace: 'nowrap' }}>{frei > 0 ? `${frei} frei` : 'voll'}</span>
+                  <span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: frei > 0 ? AKZENT_HELL : H.leise, whiteSpace: 'nowrap' }}>{frei > 0 ? `${frei} frei` : 'voll'}</span>
                 </Link>
               )
             }) : <p style={H.leer}>Zurzeit kein offenes Spiel ausgeschrieben.</p>}
@@ -191,7 +197,7 @@ export default async function EntdeckenPage() {
             </div>
             {top.length ? top.map((p, i) => (
               <Link key={p.id} href={`/spieler/${p.id}`} style={H.zeile}>
-                <span style={{ fontFamily: ANTON, fontSize: 22, width: 34, color: i < 3 ? VIOLETT : H.leise }}>{i + 1}</span>
+                <span style={{ fontFamily: ANTON, fontSize: 22, width: 34, color: i < 3 ? AKZENT_HELL : H.leise }}>{i + 1}</span>
                 <span style={{ flex: 1, minWidth: 0 }}>
                   <b style={{ display: 'block', fontFamily: INTER, fontSize: 16, fontWeight: 700 }}>{p.name}</b>
                   <span style={{ display: 'block', fontFamily: INTER, fontSize: 14, color: H.leise, marginTop: 2 }}>Level {p.level} · {p.matches_played} Matches</span>
@@ -210,7 +216,7 @@ export default async function EntdeckenPage() {
           <section className="ppl-breit" style={{ ...D.abschnitt, borderTop: 'none', paddingTop: 34 }}>
             <div style={kopf}>
               <div>
-                <div style={etikett}>Liga</div>
+                <div style={etikettD}>Liga</div>
                 <h2 style={D.titel}>Saisons</h2>
               </div>
               <Link href="/liga" style={D.mehr}>Liga ansehen →</Link>
@@ -230,7 +236,7 @@ export default async function EntdeckenPage() {
           <section className="ppl-breit" style={{ ...D.abschnitt, paddingBottom: 40 }}>
             <div style={kopf}>
               <div>
-                <div style={etikett}>Events</div>
+                <div style={etikettD}>Events</div>
                 <h2 style={D.titel}>Nächste Turniere</h2>
               </div>
               <Link href="/turniere" style={D.mehr}>Alle Events →</Link>
@@ -263,9 +269,9 @@ export default async function EntdeckenPage() {
               return (
                 <div key={m.id} style={{ ...H.zeile, cursor: 'default' }}>
                   <span style={{ flex: 1, minWidth: 0, fontFamily: INTER, fontSize: 16 }}>
-                    <b style={{ fontWeight: 700, color: p1win ? VIOLETT : H.text }}>{m.p1?.name || 'Spieler'}</b>
+                    <b style={{ fontWeight: 700, color: p1win ? AKZENT_HELL : H.text }}>{m.p1?.name || 'Spieler'}</b>
                     <span style={{ color: H.leise }}> gegen </span>
-                    <b style={{ fontWeight: 700, color: !p1win && m.winner_id ? VIOLETT : H.text }}>{m.p2?.name || 'Spieler'}</b>
+                    <b style={{ fontWeight: 700, color: !p1win && m.winner_id ? AKZENT_HELL : H.text }}>{m.p2?.name || 'Spieler'}</b>
                   </span>
                 </div>
               )

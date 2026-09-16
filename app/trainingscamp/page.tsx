@@ -105,9 +105,9 @@ export default function TrainingscampPage() {
         {/* STEP 1 — DETAIL */}
         {step === 1 && (<>
           <div style={{ position: "relative" }}>
-            <div style={{ height: 172, background: "repeating-linear-gradient(135deg,#1A1A1E 0 22px,#1c212a 22px 44px)", display: "flex", alignItems: "center", justifyContent: "center", color: FAINT, fontSize: 11, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase" }}>Camp-Foto</div>
+            <div style={{ height: 172, background: "repeating-linear-gradient(135deg,#1A1A1E 0 22px,#1c212a 22px 44px)", display: "flex", alignItems: "center", justifyContent: "center", color: FAINT, fontSize:11.5, fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase" }}>Camp-Foto</div>
             <div style={{ background: DARK, padding: "15px 18px 16px" }}>
-              <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block" }}>13.–16. August · PPL24 Glattbrugg</div>
+              <div style={{ fontSize:11.5, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase", background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent", display: "inline-block" }}>13.–16. August · PPL24 Glattbrugg</div>
               <h1 style={{ ...H1, marginTop: 5 }}>Trainings-<br />camp</h1>
               <div style={{ fontSize: 12.5, color: SUB, fontWeight: 300, marginTop: 7 }}>Vier Tage intensives Pingpong-Training mit zwei Spitzenspielern — für alle Levels.</div>
             </div>
@@ -123,7 +123,7 @@ export default function TrainingscampPage() {
                 ["Von zwei Profis.", "Elia Schmid (Schweizer Nr. 1) und Simon Berglund (Schwedens Nr. 3)."],
               ].map(([t, d], i) => (
                 <div key={i} style={{ display: "flex", gap: 11, alignItems: "flex-start", padding: "7px 0" }}>
-                  <span style={{ width: 22, height: 22, borderRadius: "50%", flexShrink: 0, background: GRAD, color: CREAM, fontSize: 11, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
+                  <span style={{ width: 22, height: 22, borderRadius: "50%", flexShrink: 0, background: GRAD, color: CREAM, fontSize:11.5, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center" }}>{i + 1}</span>
                   <span style={{ fontSize: 13, color: SUB, fontWeight: 300, lineHeight: 1.45 }}><b style={{ color: CREAM, fontWeight: 700 }}>{t}</b> {d}</span>
                 </div>
               ))}
@@ -165,7 +165,7 @@ export default function TrainingscampPage() {
                         return (
                           <div key={s.id} onClick={() => !voll && !schon && toggle(s.id)} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, background: on ? "rgba(255,255,255,.07)" : CELL, border: `1.5px solid ${on ? "rgba(255,255,255,.30)" : "transparent"}`, borderRadius: 11, padding: "11px 13px", marginTop: 8, cursor: voll || schon ? "not-allowed" : "pointer", opacity: voll || schon ? .5 : 1 }}>
                             <span><span style={{ fontSize: 13, fontWeight: 700, color: CREAM }}>{s.label} · {s.start}–{s.end}</span>
-                              <span style={{ display: "block", fontSize: 11, color: MUT, fontWeight: 300, marginTop: 2 }}>{schon ? "schon gebucht" : voll ? "ausgebucht" : `${s.frei} frei`}</span></span>
+                              <span style={{ display: "block", fontSize:11.5, color: MUT, fontWeight: 300, marginTop: 2 }}>{schon ? "schon gebucht" : voll ? "ausgebucht" : `${s.frei} frei`}</span></span>
                             <span style={{ display: "flex", alignItems: "center", gap: 10 }}>
                               <span style={{ fontSize: 12.5, fontWeight: 800, color: CREAM }}>CHF 75</span>
                               <span style={{ width: 21, height: 21, borderRadius: 6, border: `1.5px solid ${on ? "transparent" : "rgba(255,255,255,.3)"}`, background: on ? GRAD : "transparent", color: CREAM, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 900 }}>{on ? "✓" : ""}</span>
@@ -183,7 +183,7 @@ export default function TrainingscampPage() {
           {/* Sticky Summe */}
           <div style={{ position: "sticky", bottom: 0, zIndex: 40, background: DARK, borderTop: `1px solid ${LINE}`, padding: "12px 16px" }}>
             {nextTierNudge && <div style={{ fontSize: 12, fontWeight: 800, textAlign: "center", marginBottom: 10, background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }}>{nextTierNudge}</div>}
-            {ids.length > 0 && <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>{DATES.flatMap(d => { const a = (byDate[d] || []).filter(s => sel.has(s.id)); if (!a.length) return []; const txt = a.length === 2 ? "Ganztag" : a[0].label; return [<span key={d} style={{ fontSize: 11, fontWeight: 700, color: CREAM, background: CELL, borderRadius: 999, padding: "4px 10px" }}>{DAY_LABEL[d].split(" ")[0]} · {txt}</span>] })}</div>}
+            {ids.length > 0 && <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 10 }}>{DATES.flatMap(d => { const a = (byDate[d] || []).filter(s => sel.has(s.id)); if (!a.length) return []; const txt = a.length === 2 ? "Ganztag" : a[0].label; return [<span key={d} style={{ fontSize:11.5, fontWeight: 700, color: CREAM, background: CELL, borderRadius: 999, padding: "4px 10px" }}>{DAY_LABEL[d].split(" ")[0]} · {txt}</span>] })}</div>}
             <div style={{ display: "flex", flexDirection: "column", gap: 5, marginBottom: 11 }}>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}><span style={{ color: MUT }}>Anzahl</span><span style={{ color: CREAM, fontWeight: 800 }}>{ids.length ? `${ids.length} Einheit${ids.length > 1 ? "en" : ""}` : "–"}</span></div>
               <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13 }}><span style={{ color: MUT }}>Gesamt</span><span style={{ color: CREAM, fontWeight: 800 }}>CHF {price.total}</span></div>

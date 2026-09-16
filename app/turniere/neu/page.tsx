@@ -107,7 +107,7 @@ export default function NeuesTurnierPage(){
         <button onClick={create} disabled={saving} style={{...btn,width:"100%",padding:15,fontSize:15,cursor:saving?"default":"pointer",opacity:saving?0.6:1}}>
           {saving?"Wird erstellt …":"Turnier erstellen →"}
         </button>
-        <p style={{...body,textAlign:"center",marginTop:12,fontSize:11}}>Danach läuft die Anmeldung · du startest das Bracket, wenn genug Spieler da sind</p>
+        <p style={{...body,textAlign:"center",marginTop:12,fontSize:11.5}}>Danach läuft die Anmeldung · du startest das Bracket, wenn genug Spieler da sind</p>
       </div>
       <BottomNav />
     </main>

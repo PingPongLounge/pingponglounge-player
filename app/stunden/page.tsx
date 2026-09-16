@@ -25,7 +25,7 @@ function QRCode({ code }: { code: string }) {
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={url} alt="QR Code" width={100} height={100} style={{ borderRadius: 8 }} />
-      <span style={{ fontSize: 10, color: MUT, letterSpacing: "0.06em" }}>Am Empfang vorzeigen</span>
+      <span style={{ fontSize:11.5, color: MUT, letterSpacing: "0.06em" }}>Am Empfang vorzeigen</span>
     </div>
   )
 }

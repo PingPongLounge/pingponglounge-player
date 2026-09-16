@@ -140,16 +140,16 @@ export default function MatchHistoriePage(){
                     <div style={{flex:1,minWidth:0}}>
                       <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:3}}>
                         <span style={{fontSize:14,fontWeight:700,color:W}}>{opponentName}</span>
-                        <span style={{fontSize:10,fontWeight:700,color:won?GREEN:DANGER,background:won?`${GREEN}18`:`${DANGER}22`,borderRadius:999,padding:"1px 7px"}}>{won?"Sieg":"Ndlg"}</span>
+                        <span style={{fontSize:11.5,fontWeight:700,color:won?GREEN:DANGER,background:won?`${GREEN}18`:`${DANGER}22`,borderRadius:999,padding:"1px 7px"}}>{won?"Sieg":"Ndlg"}</span>
                       </div>
-                      <p style={{...meta,fontSize:11}}>
+                      <p style={{...meta,fontSize:11.5}}>
                         {city||""}{city&&setsStr?" · ":""}{setsStr}
                       </p>
                     </div>
                     <div style={{textAlign:"right",flexShrink:0}}>
                       {elo&&(<p style={{fontSize:13,fontWeight:700,color:elo.delta>=0?GREEN:DANGER,marginBottom:2}}>{elo.delta>=0?"+":""}{elo.delta}</p>)}
-                      {elo&&<p style={{...meta,fontSize:11}}>{elo.elo} ELO</p>}
-                      {!elo&&<p style={{...meta,fontSize:11}}>{dateLabel(m.confirmed_at)}</p>}
+                      {elo&&<p style={{...meta,fontSize:11.5}}>{elo.elo} ELO</p>}
+                      {!elo&&<p style={{...meta,fontSize:11.5}}>{dateLabel(m.confirmed_at)}</p>}
                     </div>
                   </div>
                 )

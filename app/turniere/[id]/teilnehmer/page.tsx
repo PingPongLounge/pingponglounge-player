@@ -182,7 +182,7 @@ export default function Teilnehmerverwaltung({ params }: { params: Promise<{ id:
   )
 
   const th: React.CSSProperties = {
-    textAlign: "left", padding: "10px 12px", fontSize: 11, letterSpacing: ".08em",
+    textAlign: "left", padding: "10px 12px", fontSize:11.5, letterSpacing: ".08em",
     textTransform: "uppercase", color: MUT, whiteSpace: "nowrap", borderBottom: `1px solid ${LINE}`,
   }
   const td: React.CSSProperties = {
