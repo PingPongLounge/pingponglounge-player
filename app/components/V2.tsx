@@ -41,7 +41,11 @@ export const FELD_KANTE = "rgba(8,8,8,.09)"
 export function Hero({
   bild, pos = "50% 45%", etikett, titel, subline, kopf, alt = "",
 }: {
-  bild: string; pos?: string
+  /* Ohne bild: schwarzer Grund mit weichem blauem Schein statt Foto.
+     Auf der Startseite ausdruecklich so gewollt (Oliver, 16.09.) — auf
+     jedem vorhandenen Hero-Foto steht Schrift (Neonzeichen, Tischaufdruck,
+     Plakate), und Schrift auf Schrift liest sich nicht. */
+  bild?: string; pos?: string
   /* etikett ist optional: auf der Startseite steht ueber dem Namen nichts. */
   etikett?: string; titel: React.ReactNode; subline?: React.ReactNode
   kopf?: React.ReactNode; alt?: string
@@ -51,16 +55,25 @@ export function Hero({
       position: "relative", background: SCHWARZ, overflow: "hidden",
       display: "flex", flexDirection: "column",
     }}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={bild} alt={alt} aria-hidden={alt ? undefined : true} className="ppl-hero-bild"
-        style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: pos }} />
-      <div aria-hidden style={{
+      {bild ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={bild} alt={alt} aria-hidden={alt ? undefined : true} className="ppl-hero-bild"
+          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: pos }} />
+      ) : (
+        <div aria-hidden style={{
+          position: "absolute", inset: 0,
+          background:
+            "radial-gradient(120% 78% at 78% 8%, rgba(91,156,255,.26) 0%, rgba(91,156,255,.07) 42%, transparent 72%)," +
+            "radial-gradient(90% 60% at 8% 96%, rgba(20,71,230,.20) 0%, transparent 62%)",
+        }} />
+      )}
+      {bild && <div aria-hidden style={{
         position: "absolute", inset: 0,
         /* 16.09.2026: unten deckender. Der Text steht im unteren Drittel —
            dort darf vom Motiv nichts mehr durchkommen, sonst liegt Schrift
            auf Schrift (Neonzeichen, Tischaufdrucke, Markennamen). */
         background: "linear-gradient(to bottom, rgba(8,8,8,.62) 0%, rgba(8,8,8,.42) 24%, rgba(8,8,8,.74) 50%, rgba(8,8,8,.94) 74%, rgba(8,8,8,.98) 100%)",
-      }} />
+      }} />}
 
       {kopf && <div style={{ position: "relative", zIndex: 2 }}>{kopf}</div>}
 

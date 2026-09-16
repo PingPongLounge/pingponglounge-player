@@ -127,7 +127,6 @@ export default async function EntdeckenPage() {
         {/* Kopf nach Referenz-Mockup: Foto, Etikett, sehr grosse Anton-Zeile,
             zwei Zeilen Erklaerung. Darunter die Aktionen. */}
         <Hero
-          bild="/player-one-neon.jpg" pos="36% 48%"
           etikett="Player"
           titel={<>Die Ping Pong Liga<br />der Schweiz.</>}
           subline="Sei Teil der Ping-Pong-Bewegung. Zeig deine Skills, spiel gegen andere und steig im Ranking auf."

@@ -47,7 +47,6 @@ export default function StartHomeV2(d: StartData) {
             Claim — sonst nichts. Kein Etikett, kein YOUR GAME, keine
             Erklaerzeile. Was zu tun ist, steht in den Kaestchen darunter. */}
         <Hero
-          bild="/player-one-neon.jpg" pos="36% 48%"
           kopf={<HeroKopf />}
           titel={<>Player<span style={{ color: VIOLETT }}>.</span></>}
           subline={<>Die Ping Pong Liga<br />der Schweiz.</>}
