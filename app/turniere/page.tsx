@@ -134,8 +134,7 @@ export default function TurnierePage() {
           {/* ── Zuletzt gespielt ── */}
           {vorbei.length > 0 && (
             <div style={{ marginTop: 28 }}>
-              <AbschnittKopf titel="Zuletzt gespielt" />
-              <Feld>
+              <Feld titel="Zuletzt gespielt">
                 {vorbei.map((t, i) => (
                   <Link key={t.id} href={`/turniere/${t.id}`} style={{ textDecoration: "none", display: "block" }}>
                     <ListenZeile erste={i === 0} titel={t.name} unter={`${datum(t.date)}${t.city ? ` · ${t.city}` : ""}`} rechts={<Pfeil />} />

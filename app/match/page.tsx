@@ -90,8 +90,7 @@ export default function MatchPage() {
         <Inhalt>
           {/* ── Die drei Wege: eine Liste, keine Matrix. Die Reihenfolge ist
                 die Empfehlung — suchen, fordern, selbst anlegen. ── */}
-          <AbschnittKopf titel="Was willst du machen?" />
-          <Feld>
+          <Feld titel="Was willst du machen?">
             <a href="#heute" style={{ textDecoration: "none", display: "block" }}>
               <AktionsZeile erste symbol={<Symbol art="suche" />} titel="Spiel finden" unter="Offene Spiele in deiner Nähe" />
             </a>
@@ -118,7 +117,7 @@ export default function MatchPage() {
 
             {!loading && !error && alle.length === 0 && (
               <Feld padding={20}>
-                <b style={{ display: "block", fontFamily: ANTON, fontWeight: 400, fontSize: 26, textTransform: "uppercase", marginBottom: 8 }}>
+                <b style={{ display: "block", fontFamily: INTER, fontWeight: 900, letterSpacing: "-.015em", fontSize: 22, textTransform: "uppercase", marginBottom: 8 }}>
                   Heute noch nichts
                 </b>
                 <p style={{ fontSize: 15, color: TEXT_LEISE, margin: "0 0 18px" }}>Mach den ersten Move.</p>

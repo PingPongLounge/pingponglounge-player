@@ -12,7 +12,7 @@ import { createClient } from "@/lib/supabase/server"
 import ProfilAvatar from "@/app/components/ProfilAvatar"
 import ProfilAktionen from "@/app/components/ProfilAktionen"
 import {
-  Hero, Inhalt, AbschnittKopf, Feld, StatsReihe, ListenZeile, Pille,
+  Hero, Inhalt, Feld, StatsReihe, ListenZeile, Pille,
   knopfPrimaer, knopfOutlineHell, TEXT_LEISE, FLAECHE,
 } from "@/app/components/V2"
 
@@ -122,8 +122,7 @@ export default async function SpielerSeite({ params }: { params: Promise<{ id: s
         </div>
 
         <div style={{ marginTop: 26 }}>
-          <AbschnittKopf titel="Letzte Spiele" />
-          <Feld>
+          <Feld titel="Letzte Spiele">
             {spiele.length ? spiele.map((m, i) => {
               const meins = m.p1_id === id
               const gewann = m.winner_id === id

@@ -8,7 +8,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import HeroKopf from "@/app/components/HeroKopf"
 import {
-  Hero, Inhalt, AbschnittKopf, Feld, StatsReihe, GrosseZahl, ListenZeile,
+  Hero, Inhalt, Feld, StatsReihe, GrosseZahl, ListenZeile,
   TEXT_LEISE, FLAECHE,
 } from "@/app/components/V2"
 import { SCHWARZ, CREME, VIOLETT, ANTON, INTER, MUT } from "@/app/theme"
@@ -53,8 +53,7 @@ export default function RanglistePage() {
         <Inhalt>
           {me && (
             <>
-              <AbschnittKopf titel="Dein Rang" />
-              <Feld padding="18px 16px 0">
+              <Feld titel="Dein Rang" padding="18px 16px 0">
                 <GrosseZahl
                   wert={`#${canton ? me.rank_filtered : me.rank_global}`}
                   rechts={<span style={{ fontFamily: INTER, fontSize: 14, color: TEXT_LEISE, lineHeight: 1.5 }}>

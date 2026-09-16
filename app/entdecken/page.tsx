@@ -102,7 +102,7 @@ export default async function EntdeckenPage() {
       return {
         text, leise: leiseF,
         abschnitt: { paddingTop: 30, paddingBottom: 30, borderTop: `1px solid ${trennF}` } as React.CSSProperties,
-        titel: { fontFamily: ANTON, fontWeight: 400, fontSize: 32, textTransform: 'uppercase', margin: '6px 0 0', color: text } as React.CSSProperties,
+        titel: { fontFamily: INTER, fontWeight: 900, fontSize: 24, letterSpacing: '-.015em', textTransform: 'uppercase', margin: '6px 0 0', color: text } as React.CSSProperties,
         mehr: { fontFamily: INTER, fontSize: 14, fontWeight: 700, color: hell ? AKZENT_HELL : CREME, textDecoration: 'none', whiteSpace: 'nowrap', padding: '12px 8px', margin: '-12px -8px' } as React.CSSProperties,
         zeile: { display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0', borderTop: `1px solid ${trennF}`, textDecoration: 'none', color: text } as React.CSSProperties,
         leer: { fontFamily: INTER, fontSize: 15, color: leiseF, padding: '13px 0', borderTop: `1px solid ${trennF}`, margin: 0 } as React.CSSProperties,
@@ -155,7 +155,7 @@ export default async function EntdeckenPage() {
             Ab hier Off-White: Orientierung, Daten, Listen. */}
         <div style={{ background: FLAECHE, color: SCHWARZ }}>
           <div className="ppl-breit" style={{ paddingTop: 34, paddingBottom: 2 }}>
-            <h2 style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 'clamp(26px,6.5vw,34px)', lineHeight: .98, textTransform: 'uppercase', margin: 0, color: SCHWARZ }}>
+            <h2 style={{ fontFamily: INTER, fontWeight: 900, letterSpacing: '-.015em', fontSize: 'clamp(22px,5.4vw,28px)', lineHeight: .98, textTransform: 'uppercase', margin: 0, color: SCHWARZ }}>
               Play. Compete. Connect.
             </h2>
             <p style={{ fontFamily: INTER, fontSize: 16, lineHeight: 1.55, color: H.leise, margin: '10px 0 0', maxWidth: '46ch' }}>

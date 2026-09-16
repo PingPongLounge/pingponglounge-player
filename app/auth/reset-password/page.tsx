@@ -146,7 +146,7 @@ export default function PasswortAendernSeite() {
 
         {stand === 'gespeichert' && (
           <>
-            <p style={{ fontFamily: ANTON, fontSize: 26, textTransform: 'uppercase', color: VIOLETT, margin: '0 0 8px' }}>Passwort geändert</p>
+            <p style={{ fontFamily: INTER, fontWeight: 900, fontSize: 22, letterSpacing: '-.015em', textTransform: 'uppercase', color: VIOLETT, margin: '0 0 8px' }}>Passwort geändert</p>
             <p style={{ fontSize: 16, color: 'rgba(244,241,235,.62)', margin: 0 }}>Zurück zum Profil …</p>
           </>
         )}

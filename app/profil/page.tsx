@@ -4,7 +4,7 @@ import Link from"next/link"
 import ProfilAvatar from "@/app/components/ProfilAvatar"
 import HeroKopf from "@/app/components/HeroKopf"
 import {
-  Hero, Inhalt, AbschnittKopf, Feld, StatsReihe, ListenZeile, AktionsZeile, Symbol, Pille, Pfeil,
+  Hero, Inhalt, Feld, StatsReihe, ListenZeile, AktionsZeile, Symbol, Pille, Pfeil,
   knopfPrimaer, knopfOutlineHell, TEXT_LEISE, FLAECHE,
 } from "@/app/components/V2"
 import BottomNav from"@/app/components/BottomNav"
@@ -63,8 +63,7 @@ return <>
       {/* ── Profil vervollstaendigen ── */}
       {(!profile.real_name||!profile.canton)&&!done&&(
         <div style={{marginTop:24}}>
-          <AbschnittKopf titel="Profil vervollständigen"/>
-          <Feld padding={16}>
+          <Feld titel="Profil vervollständigen" padding={16}>
             <p style={{color:TEXT_LEISE,fontSize:14,margin:"0 0 12px"}}>Name und Kanton helfen bei Liga und Zuordnung.</p>
             {!profile.real_name&&<input value={name} onChange={e=>setName(e.target.value)} placeholder="Vor- und Nachname" style={{width:"100%",boxSizing:"border-box",background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.14)",borderRadius:10,padding:12,color:B,marginBottom:8,fontFamily:"inherit",fontSize:15}}/>}
             {!profile.canton&&<select value={canton} onChange={e=>setCanton(e.target.value)} style={{width:"100%",background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.14)",borderRadius:10,padding:12,color:B,marginBottom:12,fontFamily:"inherit",fontSize:15}}><option value="">Kanton wählen…</option>{CANTONS.map(c=><option key={c}>{c}</option>)}</select>}
@@ -75,8 +74,7 @@ return <>
 
       {/* ── Letzte Matches ── */}
       <div style={{marginTop:24}}>
-        <AbschnittKopf titel="Letzte Matches" mehr={matches.length?"Alle":undefined} href={matches.length?"/matchhistorie":undefined}/>
-        <Feld>
+        <Feld titel="Letzte Matches" mehr={matches.length?"Alle":undefined} href={matches.length?"/matchhistorie":undefined}>
           {matches.length===0
             ? <div style={{padding:16,color:TEXT_LEISE,fontSize:15}}>Noch keine Matches gespielt.</div>
             : matches.slice(0,5).map((m,i)=>{
@@ -92,8 +90,7 @@ return <>
 
       {/* ── Navigation: was frueher im Hamburger-Menue stand ── */}
       <div style={{marginTop:24}}>
-        <AbschnittKopf titel="Dein Player"/>
-        <Feld>
+        <Feld titel="Dein Player">
           <Link href="/matchhistorie" style={{textDecoration:"none",display:"block"}}>
             <AktionsZeile erste symbol={<Symbol art="verlauf"/>} titel="Match-History" unter={`${played} Matches gespielt`}/>
           </Link>
@@ -114,8 +111,7 @@ return <>
 
       {/* ── Einstellungen ── */}
       <div id="einstellungen" style={{marginTop:24,scrollMarginTop:16}}>
-        <AbschnittKopf titel="Einstellungen"/>
-        <Feld>
+        <Feld titel="Einstellungen">
           <div style={{padding:"14px 16px 4px"}}>
             <p style={{fontSize:13.5,color:TEXT_LEISE,margin:0,lineHeight:1.5}}>Du entscheidest, wer dich erreichen darf. Spiele und Rating bleiben erhalten.</p>
           </div>

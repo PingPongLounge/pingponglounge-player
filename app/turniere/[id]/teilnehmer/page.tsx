@@ -197,7 +197,7 @@ export default function Teilnehmerverwaltung({ params }: { params: Promise<{ id:
           ‹ Zurück zum Turnier
         </Link>
 
-        <h1 style={{ fontFamily: ANTON, fontSize: 34, textTransform: "uppercase", letterSpacing: "-.01em", margin: "16px 0 4px" }}>
+        <h1 style={{ fontFamily: INTER, fontWeight: 900, fontSize: 28, textTransform: "uppercase", letterSpacing: "-.02em", margin: "16px 0 4px" }}>
           Teilnehmer
         </h1>
         {turnier && (

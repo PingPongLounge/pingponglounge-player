@@ -42,7 +42,8 @@ export function Hero({
   bild, pos = "50% 45%", etikett, titel, subline, kopf, alt = "",
 }: {
   bild: string; pos?: string
-  etikett: string; titel: React.ReactNode; subline?: React.ReactNode
+  /* etikett ist optional: auf der Startseite steht ueber dem Namen nichts. */
+  etikett?: string; titel: React.ReactNode; subline?: React.ReactNode
   kopf?: React.ReactNode; alt?: string
 }) {
   return (
@@ -67,10 +68,10 @@ export function Hero({
         position: "relative", zIndex: 2, marginTop: "auto",
         paddingTop: 24, paddingBottom: 26,
       }}>
-        <div style={{
+        {etikett && <div style={{
           fontFamily: INTER, fontSize: 12.5, fontWeight: 900, letterSpacing: ".18em",
           textTransform: "uppercase", color: VIOLETT, marginBottom: 8,
-        }}>{etikett}</div>
+        }}>{etikett}</div>}
 
         <h1 className="ppl-hero-titel" style={{
           fontFamily: ANTON, fontWeight: 400, textTransform: "uppercase",
@@ -135,10 +136,75 @@ export function AbschnittKopf({ titel, mehr, href, dunkel = false }:
 /* ---------- Weisses Feld --------------------------------------------------
    Gruppierte Listen sitzen auf Weiss, damit die Off-White-Flaeche Struktur
    bekommt, ohne dass jede Zeile eine eigene Karte wird. */
-export function Feld({ children, padding = 0 }: { children: React.ReactNode; padding?: number | string }) {
+export function Feld({ children, padding = 0, titel, mehr, href, dunkel = false }: {
+  children: React.ReactNode; padding?: number | string
+  titel?: string; mehr?: string; href?: string; dunkel?: boolean
+}) {
   return (
-    <div style={{ background: PANEL, borderRadius: 16, overflow: "hidden", padding, border: `1px solid ${FELD_KANTE}` }}>
-      {children}
+    <div style={{
+      background: dunkel ? "#15151A" : PANEL, borderRadius: 16, overflow: "hidden",
+      border: `1px solid ${dunkel ? "rgba(244,241,235,.10)" : FELD_KANTE}`,
+    }}>
+      {titel && (
+        <div style={{
+          display: "flex", alignItems: "baseline", justifyContent: "space-between",
+          gap: 16, padding: "16px 16px 12px",
+        }}>
+          <h2 style={{
+            fontFamily: INTER, fontSize: 17, fontWeight: 900, letterSpacing: ".04em",
+            textTransform: "uppercase", margin: 0, color: dunkel ? CREME : SCHWARZ,
+          }}>{titel}</h2>
+          {mehr && href && (
+            <a href={href} style={{
+              fontFamily: INTER, fontSize: 14, fontWeight: 700,
+              color: dunkel ? VIOLETT : AKZENT_TIEF, textDecoration: "none", whiteSpace: "nowrap",
+              padding: "12px 8px", margin: "-12px -8px",
+            }}>{mehr} ›</a>
+          )}
+        </div>
+      )}
+      <div style={{ padding }}>{children}</div>
+    </div>
+  )
+}
+
+/* ---------- Kennzahlen als einzelne Kaestchen ------------------------------
+   Nach der Vorlage vom 16.09.: jede Zahl steht in einem eigenen Kaestchen,
+   und jedes Kaestchen fuehrt irgendwohin. Deshalb <a>, nicht <div> — wer auf
+   sein Rating tippt, will sein Profil sehen. */
+export type StatKachel = { wert: string | number; label: string; ziel?: string; zielLabel?: string; akzent?: boolean }
+
+export function StatsKacheln({ werte, dunkel = false }: { werte: StatKachel[]; dunkel?: boolean }) {
+  const flaeche = dunkel ? "#15151A" : PANEL
+  const kante = dunkel ? "rgba(244,241,235,.10)" : FELD_KANTE
+  const akzent = dunkel ? VIOLETT : AKZENT_TIEF
+  const leise = dunkel ? "rgba(244,241,235,.80)" : TEXT_LEISE
+  return (
+    <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }} className="ppl-kacheln">
+      {werte.map(x => {
+        const inhalt = (
+          <>
+            <span style={{
+              fontFamily: ANTON, fontWeight: 400, fontSize: 32, lineHeight: ANTON_ZEILEN,
+              fontVariantNumeric: "tabular-nums", color: x.akzent ? akzent : (dunkel ? CREME : SCHWARZ),
+            }}>{x.wert}</span>
+            <span style={{
+              fontFamily: INTER, fontSize: 12, fontWeight: 700, letterSpacing: ".09em",
+              textTransform: "uppercase", color: leise,
+            }}>{x.label}</span>
+            {x.ziel && <span style={{ fontFamily: INTER, fontSize: 11.5, fontWeight: 600, color: akzent }}>{x.zielLabel ?? "Ansehen"} →</span>}
+          </>
+        )
+        const stil: React.CSSProperties = {
+          display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+          gap: 7, minHeight: 96, padding: "16px 10px", textAlign: "center",
+          background: flaeche, border: `1px solid ${kante}`, borderRadius: 16,
+          textDecoration: "none",
+        }
+        return x.ziel
+          ? <a key={x.label} href={x.ziel} style={stil}>{inhalt}</a>
+          : <div key={x.label} style={stil}>{inhalt}</div>
+      })}
     </div>
   )
 }
@@ -253,8 +319,10 @@ export function DatumBlock({ tag, monat }: { tag: string | number; monat: string
   return (
     <div aria-hidden style={{ textAlign: "center", width: 42, flexShrink: 0 }}>
       <div style={{
-        fontFamily: ANTON, fontWeight: 400, fontSize: 27, lineHeight: ANTON_ZEILEN,
-        color: SCHWARZ, fontVariantNumeric: "tabular-nums",
+        /* 16.09.: Anton steht nur noch im Hero und bei den Kennzahlen.
+           Ein Datum ist keine Kennzahl. */
+        fontFamily: INTER, fontWeight: 900, fontSize: 24, lineHeight: 1.15,
+        color: SCHWARZ, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em",
       }}>{tag}</div>
       <div style={{
         fontFamily: INTER, fontSize: 11.5, fontWeight: 900, letterSpacing: ".12em",

@@ -15,10 +15,10 @@ import PendingConfirmBanner from "./PendingConfirmBanner"
 import ProfilAvatar from "./ProfilAvatar"
 import HeroKopf from "./HeroKopf"
 import {
-  Hero, Inhalt, AbschnittKopf, Feld, StatsReihe, ListenZeile, Pfeil, Pille,
+  Hero, Inhalt, Feld, StatsKacheln, ListenZeile, Pfeil, Pille,
   knopfKlein, TEXT_LEISE, FLAECHE,
 } from "./V2"
-import { SCHWARZ, INTER } from "@/app/theme"
+import { SCHWARZ, VIOLETT, INTER } from "@/app/theme"
 
 export type Game = { id: string; href: string; day: string; time: string; title: string; sub: string; frei: number; full: boolean; ratio: string }
 export type Aktivitaet = { art: "forderung" | "neu"; id: string; spielerId: string; name: string; avatar: string | null; text: string }
@@ -43,20 +43,21 @@ export default function StartHomeV2(d: StartData) {
     <>
       <main style={{ minHeight: "100dvh", background: FLAECHE, color: SCHWARZ, fontFamily: INTER }}>
 
+        {/* 16.09.2026 (Oliver): Auf der Startseite steht der Name und der
+            Claim — sonst nichts. Kein Etikett, kein YOUR GAME, keine
+            Erklaerzeile. Was zu tun ist, steht in den Kaestchen darunter. */}
         <Hero
           bild="/player-one-neon.jpg" pos="36% 48%"
           kopf={<HeroKopf />}
-          etikett="Home"
-          titel={<>Your<br />game.</>}
-          subline={<>Deine Matches. Deine Community.<br />Dein nächster Move.</>}
+          titel={<>Player<span style={{ color: VIOLETT }}>.</span></>}
+          subline={<>Die Ping Pong Liga<br />der Schweiz.</>}
         />
 
         <Inhalt>
           <div style={{ marginBottom: 22 }}><PendingConfirmBanner /></div>
 
           {/* ── Dein naechstes Match + die vier Zahlen ── */}
-          <AbschnittKopf titel="Dein nächstes Match" mehr={d.games.length ? "Alle" : undefined} href={d.games.length ? "/match" : undefined} />
-          <Feld>
+          <Feld titel="Dein nächstes Match" mehr={d.games.length ? "Alle" : undefined} href={d.games.length ? "/match" : undefined}>
             {d.nextGame ? (
               <Link href={d.nextGame.href} style={{ textDecoration: "none", display: "block" }}>
                 <ListenZeile
@@ -77,21 +78,30 @@ export default function StartHomeV2(d: StartData) {
                 />
               </Link>
             )}
-            <div style={{ borderTop: "1px solid rgba(8,8,8,.10)" }}>
-              <StatsReihe werte={[
-                { wert: d.elo, label: "Rating" },
-                { wert: d.season.has && d.season.leagueRank ? `#${d.season.leagueRank}` : `#${d.rank}`, label: d.season.has && d.season.leagueRank ? "Liga" : "Schweiz", akzent: true },
-                { wert: d.played, label: "Matches" },
-                { wert: `${winrate}%`, label: "Win Rate" },
-              ]} />
-            </div>
           </Feld>
+
+          {/* ── Dein Stand: vier Kaestchen, jedes fuehrt irgendwohin ── */}
+          <div style={{ marginTop: 26 }}>
+            <h2 style={{
+              fontFamily: INTER, fontSize: 17, fontWeight: 900, letterSpacing: ".04em",
+              textTransform: "uppercase", margin: "0 0 12px", color: SCHWARZ,
+            }}>Dein Stand</h2>
+            <StatsKacheln werte={[
+              { wert: d.elo, label: "Rating", ziel: "/profil", zielLabel: "Profil" },
+              {
+                wert: d.season.has && d.season.leagueRank ? `#${d.season.leagueRank}` : `#${d.rank}`,
+                label: d.season.has && d.season.leagueRank ? "Liga" : "Schweiz",
+                akzent: true, ziel: "/liga", zielLabel: "Liga",
+              },
+              { wert: d.played, label: "Matches", ziel: "/matchhistorie", zielLabel: "Historie" },
+              { wert: `${winrate}%`, label: "Win Rate", ziel: "/profil", zielLabel: "Profil" },
+            ]} />
+          </div>
 
           {/* ── Deine letzten Matches ── */}
           {letzte.length > 0 && (
             <div style={{ marginTop: 26 }}>
-              <AbschnittKopf titel="Deine letzten Matches" mehr="Alle" href="/matchhistorie" />
-              <Feld>
+              <Feld titel="Deine letzten Matches" mehr="Alle" href="/matchhistorie">
                 {letzte.map((m, i) => (
                   <Link key={m.id} href={`/spieler/${m.gegnerId}`} style={{ textDecoration: "none", display: "block" }}>
                     <ListenZeile
@@ -114,8 +124,7 @@ export default function StartHomeV2(d: StartData) {
           {/* ── Offene Forderungen und neue Leute in der Liga ── */}
           {aktiv.length > 0 && (
             <div style={{ marginTop: 26 }}>
-              <AbschnittKopf titel="Was läuft" mehr="Feed" href="/feed" />
-              <Feld>
+              <Feld titel="Was läuft" mehr="Feed" href="/feed">
                 {aktiv.map((a, i) => (
                   <ListenZeile
                     key={`${a.art}-${a.id}`}
@@ -138,8 +147,7 @@ export default function StartHomeV2(d: StartData) {
           {/* ── Offene Spiele ── */}
           {d.games.length > 0 && (
             <div style={{ marginTop: 26 }}>
-              <AbschnittKopf titel="Heute wird gespielt" mehr="Alle" href="/match" />
-              <Feld>
+              <Feld titel="Heute wird gespielt" mehr="Alle" href="/match">
                 {d.games.slice(0, 3).map((g, i) => (
                   <Link key={g.id} href={g.href} style={{ textDecoration: "none", display: "block" }}>
                     <ListenZeile
@@ -157,8 +165,7 @@ export default function StartHomeV2(d: StartData) {
           {/* ── Naechstes Turnier ── */}
           {d.tour && (
             <div style={{ marginTop: 26 }}>
-              <AbschnittKopf titel="Nächstes Turnier" mehr="Alle" href="/turniere" />
-              <Feld>
+              <Feld titel="Nächstes Turnier" mehr="Alle" href="/turniere">
                 <Link href="/turniere" style={{ textDecoration: "none", display: "block" }}>
                   <ListenZeile erste titel={d.tour.name} unter={`${d.tour.dateLabel} · ${d.tour.formatLabel}`} rechts={<Pfeil />} />
                 </Link>

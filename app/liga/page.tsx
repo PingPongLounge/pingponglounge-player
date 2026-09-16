@@ -503,8 +503,7 @@ export default function LigaPage(){
 
           {myReg&&myRow?(
             <>
-              <AbschnittKopf titel="Dein Rang"/>
-              <Feld padding="18px 16px 0">
+              <Feld titel="Dein Rang" padding="18px 16px 0">
                 <GrosseZahl
                   wert={`#${meinRang}`}
                   rechts={
@@ -569,7 +568,7 @@ export default function LigaPage(){
             <div style={{padding:"4px 14px 0"}}>
               <div style={{borderRadius:16,padding:20,background:"#FFFFFF"}}>
                 <div style={{fontSize:11.5,fontWeight:900,letterSpacing:".14em",textTransform:"uppercase",color:AKZENT_TIEF}}>Neu hier?</div>
-                <div style={{fontFamily:ANTON,fontWeight:400,fontSize:26,textTransform:"uppercase",color:SCHWARZ,margin:"8px 0 16px"}}>So funktioniert die Liga</div>
+                <div style={{fontFamily:INTER,fontWeight:900,fontSize:22,letterSpacing:"-.01em",textTransform:"uppercase",color:SCHWARZ,margin:"8px 0 16px"}}>So funktioniert die Liga</div>
                 {([
                   ["1","Du bist automatisch dabei","Eine Liga für alle — kein Beitreten, keine Klassen. Deine Stufe kommt aus deiner Elo."],
                   ["2","Spielen & fordern","Fordere jeden — auch den Tabellenersten. Jedes bestätigte Resultat zählt."],
@@ -659,7 +658,7 @@ export default function LigaPage(){
               {/* ── Liga verstehen — die ECHTE Logik, keine erfundene ── */}
               <div style={{marginTop:30,borderTop:"1px solid rgba(8,8,8,.18)",paddingTop:22}}>
                 <AbschnittKopf titel="Liga verstehen"/>
-                <h3 style={{fontFamily:ANTON,fontWeight:400,fontSize:"clamp(24px,6.5vw,32px)",lineHeight:.98,textTransform:"uppercase",margin:"8px 0 12px",color:SCHWARZ}}>Wie steige ich auf?</h3>
+                <h3 style={{fontFamily:INTER,fontWeight:900,fontSize:"clamp(21px,5.6vw,27px)",letterSpacing:"-.015em",lineHeight:.98,textTransform:"uppercase",margin:"8px 0 12px",color:SCHWARZ}}>Wie steige ich auf?</h3>
                 <p style={{fontFamily:INTER,fontSize:16,lineHeight:1.55,color:"rgba(8,8,8,.72)",margin:"0 0 10px",maxWidth:"52ch"}}>
                   Fordere Spieler rund um deinen Rang heraus. Jedes bestätigte Spiel verschiebt dein Rating — ein Sieg gegen jemand Stärkeren bringt am meisten, gegen jemand Schwächeren am wenigsten.
                 </p>
@@ -680,8 +679,7 @@ export default function LigaPage(){
             return (
               <section style={{background:FLAECHE}}>
                 <div className="ppl-breit" style={{paddingTop:4,paddingBottom:34}}>
-                <AbschnittKopf titel="Who's next?"/>
-                <Feld>
+                <Feld titel="Who's next?">
                   {nah.map(r=>{
                     const ini=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                     const om=openMatches[r.user_id]
