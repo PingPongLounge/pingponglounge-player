@@ -102,6 +102,12 @@ export default async function EntdeckenPage() {
       return {
         text, leise: leiseF,
         abschnitt: { paddingTop: 30, paddingBottom: 30, borderTop: `1px solid ${trennF}` } as React.CSSProperties,
+        /* Das Kaestchen: eigene Flaeche, feine Kante, Ueberschrift sitzt drin. */
+        kasten: {
+          background: hell ? '#FFFFFF' : '#15151A',
+          border: `1px solid ${hell ? 'rgba(10,10,12,.09)' : 'rgba(244,241,235,.10)'}`,
+          color: text,
+        } as React.CSSProperties,
         titel: { fontFamily: INTER, fontWeight: 900, fontSize: 24, letterSpacing: '-.015em', textTransform: 'uppercase', margin: '6px 0 0', color: text } as React.CSSProperties,
         mehr: { fontFamily: INTER, fontSize: 14, fontWeight: 700, color: hell ? AKZENT_HELL : CREME, textDecoration: 'none', whiteSpace: 'nowrap', padding: '12px 8px', margin: '-12px -8px' } as React.CSSProperties,
         zeile: { display: 'flex', alignItems: 'center', gap: 12, padding: '13px 0', borderTop: `1px solid ${trennF}`, textDecoration: 'none', color: text } as React.CSSProperties,
@@ -153,7 +159,7 @@ export default async function EntdeckenPage() {
         {/* ── HELL ─────────────────────────────────────────────────────
             Erst die Botschaft im Hero, dann was man hier konkret tun kann.
             Ab hier Off-White: Orientierung, Daten, Listen. */}
-        <div style={{ background: FLAECHE, color: SCHWARZ }}>
+        <div style={{ background: FLAECHE, color: SCHWARZ, paddingBottom: 18 }}>
           <div className="ppl-breit" style={{ paddingTop: 34, paddingBottom: 2 }}>
             <h2 style={{ fontFamily: INTER, fontWeight: 900, letterSpacing: '-.015em', fontSize: 'clamp(22px,5.4vw,28px)', lineHeight: .98, textTransform: 'uppercase', margin: 0, color: SCHWARZ }}>
               Play. Compete. Connect.
@@ -164,7 +170,7 @@ export default async function EntdeckenPage() {
           </div>
 
           {/* 1 · OPEN GAMES */}
-          <section className="ppl-breit" style={H.abschnitt}>
+          <section className="ppl-kasten" style={H.kasten}>
             <div style={kopf}>
               <div>
                 <div style={etikett}>Open Games</div>
@@ -187,7 +193,7 @@ export default async function EntdeckenPage() {
           </section>
 
           {/* 2 · RANKING */}
-          <section className="ppl-breit" style={{ ...H.abschnitt, paddingBottom: 40 }}>
+          <section className="ppl-kasten" style={H.kasten}>
             <div style={kopf}>
               <div>
                 <div style={etikett}>Ranking</div>
@@ -213,7 +219,7 @@ export default async function EntdeckenPage() {
         <div style={{ background: SCHWARZ, color: CREME }}>
 
           {/* 3 · LIGA */}
-          <section className="ppl-breit" style={{ ...D.abschnitt, borderTop: 'none', paddingTop: 34 }}>
+          <section className="ppl-kasten" style={D.kasten}>
             <div style={kopf}>
               <div>
                 <div style={etikettD}>Liga</div>
@@ -233,7 +239,7 @@ export default async function EntdeckenPage() {
           </section>
 
           {/* 4 · EVENTS */}
-          <section className="ppl-breit" style={{ ...D.abschnitt, paddingBottom: 40 }}>
+          <section className="ppl-kasten" style={D.kasten}>
             <div style={kopf}>
               <div>
                 <div style={etikettD}>Events</div>
@@ -255,8 +261,8 @@ export default async function EntdeckenPage() {
 
         {/* ── HELL ─────────────────────────────────────────────────────
             5 · COMMUNITY */}
-        <div style={{ background: FLAECHE, color: SCHWARZ }}>
-          <section className="ppl-breit" style={{ ...H.abschnitt, borderTop: 'none', paddingTop: 34, paddingBottom: 46 }}>
+        <div style={{ background: FLAECHE, color: SCHWARZ, paddingBottom: 18 }}>
+          <section className="ppl-kasten" style={H.kasten}>
             <div style={kopf}>
               <div>
                 <div style={etikett}>Community</div>

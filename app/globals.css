@@ -20,6 +20,12 @@ body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0
    Desktop kein 390px-Streifen in schwarzer Leere ist. Contentbreite dort
    900–1100px, Leseflaechen bleiben schmaler, damit Zeilen lesbar bleiben. */
 .ppl-breit { width: 100%; max-width: 620px; margin: 0 auto; padding-left: 22px; padding-right: 22px; }
+/* 16.09.2026: Abschnitt als Kaestchen statt als Band mit Trennstrich
+   darueber. Gleiche Spaltenbreite wie .ppl-breit, aber mit eigener Flaeche,
+   feiner Kante und Innenabstand — die Ueberschrift sitzt mit drin. */
+.ppl-kasten { margin: 14px 16px; padding: 18px; border-radius: 16px; }
+@media (min-width: 652px) { .ppl-kasten { margin: 14px auto; max-width: 620px; } }
+@media (min-width: 900px) { .ppl-kasten { max-width: 1000px; padding: 22px; } }
 .ppl-eng   { width: 100%; max-width: 620px; margin: 0 auto; padding-left: 22px; padding-right: 22px; }
 @media (min-width: 900px) {
   .ppl-breit { max-width: 1000px; padding-left: 40px; padding-right: 40px; }
