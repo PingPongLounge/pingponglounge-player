@@ -4,6 +4,7 @@ import "./globals.css"
 import AppHeader from "./components/AppHeader"
 import SplashScreen from "./components/SplashScreen"
 import InvitePopup from "./components/InvitePopup"
+import HauptMenu from "./components/HauptMenu"
 
 const BASE = "https://playerapp.ch"
 
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body style={{ margin: 0, background: "#080808", color: "#F4F1EB", fontFamily: "var(--font-inter), system-ui, sans-serif", minHeight: "100vh" }}>
         <SplashScreen />
         <AppHeader />
+        <HauptMenu />
         {children}
         <InvitePopup />
       </body>

@@ -9,7 +9,7 @@
 import { useRef, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 
-const CREME = "#F4F1EB", VIOLETT = "#8C3DFF", SCHWARZ = "#080808"
+const CREME = "#F4F1EB", VIOLETT = "#5B9CFF", SCHWARZ = "#080808"
 
 export function initialen(name?: string | null): string {
   if (!name) return "PP"

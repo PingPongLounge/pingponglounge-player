@@ -83,7 +83,7 @@ export default function TurnierePage() {
             <Feld padding={20}>
               <p style={{ fontSize: 15.5, color: TEXT_LEISE, margin: 0, lineHeight: 1.55 }}>
                 Die nächsten Turniere stehen bald fest. Bis dahin:{" "}
-                <Link href="/match" style={{ color: "#5B1FBF", fontWeight: 700 }}>Open Games ansehen →</Link>
+                <Link href="/match" style={{ color: "#0E3AAE", fontWeight: 700 }}>Open Games ansehen →</Link>
               </p>
             </Feld>
           )}

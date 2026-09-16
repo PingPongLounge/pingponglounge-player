@@ -146,7 +146,7 @@ export default function StartHomeV2(d: StartData) {
                       erste={i === 0}
                       titel={g.title}
                       unter={`${g.day} ${g.time} · ${g.sub}`}
-                      rechts={<span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: g.full ? TEXT_LEISE : "#5B1FBF", whiteSpace: "nowrap" }}>{g.ratio}</span>}
+                      rechts={<span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: g.full ? TEXT_LEISE : "#0E3AAE", whiteSpace: "nowrap" }}>{g.ratio}</span>}
                     />
                   </Link>
                 ))}

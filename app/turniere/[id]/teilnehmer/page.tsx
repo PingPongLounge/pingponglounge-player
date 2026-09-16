@@ -234,7 +234,7 @@ export default function Teilnehmerverwaltung({ params }: { params: Promise<{ id:
               <button onClick={exportieren} disabled={liste.length === 0}
                 style={{
                   minHeight: 44, padding: "0 20px", borderRadius: 100, border: "none", cursor: "pointer",
-                  background: GREEN, color: "#fff", fontSize: 13, fontWeight: 900,
+                  background: GREEN, color: "#06132E", fontSize: 13, fontWeight: 900,
                   letterSpacing: ".06em", textTransform: "uppercase", opacity: liste.length ? 1 : .5,
                 }}>
                 Teilnehmer exportieren

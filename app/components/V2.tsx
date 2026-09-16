@@ -21,13 +21,18 @@
    kleine Hervorhebung, Link und Pfeil.
 
    Ohne "use client" — laeuft in Server- wie Client-Seiten. */
-import { SCHWARZ, CREME, VIOLETT, ANTON, INTER } from "@/app/theme"
+import { SCHWARZ, CREME, VIOLETT, AKZENT_TIEF, ANTON_ZEILEN, ANTON, INTER } from "@/app/theme"
 
 /* Die Off-White-Flaeche und das, was darauf liegt. */
 export const FLAECHE = CREME          // #F4F1EB — der Inhaltsgrund
 export const PANEL = "#FFFFFF"        // gruppierte Listen sitzen auf Weiss
-export const LINIE = "rgba(8,8,8,.10)"
-export const TEXT_LEISE = "rgba(8,8,8,.56)"
+export const LINIE = "rgba(8,8,8,.12)"
+/* 16.09.2026: stand auf .56. Bei 13px Nebentext waren das 5,0:1 — klein UND
+   blass, die doppelte Strafe. .70 bringt 6,8:1 bei gleichzeitig groesserer
+   Schrift. Kleine Schrift braucht MEHR Kontrast, nicht weniger. */
+export const TEXT_LEISE = "rgba(8,8,8,.70)"
+/* Feine Kante um die gruppierten Felder — Kaestchen statt Trennstriche. */
+export const FELD_KANTE = "rgba(8,8,8,.09)"
 
 /* ---------- Hero ----------------------------------------------------------
    Foto, Verlauf, Etikett, Zeile, Erklaerung. Der Verlauf ist der einzige
@@ -50,7 +55,10 @@ export function Hero({
         style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: pos }} />
       <div aria-hidden style={{
         position: "absolute", inset: 0,
-        background: "linear-gradient(to bottom, rgba(8,8,8,.55) 0%, rgba(8,8,8,.18) 26%, rgba(8,8,8,.46) 55%, rgba(8,8,8,.86) 80%, rgba(8,8,8,.96) 100%)",
+        /* 16.09.2026: unten deckender. Der Text steht im unteren Drittel —
+           dort darf vom Motiv nichts mehr durchkommen, sonst liegt Schrift
+           auf Schrift (Neonzeichen, Tischaufdrucke, Markennamen). */
+        background: "linear-gradient(to bottom, rgba(8,8,8,.58) 0%, rgba(8,8,8,.20) 26%, rgba(8,8,8,.56) 52%, rgba(8,8,8,.92) 76%, rgba(8,8,8,.98) 100%)",
       }} />
 
       {kopf && <div style={{ position: "relative", zIndex: 2 }}>{kopf}</div>}
@@ -70,13 +78,13 @@ export function Hero({
              dass sich die Zeilen bei mehrzeiligen Titeln beruehrt haben —
              "PLAY. MEET. REPEAT." klebte aufeinander. .96 laesst Luft,
              ohne dass der Block auseinanderfaellt. */
-          letterSpacing: ".002em", lineHeight: .96, color: "#FFFFFF", margin: 0,
+          letterSpacing: ".004em", lineHeight: ANTON_ZEILEN, color: "#FFFFFF", margin: 0,
         }}>{titel}</h1>
 
         {subline && (
           <p style={{
-            fontFamily: INTER, fontSize: 15.5, lineHeight: 1.45, margin: "14px 0 0",
-            color: "rgba(255,255,255,.86)", maxWidth: "40ch",
+            fontFamily: INTER, fontSize: 17, lineHeight: 1.5, margin: "16px 0 0",
+            color: "rgba(255,255,255,.93)", maxWidth: "38ch",
           }}>{subline}</p>
         )}
       </div>
@@ -107,13 +115,17 @@ export function AbschnittKopf({ titel, mehr, href, dunkel = false }:
       gap: 14, marginBottom: 12,
     }}>
       <h2 style={{
-        fontFamily: INTER, fontSize: 12.5, fontWeight: 900, letterSpacing: ".14em",
+        fontFamily: INTER, fontSize: 15, fontWeight: 900, letterSpacing: ".08em",
         textTransform: "uppercase", margin: 0, color: dunkel ? CREME : SCHWARZ,
       }}>{titel}</h2>
       {mehr && href && (
         <a href={href} style={{
-          fontFamily: INTER, fontSize: 13, fontWeight: 700, color: VIOLETT,
+          /* Akzent je nach Grund: helles Blau auf Schwarz, tiefes auf Creme.
+             Padding/Margin schaffen 44px Tippflaeche ohne optische Verschiebung. */
+          fontFamily: INTER, fontSize: 14, fontWeight: 700,
+          color: dunkel ? VIOLETT : AKZENT_TIEF,
           textDecoration: "none", whiteSpace: "nowrap",
+          padding: "12px 8px", margin: "-12px -8px",
         }}>{mehr} ›</a>
       )}
     </div>
@@ -125,7 +137,7 @@ export function AbschnittKopf({ titel, mehr, href, dunkel = false }:
    bekommt, ohne dass jede Zeile eine eigene Karte wird. */
 export function Feld({ children, padding = 0 }: { children: React.ReactNode; padding?: number | string }) {
   return (
-    <div style={{ background: PANEL, borderRadius: 16, overflow: "hidden", padding }}>
+    <div style={{ background: PANEL, borderRadius: 16, overflow: "hidden", padding, border: `1px solid ${FELD_KANTE}` }}>
       {children}
     </div>
   )
@@ -146,13 +158,13 @@ export function StatsReihe({ werte, hell = true, padding = "16px 0" }:
           borderLeft: i === 0 ? "none" : `1px solid ${linie}`,
         }}>
           <div style={{
-            fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(22px,6.2vw,30px)",
-            lineHeight: 1, fontVariantNumeric: "tabular-nums",
-            color: x.akzent ? VIOLETT : (hell ? SCHWARZ : CREME),
+            fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(24px,6.6vw,32px)",
+            lineHeight: ANTON_ZEILEN, fontVariantNumeric: "tabular-nums",
+            color: x.akzent ? (hell ? AKZENT_TIEF : VIOLETT) : (hell ? SCHWARZ : CREME),
           }}>{x.wert}</div>
           <div style={{
-            fontFamily: INTER, fontSize: 11, fontWeight: 700, marginTop: 6,
-            color: hell ? TEXT_LEISE : "rgba(244,241,235,.55)",
+            fontFamily: INTER, fontSize: 12, fontWeight: 700, marginTop: 7,
+            color: hell ? TEXT_LEISE : "rgba(244,241,235,.80)",
           }}>{x.label}</div>
         </div>
       ))}
@@ -179,14 +191,14 @@ export function AktionsZeile({ symbol, titel, unter, erste = false }:
           display: "block", fontFamily: INTER, fontSize: 14.5, fontWeight: 900,
           letterSpacing: ".05em", textTransform: "uppercase", color: SCHWARZ,
         }}>{titel}</b>
-        <span style={{ display: "block", fontFamily: INTER, fontSize: 13.5, color: TEXT_LEISE, marginTop: 3 }}>{unter}</span>
+        <span style={{ display: "block", fontFamily: INTER, fontSize: 14.5, color: TEXT_LEISE, marginTop: 4 }}>{unter}</span>
       </span>
       <Pfeil />
     </div>
   )
 }
 
-export function Pfeil({ farbe = "rgba(8,8,8,.34)" }: { farbe?: string }) {
+export function Pfeil({ farbe = "rgba(8,8,8,.46)" }: { farbe?: string }) {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={farbe}
       strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ flexShrink: 0 }}>
@@ -206,7 +218,7 @@ export function ListenZeile({ links, titel, unter, meta, rechts, erste = false, 
     <div style={{
       display: "flex", alignItems: "center", gap: 13, padding: "13px 16px",
       borderTop: erste ? "none" : `1px solid ${LINIE}`,
-      background: aktiv ? "rgba(140,61,255,.10)" : "transparent",
+      background: aktiv ? "rgba(91,156,255,.10)" : "transparent",
     }}>
       {links}
       <div style={{ flex: 1, minWidth: 0 }}>
@@ -214,11 +226,11 @@ export function ListenZeile({ links, titel, unter, meta, rechts, erste = false, 
             dem ANMELDEN-Knopf abgeschnitten — der Ort, also genau
             das Unterscheidende, fiel weg. */}
         <div style={{
-          fontFamily: INTER, fontSize: 15, fontWeight: 700, lineHeight: 1.25, color: SCHWARZ,
+          fontFamily: INTER, fontSize: 16.5, fontWeight: 700, lineHeight: 1.3, color: SCHWARZ,
           display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
         }}>{titel}</div>
-        {unter && <div style={{ fontFamily: INTER, fontSize: 13, color: TEXT_LEISE, marginTop: 3, lineHeight: 1.35 }}>{unter}</div>}
-        {meta && <div style={{ fontFamily: INTER, fontSize: 13, color: TEXT_LEISE, marginTop: 1, lineHeight: 1.35 }}>{meta}</div>}
+        {unter && <div style={{ fontFamily: INTER, fontSize: 14.5, color: TEXT_LEISE, marginTop: 4, lineHeight: 1.4 }}>{unter}</div>}
+        {meta && <div style={{ fontFamily: INTER, fontSize: 14.5, color: TEXT_LEISE, marginTop: 2, lineHeight: 1.4 }}>{meta}</div>}
       </div>
       {rechts && <div style={{ flexShrink: 0 }}>{rechts}</div>}
     </div>
@@ -241,11 +253,11 @@ export function DatumBlock({ tag, monat }: { tag: string | number; monat: string
   return (
     <div aria-hidden style={{ textAlign: "center", width: 42, flexShrink: 0 }}>
       <div style={{
-        fontFamily: ANTON, fontWeight: 400, fontSize: 26, lineHeight: .95,
+        fontFamily: ANTON, fontWeight: 400, fontSize: 27, lineHeight: ANTON_ZEILEN,
         color: SCHWARZ, fontVariantNumeric: "tabular-nums",
       }}>{tag}</div>
       <div style={{
-        fontFamily: INTER, fontSize: 10.5, fontWeight: 900, letterSpacing: ".12em",
+        fontFamily: INTER, fontSize: 11.5, fontWeight: 900, letterSpacing: ".12em",
         textTransform: "uppercase", marginTop: 3, color: TEXT_LEISE,
       }}>{monat}</div>
     </div>
@@ -260,7 +272,7 @@ export function GrosseZahl({ wert, rechts }:
     <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
       <strong style={{
         fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(52px,15vw,76px)",
-        lineHeight: .88, letterSpacing: "-.01em", fontVariantNumeric: "tabular-nums", color: SCHWARZ,
+        lineHeight: ANTON_ZEILEN, letterSpacing: "0", fontVariantNumeric: "tabular-nums", color: SCHWARZ,
       }}>{wert}</strong>
       {rechts}
     </div>
@@ -269,14 +281,14 @@ export function GrosseZahl({ wert, rechts }:
 
 /* ---------- Pillen und Knoepfe ------------------------------------------- */
 export function Pille({ text, ton = "neutral" }: { text: string; ton?: "neutral" | "violett" | "gut" | "warn" }) {
-  const stil = ton === "violett" ? { background: "rgba(140,61,255,.12)", color: "#5B1FBF" }
+  const stil = ton === "violett" ? { background: "rgba(20,71,230,.10)", color: AKZENT_TIEF }
     : ton === "gut" ? { background: "rgba(22,142,90,.12)", color: "#12764B" }
     : ton === "warn" ? { background: "rgba(229,72,77,.12)", color: "#C0353A" }
     : { background: "rgba(8,8,8,.06)", color: TEXT_LEISE }
   return (
     <span style={{
       ...stil, display: "inline-block", borderRadius: 999, padding: "4px 10px",
-      fontFamily: INTER, fontSize: 11, fontWeight: 900, letterSpacing: ".06em",
+      fontFamily: INTER, fontSize: 11.5, fontWeight: 900, letterSpacing: ".06em",
       textTransform: "uppercase", whiteSpace: "nowrap",
     }}>{text}</span>
   )
@@ -288,16 +300,18 @@ const knopfBasis: React.CSSProperties = {
   textTransform: "uppercase", textDecoration: "none", cursor: "pointer",
   border: "none", whiteSpace: "nowrap",
 }
-export const knopfPrimaer: React.CSSProperties = { ...knopfBasis, background: VIOLETT, color: "#FFFFFF", padding: "15px 24px", fontSize: 13.5 }
-export const knopfKlein: React.CSSProperties = { ...knopfBasis, background: VIOLETT, color: "#FFFFFF", padding: "8px 14px", fontSize: 11 }
+/* Gefuellte Knoepfe tragen das TIEFE Blau: weisse Schrift darauf ergibt
+   6,1:1. Auf dem hellen Blau waeren es 2,4:1 — unlesbar. */
+export const knopfPrimaer: React.CSSProperties = { ...knopfBasis, background: AKZENT_TIEF, color: "#FFFFFF", padding: "15px 24px", fontSize: 13.5, minHeight: 48 }
+export const knopfKlein: React.CSSProperties = { ...knopfBasis, background: AKZENT_TIEF, color: "#FFFFFF", padding: "11px 16px", fontSize: 12.5, minHeight: 44 }
 export const knopfOutlineHell: React.CSSProperties = {
   ...knopfBasis, background: "transparent", color: SCHWARZ,
-  border: "1.5px solid rgba(8,8,8,.24)", padding: "13.5px 24px", fontSize: 13.5,
+  border: "1.5px solid rgba(8,8,8,.32)", padding: "13.5px 24px", fontSize: 13.5, minHeight: 48,
 }
 /** Auf dunklem Grund (im Hero oder in schwarzen Bereichen). */
 export const knopfOutline: React.CSSProperties = {
   ...knopfBasis, background: "transparent", color: CREME,
-  border: "1.5px solid rgba(244,241,235,.32)", padding: "13.5px 24px", fontSize: 13.5,
+  border: "1.5px solid rgba(244,241,235,.40)", padding: "13.5px 24px", fontSize: 13.5, minHeight: 48,
 }
 
 /* ---------- Strichsymbole -------------------------------------------------

@@ -10,7 +10,7 @@ import {
 import BottomNav from"@/app/components/BottomNav"
 import LogoutButton from"@/app/components/LogoutButton"
 import{createClient}from"@/lib/supabase/client"
-const V="#8C3DFF",B="#080808",P="#F4F1EB",M="#8e8b87",L="#292929"
+const V="#5B9CFF",B="#080808",P="#F4F1EB",M="#8e8b87",L="#292929"
 type RecentMatch={id:string;sets:Array<{p1:number,p2:number}>|null;winner_id:string|null;confirmed_at:string;p1_id:string;p2_id:string;p1:{name:string}|null;p2:{name:string}|null;season:{name:string,city:string}|null};type Profile={id:string;name:string;real_name?:string|null;elo:number;level:string;matches_played:number;matches_won:number;canton:string|null;avatar_url?:string|null;allow_challenges?:boolean|null;allow_friend_requests?:boolean|null;visible_in_ranking?:boolean|null}
 const CM:Record<string,string>={"Aargau":"AG","Appenzell Ausserrhoden":"AR","Appenzell Innerrhoden":"AI","Basel-Landschaft":"BL","Basel-Stadt":"BS","Bern":"BE","Freiburg":"FR","Genf":"GE","Glarus":"GL","Graubünden":"GR","Jura":"JU","Luzern":"LU","Neuenburg":"NE","Nidwalden":"NW","Obwalden":"OW","Schaffhausen":"SH","Schwyz":"SZ","Solothurn":"SO","St. Gallen":"SG","Tessin":"TI","Thurgau":"TG","Uri":"UR","Waadt":"VD","Wallis":"VS","Zug":"ZG","Zürich":"ZH"},CANTONS=Object.keys(CM)
 function ago(d:string){const n=Math.floor((Date.now()-new Date(d).getTime())/86400000);return n<1?"heute":n===1?"gestern":n<7?`vor ${n}d`:new Date(d).toLocaleDateString("de-CH",{day:"numeric",month:"short"})}

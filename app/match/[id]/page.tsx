@@ -7,7 +7,7 @@ import { BG, CARD, CELL, W, MUT, GREEN, DANGER, cardPad, cell, btn, btnGhost, bt
 import { entryQrFor, weekdayOf } from "@/lib/opengames"
 
 const M=MUT, B=CELL, G=GREEN
-const V="#8C3DFF", OFF="#F4F1EB", BLACK="#080808"
+const V="#5B9CFF", OFF="#F4F1EB", BLACK="#080808"
 
 function qrImFenster(dateStr: string): boolean { const now=new Date(); const ev=new Date(`${dateStr}T00:00:00`); return now.getFullYear()===ev.getFullYear()&&now.getMonth()===ev.getMonth()&&now.getDate()===ev.getDate()&&now.getHours()<22 }
 function whenLabel(date:string|null,hour:number|null,dur:number){const t=hour!=null?`${String(hour).padStart(2,"0")}:00`:null;if(!date)return t?`heute · ${t}`:"Zeit offen";const d=new Date(date).toLocaleDateString("de-CH",{weekday:"long",day:"numeric",month:"long"});return `${d}${t?` · ${t}`:""} · ${dur}min`}

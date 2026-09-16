@@ -49,7 +49,7 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
     </Link>
   )
 
-  const AUS = ausFarbe || "#77736f"
+  const AUS = ausFarbe || "#8E8A86"
   const AN = aktivFarbe || "#F4F1EB"
 
   return (
@@ -65,19 +65,19 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
           <span style={{ fontSize: 10.5, fontWeight: open ? 900 : 700, letterSpacing: ".07em", textTransform: "uppercase" }}>Menü</span>
         </button>
       ) : avatar ? (
-        <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#8C3DFF,#C9A8FF)", color: "#FFFFFF", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+        <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#5B9CFF,#A9C9FF)", color: "#FFFFFF", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           {avatar}
         </button>
       ) : (
         <button onClick={() => setOpen(true)} aria-label="Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), background: C, borderRadius: 11, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#8C3DFF"/><stop offset="1" stopColor="#C9A8FF"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#5B9CFF"/><stop offset="1" stopColor="#A9C9FF"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
       )}
 
       {open && (
         <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 200, display: "flex", justifyContent: variant === "nav" ? "center" : "flex-end", alignItems: variant === "nav" ? "flex-end" : "stretch" }}>
           <div onClick={e => e.stopPropagation()} style={variant === "nav"
-            ? { width: "100%", maxWidth: 620, maxHeight: "84dvh", background: "#0E1013", borderTop: "2px solid #8C3DFF", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "18px 16px calc(22px + env(safe-area-inset-bottom))", overflowY: "auto", boxShadow: "0 -24px 70px rgba(0,0,0,.6)" }
+            ? { width: "100%", maxWidth: 620, maxHeight: "84dvh", background: "#0E1013", borderTop: "2px solid #5B9CFF", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "18px 16px calc(22px + env(safe-area-inset-bottom))", overflowY: "auto", boxShadow: "0 -24px 70px rgba(0,0,0,.6)" }
             : { width: "82%", maxWidth: 340, height: "100%", background: "#0E1013", borderLeft: `1px solid ${B}`, padding: "22px 16px", overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
               <span style={{ fontSize: 21, fontWeight: 600 }}>menü</span>
@@ -88,21 +88,21 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
 
             {authed ? (
             <Link href="/profil" onClick={() => setOpen(false)} style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 14px", background: C, borderRadius: 16, textDecoration: "none" }}>
-              <span style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#8C3DFF,#C9A8FF)", padding: 2, flexShrink: 0, display: "block" }}>
+              <span style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#5B9CFF,#A9C9FF)", padding: 2, flexShrink: 0, display: "block" }}>
                 <span style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#13161B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.7" strokeLinecap="round"><circle cx="10" cy="9.4" r="5.4"/><path d="M13.9 13.3 19.4 18.8"/><circle cx="18" cy="6.4" r="1.8" fill="#fff" stroke="none"/></svg></span>
               </span>
               <span style={{ flex: 1 }}>
                 <span style={{ display: "block", fontSize: 16, fontWeight: 500, color: W }}>{name}</span>
                 <span style={{ display: "block", fontSize: 11, color: M, marginTop: 2 }}>{sub || "profil ansehen"}</span>
               </span>
-              <span style={{ color: "#8C3DFF", fontSize: 18 }}>›</span>
+              <span style={{ color: "#5B9CFF", fontSize: 18 }}>›</span>
             </Link>
             ) : (
             <div style={{ background: C, borderRadius: 16, padding: "15px 15px 13px" }}>
               <p style={{ fontSize: 15, fontWeight: 600, color: W, margin: 0 }}>noch nicht angemeldet</p>
               <p style={{ fontSize: 12.5, color: M, margin: "5px 0 12px" }}>mit konto: liga, pingpoints, deine spiele und ergebnisse.</p>
               <div style={{ display: "flex", gap: 8 }}>
-                <Link href="/login" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#8C3DFF", color: "#FFFFFF", borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>anmelden</Link>
+                <Link href="/login" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#5B9CFF", color: "#06132E", borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>anmelden</Link>
                 <Link href="/onboarding" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#1A1A1E", color: W, borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>konto erstellen</Link>
               </div>
             </div>

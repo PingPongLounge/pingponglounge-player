@@ -8,7 +8,7 @@ const RESEND_URL = "https://api.resend.com/emails"
 const FROM = process.env.RESEND_FROM || "Player <points@playerapp.ch>"
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
 
-const G = "#8C3DFF"
+const G = "#5B9CFF"
 
 /** Mailversand protokollieren, ohne den Aufrufer scheitern zu lassen.
  *
@@ -64,7 +64,7 @@ export async function sendEmail(opts: { to: string; subject: string; html: strin
   }
 }
 
-const GRAD = "linear-gradient(135deg,#8C3DFF,#C9A8FF)"
+const GRAD = "linear-gradient(135deg,#5B9CFF,#A9C9FF)"
 const CARD = "#1A1A1E"
 
 // Voll deckender dunkler Hintergrund über die ganze Breite — sonst bleibt auf dem
@@ -511,8 +511,8 @@ export async function sendTournamentStaffNotice(opts: {
       <tr><td style="padding:14px 18px;font-family:system-ui,sans-serif">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
           ${zeile("Name", `${opts.vorname} ${opts.nachname}`)}
-          ${zeile("E-Mail", `<a href="mailto:${opts.email}" style="color:#C9A8FF">${opts.email}</a>`)}
-          ${opts.telefon ? zeile("Telefon", `<a href="tel:${opts.telefon}" style="color:#C9A8FF">${opts.telefon}</a>`) : ""}
+          ${zeile("E-Mail", `<a href="mailto:${opts.email}" style="color:#A9C9FF">${opts.email}</a>`)}
+          ${opts.telefon ? zeile("Telefon", `<a href="tel:${opts.telefon}" style="color:#A9C9FF">${opts.telefon}</a>`) : ""}
           ${opts.spielstaerke ? zeile("Spielstärke", opts.spielstaerke) : ""}
           ${zeile("Zahlung", opts.zahlungsstatus)}
           ${zeile("Warteliste", opts.warteliste ? `ja${opts.wartelistenPos ? ` · Position ${opts.wartelistenPos}` : ""}` : "nein")}

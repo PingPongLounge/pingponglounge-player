@@ -6,7 +6,7 @@
    das explizite border:none entfernt wurde. */
 button, input, textarea, select { border: none; outline: none; }
 button { background: none; }
-:root { --green: #8C3DFF; --dark: #080808; --card: #121214; --border: #1A1A1E; --muted: #6B6E7A; --text: #F4F1EB; }
+:root { --green: #5B9CFF; --dark: #080808; --card: #121214; --border: #1A1A1E; --muted: #8A8D99; --text: #F4F1EB; }
 body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0C; color: #FFF9F3; -webkit-font-smoothing: antialiased; }
 
 /* ── PLAYER V2: Breiten (07.09.2026, Referenzbild) ───────────────────────
@@ -104,6 +104,8 @@ body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0
 }
 
 /* Platz fuer die feste Navigation — sonst verdeckt sie die letzte Zeile. */
-main { padding-bottom: calc(78px + env(safe-area-inset-bottom)); }
+/* 16.09.2026: Die untere Leiste ist weg, der Platzhalter darf schrumpfen.
+   78px waren die Hoehe der Navigation plus Luft. */
+main { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }

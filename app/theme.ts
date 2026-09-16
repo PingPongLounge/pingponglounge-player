@@ -22,7 +22,13 @@ import type { CSSProperties } from 'react'
 
      SCHWARZ   #080808  Atmosphaere, Hero, Navigation, Community, Bilder, Aktionen
      OFF-WHITE #F4F1EB  Lesen und Verstehen: Rankings, Zahlen, Erklaerungen
-     VIOLETT   #8C3DFF  Interaktion, aktive Elemente, Highlights
+     BLAU      #5B9CFF  Interaktion auf DUNKLEM Grund (Kontrast 7,3:1)
+     BLAU TIEF #1447E6  Interaktion auf HELLEM Grund  (Kontrast 6,1:1)
+
+   Zwei Akzentwerte, nicht einer. Gemessen am 16.09.2026: das alte Violett
+   #8C3DFF erreichte 4,41:1 auf Creme und 4,03:1 auf Schwarz — auf BEIDEN
+   Gruenden unter der Norm von 4,5:1. Ein einziger Farbwert kann das nicht
+   leisten; welcher Ton es ist, spielt dabei keine Rolle.
 
    Die alten Werte standen bis hierher auf Neon-Pink (#FF00C8) und Tuerkis
    (#2BD4C4) — mit Namen wie GREEN, die schon lange nicht mehr stimmten. Die
@@ -34,21 +40,32 @@ export const CELL   = '#1A1A1E'                  // Zellen / Chips innerhalb Kar
 export const INPUTBG= '#0E0E10'                  // Eingabefelder
 export const W      = '#F4F1EB'                  // Primaertext (Off-White, kein reines Weiss)
 export const SUB    = 'rgba(244,241,235,.90)'    // Sekundaertext
-export const MUT    = 'rgba(244,241,235,.62)'    // Labels / gedaempft
+export const MUT    = 'rgba(244,241,235,.72)'    // Labels / gedaempft (war .62 — zu blass)
 export const LINE   = 'rgba(244,241,235,.13)'    // dezente Trennlinie
 export const DANGER = '#E5484D'                  // Fehler / Loeschen
 
-export const GREEN  = '#8C3DFF'                  // @deprecated Name — ist UV-Violett
-export const CYAN   = '#C9A8FF'                  // heller Violett-Ton (war Tuerkis)
+export const GREEN  = '#5B9CFF'                  // @deprecated Name — ist UV-Violett
+export const CYAN   = '#A9C9FF'                  // heller Violett-Ton (war Tuerkis)
 export const INK    = '#080808'                  // Schrift auf violetter oder heller Flaeche
-export const GRAD   = 'linear-gradient(135deg,#8C3DFF,#C9A8FF)'   // Logo + Rang
+export const GRAD   = 'linear-gradient(135deg,#5B9CFF,#A9C9FF)'   // Logo + Rang
 export const SHADOW = '0 4px 14px rgba(0,0,0,.35)'
 
 /* Neue, ehrlich benannte Namen fuer alles, was ab jetzt geschrieben wird. */
 export const SCHWARZ = '#080808'
 export const CREME   = '#F4F1EB'
-export const VIOLETT = '#8C3DFF'
-export const VIOLETT_HELL = '#C9A8FF'
+export const VIOLETT = '#5B9CFF'
+export const VIOLETT_HELL = '#A9C9FF'
+/* Akzent fuer HELLE Flaechen (Off-White, Weiss). Auf dunklem Grund nehmen
+   wir VIOLETT (= #5B9CFF), auf hellem diesen hier. Weisse Schrift auf
+   AKZENT_TIEF ist lesbar, weisse Schrift auf dem hellen Blau nicht. */
+export const AKZENT_TIEF = '#1447E6'
+/* Schrift auf hellblauer Flaeche — nie Weiss. */
+export const AKZENT_INK  = '#06132E'
+
+/* Zeilenabstand fuer Anton. Anton bringt fast keine eigene Luft mit; unter
+   1.05 beruehren sich mehrzeilige Titel und werden zu einem Klumpen.
+   Verbindlich fuer jede Anton-Zeile in der App (Oliver, 16.09.2026). */
+export const ANTON_ZEILEN = 1.08
 export const ANTON = "var(--font-anton), Impact, sans-serif"   // nur Display
 export const INTER = "var(--font-inter), system-ui, sans-serif" // alles Funktionale
 
@@ -149,36 +166,42 @@ export const secHead: CSSProperties = { display: 'flex', alignItems: 'center', j
 // Sektions-Überschrift (GROSS, fett, weiss — KEIN Verlauf)
 export const h2: CSSProperties = { fontSize: 20, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '.04em', color: W }
 // Seiten-Titel (oben auf einer Seite, GROSS, fett, weiss — KEIN Verlauf)
-export const h1: CSSProperties = { fontSize: 28, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '.08em', lineHeight: 1, color: W }
+export const h1: CSSProperties = { fontSize: 28, fontWeight: 900, textTransform: 'uppercase', letterSpacing: '.08em', lineHeight: 1.12, color: W }
 // Karten-Titel
 export const cardTitle: CSSProperties = { fontSize: 23, fontWeight: 900, letterSpacing: '.02em', color: W }
 // Link "Alle ansehen ›"
-export const moreLink: CSSProperties = { fontSize: 12, fontWeight: 500, color: MUT, textDecoration: 'none' }
+// Ein Link soll wie ein Link aussehen: Akzentfarbe statt gedaempftem Grau,
+// und gross genug zum Tippen (padding schafft die 44px, margin nimmt sie optisch zurueck).
+export const moreLink: CSSProperties = { fontSize: 13.5, fontWeight: 700, color: VIOLETT, textDecoration: 'none', padding: '12px 8px', margin: '-12px -8px' }
 // Eyebrow / kleine Datums-/Statuszeile über einem Titel
-export const eyebrow: CSSProperties = { fontSize: 11, color: MUT, fontWeight: 300 }
+export const eyebrow: CSSProperties = { fontSize: 12, color: SUB, fontWeight: 500 }
 // Fliesstext (leicht + weiss)
-export const body: CSSProperties = { fontSize: 13, color: 'rgba(255,255,255,.9)', fontWeight: 300, lineHeight: 1.45 }
+export const body: CSSProperties = { fontSize: 15, color: SUB, fontWeight: 400, lineHeight: 1.55 }
 // Sekundärzeile / Meta
-export const meta: CSSProperties = { fontSize: 13, color: SUB, fontWeight: 300 }
+export const meta: CSSProperties = { fontSize: 14.5, color: SUB, fontWeight: 400 }
 
 /* ---------- Karten (DER verbindliche Kästchen-Standard, app-weit gleich) ----------
    Regel: Fläche CARD, borderRadius 18, KEIN Border, flach (kein Shadow).
    Aktiver/ausgewählter Zustand: etwas hellerer Hintergrund via cardActive. */
-export const card: CSSProperties = { background: CARD, borderRadius: 18, overflow: 'hidden' }
+/* 16.09.2026: feine Kante statt gar keiner. Ohne sie verschwimmt CARD
+   (#121214) auf BG (#080808) zu einem grauen Nebel — man sieht nicht mehr,
+   wo ein Kaestchen anfaengt und das naechste aufhoert. */
+export const card: CSSProperties = { background: CARD, borderRadius: 18, overflow: 'hidden', border: `1px solid rgba(244,241,235,.09)` }
 export const cardPad: CSSProperties = { ...card, padding: 18 }
 export const cardActive: CSSProperties = { borderRadius: 18, background: 'rgba(255,255,255,.14)' }
 
 /* ---------- Zellen-Raster (Wann/Wo/Levels/Preis) ---------- */
 export const grid2: CSSProperties = { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginTop: 15 }
 export const cell: CSSProperties = { background: CELL, borderRadius: 12, padding: '12px 13px' }
-export const cellKey: CSSProperties = { fontSize: 9.5, color: MUT, fontWeight: 500, textTransform: 'uppercase', letterSpacing: '.04em', marginBottom: 2 }
-export const cellVal: CSSProperties = { fontSize: 13, fontWeight: 500, color: W }
+export const cellKey: CSSProperties = { fontSize: 11.5, color: MUT, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.06em', marginBottom: 3 }
+export const cellVal: CSSProperties = { fontSize: 14.5, fontWeight: 600, color: W }
 
 /* ---------- Chips ---------- */
-export const chip: CSSProperties = { fontSize: 10.5, fontWeight: 500, color: SUB, background: CELL, borderRadius: 8, padding: '4px 9px' }
+export const chip: CSSProperties = { fontSize: 11.5, fontWeight: 600, color: SUB, background: CELL, borderRadius: 8, padding: '5px 10px' }
 // Auswahl-Chip (Filter/Toggle) — aktiv = etwas hellerer Hintergrund + weiss
 export const chipBtn = (active: boolean): CSSProperties => ({
-  padding: '7px 13px', borderRadius: 999, fontSize: 12, cursor: 'pointer',
+  minHeight: 44, display: 'inline-flex', alignItems: 'center',
+  padding: '7px 15px', borderRadius: 999, fontSize: 13, cursor: 'pointer',
   fontWeight: active ? 700 : 500, color: W,
   background: active ? 'rgba(255,255,255,.14)' : CELL,
 })
@@ -201,11 +224,12 @@ export const btn: CSSProperties = {
 export const btnOutline: CSSProperties = {
   display: 'block', textAlign: 'center', borderRadius: 14,
   padding: '15px', fontSize: 15, fontWeight: 800, color: GREEN, textDecoration: 'none', cursor: 'pointer',
-  background: 'transparent', border: `1.5px solid rgba(255,0,200,.5)`,
+  background: 'transparent', border: `1.5px solid ${GREEN}`,
 }
 // Primär in einer Karte (gefüllt)
 export const btnInCard: CSSProperties = {
   display: 'inline-block', borderRadius: 11,
+  minHeight: 44, lineHeight: '26px',
   padding: '9px 18px', fontSize: 14, fontWeight: 800, color: INK, textDecoration: 'none', cursor: 'pointer',
   background: GREEN, border: 'none',
 }
@@ -226,8 +250,8 @@ export const gradOutlineOn = (bg: string = CARD): CSSProperties => ({
 })
 
 /* ---------- Formular ---------- */
-export const label: CSSProperties = { fontSize: 11, fontWeight: 500, color: MUT, letterSpacing: '.04em', display: 'block', marginBottom: 8 }
-export const input: CSSProperties = { width: '100%', background: INPUTBG, borderRadius: 10, padding: '12px 14px', fontSize: 14, color: W, outline: 'none', fontFamily: 'inherit' }
+export const label: CSSProperties = { fontSize: 12, fontWeight: 600, color: MUT, letterSpacing: '.05em', display: 'block', marginBottom: 8 }
+export const input: CSSProperties = { width: '100%', background: INPUTBG, borderRadius: 10, padding: '13px 14px', fontSize: 16, color: W, outline: 'none', fontFamily: 'inherit' }
 
 /* ---------- Badges ---------- */
 // Level-Pille: gefüllter Pastell-Metall-Verlauf + dunkle Schrift (Bronze/Silber/Gold lesbar)
@@ -235,9 +259,9 @@ export const input: CSSProperties = { width: '100%', background: INPUTBG, border
 // Farbverlauf (gelb, blau, grau) — in einer Rangliste ergab das einen bunten
 // Flickenteppich, der den Blick von Platz und Punkten wegzog.
 export const levelBadge = (_level?: string | null): CSSProperties => ({
-  fontSize: 10, fontWeight: 800, color: SUB, background: CELL,
-  borderRadius: 999, padding: '3px 8px',
+  fontSize: 11.5, fontWeight: 800, color: SUB, background: CELL,
+  borderRadius: 999, padding: '4px 9px',
   display: 'inline-block', letterSpacing: '.02em', whiteSpace: 'nowrap',
 })
 // Neutrale Status-Pill (offen/läuft/beendet)
-export const statusPill: CSSProperties = { fontSize: 10, fontWeight: 500, color: SUB, background: CELL, borderRadius: 999, padding: '3px 10px', display: 'inline-block' }
+export const statusPill: CSSProperties = { fontSize: 11.5, fontWeight: 600, color: SUB, background: CELL, borderRadius: 999, padding: '4px 11px', display: 'inline-block' }

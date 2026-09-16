@@ -9,7 +9,7 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 
-const CREME = "#F4F1EB", VIOLETT = "#8C3DFF"
+const CREME = "#F4F1EB", VIOLETT = "#5B9CFF"
 const INTER = "var(--font-inter), system-ui, sans-serif"
 
 const basis: React.CSSProperties = {

@@ -536,7 +536,7 @@ export default function LigaPage(){
                 <button onClick={()=>setChatOpen(true)} style={{...knopfOutlineHell,flex:"1 1 130px",position:"relative"}}>
                   Liga-Chat
                   {ungelesen>0&&(
-                    <span style={{marginLeft:9,minWidth:20,height:20,borderRadius:100,background:VIOLETT,color:"#FFFFFF",fontSize:11,fontWeight:900,display:"inline-flex",alignItems:"center",justifyContent:"center",padding:"0 6px"}}>{ungelesen>9?"9+":ungelesen}</span>
+                    <span style={{marginLeft:9,minWidth:20,height:20,borderRadius:100,background:VIOLETT,color:"#06132E",fontSize:11,fontWeight:900,display:"inline-flex",alignItems:"center",justifyContent:"center",padding:"0 6px"}}>{ungelesen>9?"9+":ungelesen}</span>
                   )}
                 </button>
               </div>
@@ -637,7 +637,7 @@ export default function LigaPage(){
                     const me=r.user_id===userId
                     const ini=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                     return(
-                      <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:11,padding:"12px 10px",marginLeft:me?-10:0,marginRight:me?-10:0,borderTop:"1px solid rgba(8,8,8,.12)",...(me?{background:"rgba(140,61,255,.13)",borderRadius:10,borderTop:"1px solid rgba(140,61,255,.28)"}:{})}}>
+                      <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:11,padding:"12px 10px",marginLeft:me?-10:0,marginRight:me?-10:0,borderTop:"1px solid rgba(8,8,8,.12)",...(me?{background:"rgba(91,156,255,.13)",borderRadius:10,borderTop:"1px solid rgba(91,156,255,.28)"}:{})}}>
                         <span style={{width:28,textAlign:"center",flexShrink:0,fontFamily:ANTON,fontSize:20,color:me?VIOLETT:"rgba(8,8,8,.45)",fontVariantNumeric:"tabular-nums"}}>{r.platz}</span>
                         <div style={{width:38,height:38,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:"rgba(8,8,8,.10)",display:"grid",placeItems:"center"}}>
                           {r.avatar
@@ -1097,7 +1097,7 @@ export default function LigaPage(){
                             const cnt=r[type]
                             const active=r.myReacts.includes(type)
                             return(
-                              <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:active?"rgba(140,61,255,.14)":"rgba(8,8,8,.05)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:SCHWARZ,fontFamily:"inherit"}}>
+                              <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:active?"rgba(91,156,255,.14)":"rgba(8,8,8,.05)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:SCHWARZ,fontFamily:"inherit"}}>
                                 <span>{emoji}</span>
                                 {cnt>0&&<span style={{fontSize:11,fontWeight:700,color:active?VIOLETT:TEXT_LEISE}}>{cnt}</span>}
                               </button>
@@ -1129,7 +1129,7 @@ export default function LigaPage(){
                                   placeholder="Kommentar zum Spiel …"
                                   style={{flex:1,minWidth:0,background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.12)",borderRadius:999,padding:"9px 12px",color:SCHWARZ,fontSize:12.5,outline:"none",fontFamily:"inherit"}}/>
                                 <button onClick={()=>sendComment(m.id)} aria-label="Kommentar senden"
-                                  style={{width:36,flexShrink:0,borderRadius:999,background:VIOLETT,color:"#FFFFFF",fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>→</button>
+                                  style={{width:36,flexShrink:0,borderRadius:999,background:VIOLETT,color:"#06132E",fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>→</button>
                               </div>
                             )}
                           </div>
@@ -1150,7 +1150,7 @@ export default function LigaPage(){
             {myReg?(
               <div style={{display:"flex",gap:8,padding:"12px 14px",borderTop:"1px solid rgba(8,8,8,.10)",background:"#FFFFFF"}}>
                 <input value={msg} onChange={e=>setMsg(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")send()}} placeholder="Nachricht an die Liga …" style={{flex:1,background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.12)",borderRadius:999,padding:"11px 14px",color:SCHWARZ,fontSize:13.5,outline:"none",fontFamily:"inherit"}}/>
-                <button onClick={send} style={{width:42,borderRadius:999,background:VIOLETT,color:"#FFFFFF",fontWeight:800,cursor:"pointer"}}>→</button>
+                <button onClick={send} style={{width:42,borderRadius:999,background:VIOLETT,color:"#06132E",fontWeight:800,cursor:"pointer"}}>→</button>
               </div>
             ):(
               <p style={{padding:"14px",textAlign:"center",color:TEXT_LEISE,fontSize:13}}>Tritt der Liga bei, um mitzuschreiben.</p>

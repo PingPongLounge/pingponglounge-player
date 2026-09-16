@@ -16,7 +16,7 @@ import {
   knopfPrimaer, knopfOutlineHell, TEXT_LEISE, FLAECHE,
 } from "@/app/components/V2"
 
-const SCHWARZ = "#080808", CREME = "#F4F1EB", VIOLETT = "#8C3DFF"
+const SCHWARZ = "#080808", CREME = "#F4F1EB", VIOLETT = "#5B9CFF"
 const LEISE = "rgba(244,241,235,.62)", TRENN = "rgba(244,241,235,.13)"
 const ANTON = "var(--font-anton), Impact, sans-serif"
 const INTER = "var(--font-inter), system-ui, sans-serif"

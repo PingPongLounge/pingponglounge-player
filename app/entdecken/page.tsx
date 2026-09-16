@@ -28,7 +28,7 @@ export default async function EntdeckenPage() {
     // browsbar. Unter dem Kopf steht echter Inhalt aus der Datenbank —
     // Open Games, Rangliste, Liga, Events, Community. Angemeldet werden muss
     // erst, wer etwas TUT; jeder Knopf hier fuehrt auf eine Leseansicht.
-    const SCHWARZ = '#0A0A0C', CREME = '#FFF9F3', VIOLETT = '#8C3DFF'
+    const SCHWARZ = '#0A0A0C', CREME = '#FFF9F3', VIOLETT = '#5B9CFF'
     const FENSTER = '#121214', LEISE = 'rgba(255,249,243,.65)', TRENN = 'rgba(255,249,243,.13)'
     /* Off-White wie im V2-Bausystem (app/components/V2.tsx). Die oeffentliche
        Startseite war als einzige Seite durchgehend dunkel — sie folgt jetzt
@@ -84,14 +84,6 @@ export default async function EntdeckenPage() {
       : 'Datum offen'
     const uhr = (h?: number | null) => h != null ? `${String(h).padStart(2, '0')}:00` : ''
 
-    const NAV = [
-      { href: '/match', label: 'Open Games' },
-      { href: '/rangliste', label: 'Ranking' },
-      { href: '/liga', label: 'Liga' },
-      { href: '/turniere', label: 'Events' },
-      { href: '/feed', label: 'Community' },
-    ]
-
     const kopf: React.CSSProperties = { display: 'flex', alignItems: 'baseline', justifyContent: 'space-between', gap: 14, marginBottom: 16 }
     const etikett: React.CSSProperties = { fontFamily: INTER, fontSize: 12, fontWeight: 900, letterSpacing: '.16em', textTransform: 'uppercase', color: VIOLETT }
 
@@ -116,15 +108,9 @@ export default async function EntdeckenPage() {
     return (
       <main style={{ minHeight: '100dvh', background: SCHWARZ, fontFamily: INTER }}>
 
-        {/* Oeffentliche Navigation — sichtbar ohne Konto, Login blockiert nichts. */}
-        <nav style={{ borderBottom: `1px solid ${TRENN}`, background: SCHWARZ, position: 'sticky', top: 0, zIndex: 40 }}>
-          <div className="ppl-breit" style={{ paddingTop: 11, paddingBottom: 11, display: 'flex', alignItems: 'center', gap: 18, overflowX: 'auto' }}>
-            {NAV.map(n => (
-              <Link key={n.href} href={n.href} style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, letterSpacing: '.06em', textTransform: 'uppercase', color: CREME, textDecoration: 'none', whiteSpace: 'nowrap' }}>{n.label}</Link>
-            ))}
-            <Link href="/login" style={{ marginLeft: 'auto', fontFamily: INTER, fontSize: 13, fontWeight: 900, letterSpacing: '.06em', textTransform: 'uppercase', color: VIOLETT, textDecoration: 'none', whiteSpace: 'nowrap' }}>Login</Link>
-          </div>
-        </nav>
+        {/* 16.09.2026: Die waagrechte Navigation ist weg. Dieselben fuenf
+            Punkte stehen jetzt im Hamburger oben rechts (HauptMenu), damit
+            hier nicht zwei Navigationen uebereinander liegen. */}
 
         {/* Kopf nach Referenz-Mockup: Foto, Etikett, sehr grosse Anton-Zeile,
             zwei Zeilen Erklaerung. Darunter die Aktionen. */}

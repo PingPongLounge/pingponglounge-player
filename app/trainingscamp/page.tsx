@@ -7,7 +7,7 @@ import { campPrice, CAMP_SESSIONS } from "@/lib/camp"
 const BG = "#0E0E10", CARD = "#1A1A1E", CELL = "#1A1A1E", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.9)", MUT = "rgba(255,255,255,.82)", FAINT = "rgba(255,255,255,.55)"
 const LINE = "rgba(255,255,255,.07)", CREAM = "#FFF9F3", DARK = "#171A20"
-const GRAD = "linear-gradient(135deg,#8C3DFF,#C9A8FF)"
+const GRAD = "linear-gradient(135deg,#5B9CFF,#A9C9FF)"
 
 type Session = { id: string; date: string; part: "vm" | "nm"; label: string; start: string; end: string; frei: number; belegt: number; max: number }
 const DAY_LABEL: Record<string, string> = {
