@@ -3,9 +3,9 @@ import Stripe from "stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { PP_CONFIG } from "@/lib/rewards"
 import { sessionUuid } from "@/lib/stripe-util"
-import { melde, sendBookingConfirm, sendEmail, sendTournamentConfirm, sendTournamentStaffNotice } from "@/lib/email"
-import { entryQrFor, weekdayOf, SINGLE_NIGHT_PLAETZE } from "@/lib/opengames"
-import { belegung, SELF_RATINGS } from "@/lib/tournaments"
+import { sendEmail } from "@/lib/email"
+import { schliesseAbOpenGame, schliesseAbSingleNight, schliesseAbTurnier } from "@/lib/abschluss"
+import { gibGutscheinFrei } from "@/lib/gutschein"
 import { CAMP_MAX_PER_SESSION } from "@/lib/camp"
 import { campBelegung } from "@/lib/camp-server"
 
@@ -47,7 +47,13 @@ export async function POST(req: NextRequest) {
         await admin.from("tournament_registrations")
           .update({ payment_status: "none", reserved_until: null, stripe_session_id: null })
           .eq("id", s.metadata.registration_id)
+        // Ein abgebrochener Kauf darf kein Gutschein-Kontingent verbrauchen.
+        await gibGutscheinFrei(admin, "tournament", s.metadata.registration_id)
       }
+    }
+    // OPEN GAME: hier entsteht nie eine Zeile, aber der Gutschein war gehalten.
+    if (s.metadata?.type === "open_game" && s.metadata.gutschein_ref) {
+      await gibGutscheinFrei(createAdminClient(), "open_game", s.metadata.gutschein_ref)
     }
     // CAMP: Reservierung abgelaufen ohne Zahlung → freigeben.
     if (s.metadata?.type === "camp" && s.metadata.booking_id) {
@@ -62,6 +68,7 @@ export async function POST(req: NextRequest) {
       await admin.from("single_night_bookings")
         .update({ payment_status: "cancelled", reserved_until: null })
         .eq("id", s.metadata.booking_id).eq("payment_status", "reserved")
+      await gibGutscheinFrei(admin, "single_night", s.metadata.booking_id)
     }
     return NextResponse.json({ received: true })
   }
@@ -131,279 +138,99 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ received: true })
     }
 
-    // TURNIER: Zahlung eingegangen → Platz endgültig bestätigt, Bestätigung raus.
+    // TURNIER: Zahlung eingegangen → Platz endgueltig bestaetigt.
+    // Der ganze Abschluss — Status, Gutschein, Bestaetigung, Staff-Meldung —
+    // steht in lib/abschluss.ts, damit der 100-%-Weg exakt dasselbe tut.
+    // Die Idempotenz steckt dort im Filter auf den alten Zahlungsstatus:
+    // eine Webhook-Wiederholung trifft keine Zeile mehr und mailt nicht nochmal.
     if (s.payment_status === "paid" && s.metadata?.type === "tournament" && s.metadata.registration_id) {
-      const admin = createAdminClient()
-      // IDEMPOTENZ: Stripe stellt mindestens einmal zu und wiederholt bei
-      // jeder Nicht-2xx-Antwort. Ohne Filter lief das Update jedes Mal durch,
-      // lieferte eine Zeile zurueck und schickte eine WEITERE Bestaetigung.
-      // Mit .neq("payment_status","paid") trifft die Wiederholung keine Zeile
-      // mehr -> reg ist null -> keine zweite Mail. Bezahlt bleibt bezahlt.
-      const { data: reg } = await admin.from("tournament_registrations")
-        .update({ payment_status: "paid", reserved_until: null })
-        .eq("id", s.metadata.registration_id)
-        .neq("payment_status", "paid")
-        .select("email,first_name,last_name,phone,self_rating,amount_chf,tournament_id,waitlist,waitlist_pos")
-        .maybeSingle()
-
-      // Bisher endete der Vorgang hier — der Gast zahlte und bekam nichts.
-      if (reg?.email) {
-        const { data: t } = await admin.from("player_tournaments")
-          .select("name,date,start_time,end_time,city,max_players").eq("id", reg.tournament_id).maybeSingle()
-        const datumLabel = t?.date
-          ? new Date(`${t.date}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })
-          : "Termin folgt"
-        await melde(
-          "turnier_bezahlt",
-          { to: reg.email, turnierId: reg.tournament_id },
-          sendTournamentConfirm({
-          to: reg.email,
-          name: reg.first_name || "zusammen",
-          turnier: t?.name || "Turnier",
-          datumLabel,
-          zeitLabel: t?.start_time ? `${String(t.start_time).slice(0, 5)}${t.end_time ? `–${String(t.end_time).slice(0, 5)}` : ""} Uhr` : undefined,
-          ort: t?.city || undefined,
-          startgeldChf: Number(reg.amount_chf) || 0,
-          bezahlt: true,
-          turnierUrl: `https://pingponglounge.ch/turniere/${reg.tournament_id}`,
-          }),
-        ) // wirft nie — Zahlung darf nie am Mailversand scheitern
-
-        // Interne Meldung. Hier und NUR hier fuer onlinebezahlte Anmeldungen —
-        // register-guest haelt sich in genau diesem Fall zurueck. Weil dieser
-        // Zweig durch .neq("payment_status","paid") nur beim ERSTEN Mal
-        // erreicht wird, meldet auch eine Webhook-Wiederholung nicht nochmals.
-        const staffBel = t ? await belegung(admin, reg.tournament_id, t.max_players ?? 32) : null
-        await melde(
-          "turnier_staff",
-          { to: "STAFF", turnierId: reg.tournament_id },
-          sendTournamentStaffNotice({
-            turnier: t?.name || "Turnier",
-            datumLabel,
-            ort: t?.city,
-            vorname: reg.first_name || "", nachname: reg.last_name || "",
-            email: reg.email, telefon: reg.phone,
-            spielstaerke: SELF_RATINGS.find(r => r.key === reg.self_rating)?.label ?? reg.self_rating,
-            zahlungsstatus: `bezahlt · CHF ${Number(reg.amount_chf) || 0}`,
-            warteliste: !!reg.waitlist,
-            wartelistenPos: reg.waitlist_pos,
-            belegt: staffBel?.belegt ?? null,
-            max: t?.max_players ?? null,
-            turnierId: reg.tournament_id,
-          }),
-        ) // wirft nie
-      }
+      await schliesseAbTurnier(createAdminClient(), s.metadata.registration_id, {
+        neuerStatus: "paid",
+        gutscheinCode: s.metadata.gutschein_code || null,
+      })
       return NextResponse.json({ received: true })
     }
 
-    // OPEN GAME: Der Platz wird ERST HIER vergeben — nach tatsächlich erfolgter
-    // Zahlung. Wer die Kasse abbricht, hat nie einen Platz belegt.
+    // OPEN GAME: Der Platz wird ERST HIER vergeben — nach tatsaechlich
+    // erfolgter Zahlung. Wer die Kasse abbricht, hat nie einen Platz belegt.
+    // Das Vergeben selbst steht in lib/abschluss.ts; hier bleibt nur, was
+    // ausschliesslich Stripe betrifft: die Rueckerstattung.
     if (s.payment_status === "paid" && s.metadata?.type === "open_game") {
+      const admin = createAdminClient()
       const gameId = s.metadata.game_id
-      /* 11.09.: Ein Platz kann jetzt einem Player ODER einem Gast von
-         pingponglounge.ch gehoeren. Alles andere in diesem Zweig — Kapazitaet,
-         Ueberbuchungs-Refund, Idempotenz, Zaehler, Mail — bleibt gleich.
-         Nur PingPoints gibt es weiterhin ausschliesslich fuer Konten. */
       const userId = s.metadata.user_id || ""
       const gastEmail = (s.metadata.guest_email || "").trim().toLowerCase()
-      const istGast = !userId && !!gastEmail
-      const admin = createAdminClient()
+      if (!gameId || (!userId && !gastEmail)) return NextResponse.json({ received: true })
 
-      if (gameId && (userId || gastEmail)) {
-        const { data: game } = await admin
-          .from("open_games")
-          .select("id,max_players,current_players,status,location_name,price_per_player,date,start_hour,kind")
-          .eq("id", gameId).maybeSingle()
+      const { data: prof } = userId
+        ? await admin.from("profiles").select("name").eq("id", userId).maybeSingle()
+        : { data: null as { name?: string } | null }
 
-        // Ausgebucht, während der Spieler an der Kasse stand? Dann Geld zurück.
-        const voll = !game || game.status !== "open" ||
-          (game.current_players ?? 0) >= (game.max_players ?? 6)
+      const erg = await schliesseAbOpenGame(admin, {
+        gameId,
+        userId: userId || null,
+        gast: userId ? null : {
+          name: s.metadata.guest_name || "Gast",
+          email: gastEmail,
+          phone: s.metadata.guest_phone || null,
+          level: s.metadata.guest_level || null,
+        },
+        anzeigeName: prof?.name || s.metadata.player_name || (userId ? "Spieler" : "Gast"),
+        betragChf: s.amount_total != null ? s.amount_total / 100 : 0,
+        stripeSessionId: s.id,
+        stripePaymentIntent: s.payment_intent ? String(s.payment_intent) : null,
+        punkteGutschreiben: true,
+        gutscheinRef: s.metadata.gutschein_ref || null,
+      })
 
-        if (voll) {
-          try {
-            if (s.payment_intent) {
-              await getStripe().refunds.create({ payment_intent: String(s.payment_intent) })
-            }
-          } catch (e) {
-            console.error("Rückerstattung nach Überbuchung fehlgeschlagen:", e)
-          }
-        } else {
-          const { data: prof } = userId
-            ? await admin.from("profiles").select("name").eq("id", userId).maybeSingle()
-            : { data: null as { name?: string } | null }
-
-          /* Idempotent ueber einen Unique-Index — beim Player (game_id,
-             user_id), beim Gast (game_id, lower(guest_email)). Feuert der
-             Webhook zweimal, entsteht in beiden Faellen kein zweiter Platz. */
-          const { error: insErr } = await admin.from("open_game_players").insert({
-            game_id: gameId,
-            user_id: userId || null,
-            display_name: prof?.name || s.metadata.player_name || (istGast ? "Gast" : "Spieler"),
-            status: "confirmed",
-            paid: true,
-            amount_chf: game.price_per_player ?? null,
-            stripe_session_id: s.id,
-            stripe_payment_intent: s.payment_intent ? String(s.payment_intent) : null,
-            source: istGast ? "ppl_web" : "player",
-            guest_name: istGast ? (s.metadata.guest_name || null) : null,
-            guest_email: istGast ? gastEmail : null,
-            guest_phone: istGast ? (s.metadata.guest_phone || null) : null,
-            guest_level: istGast ? (s.metadata.guest_level || null) : null,
-          })
-
-          if (insErr) {
-            // Der Spieler ist schon drin. Zwei Faelle sehen an dieser Stelle
-            // gleich aus, brauchen aber das Gegenteil voneinander:
-            //
-            //   a) ECHTE DOPPELZAHLUNG (zwei Tabs, zwei Stripe-Sessions):
-            //      der zweite Platz entsteht dank Unique-Index nicht, die
-            //      zweite Zahlung muss zurueck.
-            //   b) WIEDERHOLUNG DESSELBEN WEBHOOKS (Stripe liefert mindestens
-            //      einmal und wiederholt bei jeder Nicht-2xx-Antwort): es gab
-            //      nur EINE Zahlung. Frueher landete auch dieser Fall im
-            //      Refund — der Spieler behielt seinen Platz und bekam sein
-            //      Geld zurueck.
-            //
-            // Unterschieden wird an der Session-ID der bereits gespeicherten
-            // Zeile: ist es dieselbe Session, war es dieselbe Zahlung.
-            const vorhandenQuery = admin.from("open_game_players")
-              .select("stripe_session_id").eq("game_id", gameId)
-            const { data: vorhanden } = await (istGast
-              ? vorhandenQuery.ilike("guest_email", gastEmail)
-              : vorhandenQuery.eq("user_id", userId)).maybeSingle()
-
-            if (vorhanden?.stripe_session_id === s.id) {
-              console.log("Open Game: Webhook-Wiederholung fuer dieselbe Session, nichts zu tun —", s.id)
-            } else {
-              try {
-                if (s.payment_intent) await getStripe().refunds.create({ payment_intent: String(s.payment_intent) })
-              } catch (e) { console.error("Refund bei Doppelzahlung fehlgeschlagen:", e) }
-            }
+      if (!erg.ok) {
+        // Ausgebucht, waehrend der Spieler an der Kasse stand → Geld zurueck.
+        if (erg.grund === "voll") {
+          try { if (s.payment_intent) await getStripe().refunds.create({ payment_intent: String(s.payment_intent) }) }
+          catch (e) { console.error("Rueckerstattung nach Ueberbuchung fehlgeschlagen:", e) }
+          if (s.metadata.gutschein_ref) await gibGutscheinFrei(admin, "open_game", s.metadata.gutschein_ref)
+        }
+        // Der Platz ist schon vergeben. Zwei Faelle sehen gleich aus, brauchen
+        // aber das Gegenteil voneinander:
+        //   a) ECHTE DOPPELZAHLUNG (zwei Tabs, zwei Sessions) → zurueckzahlen.
+        //   b) WIEDERHOLUNG DESSELBEN WEBHOOKS → nichts tun, es gab nur EINE
+        //      Zahlung. Frueher landete auch dieser Fall im Refund: der Spieler
+        //      behielt den Platz und bekam sein Geld zurueck.
+        // Unterschieden an der Session-ID der bereits gespeicherten Zeile.
+        if (erg.grund === "doppelt") {
+          const q = admin.from("open_game_players").select("stripe_session_id").eq("game_id", gameId)
+          const { data: vorhanden } = await (userId ? q.eq("user_id", userId) : q.ilike("guest_email", gastEmail)).maybeSingle()
+          if (vorhanden?.stripe_session_id === s.id) {
+            console.log("Open Game: Webhook-Wiederholung fuer dieselbe Session, nichts zu tun —", s.id)
           } else {
-            await admin.from("open_games").update({
-              current_players: (game.current_players ?? 0) + 1,
-              status: (game.current_players ?? 0) + 1 >= (game.max_players ?? 6) ? "full" : "open",
-              updated_at: new Date().toISOString(),
-            }).eq("id", gameId)
-
-            // PingPoints für die bezahlte Buchung — idempotent über die
-            // Session-ID. Nur mit Konto: Punkte gehoeren einem Spielerprofil,
-            // ein Gast hat keins.
-            if (userId) {
-              const refId = sessionUuid(s.id)
-              const { data: schon } = await admin.from("ping_points_transactions")
-                .select("id").eq("player_id", userId).eq("ref_id", refId).maybeSingle()
-              if (!schon) {
-                await admin.from("ping_points_transactions").insert({
-                  player_id: userId,
-                  amount: PP_CONFIG.perPaidBooking,
-                  source: "booking_paid",
-                  description: `Open Game${game.location_name ? ` — ${game.location_name}` : ""}`,
-                  ref_id: refId,
-                })
-              }
-            }
-
-            // Bestätigungsmail mit Zutritts-QR (falls Standort/Tag einen hat).
-            // Fehler beim Mailen dürfen die Buchung nie scheitern lassen.
-            try {
-              // Player: Adresse aus dem Konto. Gast: die, mit der er gebucht hat.
-              let email: string | undefined
-              if (userId) {
-                const { data: authU } = await admin.auth.admin.getUserById(userId)
-                email = authU?.user?.email
-              } else {
-                email = gastEmail || undefined
-              }
-              if (email) {
-                const wt = game.date ? weekdayOf(game.date) : -1
-                const hatZutritt = !!(game.date && entryQrFor(game.location_name, wt))
-                const d = game.date ? new Date(`${game.date}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long" }) : ""
-                const isTraining = game.kind === "training"
-                const zeit = `${String(game.start_hour ?? 19).padStart(2, "0")}:00`
-                await sendBookingConfirm({
-                  to: email,
-                  name: prof?.name || s.metadata.player_name || (istGast ? "Gast" : "Spieler"),
-                  isTraining,
-                  location: game.location_name || "",
-                  whenLabel: `${d}${d ? " · " : ""}${zeit}${isTraining ? "–20:30" : ""}`,
-                  priceChf: Number(game.price_per_player ?? 0),
-                  hatZutritt,
-                  // Ein Gast hat kein Player-Konto — ihn in die App zu
-                  // schicken, hiesse ihn vor eine Anmeldemaske zu stellen.
-                  appUrl: istGast
-                    ? "https://pingponglounge.ch/events/open-games"
-                    : `https://playerapp.ch/match/${gameId}`,
-                })
-              }
-            } catch (e) {
-              console.error("Bestätigungsmail (Open Game/Training) fehlgeschlagen:", e)
-            }
+            try { if (s.payment_intent) await getStripe().refunds.create({ payment_intent: String(s.payment_intent) }) }
+            catch (e) { console.error("Refund bei Doppelzahlung fehlgeschlagen:", e) }
+            if (s.metadata.gutschein_ref) await gibGutscheinFrei(admin, "open_game", s.metadata.gutschein_ref)
           }
         }
       }
       return NextResponse.json({ received: true })
     }
 
-    // SINGLE NIGHT: Zahlung eingegangen → Ticket fest. Überkapazitäts-Recheck,
-    // sonst Sicherheits-Refund. Bestätigungsmail mit Storno-Link. PP idempotent.
+    // SINGLE NIGHT: Zahlung eingegangen → Ticket fest. Ueberkapazitaets-Recheck
+    // und Bestaetigungsmail stehen in lib/abschluss.ts; hier nur der Refund.
     if (s.payment_status === "paid" && s.metadata?.type === "single_night" && s.metadata.booking_id) {
       const admin = createAdminClient()
       const bid = s.metadata.booking_id
-      const { data: b } = await admin.from("single_night_bookings").select("*").eq("id", bid).maybeSingle()
-      if (b && b.payment_status !== "paid" && b.payment_status !== "cancelled") {
-        const nowIso = new Date().toISOString()
-        const { data: ev } = await admin.from("open_games").select("max_players").eq("id", b.event_id).maybeSingle()
-        const { data: others } = await admin.from("single_night_bookings").select("id,persons,payment_status,reserved_until").eq("event_id", b.event_id)
-        let used = 0
-        for (const o of others || []) {
-          if (o.id === bid) continue
-          const active = o.payment_status === "paid" || (o.payment_status === "reserved" && o.reserved_until && o.reserved_until > nowIso)
-          if (active) used += Number(o.persons || 1)
-        }
-        const kap = Number(ev?.max_players ?? SINGLE_NIGHT_PLAETZE)
-        if (used + Number(b.persons || 1) > kap) {
-          try { if (s.payment_intent) await getStripe().refunds.create({ payment_intent: String(s.payment_intent) }) }
-          catch (e) { console.error("Single-Night-Refund (Überbuchung) fehlgeschlagen:", e) }
-          await admin.from("single_night_bookings").update({
-            payment_status: "cancelled", reserved_until: null,
-            stripe_payment_intent: s.payment_intent ? String(s.payment_intent) : null,
-          }).eq("id", bid)
-        } else {
-          const { data: upd } = await admin.from("single_night_bookings").update({
-            payment_status: "paid", reserved_until: null,
-            stripe_payment_intent: s.payment_intent ? String(s.payment_intent) : null,
-          }).eq("id", bid).neq("payment_status", "paid").select("id").maybeSingle()
-          if (upd) {
-            try {
-              let to: string | null = b.guest_email || null
-              if (!to && b.user_id) { const { data: authU } = await admin.auth.admin.getUserById(b.user_id); to = authU?.user?.email || null }
-              if (to) {
-                const base = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
-                const stornoLink = b.cancel_token ? `${base}/single-night/storno?token=${b.cancel_token}` : `${base}/single-night`
-                await sendEmail({
-                  to,
-                  subject: "Single Night — Ticket bestätigt",
-                  html: `<div style="font-family:system-ui,sans-serif;color:#111">
-                    <h2>Ticket bestätigt 🏓</h2>
-                    <p>Dein Single-Night-Ticket (${b.persons > 1 ? "2 Personen" : "1 Person"}) ist gesichert. CHF ${b.amount_chf}.</p>
-                    <p>Los geht's um 19:00 — Ticket an der Bar zeigen, Welcome Drink ist inklusive.</p>
-                    <p style="margin-top:20px;font-size:14px;color:#555">Verhindert? Absage bis 24 h vorher — Geld zurück:<br>
-                    <a href="${stornoLink}">Ticket stornieren</a></p>
-                  </div>`,
-                })
-              }
-            } catch (e) { console.error("Single-Night-Bestätigungsmail fehlgeschlagen:", e) }
-            if (b.user_id) {
-              try {
-                await admin.from("ping_points_transactions").insert({
-                  player_id: b.user_id, amount: PP_CONFIG.perPaidBooking, source: "booking_paid",
-                  description: "Single Night", ref_id: sessionUuid(s.id),
-                })
-              } catch { /* Unique-Index verhindert Doppelgutschrift */ }
-            }
-          }
-        }
+      const erg = await schliesseAbSingleNight(admin, bid, {
+        stripePaymentIntent: s.payment_intent ? String(s.payment_intent) : null,
+        gutscheinCode: s.metadata.gutschein_code || null,
+        punkteGutschreiben: true,
+        stripeSessionId: s.id,
+      })
+      if (!erg.ok && erg.grund === "voll") {
+        try { if (s.payment_intent) await getStripe().refunds.create({ payment_intent: String(s.payment_intent) }) }
+        catch (e) { console.error("Single-Night-Refund (Ueberbuchung) fehlgeschlagen:", e) }
+        await admin.from("single_night_bookings").update({
+          payment_status: "cancelled", reserved_until: null,
+          stripe_payment_intent: s.payment_intent ? String(s.payment_intent) : null,
+        }).eq("id", bid)
+        await gibGutscheinFrei(admin, "single_night", bid)
       }
       return NextResponse.json({ received: true })
     }

@@ -5,6 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { OG_PREIS_CHF, OG_GAST_STAERKEN, gastGruppe, gruppeDesAbends, gruppeFuerLevel, startZeit } from "@/lib/opengames"
 import { PP_CHF, PP_CONFIG, SIGNUP_BONUS_LOCKED_UNTIL_FIRST_PAYMENT } from "@/lib/rewards"
 import { erlaubteBasis, erlaubterPfad } from "@/lib/return-base"
+import { gibGutscheinFrei, normCode, reserviereGutschein } from "@/lib/gutschein"
+import { schliesseAbOpenGame } from "@/lib/abschluss"
 
 // Einen Platz in einem offiziellen Open Game kaufen.
 // Der Preis kommt NIE vom Client — er steht serverseitig in lib/opengames.ts.
@@ -133,9 +135,57 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   }
 
   // Preis serverseitig
-  const chf = Number(game.price_per_player ?? OG_PREIS_CHF)
+  const voll = Number(game.price_per_player ?? OG_PREIS_CHF)
+  let chf = voll
   const isTraining = game.kind === "training"
   const titel = isTraining ? `Training ${game.location_name}` : `Open Game ${game.location_name}`
+
+  // ── Gutschein ────────────────────────────────────────────────────────────
+  // Beim Open Game entsteht die Teilnehmerzeile erst nach der Zahlung. Es gibt
+  // hier also noch keine id, an der die Einloesung haengen koennte — deshalb
+  // eine eigene Kennung, die durch Stripe mitreist und im Webhook bestaetigt
+  // wird. Ein abgebrochener Kauf gibt sie ueber checkout.session.expired zurueck.
+  const gutscheinRef = crypto.randomUUID()
+  let gutschein: string | null = null
+  let prozent = 0
+  const code = normCode(body?.gutschein_code)
+  // Punkte ODER Gutschein — nicht beides. Sonst wuerde eine Reservierung
+  // angelegt, die der PingPoints-Weg danach nie einloest.
+  if (code && wantRedeem)
+    return NextResponse.json({ error: "Entweder PingPoints oder Gutschein — nicht beides." }, { status: 400 })
+  if (code) {
+    const g = await reserviereGutschein(admin, {
+      code, art: "open_game", refId: gutscheinRef, preisChf: voll,
+      eventId: game.id, standort: game.location_name ?? null,
+      sofort: false,
+    })
+    if (!g.ok) return NextResponse.json({ error: g.meldung, gutscheinFehler: g.grund }, { status: 400 })
+    chf = g.preisNachher
+    prozent = g.prozent
+    gutschein = g.code
+  }
+
+  // ── 100 %: kein Stripe ───────────────────────────────────────────────────
+  // Derselbe Abschluss wie nach einer Zahlung — Platz, Zaehler, Bestaetigungs-
+  // mail mit Zutritts-QR. Genau das fehlte der Vollausloesung mit PingPoints.
+  if (prozent === 100) {
+    const erg = await schliesseAbOpenGame(admin, {
+      gameId: game.id,
+      userId: user?.id ?? null,
+      gast: user ? null : { name: gast!.name, email: gast!.email, phone: gast!.phone, level: meineGruppe },
+      anzeigeName,
+      betragChf: 0,
+      punkteGutschreiben: false,   // gratis ist keine bezahlte Buchung
+      gutscheinRef,
+    })
+    if (!erg.ok) {
+      await gibGutscheinFrei(admin, "open_game", gutscheinRef)
+      return NextResponse.json({
+        error: erg.grund === "doppelt" ? "Du bist schon angemeldet" : "Ausgebucht",
+      }, { status: erg.grund === "doppelt" ? 400 : 409 })
+    }
+    return NextResponse.json({ gratis: true, prozent, preis: 0, redirect: `/match/${game.id}?bezahlt=1` })
+  }
 
   // PingPoints einlösen: GANZ oder gar nicht — keine anteilige Zahlung. Man
   // braucht genug Punkte für den VOLLEN Preis (1 Punkt = CHF 1). Dann geht
@@ -163,21 +213,28 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       return NextResponse.json({ error: grund, zuWenigPunkte: true }, { status: 400 })
     }
     const ref = `pp-${crypto.randomUUID()}`
-    const { error: insErr } = await admin.from("open_game_players").insert({
-      game_id: game.id, user_id: user.id, display_name: anzeigeName,
-      status: "confirmed", paid: true, amount_chf: 0, redeemed_points: kosten, redeem_ref: ref,
-      source: "player",
+    // 17.09.2026: Dieser Weg legte die Zeile frueher selbst an — und schickte
+    // deshalb KEINE Bestaetigungsmail und keinen Zutritts-QR, weil die Mails
+    // alle im Webhook hingen, den er nie erreicht. Jetzt laeuft er durch
+    // denselben Abschluss wie die Stripe-Zahlung und der 100-%-Gutschein.
+    const erg = await schliesseAbOpenGame(admin, {
+      gameId: game.id,
+      userId: user.id,
+      anzeigeName,
+      betragChf: 0,
+      punkteGutschreiben: false,
+      eingelostePunkte: kosten,
+      punkteRef: ref,
     })
-    if (insErr) return NextResponse.json({ error: "Du bist schon angemeldet" }, { status: 400 })
+    if (!erg.ok) {
+      return NextResponse.json({
+        error: erg.grund === "doppelt" ? "Du bist schon angemeldet" : "Ausgebucht",
+      }, { status: erg.grund === "doppelt" ? 400 : 409 })
+    }
     await admin.from("ping_points_transactions").insert({
       player_id: user.id, amount: -kosten, source: "booking_redeem",
       description: `${isTraining ? "Training" : "Open Game"} — ${game.location_name}`, ref_id: ref,
     })
-    const neu = (game.current_players ?? 0) + 1
-    await admin.from("open_games").update({
-      current_players: neu, status: neu >= (game.max_players ?? 6) ? "full" : "open",
-      updated_at: new Date().toISOString(),
-    }).eq("id", game.id)
     return NextResponse.json({ gratis: true, redirect: `/match/${game.id}?bezahlt=1` })
   }
 
@@ -211,10 +268,12 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       guest_email: user ? "" : gast!.email,
       guest_phone: user ? "" : gast!.phone,
       guest_level: user ? "" : (meineGruppe ?? ""),
+      gutschein_code: gutschein ?? "",
+      gutschein_ref: gutschein ? gutscheinRef : "",
     },
     success_url: `${returnBase}${successPath}`,
     cancel_url: `${returnBase}${cancelPath}`,
   })
 
-  return NextResponse.json({ url: session.url })
+  return NextResponse.json({ url: session.url, prozent, preis: chf, preisVorher: voll })
 }

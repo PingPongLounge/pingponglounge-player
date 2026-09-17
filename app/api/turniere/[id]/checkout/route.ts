@@ -3,6 +3,8 @@ import Stripe from "stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { belegung, RESERVE_MINUTES } from "@/lib/tournaments"
 import { erlaubteBasis, erlaubterPfad } from "@/lib/return-base"
+import { gibGutscheinFrei, normCode, reserviereGutschein } from "@/lib/gutschein"
+import { schliesseAbTurnier } from "@/lib/abschluss"
 
 // TURNIER-ZAHLUNG
 // Der Preis kommt NIE vom Client — er steht am Turnier (entry_fee_chf).
@@ -44,7 +46,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (["paid", "free"].includes(reg.payment_status)) return NextResponse.json({ ok: true, alreadyPaid: true })
 
   const { data: t } = await admin.from("player_tournaments")
-    .select("id,name,entry_fee_chf,payment_mode,max_players,status,date,start_time").eq("id", id).single()
+    .select("id,name,entry_fee_chf,payment_mode,max_players,status,date,start_time,city").eq("id", id).single()
   if (!t) return NextResponse.json({ error: "Turnier nicht gefunden" }, { status: 404 })
   // 11.09.: Der Status wurde zwar geladen, aber nie geprueft. register-guest
   // blockiert abgesagte Turniere seit jeher; diese Route nicht — wer eine
@@ -61,7 +63,42 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (b.voll && !["reserved", "pending"].includes(reg.payment_status))
     return NextResponse.json({ error: "Turnier ist voll" }, { status: 409 })
 
-  const chf = Number(t.entry_fee_chf)
+  // ── Gutschein ────────────────────────────────────────────────────────────
+  // Der Browser schickt nur den Code. Gerechnet wird hier, gehalten wird in der
+  // Datenbank — auf der registration_id, also genau einmal je Anmeldung.
+  const voll = Number(t.entry_fee_chf)
+  let chf = voll
+  let gutschein: string | null = null
+  let prozent = 0
+  const code = normCode(body.gutschein_code)
+  if (code) {
+    const g = await reserviereGutschein(admin, {
+      code, art: "tournament", refId: regId, preisChf: voll,
+      eventId: id, standort: t.city ?? null,
+      sofort: false,
+    })
+    if (!g.ok) return NextResponse.json({ error: g.meldung, gutscheinFehler: g.grund }, { status: 400 })
+    chf = g.preisNachher
+    prozent = g.prozent
+    gutschein = g.code
+  }
+
+  // ── 100 %: kein Stripe ───────────────────────────────────────────────────
+  // Die Anmeldung wird direkt abgeschlossen — und zwar durch dieselbe Funktion,
+  // die sonst der Webhook nach der Zahlung aufruft. Platz, Status,
+  // Bestaetigungsmail und Staff-Meldung sind damit identisch zur bezahlten
+  // Anmeldung; es gibt keinen zweiten Weg, der etwas vergessen koennte.
+  if (prozent === 100) {
+    const erg = await schliesseAbTurnier(admin, regId, {
+      neuerStatus: "free", gutscheinCode: gutschein, betragChf: 0,
+    })
+    if (!erg.ok && erg.grund !== "schon_erledigt") {
+      await gibGutscheinFrei(admin, "tournament", regId)
+      return NextResponse.json({ error: "Anmeldung konnte nicht abgeschlossen werden" }, { status: 409 })
+    }
+    return NextResponse.json({ gratis: true, prozent, preis: 0, redirect: successPath })
+  }
+
   const reservedUntil = new Date(Date.now() + RESERVE_MINUTES * 60 * 1000).toISOString()
 
   // Platz reservieren (zählt jetzt gegen die Kapazität, läuft nach der Frist ab).
@@ -80,12 +117,15 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         product_data: { name: `Turnier: ${t.name}`, description: t.date ? `${t.date}${t.start_time ? " · " + t.start_time : ""}` : undefined },
       },
     }],
-    metadata: { type: "tournament", tournament_id: id, registration_id: regId },
+    metadata: {
+      type: "tournament", tournament_id: id, registration_id: regId,
+      gutschein_code: gutschein ?? "",
+    },
     expires_at: Math.floor(Date.now() / 1000) + RESERVE_MINUTES * 60,
     success_url: `${returnBase}${successPath}`,
     cancel_url: `${returnBase}${cancelPath}`,
   })
 
   await admin.from("tournament_registrations").update({ stripe_session_id: session.id, payment_status: "pending" }).eq("id", regId)
-  return NextResponse.json({ url: session.url })
+  return NextResponse.json({ url: session.url, prozent, preis: chf, preisVorher: voll })
 }

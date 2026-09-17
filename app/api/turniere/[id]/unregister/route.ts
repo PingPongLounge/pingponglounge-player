@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { gibGutscheinFrei } from "@/lib/gutschein"
 import { NextRequest, NextResponse } from "next/server"
 
 // Vom Turnier abmelden. Gab es bisher nicht: wer sich einmal angemeldet hatte,
@@ -25,12 +26,24 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ error: "Das Turnier läuft bereits — eine Abmeldung ist nicht mehr möglich" }, { status: 400 })
   }
 
+  // Vor dem Loeschen die id merken: die Gutschein-Einloesung haengt daran,
+  // und danach gibt es die Zeile nicht mehr.
+  const { data: meine } = await admin
+    .from("tournament_registrations")
+    .select("id")
+    .eq("tournament_id", id)
+    .eq("player_id", user.id)
+    .maybeSingle()
+
   const { error } = await admin
     .from("tournament_registrations")
     .delete()
     .eq("tournament_id", id)
     .eq("player_id", user.id)
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
+
+  // Echte Abmeldung → Kontingent zurueck.
+  if (meine?.id) await gibGutscheinFrei(admin, "tournament", meine.id)
 
   return NextResponse.json({ ok: true })
 }

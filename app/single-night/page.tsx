@@ -14,6 +14,8 @@ function dateLabel(d: string) {
   return new Date(`${d}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "numeric", month: "long" })
 }
 
+import GutscheinFeld, { type GutscheinStand } from "@/app/components/GutscheinFeld"
+
 export default function SingleNightPage() {
   const [ev, setEv] = useState<SnEvent | null>(null)
   const [loading, setLoading] = useState(true)
@@ -36,14 +38,18 @@ export default function SingleNightPage() {
     })()
   }, [])
 
+  const [gutschein, setGutschein] = useState<GutscheinStand | null>(null)
+
   async function buchen() {
     if (!ev) return
     setBusy(true); setErr("")
     const payload: Record<string, unknown> = { event_id: ev.id, ticket_type: ticket }
+    if (gutschein) payload.gutschein_code = gutschein.code
     if (!loggedIn) payload.guest = { name: guest.name.trim(), email: guest.email.trim() }
     try {
       const r = await fetch("/api/single-night/checkout", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(payload) })
       const j = await r.json().catch(() => ({}))
+      if (j.gratis) { window.location.href = j.redirect || "/single-night?bezahlt=1"; return }
       if (!r.ok || !j.url) { setErr(j.error || "Buchung fehlgeschlagen"); setBusy(false); return }
       window.location.href = j.url
     } catch { setErr("Verbindung fehlgeschlagen"); setBusy(false) }
@@ -130,6 +136,8 @@ export default function SingleNightPage() {
                 <input style={input} placeholder="E-Mail" value={guest.email} onChange={e => setGuest({ ...guest, email: e.target.value })} />
               </div>
             )}
+
+            <GutscheinFeld art="single_night" eventId={ev.id} ticketType={ticket} onGeprueft={setGutschein} />
 
             {err && <p style={{ color: DANGER, fontSize: 13, margin: "6px 0" }}>{err}</p>}
             <button onClick={buchen} disabled={busy || ev.frei <= 0 || (!loggedIn && (!guest.name.trim() || !guest.email.trim()))} style={{ ...btn, marginTop: 8, opacity: busy || ev.frei <= 0 || (!loggedIn && (!guest.name.trim() || !guest.email.trim())) ? .5 : 1 }}>

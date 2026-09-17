@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
+import { gibGutscheinFrei } from "@/lib/gutschein"
 import { startZeit, SINGLE_NIGHT_STORNO_STUNDEN } from "@/lib/opengames"
 
 // Single-Night-Ticket stornieren. Gast per Token (aus der Bestätigungsmail) ODER
@@ -48,6 +49,10 @@ export async function POST(req: NextRequest) {
   const { data: upd } = await admin.from("single_night_bookings")
     .update({ payment_status: "cancelled", cancelled_at: new Date().toISOString(), reserved_until: null })
     .eq("id", b.id).in("payment_status", ["paid", "reserved"]).select("id").maybeSingle()
+
+  // Echte Stornierung → das Gutschein-Kontingent kommt zurueck (Entscheid
+  // Oliver, 17.09.). Faellt nichts frei, tut der Aufruf nichts.
+  await gibGutscheinFrei(admin, "single_night", b.id)
   if (!upd) return NextResponse.json({ error: "Bereits verarbeitet" }, { status: 409 })
 
   return NextResponse.json({ ok: true, refundHint: "Dein Ticket ist storniert. Die Rückerstattung wird manuell bearbeitet." })

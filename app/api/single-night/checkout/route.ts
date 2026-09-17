@@ -5,6 +5,8 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { snTicket, SINGLE_NIGHT_PLAETZE, startZeit } from "@/lib/opengames"
 import { rateLimited, clientIp } from "@/lib/ratelimit"
 import { erlaubteBasis, erlaubterPfad } from "@/lib/return-base"
+import { gibGutscheinFrei, normCode, reserviereGutschein } from "@/lib/gutschein"
+import { schliesseAbSingleNight } from "@/lib/abschluss"
 
 // Single-Night-Ticket: Herren (29, 1 Person) oder Damen 2-für-1 (29, 2 Personen).
 // Preis + Personenzahl IMMER serverseitig aus lib/opengames. Platz erst nach
@@ -129,6 +131,46 @@ export async function POST(req: NextRequest) {
   }).select("id").single()
   if (insErr || !booking) return NextResponse.json({ error: "Buchung konnte nicht angelegt werden" }, { status: 500 })
 
+  // ── Gutschein ────────────────────────────────────────────────────────────
+  // Gerechnet wird auf den TICKETPREIS, nicht pro Person: beim Damenticket
+  // "2 fuer 1" sind 50 % auf CHF 29 also CHF 14.50 fuer zwei (Vorgabe Oliver,
+  // 17.09.). Gehalten wird auf der booking_id — eine Buchung, ein Gutschein.
+  let chf = ticket.price
+  let gutschein: string | null = null
+  let prozent = 0
+  const code = normCode(body?.gutschein_code)
+  if (code) {
+    const g = await reserviereGutschein(admin, {
+      code, art: "single_night", refId: booking.id, preisChf: ticket.price,
+      eventId, standort: null, sofort: false,
+    })
+    if (!g.ok) {
+      // Die Reservierung des Platzes wieder hergeben — sonst blockiert ein
+      // falscher Code 30 Minuten lang eine Kapazitaet.
+      await admin.from("single_night_bookings")
+        .update({ payment_status: "cancelled", reserved_until: null }).eq("id", booking.id)
+      return NextResponse.json({ error: g.meldung, gutscheinFehler: g.grund }, { status: 400 })
+    }
+    chf = g.preisNachher
+    prozent = g.prozent
+    gutschein = g.code
+    await admin.from("single_night_bookings").update({ amount_chf: chf }).eq("id", booking.id)
+  }
+
+  // ── 100 %: kein Stripe ───────────────────────────────────────────────────
+  // Single Night hatte bisher gar keinen kostenlosen Weg. Der Abschluss ist
+  // derselbe, den sonst der Webhook nach der Zahlung faehrt.
+  if (prozent === 100) {
+    const erg = await schliesseAbSingleNight(admin, booking.id, { gutscheinCode: gutschein })
+    if (!erg.ok) {
+      await gibGutscheinFrei(admin, "single_night", booking.id)
+      await admin.from("single_night_bookings")
+        .update({ payment_status: "cancelled", reserved_until: null }).eq("id", booking.id)
+      return NextResponse.json({ error: erg.grund === "voll" ? "Ausgebucht" : "Buchung konnte nicht abgeschlossen werden" }, { status: 409 })
+    }
+    return NextResponse.json({ gratis: true, prozent, preis: 0, redirect: successPath })
+  }
+
   const stripe = getStripe()
   const datum = new Date(`${ev.date}T12:00:00`).toLocaleDateString("de-CH", { weekday: "long", day: "2-digit", month: "long" })
   const stripeSession = await stripe.checkout.sessions.create({
@@ -139,16 +181,16 @@ export async function POST(req: NextRequest) {
       quantity: 1,
       price_data: {
         currency: "chf",
-        unit_amount: Math.round(ticket.price * 100),
+        unit_amount: Math.round(chf * 100),
         product_data: { name: `Single Night — ${ticket.label}`, description: `${datum}, 19:00${ticket.persons > 1 ? " · 2 Personen" : ""}` },
       },
     }],
-    metadata: { type: "single_night", booking_id: booking.id },
+    metadata: { type: "single_night", booking_id: booking.id, gutschein_code: gutschein ?? "" },
     expires_at: Math.floor(reservedUntil.getTime() / 1000),
     success_url: `${returnBase}${successPath}`,
     cancel_url: `${returnBase}${cancelPath}`,
   })
 
   await admin.from("single_night_bookings").update({ stripe_session_id: stripeSession.id }).eq("id", booking.id)
-  return NextResponse.json({ url: stripeSession.url })
+  return NextResponse.json({ url: stripeSession.url, prozent, preis: chf, preisVorher: ticket.price })
 }

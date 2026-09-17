@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { stornoMoeglich, OG_STORNO_STUNDEN } from "@/lib/opengames"
 import { sessionUuid } from "@/lib/stripe-util"
+import { gibGutscheinFrei } from "@/lib/gutschein"
 import Stripe from "stripe"
 import { NextRequest, NextResponse } from "next/server"
 
@@ -39,10 +40,14 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   // Bezahlter Platz? Dann Geld zurück — aber nur innerhalb der Frist.
   const { data: mein } = await admin
     .from("open_game_players")
-    .select("id,paid,stripe_payment_intent,stripe_session_id,refunded_at,redeemed_points,redeem_ref")
+    .select("id,paid,stripe_payment_intent,stripe_session_id,refunded_at,redeemed_points,redeem_ref,gutschein_ref")
     .eq("game_id", id).eq("user_id", user.id).maybeSingle()
 
   if (!mein) return NextResponse.json({ error: "Du bist nicht angemeldet" }, { status: 400 })
+
+  // Wer wieder aussteigt, gibt auch seinen Gutschein zurueck ins Kontingent
+  // (Entscheid Oliver, 17.09.). Ohne Gutschein tut der Aufruf nichts.
+  if (mein.gutschein_ref) await gibGutscheinFrei(admin, "open_game", mein.gutschein_ref)
 
   let erstattet = false
   if (game.is_official && mein.paid && !mein.refunded_at) {
