@@ -35,6 +35,7 @@ const HAUPT = [
 
 /* Zweite Ebene — jeder Eintrag zeigt auf eine Seite, die es wirklich gibt. */
 const ZWEITE = [
+  { label: "Liga-Chat",     href: "/liga?chat=1" },
   { label: "Match-History", href: "/matchhistorie" },
   { label: "Achievements",  href: "/achievements" },
   { label: "Freunde",       href: "/freunde" },

@@ -560,6 +560,17 @@ export default function LigaPage(){
      und bekam beim Druecken die Fehlermeldung der Middleware zu lesen.
      Jetzt traegt der Link das Match, und ohne Session geht es zuerst zum
      Login und danach genau hierher zurueck. */
+  /* ── /liga?chat=1 — der Chat war nur hier unten erreichbar ───────────
+     24.09.2026 (Oliver): "wo ist der chat? nirgends ich sehe ihn nicht".
+     Er sass ausschliesslich als Knopf unter der Rangkarte. Mit diesem
+     Parameter kann ihn das Menue von jeder Seite aus direkt oeffnen. */
+  useEffect(()=>{
+    if(loading) return
+    if(new URLSearchParams(window.location.search).get("chat")!=="1") return
+    window.history.replaceState({},"",window.location.pathname)
+    setChatOpen(true)
+  },[loading])
+
   const annahmeLaeuft=useRef(false)
   useEffect(()=>{
     if(loading||annahmeLaeuft.current) return
