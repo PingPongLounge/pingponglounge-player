@@ -16,19 +16,26 @@
 // =====================================================================
 
 import type { CSSProperties } from 'react'
+import { AKZENT } from '@/app/design'
 
 /* ---------- Farben — PLAYER V2 (07.09.2026, verbindlich) --------------------
    Drei Farben, eine Logik. Sie gilt fuer Player UND pingponglounge.ch:
 
      SCHWARZ   #080808  Atmosphaere, Hero, Navigation, Community, Bilder, Aktionen
      OFF-WHITE #F4F1EB  Lesen und Verstehen: Rankings, Zahlen, Erklaerungen
-     BLAU      #5B9CFF  Interaktion auf DUNKLEM Grund (Kontrast 7,3:1)
-     BLAU TIEF #1447E6  Interaktion auf HELLEM Grund  (Kontrast 6,1:1)
+     GRUEN     #39FF14  Interaktion auf DUNKLEM Grund (Kontrast 14:1)
+     GRUEN TIEF #0B7A33 Interaktion auf HELLEM Grund  (Kontrast 7,1:1)
 
-   Zwei Akzentwerte, nicht einer. Gemessen am 16.09.2026: das alte Violett
-   #8C3DFF erreichte 4,41:1 auf Creme und 4,03:1 auf Schwarz — auf BEIDEN
-   Gruenden unter der Norm von 4,5:1. Ein einziger Farbwert kann das nicht
-   leisten; welcher Ton es ist, spielt dabei keine Rolle.
+   Zwei Akzentwerte, nicht einer. Das gilt unveraendert weiter, jetzt in
+   Gruen: das Marken-Gruen #39FF14 erreicht auf Schwarz 14:1, auf Off-White
+   aber nur 1,26:1 — dort waere es unsichtbar. Fuer helle Flaechen gibt es
+   deshalb #0B7A33 (7,1:1). Ein einziger Farbwert kann beides nicht leisten;
+   welcher Ton es ist, spielt dabei keine Rolle.
+
+   23.09.2026: zurueck auf Gruen. Das Blau (#5B9CFF / #1447E6) war ab dem
+   16.09. die Uebergangsloesung, nachdem das Violett an beiden Kontrasten
+   gescheitert war. Gruen ist die Markenfarbe von PLAYER und erfuellt die
+   Norm auf beiden Gruenden — es gab keinen Grund, beim Blau zu bleiben.
 
    Die alten Werte standen bis hierher auf Neon-Pink (#FF00C8) und Tuerkis
    (#2BD4C4) — mit Namen wie GREEN, die schon lange nicht mehr stimmten. Die
@@ -44,23 +51,26 @@ export const MUT    = 'rgba(244,241,235,.72)'    // Labels / gedaempft (war .62 
 export const LINE   = 'rgba(244,241,235,.13)'    // dezente Trennlinie
 export const DANGER = '#E5484D'                  // Fehler / Loeschen
 
-export const GREEN  = '#5B9CFF'                  // @deprecated Name — ist UV-Violett
-export const CYAN   = '#A9C9FF'                  // heller Violett-Ton (war Tuerkis)
-export const INK    = '#080808'                  // Schrift auf violetter oder heller Flaeche
-export const GRAD   = 'linear-gradient(135deg,#5B9CFF,#A9C9FF)'   // Logo + Rang
+export const GREEN  = '#39FF14'                  // Marken-Gruen, NUR auf dunklem Grund
+export const CYAN   = '#12D45C'                  // Smaragd, das zweite Ende des Verlaufs
+export const INK    = '#080808'                  // Schrift auf gruener oder heller Flaeche
+export const GRAD   = 'linear-gradient(135deg,#39FF14,#12D45C)'   // Logo + Rang
 export const SHADOW = '0 4px 14px rgba(0,0,0,.35)'
 
 /* Neue, ehrlich benannte Namen fuer alles, was ab jetzt geschrieben wird. */
 export const SCHWARZ = '#080808'
 export const CREME   = '#F4F1EB'
-export const VIOLETT = '#5B9CFF'
-export const VIOLETT_HELL = '#A9C9FF'
+export const VIOLETT = '#39FF14'
+export const VIOLETT_HELL = '#12D45C'
 /* Akzent fuer HELLE Flaechen (Off-White, Weiss). Auf dunklem Grund nehmen
-   wir VIOLETT (= #5B9CFF), auf hellem diesen hier. Weisse Schrift auf
-   AKZENT_TIEF ist lesbar, weisse Schrift auf dem hellen Blau nicht. */
-export const AKZENT_TIEF = '#1447E6'
+   wir VIOLETT (= #39FF14), auf hellem diesen hier.
+   24.09.2026: Der Wert stand hier auf #0B7A33, auf der Startseite aber auf
+   #078A3B — zwei Gruens fuer dieselbe Aufgabe. Es gilt der Wert der
+   Startseite; er kommt jetzt aus app/design.ts und wird nur noch von dort
+   geaendert. Die 200+ Importstellen von AKZENT_TIEF bleiben unberuehrt. */
+export const AKZENT_TIEF = AKZENT
 /* Schrift auf hellblauer Flaeche — nie Weiss. */
-export const AKZENT_INK  = '#06132E'
+export const AKZENT_INK  = '#06220E'
 
 /* Zeilenabstand fuer Anton. Anton bringt fast keine eigene Luft mit; unter
    1.05 beruehren sich mehrzeilige Titel und werden zu einem Klumpen.

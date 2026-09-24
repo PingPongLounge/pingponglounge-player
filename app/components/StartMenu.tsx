@@ -3,13 +3,15 @@ import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
+import { IconSuche, IconProfil, IconRangliste, IconMatches, IconFavorit, IconBuchungen, IconLiga, IconOpenGames, IconTurniere, IconKalender } from "@/app/components/Icons"
 
 const C = "#121214", B = "#1A1A1E", W = "#fff", M = "rgba(255,255,255,.85)"
 
-function Icon({ d, fillBall }: { d: string; fillBall?: string }) {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={W} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: 6, flexShrink: 0 }} dangerouslySetInnerHTML={{ __html: d + (fillBall ? `<circle cx="${fillBall}" fill="${W}" stroke="none"/>` : "") }} />
-  )
+/* 24.09.2026: Das Menue zeichnete neun eigene Strichsymbole als rohe
+   SVG-Strings. Jetzt kommt jedes aus app/components/Icons.tsx — dem
+   PLAYER-Satz. `Ik` ist nur noch der Traeger fuer Farbe und Abstand. */
+function Ik({ children }: { children: React.ReactNode }) {
+  return <span style={{ color: W, marginRight: 6, display: "inline-flex", flexShrink: 0 }}>{children}</span>
 }
 
 function buchenLink(): string {
@@ -65,19 +67,19 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
           <span style={{ fontSize:11.5, fontWeight: open ? 900 : 700, letterSpacing: ".07em", textTransform: "uppercase" }}>Menü</span>
         </button>
       ) : avatar ? (
-        <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#5B9CFF,#A9C9FF)", color: "#FFFFFF", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+        <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#39FF14,#12D45C)", color: "#FFFFFF", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           {avatar}
         </button>
       ) : (
         <button onClick={() => setOpen(true)} aria-label="Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), background: C, borderRadius: 11, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#5B9CFF"/><stop offset="1" stopColor="#A9C9FF"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#12D45C"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
       )}
 
       {open && (
         <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 200, display: "flex", justifyContent: variant === "nav" ? "center" : "flex-end", alignItems: variant === "nav" ? "flex-end" : "stretch" }}>
           <div onClick={e => e.stopPropagation()} style={variant === "nav"
-            ? { width: "100%", maxWidth: 620, maxHeight: "84dvh", background: "#0E1013", borderTop: "2px solid #5B9CFF", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "18px 16px calc(22px + env(safe-area-inset-bottom))", overflowY: "auto", boxShadow: "0 -24px 70px rgba(0,0,0,.6)" }
+            ? { width: "100%", maxWidth: 620, maxHeight: "84dvh", background: "#0E1013", borderTop: "2px solid #39FF14", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "18px 16px calc(22px + env(safe-area-inset-bottom))", overflowY: "auto", boxShadow: "0 -24px 70px rgba(0,0,0,.6)" }
             : { width: "82%", maxWidth: 340, height: "100%", background: "#0E1013", borderLeft: `1px solid ${B}`, padding: "22px 16px", overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
               <span style={{ fontSize: 21, fontWeight: 600 }}>menü</span>
@@ -88,41 +90,41 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
 
             {authed ? (
             <Link href="/profil" onClick={() => setOpen(false)} style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 14px", background: C, borderRadius: 16, textDecoration: "none" }}>
-              <span style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#5B9CFF,#A9C9FF)", padding: 2, flexShrink: 0, display: "block" }}>
-                <span style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#13161B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.7" strokeLinecap="round"><circle cx="10" cy="9.4" r="5.4"/><path d="M13.9 13.3 19.4 18.8"/><circle cx="18" cy="6.4" r="1.8" fill="#fff" stroke="none"/></svg></span>
+              <span style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#39FF14,#12D45C)", padding: 2, flexShrink: 0, display: "block" }}>
+                <span style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#13161B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><IconSuche size={22} /></span>
               </span>
               <span style={{ flex: 1 }}>
                 <span style={{ display: "block", fontSize: 16, fontWeight: 500, color: W }}>{name}</span>
                 <span style={{ display: "block", fontSize:11.5, color: M, marginTop: 2 }}>{sub || "profil ansehen"}</span>
               </span>
-              <span style={{ color: "#5B9CFF", fontSize: 18 }}>›</span>
+              <span style={{ color: "#39FF14", fontSize: 18 }}>›</span>
             </Link>
             ) : (
             <div style={{ background: C, borderRadius: 16, padding: "15px 15px 13px" }}>
               <p style={{ fontSize: 15, fontWeight: 600, color: W, margin: 0 }}>noch nicht angemeldet</p>
               <p style={{ fontSize: 12.5, color: M, margin: "5px 0 12px" }}>mit konto: liga, pingpoints, deine spiele und ergebnisse.</p>
               <div style={{ display: "flex", gap: 8 }}>
-                <Link href="/login" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#5B9CFF", color: "#06132E", borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>anmelden</Link>
+                <Link href="/login" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#39FF14", color: "#06220E", borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>anmelden</Link>
                 <Link href="/onboarding" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#1A1A1E", color: W, borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>konto erstellen</Link>
               </div>
             </div>
             )}
 
             <div style={{ background: C, borderRadius: 16, overflow: "hidden", marginTop: 10 }}>
-              {authed && <Link2 href="/profil" label="profil" icon={<Icon d='<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>' />} />}
-              <Link2 href="/rangliste" label="rangliste" icon={<Icon d='<path d="M5 20v-6M12 20v-11M19 20v-8"/>' />} />
-              {authed && <Link2 href="/matchhistorie" label="deine spiele" icon={<Icon d='<path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/>' />} />}
-              {authed && <Link2 href="/pingpoints" label="pingpoints" icon={<Icon d='<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>' />} />}
-              <Link2 href="/shop" label="shop" icon={<Icon d='<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2l2.2 12.2a1.5 1.5 0 0 0 1.5 1.3h8.4a1.5 1.5 0 0 0 1.5-1.2L21 7H6"/>' />} />
+              {authed && <Link2 href="/profil" label="profil" icon={<Ik><IconProfil size={22} /></Ik>} />}
+              <Link2 href="/rangliste" label="rangliste" icon={<Ik><IconRangliste size={22} /></Ik>} />
+              {authed && <Link2 href="/matchhistorie" label="deine spiele" icon={<Ik><IconMatches size={22} /></Ik>} />}
+              {authed && <Link2 href="/pingpoints" label="pingpoints" icon={<Ik><IconFavorit size={22} /></Ik>} />}
+              <Link2 href="/shop" label="shop" icon={<Ik><IconBuchungen size={22} /></Ik>} />
             </div>
 
             <div style={{ fontSize:11.5, color: "rgba(255,255,255,.82)", textTransform: "uppercase", letterSpacing: ".06em", margin: "22px 4px 8px" }}>spielen &amp; buchen</div>
             <div style={{ background: C, borderRadius: 16, overflow: "hidden" }}>
-              <Link2 href="/liga" label="liga" icon={<Icon d='<path d="M5 20v-4M12 20v-8M19 20v-12"/><circle cx="19" cy="4.6" r="1.6" fill="#fff" stroke="none"/>' />} />
-              <Link2 href="/match" label="open game" icon={<Icon d='<g transform="translate(2.2 0)"><ellipse cx="10" cy="9.8" rx="6" ry="5.2" transform="rotate(-42 10 9.8)"/><path d="M14 13.6 18 17.6" stroke-width="3.4"/><circle cx="18.6" cy="5.7" r="1.6" fill="#fff" stroke="none"/></g>' />} />
-              <Link2 href="/turniere" label="turnier" icon={<Icon d='<path d="M3 6h5v5h4M3 16h5v-5M12 11h5"/><circle cx="19" cy="11" r="1.6" fill="#fff" stroke="none"/>' />} />
+              <Link2 href="/liga" label="liga" icon={<Ik><IconLiga size={22} /></Ik>} />
+              <Link2 href="/match" label="open game" icon={<Ik><IconOpenGames size={22} /></Ik>} />
+              <Link2 href="/turniere" label="turnier" icon={<Ik><IconTurniere size={22} /></Ik>} />
               <a href={buchenLink()} target="_blank" rel="noopener noreferrer" style={row}>
-                <Icon d='<path d="M4 11h16M6 11v6M18 11v6M12 11V6M10 7.6h4M10 9.5h4"/>' /><span style={{ flex: 1, fontSize: 15, fontWeight: 500, color: W }}>tisch buchen</span><span style={{ color: M, fontSize: 13 }}>↗</span>
+                <Ik><IconKalender size={22} /></Ik><span style={{ flex: 1, fontSize: 15, fontWeight: 500, color: W }}>tisch buchen</span><span style={{ color: M, fontSize: 13 }}>↗</span>
               </a>
             </div>
 

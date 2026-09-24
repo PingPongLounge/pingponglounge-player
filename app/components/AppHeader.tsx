@@ -9,7 +9,7 @@ import NotificationBell from "./NotificationBell"
 // dem Foto bzw. die oeffentliche Navigation) — hier stand bisher ein zweiter
 // Kopf darueber.
 const HIDE=["/","/entdecken","/rangliste","/profil","/spieler","/login","/onboarding","/spielen","/join","/auth","/liga","/match","/turniere","/training","/shop"]
-const BLACK="#080808",OFF="#F4F1EB",V="#5B9CFF"
+const BLACK="#080808",OFF="#F4F1EB",V="#39FF14"
 
 export default function AppHeader(){
  const path=usePathname()||"/";const[initialen,setInitialen]=useState("")

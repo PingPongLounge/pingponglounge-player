@@ -3,7 +3,7 @@ import { useEffect, useState, use } from "react"
 import { createClient } from "@/lib/supabase/client"
 
 const BG = "#121214", CARD = "#1A1A1E", W = "#fff", MUT = "rgba(255,255,255,.7)"
-const GRAD = "linear-gradient(135deg,#5B9CFF,#A9C9FF)"
+const GRAD = "linear-gradient(135deg,#39FF14,#12D45C)"
 
 export default function JoinLeaguePage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params)
@@ -49,7 +49,7 @@ export default function JoinLeaguePage({ params }: { params: Promise<{ code: str
         {state === "check" && <div style={{ color: MUT, fontSize: 14 }}>Lädt …</div>}
 
         {state === "ready" && (
-          <button onClick={join} style={{ width: "100%", background: GRAD, color: "#FFFFFF", borderRadius: 14, padding: 15, fontSize: 16, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", cursor: "pointer", fontFamily: "inherit" }}>
+          <button onClick={join} style={{ width: "100%", background: GRAD, color: "#0B0B0D", borderRadius: 14, padding: 15, fontSize: 16, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", cursor: "pointer", fontFamily: "inherit" }}>
             Jetzt beitreten
           </button>
         )}
@@ -57,7 +57,7 @@ export default function JoinLeaguePage({ params }: { params: Promise<{ code: str
         {state === "joining" && <div style={{ color: MUT, fontSize: 14 }}>Tritt bei …</div>}
 
         {state === "done" && (
-          <div style={{ color: "#5B9CFF", fontSize: 15, fontWeight: 800 }}>✓ Drin{org ? ` — ${org}` : ""}! Weiter zur Liga …</div>
+          <div style={{ color: "#39FF14", fontSize: 15, fontWeight: 800 }}>✓ Drin{org ? ` — ${org}` : ""}! Weiter zur Liga …</div>
         )}
 
         {state === "error" && (

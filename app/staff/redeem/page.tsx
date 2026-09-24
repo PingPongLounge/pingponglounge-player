@@ -5,9 +5,9 @@ const BG = "#0E0E10"
 const C  = "#1A1A1E"
 const B  = "#1A1A1E"
 const M  = "rgba(255,255,255,0.66)"
-const G  = "#5B9CFF"
+const G  = "#39FF14"
 const W  = "#FFFFFF"
-const GRAD = "linear-gradient(135deg,#5B9CFF 0%,#00D4AA 50%,#A9C9FF 100%)"
+const GRAD = "linear-gradient(135deg,#39FF14 0%,#0FC24E 50%,#12D45C 100%)"
 
 export default function StaffRedeemPage() {
   const [code, setCode]       = useState("")

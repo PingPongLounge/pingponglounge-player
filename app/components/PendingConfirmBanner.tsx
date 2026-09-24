@@ -1,6 +1,7 @@
 "use client"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
+import { IconGlocke } from "@/app/components/Icons"
 
 type Item = { id: string; opponent: string; scoreLine: string; iWon: boolean }
 
@@ -25,7 +26,7 @@ export default function PendingConfirmBanner() {
   }, [])
 
   if (items.length === 0) return null
-  const GRAD = "linear-gradient(135deg,#5B9CFF,#A9C9FF)"
+  const GRAD = "linear-gradient(135deg,#39FF14,#12D45C)"
 
   const one = items.length === 1 ? items[0] : null
   const href = one ? `/liga/match/${one.id}` : "/liga"
@@ -42,16 +43,14 @@ export default function PendingConfirmBanner() {
         borderRadius: 16, padding: "13px 15px", margin: "0 0 14px",
       }}
     >
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }}>
-        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.7 21a2 2 0 0 1-3.4 0" />
-      </svg>
+      <IconGlocke size={24} style={{ color: "#fff" }} />
       <span style={{ flex: 1, minWidth: 0 }}>
         <span style={{ display: "block", fontSize: 14, fontWeight: 800, color: "#fff", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{title}</span>
         <span style={{ display: "block", fontSize: 12.5, fontWeight: 500, color: "rgba(255,255,255,.72)", marginTop: 1 }}>{sub}</span>
       </span>
       <span style={{
         flexShrink: 0, fontSize:11.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".04em",
-        color: "#FFFFFF", background: GRAD, borderRadius: 9, padding: "9px 13px",
+        color: "#0B0B0D", background: GRAD, borderRadius: 9, padding: "9px 13px",
       }}>Bestätigen</span>
     </button>
   )

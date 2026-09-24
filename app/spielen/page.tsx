@@ -1,12 +1,20 @@
 "use client"
+/* PLAYER · SPIELEN — der Einstieg ohne Konto (zwei Schritte).
+
+   24.09.2026: auf das Design-System V3 gezogen. Derselbe Kopf wie die
+   Startseite, dieselbe Anton-Zeile, dieselben Karten, Felder und Knoepfe.
+   Weg sind der Leuchtring um die Rating-Zahl, die Level-Farben und das
+   Gold der PingPoints — das System kennt Schwarz, Weiss, Neutralgrau und
+   EIN Gruen als Signal.
+
+   Die Logik ist unveraendert: dieselbe Satz-Validierung, dieselbe
+   provisorische ELO, derselbe /api/spielen/preview-Aufruf, dasselbe
+   localStorage-Paket und dieselben Weiterleitungen. */
 import { useEffect, useState, Suspense } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
-import { BG, CELL, W, SUB, MUT, GREEN, lvColor, ratingLabel, btn, cardPad } from "@/app/theme"
-
-const G = GREEN
-const DARK = BG
-const TEXT = W
-const MUTED = MUT
+import PlayerKopf from "@/app/components/PlayerKopf"
+import { ratingLabel } from "@/app/theme"
+import { INTER, TEXT, LEISE, BG, AKZENT, knopf } from "@/app/design"
 
 // Level 1–7 wie im Rest der App. Hier standen noch die abgeschafften Namen
 // Rookie/Challenger/Advanced/Elite — der Neuling bekam ein Level angezeigt,
@@ -29,9 +37,6 @@ function levelForElo(elo: number) {
 }
 
 type SetScore = { you: string; opp: string }
-
-const inp: React.CSSProperties = { flex: 1, background: CELL, borderRadius: "12px", padding: "12px", fontSize: "18px", fontWeight: 700, color: TEXT, outline: "none", textAlign: "center", boxSizing: "border-box", fontFamily: "inherit" }
-const primaryBtn = (disabled = false): React.CSSProperties => ({ ...btn, width: "100%", padding: "16px", marginTop: "14px", opacity: disabled ? 0.5 : 1, cursor: disabled ? "not-allowed" : "pointer" })
 
 function SpielenInner() {
   const router = useRouter()
@@ -107,108 +112,122 @@ function SpielenInner() {
 
   const level = levelForElo(provisionalElo)
 
-  const wrap: React.CSSProperties = { minHeight: "100vh", background: DARK, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }
-  const box: React.CSSProperties = { maxWidth: "400px", width: "100%" }
-
   // ── Screen A: Gerade gespielt? ────────────────────────────────
   if (screen === "A") return (
-    <div style={wrap}><div style={box}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>Gerade gespielt?</span>
-        <span style={{ fontSize: "11px", color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em" }}>PLAYER</span>
-      </div>
-      <h2 style={{ fontSize: "28px", fontWeight: 900, color: TEXT, textTransform: "uppercase", letterSpacing: ".04em", marginBottom: "6px" }}>Dein Resultat</h2>
-      <p style={{ fontSize: "14px", color: MUTED, fontWeight: 300, marginBottom: "24px" }}>
-        {ort ? <>Trag dein Ergebnis aus <span style={{ color: TEXT, fontWeight: 700 }}>{ort}</span> ein.</> : "Trag dein Ergebnis Satz für Satz ein."}
-      </p>
-
-      <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "10px", padding: "0 4px" }}>
-        <span style={{ fontSize: "12px", color: SUB, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>Du</span>
-        <span style={{ fontSize: "12px", color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.08em" }}>Gegner</span>
-      </div>
-
-      {sets.map((s, i) => (
-        <div key={i} style={{ display: "flex", alignItems: "center", gap: "8px", marginBottom: "8px" }}>
-          <span style={{ fontSize: "12px", color: MUTED, width: 50, flexShrink: 0 }}>Satz {i + 1}</span>
-          <input value={s.you} onChange={e => updateSet(i, "you", e.target.value)} placeholder="11" style={inp} type="number" inputMode="numeric" min={0} max={30} />
-          <span style={{ color: MUTED, fontSize: "16px" }}>:</span>
-          <input value={s.opp} onChange={e => updateSet(i, "opp", e.target.value)} placeholder="8" style={inp} type="number" inputMode="numeric" min={0} max={30} />
-          {i >= 3 && <button type="button" onClick={() => removeSet(i)} style={{ background: "none", color: MUTED, cursor: "pointer", fontSize: "18px", flexShrink: 0 }}>×</button>}
+    <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+      <header className="p-hero">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/ppl-liga.jpg" alt="" aria-hidden className="p-foto" style={{ objectPosition: "50% 45%" }} />
+        <div aria-hidden className="p-hero-schleier" />
+        <PlayerKopf navigation={false} />
+        <div className="p-spalte p-hero-inhalt">
+          <h1 className="p-h1">Resultat</h1>
+          <p className="p-eyebrow">
+            {ort ? <>Dein Ergebnis aus {ort}</> : <>Trag dein Ergebnis<br />Satz für Satz ein.</>}
+          </p>
         </div>
-      ))}
+      </header>
 
-      {sets.length < 5 && (
-        <button type="button" onClick={addSet} style={{ width: "100%", background: CELL, borderRadius: "12px", padding: "10px", color: MUTED, cursor: "pointer", fontSize: "13px", marginTop: "4px", fontFamily: "inherit" }}>
-          + Satz hinzufügen
-        </button>
-      )}
+      <div className="p-lese" style={{ paddingTop: 18, paddingBottom: 34, maxWidth: 560 }}>
+        <section className="p-karte">
+          <div className="p-kopf">
+            <h2>Sätze</h2>
+            <span className="p-mehr">Du · Gegner</span>
+          </div>
 
-      {error && <p style={{ fontSize: "13px", color: "#f87171", marginTop: "12px" }}>{error}</p>}
+          <div style={{ padding: 18 }}>
+            {sets.map((s, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8 }}>
+                <span className="p-label" style={{ width: 52, flexShrink: 0 }}>Satz {i + 1}</span>
+                <input value={s.you} onChange={e => updateSet(i, "you", e.target.value)} placeholder="11"
+                  className="p-feld zahl" type="number" inputMode="numeric" min={0} max={30} aria-label={`Satz ${i + 1}, deine Punkte`} />
+                <span style={{ color: LEISE, fontSize: 15, flexShrink: 0 }}>:</span>
+                <input value={s.opp} onChange={e => updateSet(i, "opp", e.target.value)} placeholder="8"
+                  className="p-feld zahl" type="number" inputMode="numeric" min={0} max={30} aria-label={`Satz ${i + 1}, Punkte des Gegners`} />
+                {i >= 3 && (
+                  <button type="button" onClick={() => removeSet(i)} aria-label={`Satz ${i + 1} entfernen`}
+                    style={{ flexShrink: 0, width: 32, height: 32, color: LEISE, fontSize: 18, cursor: "pointer" }}>×</button>
+                )}
+              </div>
+            ))}
 
-      <button type="button" style={primaryBtn(false)} onClick={goToResult}>Resultat ansehen →</button>
-      <button type="button" onClick={() => router.push("/login")} style={{ width: "100%", background: "none", color: MUTED, fontSize: "12px", textDecoration: "underline", cursor: "pointer", marginTop: "14px", fontFamily: "inherit" }}>
-        Ich will mich nur anmelden
-      </button>
-    </div></div>
+            {sets.length < 5 && (
+              <button type="button" onClick={addSet} className="p-textlink" style={{ marginTop: 6 }}>
+                + Satz hinzufügen
+              </button>
+            )}
+
+            {error && <p className="p-fehler">{error}</p>}
+          </div>
+        </section>
+
+        <div className="p-abschnitt">
+          <button type="button" onClick={goToResult} style={{ ...knopf, width: "100%" }}>Resultat ansehen →</button>
+          <button type="button" onClick={() => router.push("/login")} className="p-textlink">
+            Ich will mich nur anmelden
+          </button>
+        </div>
+      </div>
+    </main>
   )
 
   // ── Screen B: Du bist jetzt Spieler (Aha) ─────────────────────
   return (
-    <div style={wrap}><div style={box}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <span style={{ fontSize: "11px", fontWeight: 700, color: MUTED, letterSpacing: "0.14em", textTransform: "uppercase" }}>Du bist jetzt Spieler</span>
-        <span style={{ fontSize: "11px", color: MUTED, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.14em" }}>PLAYER</span>
-      </div>
+    <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+      <header className="p-hero">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src="/ppl-liga.jpg" alt="" aria-hidden className="p-foto" style={{ objectPosition: "50% 45%" }} />
+        <div aria-hidden className="p-hero-schleier" />
+        <PlayerKopf navigation={false} />
+        <div className="p-spalte p-hero-inhalt">
+          <h1 className="p-h1">{ratingLabel(provisionalElo)}</h1>
+          <p className="p-eyebrow">Dein Rating.<br />Du bist jetzt Spieler.</p>
 
-      {/* ELO-Ring / Card */}
-      <div style={{ ...cardPad, padding: "28px 20px", textAlign: "center", marginBottom: "16px" }}>
-        <div style={{
-          width: 140, height: 140, margin: "0 auto 16px", borderRadius: "50%",
-          background: "#1A1A1E", display: "flex", flexDirection: "column",
-          alignItems: "center", justifyContent: "center",
-          boxShadow: `0 0 28px ${lvColor(level.name)}33`,
-        }}>
-          <span style={{ fontSize: "11px", color: MUTED, fontWeight: 700, letterSpacing: "0.14em", textTransform: "uppercase" }}>Rating</span>
-          <span style={{ fontSize: "44px", fontWeight: 900, color: TEXT, lineHeight: 1 }}>{ratingLabel(provisionalElo)}</span>
+          <div className="p-streifen">
+            <div>
+              <span className="zahl">{level.name}</span>
+              <span className="was">Level</span>
+            </div>
+            <div>
+              <span className="zahl">{rankLoading ? "…" : rank !== null ? `#${rank}` : "—"}</span>
+              <span className="was">Start-Rang</span>
+            </div>
+          </div>
         </div>
+      </header>
 
-        <p style={{ fontSize: "11px", fontWeight: 700, color: lvColor(level.name), letterSpacing: "0.14em", textTransform: "uppercase", marginBottom: "4px" }}>Dein Level</p>
-        <h2 style={{ fontSize: "32px", fontWeight: 900, color: lvColor(level.name), textTransform: "uppercase", marginBottom: "16px", letterSpacing: "-0.02em" }}>{level.name}</h2>
-
-        {/* Rang */}
-        <div style={{ borderTop: "1px solid " + CELL, paddingTop: "16px" }}>
-          {rankLoading ? (
-            <p style={{ fontSize: "13px", color: MUTED }}>Rang wird berechnet…</p>
-          ) : rank !== null ? (
-            <p style={{ fontSize: "14px", color: TEXT }}>
-              Geschätzter Start-Rang <span style={{ color: G, fontWeight: 900, fontSize: "22px" }}>#{rank}</span>
+      <div className="p-lese" style={{ paddingTop: 18, paddingBottom: 34, maxWidth: 560 }}>
+        <section className="p-karte">
+          <div className="p-kopf"><h2>Was jetzt passiert</h2></div>
+          <div style={{ padding: 18 }}>
+            <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: TEXT }}>
+              {won
+                ? "Sieg eingetragen — dein Rating bekommt einen Bonus."
+                : "Resultat eingetragen. Sicher dir jetzt deinen Rang."}
             </p>
-          ) : (
-            <p style={{ fontSize: "13px", color: MUTED, lineHeight: 1.5 }}>Dein Rang wird nach dem Sichern berechnet.</p>
-          )}
+            {rank === null && !rankLoading && (
+              <p style={{ margin: "8px 0 0", fontSize: 13, color: LEISE, lineHeight: 1.5 }}>
+                Dein Rang wird nach dem Sichern berechnet.
+              </p>
+            )}
+            <p style={{ margin: "14px 0 0", fontSize: 13, color: LEISE }}>
+              <b style={{ color: AKZENT, fontWeight: 600 }}>+10 PingPoints</b> nach dem Sichern
+            </p>
+          </div>
+        </section>
+
+        <div className="p-abschnitt">
+          <button type="button" onClick={saveProfile} style={{ ...knopf, width: "100%" }}>Profil sichern →</button>
+          <button type="button" onClick={() => router.push("/login")} className="p-textlink">Später</button>
         </div>
       </div>
-
-      {/* PingPoints Chip */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", background: CELL, borderRadius: "12px", padding: "12px", marginBottom: "8px" }}>
-        <span style={{ color: "#FFD700", fontWeight: 900, fontSize: "15px" }}>+10 PingPoints</span>
-        <span style={{ color: MUTED, fontSize: "12px" }}>nach dem Sichern</span>
-      </div>
-      <p style={{ fontSize: "12px", color: MUTED, textAlign: "center", marginBottom: "8px", lineHeight: 1.5 }}>
-        {won ? "Sieg eingetragen — dein Rating bekommt einen Bonus." : "Resultat eingetragen. Sicher dir jetzt deinen Rang."}
-      </p>
-
-      <button type="button" style={primaryBtn(false)} onClick={saveProfile}>Profil sichern →</button>
-      <button type="button" onClick={() => router.push("/login")} style={{ width: "100%", background: "none", color: MUTED, fontSize: "12px", textDecoration: "underline", cursor: "pointer", marginTop: "14px", fontFamily: "inherit" }}>
-        Später
-      </button>
-    </div></div>
+    </main>
   )
 }
 
 export default function SpielenPage() {
   return (
-    <Suspense fallback={<div style={{ minHeight: "100vh", background: DARK }} />}>
+    <Suspense fallback={<div style={{ minHeight: "100dvh", background: BG }} />}>
       <SpielenInner />
     </Suspense>
   )

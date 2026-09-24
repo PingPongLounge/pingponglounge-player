@@ -1,24 +1,22 @@
 "use client"
-/* PLAYER V2 — EVENTS (07.09.2026, Oliver).
+/* PLAYER · TURNIERE — auf das Design-System V3 gezogen (24.09.2026).
 
-   Die Seite beantwortet: "Was läuft demnächst und wo kann ich mitmachen?"
-   Sie soll Lust machen, nicht wie eine Terminverwaltung wirken — deshalb
-   traegt ein echtes PPL-Foto den Kopf, und die Liste steht auf Off-White,
-   weil Datum, Ort und freie Plaetze gelesen werden muessen.
+   Die Startseite ist die visuelle Vorgabe: dunkler Kopf mit Foto und
+   PlayerKopf, EINE Anton-Zeile, Eyebrow, Kennzahlenstreifen — darunter
+   .p-karte, .p-kopf, .p-zeile und die Datumskachel .p-datum, genau wie in
+   der Turnierliste auf /entdecken.
 
-   Aufbau nach Referenz-Mockup: HERO (Foto, EVENTS, PLAY. MEET. REPEAT.),
-   darunter mit gerader Kante die Off-White-Flaeche mit den naechsten
-   Terminen, der Community und den vergangenen Turnieren.
-   Daten und Funktionen unveraendert: /api/turniere, dieselben Felder. */
+   Inhalte und Funktionen unveraendert: /api/turniere, dieselbe Trennung in
+   kommende und vergangene Turniere, dieselben Links, dieselbe
+   Community-Bildreihe, dieselben zwei Knoepfe am Schluss.
+   Eventnamen werden nicht gekuerzt — bei wenig Platz rutscht der
+   Anmelde-Knopf auf eine eigene Zeile (siehe .p-zeile.hat-cta). */
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-import HeroKopf from "@/app/components/HeroKopf"
-import {
-  Hero, Inhalt, AbschnittKopf, Feld, ListenZeile, DatumBlock, Pille, Pfeil,
-  knopfPrimaer, knopfKlein, knopfOutlineHell, TEXT_LEISE, FLAECHE,
-} from "@/app/components/V2"
-import { SCHWARZ, INTER } from "@/app/theme"
+import PlayerKopf from "@/app/components/PlayerKopf"
+import { IconChevron } from "@/app/components/Icons"
+import { INTER, TEXT, LEISE, BG, knopf, knopfUmriss } from "@/app/design"
 
 type Tournament = {
   id: string; name: string; date: string; city: string; skill_class: string
@@ -33,6 +31,9 @@ function datum(d: string) {
   const t = new Date(`${d}T12:00:00`)
   return t.toLocaleDateString("de-CH", { weekday: "short", day: "numeric", month: "long" })
 }
+const tagKurz = (d: string) => d ? new Date(`${d}T12:00:00`).toLocaleDateString("de-CH", { weekday: "short" }).replace(".", "") : "—"
+const tagZahl = (d: string) => d ? new Date(`${d}T12:00:00`).getDate() : "–"
+const tagMon = (d: string) => d ? new Date(`${d}T12:00:00`).toLocaleDateString("de-CH", { month: "short" }).replace(".", "") : ""
 
 export default function TurnierePage() {
   const [tournaments, setTournaments] = useState<Tournament[]>([])
@@ -54,101 +55,143 @@ export default function TurnierePage() {
   const kommend = tournaments.filter(t => !t.date || t.date >= heute)
   const vorbei = tournaments.filter(t => t.date && t.date < heute).slice(0, 4)
 
+  const freiGesamt = kommend.reduce((s, t) => {
+    const an = t.tournament_registrations?.[0]?.count ?? 0
+    return s + Math.max(0, (t.max_players || 0) - an)
+  }, 0)
+
   return (
     <>
-      <main style={{ minHeight: "100dvh", background: FLAECHE, color: SCHWARZ, fontFamily: INTER }}>
+      <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
 
-        <Hero
-          bild="/ppl-lachen.jpg" pos="62% 46%"
-          kopf={<HeroKopf />}
-          etikett="Events"
-          titel={<>Play.<br />Meet.<br />Repeat.</>}
-          subline={<>Turniere, Open Games und<br />Community Events in deiner Nähe.</>}
-        />
+        <header className="p-hero">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/ppl-spielen.jpg" alt="" aria-hidden className="p-foto" style={{ objectPosition: "50% 45%" }} />
+          <div aria-hidden className="p-hero-schleier" />
 
-        <Inhalt>
+          <PlayerKopf />
+
+          <div className="p-spalte p-hero-inhalt">
+            <h1 className="p-h1">Turniere</h1>
+            <p className="p-eyebrow">Turniere, Open Games<br />und Events in deiner Nähe.</p>
+
+            <div className="p-streifen">
+              <div>
+                <span className="zahl">{kommend.length || "—"}</span>
+                <span className="was">Kommend</span>
+              </div>
+              <div>
+                <span className="zahl">{freiGesamt || "—"}</span>
+                <span className="was">Plätze frei</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="p-lese" style={{ paddingTop: 18, paddingBottom: 34 }}>
+
           {/* ── Naechste Events ── */}
-          <AbschnittKopf titel="Nächste Events" mehr="Erstellen" href="/turniere/neu" />
+          <section className="p-karte">
+            <div className="p-kopf">
+              <h2>Nächste Events</h2>
+              <Link href="/turniere/neu" className="p-mehr">Erstellen →</Link>
+            </div>
 
-          {loading && <p style={{ fontSize: 15, color: TEXT_LEISE, margin: 0 }}>Turniere werden geladen …</p>}
+            {loading && <p className="p-leer">Turniere werden geladen …</p>}
 
-          {!loading && error && (
-            <Feld padding={16}>
-              <p style={{ fontSize: 15, color: TEXT_LEISE, margin: "0 0 14px" }}>{error}</p>
-              <button onClick={load} style={knopfOutlineHell}>Nochmals</button>
-            </Feld>
-          )}
+            {!loading && error && (
+              <div style={{ padding: 18 }}>
+                <p style={{ margin: "0 0 14px", fontSize: 14, color: LEISE }}>{error}</p>
+                <button onClick={load} style={knopfUmriss}>Nochmals</button>
+              </div>
+            )}
 
-          {!loading && !error && kommend.length === 0 && (
-            <Feld padding={20}>
-              <p style={{ fontSize: 15.5, color: TEXT_LEISE, margin: 0, lineHeight: 1.55 }}>
+            {!loading && !error && kommend.length === 0 && (
+              <p className="p-leer">
                 Die nächsten Turniere stehen bald fest. Bis dahin:{" "}
-                <Link href="/match" style={{ color: "#0E3AAE", fontWeight: 700 }}>Open Games ansehen →</Link>
+                <Link href="/match" style={{ color: TEXT, fontWeight: 600 }}>Open Games ansehen →</Link>
               </p>
-            </Feld>
-          )}
+            )}
 
-          {!loading && !error && kommend.length > 0 && (
-            <Feld>
-              {kommend.map((t, i) => {
-                const angemeldet = t.tournament_registrations?.[0]?.count ?? 0
-                const frei = Math.max(0, (t.max_players || 0) - angemeldet)
-                const offen = t.status === "open"
-                const d = t.date ? new Date(`${t.date}T12:00:00`) : null
-                return (
-                  <ListenZeile
-                    key={t.id}
-                    erste={i === 0}
-                    links={<DatumBlock tag={d ? d.getDate() : "–"} monat={d ? d.toLocaleDateString("de-CH", { month: "short" }).replace(".", "") : ""} />}
-                    titel={<Link href={`/turniere/${t.id}`} style={{ color: SCHWARZ, textDecoration: "none" }}>{t.name}</Link>}
-                    unter={`${t.format === "ko" ? "Turnier · K.-o." : "Turnier · Gruppen + K.o."}${t.skill_class ? ` · ${t.skill_class}` : ""}`}
-                    meta={`${t.city || "Ort offen"}${t.max_players ? ` · ${frei > 0 ? `${frei} Plätze frei` : "ausgebucht"}` : ""}`}
-                    rechts={offen
-                      ? <Link href={`/turniere/${t.id}`} style={knopfKlein}>Anmelden</Link>
-                      : <Pille text={STATUS[t.status] || t.status} />}
-                  />
-                )
-              })}
-            </Feld>
-          )}
+            {!loading && !error && kommend.map(t => {
+              const angemeldet = t.tournament_registrations?.[0]?.count ?? 0
+              const frei = Math.max(0, (t.max_players || 0) - angemeldet)
+              const offen = t.status === "open"
+              return (
+                <div key={t.id} className="p-zeile hat-cta">
+                  <span className="p-datum voll">
+                    <span className="wt">{tagKurz(t.date)}</span>
+                    <span className="tag">{tagZahl(t.date)}</span>
+                    <span className="mon">{tagMon(t.date)}</span>
+                  </span>
+
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <Link href={`/turniere/${t.id}`} style={{ color: TEXT, textDecoration: "none" }}>
+                      <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>{t.name}</b>
+                    </Link>
+                    <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 400, color: LEISE }}>
+                      {t.format === "ko" ? "Turnier · K.-o." : "Turnier · Gruppen + K.o."}{t.skill_class ? ` · ${t.skill_class}` : ""}
+                    </span>
+                    <span style={{ display: "block", marginTop: 2, fontSize: 13, fontWeight: 400, color: LEISE }}>
+                      {t.city || "Ort offen"}{t.max_players ? ` · ${frei > 0 ? `${frei} Plätze frei` : "ausgebucht"}` : ""}
+                    </span>
+                  </span>
+
+                  <span className="cta">
+                    {offen
+                      ? <Link href={`/turniere/${t.id}`} className="p-aktion">Anmelden</Link>
+                      : <span className="p-pille">{STATUS[t.status] || t.status}</span>}
+                  </span>
+                </div>
+              )
+            })}
+          </section>
 
           {/* ── Community: echte Bilder aus der Lounge ── */}
-          <div style={{ marginTop: 28 }}>
-            <AbschnittKopf titel="Community" mehr="Feed" href="/feed" />
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8 }}>
-              {["/ppl-lachen.jpg", "/ppl-home.jpg", "/ppl-tisch.jpg"].map(src => (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img key={src} src={src} alt="" aria-hidden style={{
-                  width: "100%", aspectRatio: "4 / 3", objectFit: "cover", borderRadius: 10, display: "block",
-                }} />
-              ))}
+          <section className="p-karte p-abschnitt">
+            <div className="p-kopf">
+              <h2>Community</h2>
+              <Link href="/feed" className="p-mehr">Feed →</Link>
             </div>
-            <p style={{ fontFamily: INTER, fontSize: 15, color: SCHWARZ, fontWeight: 700, margin: "12px 0 2px" }}>
-              Great games. Better people.
-            </p>
-            <p style={{ fontFamily: INTER, fontSize: 13.5, color: TEXT_LEISE, margin: 0 }}>
-              Impressionen aus unseren Lounges.
-            </p>
-          </div>
+            <div style={{ padding: 18 }}>
+              <div className="p-bilder">
+                {["/ppl-lachen.jpg", "/ppl-home.jpg", "/ppl-tisch.jpg"].map(src => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img key={src} src={src} alt="" aria-hidden />
+                ))}
+              </div>
+              <p style={{ margin: "14px 0 2px", fontSize: 15, fontWeight: 600, color: TEXT }}>
+                Great games. Better people.
+              </p>
+              <p style={{ margin: 0, fontSize: 13, fontWeight: 400, color: LEISE }}>
+                Impressionen aus unseren Lounges.
+              </p>
+            </div>
+          </section>
 
           {/* ── Zuletzt gespielt ── */}
           {vorbei.length > 0 && (
-            <div style={{ marginTop: 28 }}>
-              <Feld titel="Zuletzt gespielt">
-                {vorbei.map((t, i) => (
-                  <Link key={t.id} href={`/turniere/${t.id}`} style={{ textDecoration: "none", display: "block" }}>
-                    <ListenZeile erste={i === 0} titel={t.name} unter={`${datum(t.date)}${t.city ? ` · ${t.city}` : ""}`} rechts={<Pfeil />} />
-                  </Link>
-                ))}
-              </Feld>
-            </div>
+            <section className="p-karte p-abschnitt">
+              <div className="p-kopf"><h2>Zuletzt gespielt</h2></div>
+              {vorbei.map(t => (
+                <Link key={t.id} href={`/turniere/${t.id}`} className="p-zeile">
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>{t.name}</b>
+                    <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 400, color: LEISE }}>
+                      {datum(t.date)}{t.city ? ` · ${t.city}` : ""}
+                    </span>
+                  </span>
+                  <IconChevron size={19} style={{ color: LEISE }} />
+                </Link>
+              ))}
+            </section>
           )}
 
-          <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 26, maxWidth: 480 }}>
-            <Link href="/match" style={{ ...knopfPrimaer, flex: "1 1 170px" }}>Open Games</Link>
-            <Link href="/liga" style={{ ...knopfOutlineHell, flex: "1 1 130px" }}>Liga</Link>
+          <div className="p-knopfreihe">
+            <Link href="/match" style={knopf}>Open Games</Link>
+            <Link href="/liga" style={knopfUmriss}>Liga</Link>
           </div>
-        </Inhalt>
+        </div>
       </main>
       <BottomNav />
     </>

@@ -10,9 +10,9 @@ import { NextRequest, NextResponse } from "next/server"
 export const runtime = "nodejs"
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
-const G = "#5B9CFF"
+const G = "#39FF14"
 
-const GRAD = "linear-gradient(135deg,#5B9CFF,#A9C9FF)"
+const GRAD = "linear-gradient(135deg,#39FF14,#12D45C)"
 const CARD = "#1A1A1E"
 
 function page(title: string, text: string, ok: boolean) {

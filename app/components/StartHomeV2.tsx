@@ -1,11 +1,13 @@
 "use client"
-/* PLAYER V2 — HOME (07.09.2026, nach dem Referenz-Mockup).
+/* PLAYER · HOME — die eingeloggte Startseite.
 
-   HOME beantwortet eine Frage: "Was ist fuer mich jetzt wichtig?"
+   Sie beantwortet eine Frage: "Was ist fuer mich jetzt wichtig?"
 
-     HERO      Venue-Bild, Etikett HOME, YOUR GAME., zwei Zeilen Erklaerung
-     INHALT    Dein naechstes Match · vier Zahlen · deine letzten Matches
-               danach, wenn vorhanden: was in der Community laeuft
+   24.09.2026: auf das Design-System V3 gezogen und damit auf denselben
+   Stand wie die oeffentliche Startseite, die die visuelle Vorgabe ist —
+   derselbe Kopf (Foto, PlayerKopf, eine Anton-Zeile, Eyebrow,
+   Kennzahlenstreifen) und darunter .p-karte / .p-kopf / .p-zeile.
+   Eingeloggte und Ausgeloggte sehen ab jetzt dieselbe Sprache.
 
    Alles hier sind echte Daten aus entdecken/page.tsx. Fehlt etwas, faellt
    der Block weg — es wird nichts erfunden. */
@@ -13,12 +15,9 @@ import Link from "next/link"
 import BottomNav from "./BottomNav"
 import PendingConfirmBanner from "./PendingConfirmBanner"
 import ProfilAvatar from "./ProfilAvatar"
-import HeroKopf from "./HeroKopf"
-import {
-  Hero, Inhalt, Feld, StatsKacheln, ListenZeile, Pfeil, Pille,
-  knopfKlein, TEXT_LEISE, FLAECHE,
-} from "./V2"
-import { SCHWARZ, VIOLETT, INTER } from "@/app/theme"
+import PlayerKopf from "./PlayerKopf"
+import { IconChevron } from "./Icons"
+import { INTER, TEXT, LEISE, BG } from "@/app/design"
 
 export type Game = { id: string; href: string; day: string; time: string; title: string; sub: string; frei: number; full: boolean; ratio: string }
 export type Aktivitaet = { art: "forderung" | "neu"; id: string; spielerId: string; name: string; avatar: string | null; text: string }
@@ -38,140 +37,177 @@ export default function StartHomeV2(d: StartData) {
   const winrate = d.played ? Math.round((d.wins / d.played) * 100) : 0
   const aktiv = d.aktivitaet || []
   const letzte = d.letzteMatches || []
+  const ligaRang = d.season.has && d.season.leagueRank ? d.season.leagueRank : d.rank
+  const ligaLabel = d.season.has && d.season.leagueRank ? "Liga" : "Schweiz"
 
   return (
     <>
-      <main style={{ minHeight: "100dvh", background: FLAECHE, color: SCHWARZ, fontFamily: INTER }}>
+      <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
 
         {/* 16.09.2026 (Oliver): Auf der Startseite steht der Name und der
-            Claim — sonst nichts. Kein Etikett, kein YOUR GAME, keine
-            Erklaerzeile. Was zu tun ist, steht in den Kaestchen darunter. */}
-        <Hero
-          kopf={<HeroKopf />}
-          titel={<>Player<span style={{ color: VIOLETT }}>.</span></>}
-          subline={<>Die Ping Pong Liga<br />der Schweiz.</>}
-        />
+            Claim — sonst nichts. Was zu tun ist, steht in den Kaestchen
+            darunter. Derselbe Kopf wie auf der oeffentlichen Startseite. */}
+        <header className="p-hero">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/player-hero.jpg" alt="" aria-hidden className="p-foto" style={{ objectPosition: "50% 62%" }} />
+          <div aria-hidden className="p-hero-schleier" />
 
-        <Inhalt>
-          <div style={{ marginBottom: 22 }}><PendingConfirmBanner /></div>
+          <PlayerKopf />
 
-          {/* ── Dein naechstes Match + die vier Zahlen ── */}
-          <Feld titel="Dein nächstes Match" mehr={d.games.length ? "Alle" : undefined} href={d.games.length ? "/match" : undefined}>
+          <div className="p-spalte p-hero-inhalt">
+            <h1 className="p-h1">Player</h1>
+            <p className="p-eyebrow">Die Ping Pong Liga<br />der Schweiz.</p>
+
+            <div className="p-streifen">
+              <div>
+                <span className="zahl">{d.elo}</span>
+                <span className="was">Rating</span>
+              </div>
+              <div>
+                <span className="zahl">#{ligaRang}</span>
+                <span className="was">{ligaLabel}</span>
+              </div>
+              <div>
+                <span className="zahl">{winrate}%</span>
+                <span className="was">Win Rate</span>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        <div className="p-lese" style={{ paddingTop: 18, paddingBottom: 34 }}>
+          <PendingConfirmBanner />
+
+          {/* ── Dein naechstes Match ── */}
+          <section className="p-karte">
+            <div className="p-kopf">
+              <h2>Dein nächstes Match</h2>
+              {d.games.length > 0 && <Link href="/match" className="p-mehr">Alle →</Link>}
+            </div>
             {d.nextGame ? (
-              <Link href={d.nextGame.href} style={{ textDecoration: "none", display: "block" }}>
-                <ListenZeile
-                  erste
-                  links={<ProfilAvatar src={d.avatarUrl} name={d.firstName} groesse={46} />}
-                  titel={d.nextGame.location}
-                  unter={d.nextGame.when}
-                  rechts={<Pfeil />}
-                />
+              <Link href={d.nextGame.href} className="p-zeile">
+                <ProfilAvatar src={d.avatarUrl} name={d.firstName} groesse={46} />
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>{d.nextGame.location}</b>
+                  <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 400, color: LEISE }}>{d.nextGame.when}</span>
+                </span>
+                <IconChevron size={19} style={{ color: LEISE }} />
               </Link>
             ) : (
-              <Link href="/match" style={{ textDecoration: "none", display: "block" }}>
-                <ListenZeile
-                  erste
-                  titel="Noch kein Spiel eingetragen"
-                  unter="Offene Spiele in deiner Nähe ansehen"
-                  rechts={<Pfeil />}
-                />
+              <Link href="/match" className="p-zeile">
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>Noch kein Spiel eingetragen</b>
+                  <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 400, color: LEISE }}>Offene Spiele in deiner Nähe ansehen</span>
+                </span>
+                <IconChevron size={19} style={{ color: LEISE }} />
               </Link>
             )}
-          </Feld>
+          </section>
 
           {/* ── Dein Stand: vier Kaestchen, jedes fuehrt irgendwohin ── */}
-          <div style={{ marginTop: 26 }}>
-            <h2 style={{
-              fontFamily: INTER, fontSize: 17, fontWeight: 900, letterSpacing: ".04em",
-              textTransform: "uppercase", margin: "0 0 12px", color: SCHWARZ,
-            }}>Dein Stand</h2>
-            <StatsKacheln werte={[
-              { wert: d.elo, label: "Rating", ziel: "/profil", zielLabel: "Profil" },
-              {
-                wert: d.season.has && d.season.leagueRank ? `#${d.season.leagueRank}` : `#${d.rank}`,
-                label: d.season.has && d.season.leagueRank ? "Liga" : "Schweiz",
-                akzent: true, ziel: "/liga", zielLabel: "Liga",
-              },
-              { wert: d.played, label: "Matches", ziel: "/matchhistorie", zielLabel: "Historie" },
-              { wert: `${winrate}%`, label: "Win Rate", ziel: "/profil", zielLabel: "Profil" },
-            ]} />
-          </div>
+          <section className="p-karte p-abschnitt">
+            <div className="p-kopf"><h2>Dein Stand</h2></div>
+            <div className="p-kacheln">
+              <Link href="/profil" className="p-kachel">
+                <span className="zahl">{d.elo}</span><span className="was">Rating</span>
+              </Link>
+              <Link href="/liga" className="p-kachel">
+                <span className="zahl">#{ligaRang}</span><span className="was">{ligaLabel}</span>
+              </Link>
+              <Link href="/matchhistorie" className="p-kachel">
+                <span className="zahl">{d.played}</span><span className="was">Matches</span>
+              </Link>
+              <Link href="/profil" className="p-kachel">
+                <span className="zahl">{winrate}%</span><span className="was">Win Rate</span>
+              </Link>
+            </div>
+          </section>
 
           {/* ── Deine letzten Matches ── */}
           {letzte.length > 0 && (
-            <div style={{ marginTop: 26 }}>
-              <Feld titel="Deine letzten Matches" mehr="Alle" href="/matchhistorie">
-                {letzte.map((m, i) => (
-                  <Link key={m.id} href={`/spieler/${m.gegnerId}`} style={{ textDecoration: "none", display: "block" }}>
-                    <ListenZeile
-                      erste={i === 0}
-                      links={<ProfilAvatar src={m.avatar} name={m.gegner} groesse={38} />}
-                      titel={`vs. ${m.gegner}`}
-                      rechts={
-                        <span style={{ display: "inline-flex", alignItems: "center", gap: 12 }}>
-                          {m.satz && <b style={{ fontFamily: INTER, fontSize: 15, fontWeight: 800, color: SCHWARZ, fontVariantNumeric: "tabular-nums" }}>{m.satz}</b>}
-                          <Pille text={m.sieg ? "Sieg" : "Niederlage"} ton={m.sieg ? "gut" : "warn"} />
-                        </span>
-                      }
-                    />
-                  </Link>
-                ))}
-              </Feld>
-            </div>
+            <section className="p-karte p-abschnitt">
+              <div className="p-kopf">
+                <h2>Deine letzten Matches</h2>
+                <Link href="/matchhistorie" className="p-mehr">Alle →</Link>
+              </div>
+              {letzte.map(m => (
+                <Link key={m.id} href={`/spieler/${m.gegnerId}`} className="p-zeile">
+                  <ProfilAvatar src={m.avatar} name={m.gegner} groesse={38} />
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>vs. {m.gegner}</b>
+                  </span>
+                  {m.satz && (
+                    <span style={{ fontSize: 15, fontWeight: 600, fontVariantNumeric: "tabular-nums", flexShrink: 0 }}>{m.satz}</span>
+                  )}
+                  <span className={m.sieg ? "p-pille gut" : "p-pille"}>{m.sieg ? "Sieg" : "Niederlage"}</span>
+                </Link>
+              ))}
+            </section>
           )}
 
           {/* ── Offene Forderungen und neue Leute in der Liga ── */}
           {aktiv.length > 0 && (
-            <div style={{ marginTop: 26 }}>
-              <Feld titel="Was läuft" mehr="Feed" href="/feed">
-                {aktiv.map((a, i) => (
-                  <ListenZeile
-                    key={`${a.art}-${a.id}`}
-                    erste={i === 0}
-                    links={<ProfilAvatar src={a.avatar} name={a.name} groesse={38} />}
-                    titel={a.name}
-                    unter={a.text}
-                    rechts={
-                      <Link href={a.art === "forderung" ? "/liga" : `/spieler/${a.spielerId}`}
-                        style={a.art === "forderung" ? knopfKlein : { textDecoration: "none" }}>
-                        {a.art === "forderung" ? "Annehmen" : <Pfeil />}
-                      </Link>
-                    }
-                  />
-                ))}
-              </Feld>
-            </div>
+            <section className="p-karte p-abschnitt">
+              <div className="p-kopf">
+                <h2>Was läuft</h2>
+                <Link href="/feed" className="p-mehr">Feed →</Link>
+              </div>
+              {aktiv.map(a => (
+                <div key={`${a.art}-${a.id}`} className="p-zeile hat-cta">
+                  <ProfilAvatar src={a.avatar} name={a.name} groesse={38} />
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>{a.name}</b>
+                    <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 400, color: LEISE }}>{a.text}</span>
+                  </span>
+                  <span className="cta">
+                    {a.art === "forderung"
+                      ? <Link href="/liga" className="p-aktion">Annehmen</Link>
+                      : <Link href={`/spieler/${a.spielerId}`} aria-label={`Profil von ${a.name}`}><IconChevron size={19} style={{ color: LEISE }} /></Link>}
+                  </span>
+                </div>
+              ))}
+            </section>
           )}
 
           {/* ── Offene Spiele ── */}
           {d.games.length > 0 && (
-            <div style={{ marginTop: 26 }}>
-              <Feld titel="Heute wird gespielt" mehr="Alle" href="/match">
-                {d.games.slice(0, 3).map((g, i) => (
-                  <Link key={g.id} href={g.href} style={{ textDecoration: "none", display: "block" }}>
-                    <ListenZeile
-                      erste={i === 0}
-                      titel={g.title}
-                      unter={`${g.day} ${g.time} · ${g.sub}`}
-                      rechts={<span style={{ fontFamily: INTER, fontSize: 13, fontWeight: 800, color: g.full ? TEXT_LEISE : "#0E3AAE", whiteSpace: "nowrap" }}>{g.ratio}</span>}
-                    />
-                  </Link>
-                ))}
-              </Feld>
-            </div>
+            <section className="p-karte p-abschnitt">
+              <div className="p-kopf">
+                <h2>Heute wird gespielt</h2>
+                <Link href="/match" className="p-mehr">Alle →</Link>
+              </div>
+              {d.games.slice(0, 3).map(g => (
+                <Link key={g.id} href={g.href} className="p-zeile">
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>{g.title}</b>
+                    <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 400, color: LEISE }}>{g.day} {g.time} · {g.sub}</span>
+                  </span>
+                  <span style={{
+                    flexShrink: 0, fontSize: 12.5, fontWeight: 600, whiteSpace: "nowrap",
+                    color: g.full ? LEISE : "var(--p-akzent)",
+                  }}>{g.ratio}</span>
+                </Link>
+              ))}
+            </section>
           )}
 
           {/* ── Naechstes Turnier ── */}
           {d.tour && (
-            <div style={{ marginTop: 26 }}>
-              <Feld titel="Nächstes Turnier" mehr="Alle" href="/turniere">
-                <Link href="/turniere" style={{ textDecoration: "none", display: "block" }}>
-                  <ListenZeile erste titel={d.tour.name} unter={`${d.tour.dateLabel} · ${d.tour.formatLabel}`} rechts={<Pfeil />} />
-                </Link>
-              </Feld>
-            </div>
+            <section className="p-karte p-abschnitt">
+              <div className="p-kopf">
+                <h2>Nächstes Turnier</h2>
+                <Link href="/turniere" className="p-mehr">Alle →</Link>
+              </div>
+              <Link href="/turniere" className="p-zeile">
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>{d.tour.name}</b>
+                  <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 400, color: LEISE }}>{d.tour.dateLabel} · {d.tour.formatLabel}</span>
+                </span>
+                <IconChevron size={19} style={{ color: LEISE }} />
+              </Link>
+            </section>
           )}
-        </Inhalt>
+        </div>
       </main>
       <BottomNav />
     </>

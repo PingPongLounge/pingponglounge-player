@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { BG, CELL, W, MUT, GREEN, DANGER, gt, cardPad, h1, meta, eyebrow, btn, btnGhost, statusPill } from "@/app/theme"
+import { IconCommunity } from "@/app/components/Icons"
 
 type Credit = {
   id: string
@@ -150,12 +151,7 @@ export default function StundenPage() {
 
         <div style={{ marginTop: 24, textAlign: "center" }}>
           <Link href="/freunde" style={{ ...btnGhost, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/>
-              <circle cx="9" cy="7" r="4"/>
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87"/>
-              <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
-            </svg>
+            <IconCommunity size={16} />
             Weitere Stunden verdienen →
           </Link>
         </div>

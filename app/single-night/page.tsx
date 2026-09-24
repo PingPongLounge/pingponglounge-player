@@ -5,8 +5,9 @@ import { createClient } from "@/lib/supabase/client"
 import BottomNav from "@/app/components/BottomNav"
 import { BG, CARD, CELL, W, SUB, MUT, LINE, GREEN, DANGER, btn } from "@/app/theme"
 import { SINGLE_NIGHT_TICKETS, SINGLE_NIGHT_ABLAUF, SINGLE_NIGHT_ROTATION, SINGLE_NIGHT_INFO } from "@/lib/opengames"
+import { IconChevron } from "@/app/components/Icons"
 
-const PINK = "#5B9CFF"
+const PINK = "#39FF14"
 
 type SnEvent = { id: string; date: string; start_hour: number | null; location_name: string; plaetze: number; frei: number }
 
@@ -63,7 +64,7 @@ export default function SingleNightPage() {
       <div className="ppl-huelle">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2, marginBottom: 14 }}>
           <Link href="/erstellen" aria-label="Zurück" style={{ display: "inline-flex" }}>
-            <svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={W} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6" /></svg>
+            <IconChevron size={22} style={{ color: W, transform: "rotate(180deg)" }} />
           </Link>
           <span style={{ fontSize: 15, fontWeight: 700, color: W }}>Single Night</span>
           <span style={{ width: 22 }} />

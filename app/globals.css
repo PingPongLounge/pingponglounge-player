@@ -6,8 +6,11 @@
    das explizite border:none entfernt wurde. */
 button, input, textarea, select { border: none; outline: none; }
 button { background: none; }
-:root { --green: #5B9CFF; --dark: #080808; --card: #121214; --border: #1A1A1E; --muted: #8A8D99; --text: #F4F1EB; }
-body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0C; color: #FFF9F3; -webkit-font-smoothing: antialiased; }
+:root { --green: #39FF14; --dark: #080808; --card: #121214; --border: #1A1A1E; --muted: #8A8D99; --text: #F4F1EB; }
+/* 24.09.2026 · Canvas-Entscheid: ausserhalb des Player-Canvas #080808,
+   innerhalb Off-White wie auf der Startseite. Auf dem Handy ist der Canvas
+   100% breit — dort sieht man von dieser Farbe nur den Ueberroll-Rand. */
+body { font-family: var(--font-inter), system-ui, sans-serif; background: #080808; color: #FFF9F3; -webkit-font-smoothing: antialiased; }
 
 /* ── PLAYER V2: Breiten (07.09.2026, Referenzbild) ───────────────────────
    Eine Regel fuer die ganze App, statt maxWidth:620 in jeder Datei.
@@ -19,7 +22,10 @@ body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0
    Ab 900px wird sie breit: Oliver hat ausdruecklich verlangt, dass der
    Desktop kein 390px-Streifen in schwarzer Leere ist. Contentbreite dort
    900–1100px, Leseflaechen bleiben schmaler, damit Zeilen lesbar bleiben. */
-.ppl-breit { width: 100%; max-width: 620px; margin: 0 auto; padding-left: 22px; padding-right: 22px; }
+/* 24.09.2026: .ppl-breit und .p-spalte waren zwei Spalten mit zwei
+   Randmassen (22px / 20px) und zwei Breakpoints (900 / 1100). Es ist
+   jetzt EINE Spalte — die der Startseite. */
+.ppl-breit { width: 100%; max-width: 680px; margin: 0 auto; padding-left: 20px; padding-right: 20px; }
 /* 16.09.2026: Abschnitt als Kaestchen statt als Band mit Trennstrich
    darueber. Gleiche Spaltenbreite wie .ppl-breit, aber mit eigener Flaeche,
    feiner Kante und Innenabstand — die Ueberschrift sitzt mit drin. */
@@ -27,9 +33,9 @@ body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0
 @media (min-width: 652px) { .ppl-kasten { margin: 14px auto; max-width: 620px; } }
 @media (min-width: 900px) { .ppl-kasten { max-width: 1000px; padding: 22px; } }
 .ppl-eng   { width: 100%; max-width: 620px; margin: 0 auto; padding-left: 22px; padding-right: 22px; }
-@media (min-width: 900px) {
-  .ppl-breit { max-width: 1000px; padding-left: 40px; padding-right: 40px; }
-  .ppl-eng   { max-width: 760px;  padding-left: 40px; padding-right: 40px; }
+@media (min-width: 1100px) {
+  .ppl-breit { max-width: 1240px; padding-left: 44px; padding-right: 44px; }
+  .ppl-eng   { max-width: 800px;  padding-left: 44px; padding-right: 44px; }
 }
 
 /* Raster, die auf dem Handy untereinander und auf dem Desktop nebeneinander
@@ -55,13 +61,19 @@ body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0
    Das Foto nimmt rund die Haelfte des ersten Bildschirms — genug fuer
    Stimmung, wenig genug, dass der Inhalt darunter sofort sichtbar ist.
    Die Kante zum Off-White ist gerade; die schraegen Uebergaenge sind weg. */
-.ppl-hero { min-height: 52svh; }
-@media (min-width: 700px)  { .ppl-hero { min-height: 46svh; } }
-@media (min-width: 900px)  { .ppl-hero { min-height: 50svh; } }
+/* 23.09.2026 (A.1): Der Hero war an die Bildschirmhoehe gekoppelt (52svh)
+   und verbrauchte damit auf dem Handy den halben ersten Screen — auf einer
+   Produktseite, wo direkt darunter die eigentliche Arbeit beginnt. Jetzt
+   feste Hoehen: nach dem ersten Screen ist der Inhalt bereits angeschnitten.
+   /entdecken hat einen eigenen Kopf und ist davon nicht betroffen. */
+.ppl-hero { min-height: 400px; }
+@media (min-width: 700px)  { .ppl-hero { min-height: 340px; } }
+@media (min-width: 1100px) { .ppl-hero { min-height: 360px; } }
 
 /* Die Anton-Zeile ist das groesste Element der Seite. */
-.ppl-hero-titel { font-size: clamp(52px, 15.5vw, 76px); }
-@media (min-width: 700px) { .ppl-hero-titel { font-size: clamp(64px, 8.5vw, 104px); } }
+/* Die Zeile bleibt das staerkste Element, wird aber mit dem Hero kleiner. */
+.ppl-hero-titel { font-size: clamp(40px, 11.5vw, 62px); }
+@media (min-width: 700px)  { .ppl-hero-titel { font-size: clamp(50px, 6.4vw, 82px); } }
 
 /* Auf dem Desktop darf das Bild breiter und ruhiger stehen. */
 @media (min-width: 900px) { .ppl-hero-bild { object-position: var(--pos-desktop, 50% 42%); } }
@@ -79,35 +91,26 @@ body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0
    riesigen schwarzen Flaeche. Dahinter liegt jetzt ein echtes PPL-Foto,
    stark abgedunkelt und leicht unscharf — Atmosphaere, die nie mit dem Text
    konkurriert: der Inhalt sitzt auf deckendem Schwarz. */
-@media (min-width: 900px) {
-  body::before {
-    content: "";
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background-image: url("/ppl-lounge-hero.png");
-    background-size: cover; background-position: center;
-    filter: blur(9px) saturate(.85);
-    opacity: .30;
-    transform: scale(1.06);   /* schneidet die weichen Raender der Unschaerfe ab */
-  }
-  body::after {
-    content: "";
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-    background:
-      radial-gradient(120% 90% at 50% 0%, rgba(8,8,8,.55) 0%, rgba(8,8,8,.86) 55%, #080808 100%),
-      linear-gradient(180deg, rgba(8,8,8,.4) 0%, rgba(8,8,8,.8) 100%);
-  }
-  body > * { position: relative; z-index: 1; }
+/* ── DER PLAYER-CANVAS (Entscheid Oliver, 24.09.2026) ────────────────────
+   Eine Regel fuer die ganze App:
 
-  /* Der Inhalt bekommt einen eigenen, deckenden Grund — der Hintergrund
-     darf die Lesbarkeit unter keinen Umstaenden anfassen. */
-  main {
-    background: #080808;
-    max-width: 1100px;
-    margin: 0 auto;
-    min-height: 100dvh;
-    box-shadow: 0 0 90px rgba(0,0,0,.6);
-  }
+     ausserhalb   #080808          (body, siehe oben)
+     innerhalb    Off-White #F5F5F2 auf den Seiten im neuen Bausystem,
+                  #080808 auf den noch dunklen Seiten
+     Breite       max. 1240px, zentriert
+     Handy        100% — kein kuenstlicher schwarzer Seitenrand
+
+   Weg sind: das unscharfe Hintergrundfoto, der radiale Verlauf und der
+   90px-Schlagschatten um den Inhalt. Das Design-System kennt weder
+   Schatten noch Glows; der Rahmen ist eine Flaeche, kein Effekt. */
+main {
+  width: 100%;
+  max-width: 1240px;
+  margin: 0 auto;
+  min-height: 100dvh;
+  background: #080808;
 }
+main:has(.ppl-hero), main.p-seite { background: var(--p-bg); }
 
 /* Platz fuer die feste Navigation — sonst verdeckt sie die letzte Zeile. */
 /* 16.09.2026: Die untere Leiste ist weg, der Platzhalter darf schrumpfen.
@@ -115,3 +118,377 @@ body { font-family: var(--font-inter), system-ui, sans-serif; background: #0A0A0
 main { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* =====================================================================
+   PLAYER · Design-System V3 — Swiss Sports Editorial (23.09.2026)
+   Referenzbild von Oliver ist die verbindliche visuelle Vorgabe.
+
+   Grundwelt: Schwarz, Weiss, neutrales Hellgrau. Gruen ist NUR Akzent —
+   auf einem normalen Schirm bleiben 90-95% der Flaeche neutral.
+
+     --p-dark    #080B0D  dunkle Plakatflaechen, Hero, Footer
+     --p-bg      #F5F5F2  Seitengrund (neutral, NICHT creme)
+     --p-flaeche #FFFFFF  Karten
+     --p-text    #111111
+     --p-leise   #686868
+     --p-kante   #DDDDDA
+     --p-neon    #39FF14  nur auf dunkel, sehr sparsam
+     --p-akzent  #078A3B  nur auf hell, sehr sparsam
+
+   Kein Schatten, kein Radius. Struktur entsteht aus Linien und Weissraum.
+   Klassen mit Praefix .ent- gehoeren zu /entdecken; die .p-* Klassen sind
+   das gemeinsame Geruest fuer die weiteren Phasen.
+   ===================================================================== */
+:root{
+  --p-dark:#080B0D; --p-bg:#F5F5F2; --p-flaeche:#FFFFFF;
+  --p-text:#111111; --p-leise:#686868; --p-kante:#DDDDDA;
+  --p-neon:#39FF14; --p-akzent:#078A3B;
+  --p-dark-leise:rgba(255,255,255,.62); --p-dark-kante:rgba(255,255,255,.20);
+  --p-anton:var(--font-anton),Impact,sans-serif;
+  --p-inter:var(--font-inter),system-ui,sans-serif;
+}
+
+/* Spalte. Mobil 20px Rand, ab 1100px die Editorial-Breite. */
+.p-spalte{width:100%;max-width:680px;margin:0 auto;padding:0 20px}
+/* 1240px statt 1320px: der Canvas ist 1240 breit, eine Spalte darin kann
+   nicht breiter sein. .ppl-breit traegt dieselben Werte — es ist eine
+   Spalte mit zwei Namen, bis die alten Aufrufstellen umgezogen sind. */
+@media(min-width:1100px){.p-spalte{max-width:1240px;padding:0 44px}}
+
+/* Kartenflaeche: weiss, feine Kante, kein Schatten, kein Radius.
+   overflow:hidden ist kein Schoenheitsdetail — ohne es waechst eine Karte
+   mit langem Turniernamen ueber die Fensterbreite hinaus. */
+.p-karte{background:var(--p-flaeche);border:1px solid var(--p-kante);overflow:hidden;min-width:0}
+
+/* Abschnittskopf INNERHALB einer Karte: Icon + Titel links, Link rechts. */
+.p-kopf{display:flex;align-items:center;justify-content:space-between;gap:16px;
+  padding:16px 18px;border-bottom:1px solid var(--p-kante)}
+/* B · Abschnitts-Ueberschrift. Anton, aber ohne kuenstlich grosses
+   Tracking — das liess jede Zeile wie ein Plakat wirken. */
+.p-kopf h2{display:flex;align-items:center;gap:11px;margin:0;
+  font-family:var(--p-anton);font-weight:400;font-size:19px;letter-spacing:.012em;
+  text-transform:uppercase;line-height:1.05;color:var(--p-text)}
+@media(min-width:1100px){.p-kopf{padding:18px 22px}.p-kopf h2{font-size:22px}}
+/* E · Meta. 600 statt 800, Tracking .12em statt .16em. */
+.p-mehr{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;
+  font-family:var(--p-inter);font-size:11px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--p-leise);text-decoration:none}
+.p-mehr:hover{color:var(--p-text)}
+
+/* Listenzeile. */
+.p-zeile{display:flex;align-items:center;gap:15px;padding:13px 18px;min-height:44px;
+  text-decoration:none;color:var(--p-text);border-top:1px solid var(--p-kante)}
+.p-zeile:first-of-type{border-top:0}
+.p-zeile:hover{background:#FAFAF8}
+.p-zeile>span{min-width:0}
+.p-zeile b{overflow-wrap:anywhere}
+@media(min-width:1100px){.p-zeile{padding:14px 22px}}
+
+/* Datumskachel — das charakteristische Element der Termin-Listen. */
+/* Datumskachel: EINE Anton-Zahl, darum herum ruhige Inter-Kuerzel.
+   Wochentag und Monat standen auf 8px/800 — zu klein UND zu fett. */
+.p-datum{width:48px;flex-shrink:0;text-align:center;line-height:1;
+  border:1px solid var(--p-kante);padding:6px 0}
+.p-datum .wt,.p-datum .mon{display:block;font-family:var(--p-inter);font-size:10px;
+  font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--p-leise)}
+.p-datum .tag{display:block;font-family:var(--p-anton);font-weight:400;font-size:27px;margin:2px 0}
+/* Turniere: gefuellte Kachel, damit sich die beiden Listen unterscheiden. */
+.p-datum.voll{background:var(--p-dark);border-color:var(--p-dark);color:#fff}
+.p-datum.voll .wt,.p-datum.voll .mon{color:rgba(255,255,255,.66)}
+
+/* ---- /entdecken: Editorial-Raster ab 1100px ---- */
+.ent-raster{display:grid;gap:18px;margin-top:18px}
+/* Raster- und Flex-Kinder stehen per Vorgabe auf min-width:auto und
+   weigern sich, unter ihre Inhaltsbreite zu schrumpfen. Genau daran ist
+   die Seite auf 375px auf 1216px Breite aufgegangen. */
+.ent-raster>*{min-width:0}
+@media(min-width:1100px){
+  .ent-raster{gap:22px;margin-top:22px}
+  .ent-r-oben{grid-template-columns:5fr 7fr}
+  .ent-r-drei{grid-template-columns:4fr 5fr 4fr}
+}
+
+/* Drei Haupteinstiege. Auch auf 375px drei Spalten. */
+.ent-einstiege{display:grid;grid-template-columns:repeat(3,1fr)}
+.ent-einstieg{display:flex;flex-direction:column;align-items:center;text-align:center;
+  gap:10px;padding:22px 8px 18px;text-decoration:none;color:var(--p-text);
+  border-left:1px solid var(--p-kante)}
+.ent-einstieg:first-child{border-left:0}
+.ent-einstieg h3{margin:0;font-family:var(--p-anton);font-weight:400;font-size:16px;
+  letter-spacing:.015em;text-transform:uppercase;line-height:1.05}
+.ent-einstieg p{margin:0;font-family:var(--p-inter);font-size:12.5px;font-weight:400;
+  line-height:1.4;color:var(--p-leise);max-width:18ch}
+@media(min-width:1100px){
+  .ent-einstieg{gap:16px;padding:44px 24px 36px}
+  .ent-einstieg h3{font-size:26px;letter-spacing:.01em}
+  .ent-einstieg p{font-size:15px;line-height:1.45;max-width:24ch}
+}
+
+/* Spielerreihe — auf dem Handy wischbar, auf dem Desktop einfach breiter. */
+.ent-spieler{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:14px 12px 18px;max-width:100%}
+.ent-spieler::-webkit-scrollbar{display:none}
+.ent-spieler a{flex:0 0 auto;width:78px;text-align:center;text-decoration:none;color:var(--p-text)}
+@media(min-width:1100px){.ent-spieler{gap:4px;padding:18px 14px 22px}.ent-spieler a{width:84px}}
+
+/* Letzte Matches: mobil untereinander, auf dem Desktop drei Spalten. */
+.ent-matches{display:grid;grid-template-columns:1fr}
+.ent-match{padding:14px 18px;border-top:1px solid var(--p-kante)}
+.ent-match:first-child{border-top:0}
+@media(min-width:1100px){
+  .ent-matches{grid-template-columns:repeat(3,1fr)}
+  .ent-match{border-top:0;border-left:1px solid var(--p-kante);padding:18px 22px}
+  .ent-match:first-child{border-left:0}
+}
+
+/* Fotoflaechen. player-hero.jpg ist bereits monochrom und dunkel — es
+   braucht keinen Graufilter mehr, nur eine Spur weniger Helligkeit, damit
+   weisse Schrift sicher darauf steht. */
+.p-foto{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  filter:brightness(.88) contrast(1.04)}
+
+/* ---- /entdecken: Hero, Navigation, Fuss ---- */
+.ent-nav{display:none !important}
+@media(min-width:1100px){.ent-nav{display:flex !important}}
+
+.ent-heroBlock{margin-top:36px}
+.ent-heroRechts{margin-top:26px}
+@media(min-width:1100px){
+  .ent-heroBlock{display:grid;grid-template-columns:5fr 6fr;gap:56px;align-items:end;
+    margin-top:64px;padding-bottom:12px}
+  .ent-heroRechts{margin-top:0}
+}
+
+.ent-fuss{display:flex;flex-direction:column;gap:20px}
+.ent-fussKnopf{width:100%}
+.ent-fussRechts{display:none}
+@media(min-width:1100px){
+  .ent-fuss{flex-direction:row;align-items:center;gap:40px;padding-top:40px;padding-bottom:44px}
+  .ent-fussLinks{flex:1;min-width:0}
+  .ent-fussKnopf{width:auto;flex-shrink:0}
+  .ent-fussRechts{display:block;flex-shrink:0;width:150px}
+}
+
+/* Kein waagrechtes Ueberlaufen — NUR auf /entdecken, wo die Spielerreihe
+   bewusst breiter ist als das Fenster. App-weit war das ein Pflaster, das
+   echte Ueberlaeufe auf anderen Seiten unsichtbar gemacht haette
+   (Entscheid Oliver, 23.09.2026). */
+body:has(main.p-seite){overflow-x:hidden}
+
+/* ---- /entdecken loest sich aus dem alten dunklen App-Rahmen ----
+   Weiter oben in dieser Datei steht ein `main { background:#080808;
+   max-width:1100px; box-shadow:... }` fuer die dunklen App-Seiten. Die
+   oeffentliche Startseite ist hell und randlos — sie hebt das gezielt auf,
+   statt die Regel fuer alle anderen Seiten anzufassen. */
+main.p-seite{background:var(--p-bg);padding-bottom:0}
+
+/* Ab 1100px steht die Navigation ausgeschrieben im Hero — dann braucht es
+   den festen Hamburger daneben nicht mehr. Nur auf dieser Seite. */
+/* Ab 1100px steht die Navigation in PlayerKopf ausgeschrieben — dann
+   braucht es den festen Hamburger daneben auf KEINER Seite mehr.
+   !important, weil der Knopf sein display:flex als Inline-Stil traegt. */
+@media(min-width:1100px){
+  .ppl-menue-knopf{display:none !important}
+}
+
+/* Karten im Dreier-Raster sollen ihre eigene Hoehe behalten, nicht auf die
+   der laengsten Nachbarin wachsen. */
+@media(min-width:1100px){ .ent-r-drei{align-items:start} .ent-r-oben{align-items:start} }
+
+/* Icons der drei Einstiege: auf dem Handy eine Nummer kleiner, damit die
+   drei Spalten bei 375px nicht gequetscht wirken. Der Pfeil darunter
+   bleibt unberuehrt — deshalb der eigene Traeger .ei-ik. */
+/* Die Pfeile der drei Einstiege sollen auf einer Linie liegen, auch wenn
+   ein Text zweizeilig umbricht. */
+.ent-einstieg>svg:last-child{margin-top:auto}
+.ent-einstieg .ei-ik{display:flex;align-items:center;justify-content:center;height:40px}
+.ent-einstieg .ei-ik svg{width:34px;height:34px}
+@media(min-width:1100px){
+  .ent-einstieg .ei-ik{height:60px}
+  .ent-einstieg .ei-ik svg{width:50px;height:50px}
+}
+
+/* ---- Listenzeile: der Aufruf rutscht auf schmalen Schirmen unter den
+   Titel. Vorher drueckte er den Eventnamen auf zwei Drittel Breite, und
+   "Ping Pong Lounge Open St. Gallen · Oktober" wurde zu "Ping Pong Lounge
+   Ope…". Ein Eventname ist die wichtigste Information der Zeile — er wird
+   nicht gekuerzt, damit ein Knopf daneben passt. (A.1, 23.09.2026) */
+@media (max-width: 460px) {
+  /* Nur Zeilen mit einem echten Knopf brechen um. Eine Zeile, deren
+     rechte Seite nur ein Pfeil oder eine Zahl ist, bleibt einzeilig —
+     sonst stand der Pfeil ploetzlich mittig unter dem Text. */
+  .ppl-zeile:has(> .ppl-zeile-cta a),
+  .ppl-zeile:has(> .ppl-zeile-cta button) { flex-wrap: wrap; }
+  .ppl-zeile > .ppl-zeile-cta:has(a),
+  .ppl-zeile > .ppl-zeile-cta:has(button) { width: 100%; margin-top: 12px; }
+  .ppl-zeile > .ppl-zeile-cta > a,
+  .ppl-zeile > .ppl-zeile-cta > button { width: 100%; }
+}
+
+/* ---- Seiten im neuen Bausystem sind hell, bis zum Rand ------------------
+   Der Rest der App sitzt noch im alten dunklen Rahmen: body ist #0A0A0C,
+   dahinter liegt ein abgedunkeltes Lounge-Foto, und main war ein schwarzer
+   1100px-Streifen. Nachdem main fuer die neuen Seiten randlos geworden ist,
+   schien dieses Schwarz ueberall dort durch, wo die Seite selbst nichts
+   malt — neben und unter dem Inhalt.
+
+   Eine Seite, die V2s Hero benutzt (oder /entdecken), bringt deshalb ihren
+   eigenen hellen Grund mit und schaltet die dunkle Kulisse fuer sich ab.
+   Die 27 noch dunklen Seiten bleiben davon unberuehrt. (24.09.2026) */
+/* 24.09.2026: Hier standen bis heute drei Regeln, die den schwarzen
+   Rahmen auf V2- und V3-Seiten abgeschaltet haben. Der Entscheid vom
+   24.09. sagt das Gegenteil — dunkel aussen, Off-White im Canvas. Die
+   Regeln sind ersatzlos weg; den Canvas setzt jetzt die main-Regel
+   weiter oben. */
+
+/* =====================================================================
+   PRODUKT-HERO + gemeinsame Bausteine (24.09.2026)
+   =====================================================================
+   Derselbe Aufbau wie der Kopf der Startseite: dunkles Foto, darauf der
+   PlayerKopf, darunter EINE Anton-Zeile, darunter die Eyebrow und
+   optional der Kennzahlenstreifen. Kein zweiter Hero-Typ.
+   Mobile First: die Groessen unten gelten ab 375px, der Breakpoint 1100px
+   macht sie breiter — er erfindet nichts Neues.
+   ===================================================================== */
+.p-hero{position:relative;background:var(--p-dark);color:#FFFFFF;overflow:hidden}
+.p-hero-schleier{position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(8,11,13,.80) 0%,rgba(8,11,13,.34) 30%,
+    rgba(8,11,13,.52) 62%,rgba(8,11,13,.88) 100%)}
+.p-hero-inhalt{position:relative;z-index:2;padding-bottom:26px}
+@media(min-width:1100px){.p-hero-inhalt{padding-bottom:34px}}
+
+/* A · Display. EINE Skala fuer die ganze App — die der Startseite. */
+.p-h1{font-family:var(--p-anton);font-weight:400;text-transform:uppercase;
+  font-size:clamp(46px,13vw,92px);line-height:.92;letter-spacing:-.005em;margin:0}
+/* E · Eyebrow. Inter 600, kein Fettdruck-Ersatz fuer Groesse. */
+.p-eyebrow{margin:14px 0 0;font-family:var(--p-inter);font-size:12px;font-weight:600;
+  letter-spacing:.14em;text-transform:uppercase;line-height:1.6;color:rgba(255,255,255,.88)}
+
+/* Kennzahlenstreifen — dieselben drei Felder wie im Kopf der Startseite. */
+.p-streifen{display:flex;margin-top:26px;
+  border-top:1px solid var(--p-dark-kante);border-bottom:1px solid var(--p-dark-kante)}
+.p-streifen>div{flex:1;min-width:0;padding:13px 0;text-align:center;
+  border-left:1px solid var(--p-dark-kante)}
+.p-streifen>div:first-child{border-left:0}
+.p-streifen .zahl{display:block;font-family:var(--p-anton);font-weight:400;font-size:28px;line-height:1}
+.p-streifen .was{display:block;margin-top:6px;font-family:var(--p-inter);font-size:10px;
+  font-weight:600;letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.60)}
+
+/* Abstand zwischen zwei Abschnitten — app-weit derselbe. */
+.p-abschnitt{margin-top:18px}
+@media(min-width:1100px){.p-abschnitt{margin-top:22px}}
+
+/* Auswahlfeld im Design-System: Flaeche, feine Kante, kein Radius. */
+.p-auswahl{font-family:var(--p-inter);font-size:11px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--p-text);background:var(--p-flaeche);
+  border:1px solid var(--p-kante);border-radius:0;padding:0 10px;height:36px;cursor:pointer}
+
+/* Leerzeile in einer Karte (laedt / kein Ergebnis / Fehler). */
+.p-leer{margin:0;padding:18px;font-family:var(--p-inter);font-size:14px;font-weight:400;
+  color:var(--p-leise)}
+
+/* Lesespalte fuer einspaltige Listen und Fliesstext. Der Canvas ist
+   1240px breit — eine Rangliste darf darin schmaler stehen, sonst liegen
+   Name und Zahl auf 1150px Abstand voneinander (Entscheid Oliver,
+   24.09.2026: "Listen duerfen innerhalb des Canvas schmaler bleiben").
+   Mobil identisch mit .p-spalte: 100% mit 20px Rand. */
+.p-lese{width:100%;max-width:680px;margin:0 auto;padding:0 20px}
+@media(min-width:1100px){.p-lese{max-width:860px;padding:0 44px}}
+
+/* Statuspille — Kante statt Fuellung, wie alles andere ohne Radius. */
+.p-pille{display:inline-block;flex-shrink:0;padding:5px 10px;border:1px solid var(--p-kante);
+  font-family:var(--p-inter);font-size:10.5px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--p-leise);white-space:nowrap}
+
+/* Listenzeile mit Knopf rechts. Unter 460px hat ein Turniername plus
+   "Anmelden" nebeneinander keinen Platz mehr — der Knopf rutscht dann auf
+   eine eigene Zeile und wird volle Breite, statt den Namen abzuschneiden.
+   Eventnamen werden nie gekuerzt (Vorgabe Oliver). */
+.p-zeile>.cta{flex-shrink:0}
+@media(max-width:460px){
+  .p-zeile.hat-cta{flex-wrap:wrap}
+  .p-zeile.hat-cta>.cta{width:100%;margin-top:12px}
+  .p-zeile.hat-cta>.cta>a,.p-zeile.hat-cta>.cta>button{width:100%}
+}
+
+/* Bildraster (Community-Impressionen). Kein Radius — wie jede Flaeche. */
+.p-bilder{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.p-bilder img{width:100%;aspect-ratio:4/3;object-fit:cover;display:block}
+
+/* Knopfreihe am Seitenende. */
+.p-knopfreihe{display:flex;gap:10px;flex-wrap:wrap;margin-top:22px}
+.p-knopfreihe>*{flex:1 1 170px}
+
+/* Sieg als Status — der einzige Fall, in dem eine Pille Farbe traegt. */
+.p-pille.gut{color:var(--p-akzent);border-color:var(--p-akzent)}
+
+/* Zurueck-Zeile im dunklen Kopf (Profil, Detailseiten). */
+.p-zurueck{display:inline-flex;align-items:center;gap:8px;margin-bottom:14px;
+  font-family:var(--p-inter);font-size:11px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:rgba(255,255,255,.72);text-decoration:none}
+.p-zurueck:hover{color:#FFFFFF}
+
+/* Eingabefeld — eine Form fuer die ganze App: Flaeche, feine Kante,
+   kein Radius. 16px, damit iOS beim Tippen nicht hineinzoomt. */
+.p-feld{width:100%;min-height:50px;padding:0 14px;background:var(--p-flaeche);
+  border:1px solid var(--p-kante);border-radius:0;font-family:var(--p-inter);
+  font-size:16px;font-weight:500;color:var(--p-text);outline:none}
+.p-feld:focus{border-color:var(--p-text)}
+.p-feld.zahl{text-align:center;padding:0 6px}
+/* Kleines Label ueber einem Feld. */
+.p-label{display:block;font-family:var(--p-inter);font-size:11px;font-weight:600;
+  letter-spacing:.12em;text-transform:uppercase;color:var(--p-leise)}
+/* Fehlerzeile. Rot ist kein Designelement, sondern eine Warnung. */
+.p-fehler{margin:12px 0 0;font-family:var(--p-inter);font-size:13px;font-weight:500;color:#B3261E}
+/* Textlink unter einem Knopf ("Später", "Nur anmelden"). */
+.p-textlink{display:block;width:100%;margin-top:14px;background:none;cursor:pointer;
+  font-family:var(--p-inter);font-size:11px;font-weight:600;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--p-leise);text-align:center;text-decoration:none}
+.p-textlink:hover{color:var(--p-text)}
+
+/* Kennzahlen-Kacheln, die irgendwohin fuehren. Gleiche Idee wie die drei
+   Einstiege auf der Startseite: Zellen, durch Linien getrennt, kein Radius.
+   Mobil zwei Spalten, ab 1100px vier. */
+.p-kacheln{display:grid;grid-template-columns:1fr 1fr}
+.p-kachel{display:flex;flex-direction:column;gap:5px;padding:16px 14px;min-width:0;
+  text-decoration:none;color:var(--p-text);
+  border-left:1px solid var(--p-kante);border-top:1px solid var(--p-kante)}
+.p-kachel:nth-child(-n+2){border-top:0}
+.p-kachel:nth-child(odd){border-left:0}
+.p-kachel:hover{background:#FAFAF8}
+.p-kachel .zahl{font-family:var(--p-anton);font-weight:400;font-size:27px;line-height:1}
+.p-kachel .was{font-family:var(--p-inter);font-size:10px;font-weight:600;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--p-leise)}
+@media(min-width:1100px){
+  .p-kacheln{grid-template-columns:repeat(4,1fr)}
+  .p-kachel{border-top:0;border-left:1px solid var(--p-kante)}
+  .p-kachel:first-child{border-left:0}
+}
+
+/* Aktion in einer Listenzeile — Umriss statt Fuellung. Vier gefuellte
+   schwarze Knoepfe untereinander waren das Lauteste auf der Seite und
+   verstiessen gegen die Regel "hoechstens EIN hervorgehobener CTA pro
+   Seite" (Oliver, 24.09.2026). Der gefuellte Knopf bleibt dem einen
+   Hauptweg am Seitenende vorbehalten. */
+.p-aktion{display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  min-height:44px;padding:0 14px;background:none;border:1px solid var(--p-text);
+  cursor:pointer;white-space:nowrap;font-family:var(--p-inter);font-size:11px;
+  font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--p-text);
+  text-decoration:none}
+.p-aktion:hover{background:var(--p-text);color:#FFFFFF}
+.p-aktion[disabled]{opacity:.5;cursor:default}
+
+/* Fester Wechsler am Seitenrand (Liga: Rangliste ↔ Saison). Er haengt am
+   Canvas, nicht am Fenster — sonst klebt er auf dem schwarzen Rahmen
+   neben dem Inhalt. 620px = halbe Canvasbreite. */
+.p-schweber{position:fixed;right:16px;bottom:20px;z-index:95}
+@media(min-width:1272px){.p-schweber{right:calc(50vw - 620px + 16px)}}
+
+/* Schalter (Einstellungen). Kein Radius, wie alles andere; Gruen zeigt
+   den eingeschalteten Zustand — Status, nicht Schmuck. */
+.p-schalter{width:46px;height:26px;flex-shrink:0;position:relative;cursor:pointer;
+  border:1px solid var(--p-kante);background:var(--p-flaeche);padding:0}
+.p-schalter[aria-pressed="true"]{background:var(--p-akzent);border-color:var(--p-akzent)}
+.p-schalter span{position:absolute;top:3px;left:3px;width:18px;height:18px;
+  background:var(--p-kante);transition:left .15s,background .15s}
+.p-schalter[aria-pressed="true"] span{left:23px;background:#FFFFFF}
+.p-schalter[disabled]{opacity:.6;cursor:default}

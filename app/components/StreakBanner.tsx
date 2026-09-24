@@ -23,7 +23,7 @@ export default function StreakBanner() {
   }, [])
 
   if (!info) return null
-  const GRAD = "linear-gradient(135deg,#5B9CFF,#A9C9FF)"
+  const GRAD = "linear-gradient(135deg,#39FF14,#12D45C)"
 
   return (
     <div style={{
@@ -38,7 +38,7 @@ export default function StreakBanner() {
       </svg>
       <span style={{ flex: 1, minWidth: 0, fontSize: 14, fontWeight: 700, color: "#fff", lineHeight: 1.35 }}>{info.text}</span>
       {info.cta && (
-        <Link href={info.cta.href} style={{ flexShrink: 0, fontSize:11.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".04em", color: "#FFFFFF", background: GRAD, borderRadius: 9, padding: "9px 13px", textDecoration: "none" }}>
+        <Link href={info.cta.href} style={{ flexShrink: 0, fontSize:11.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".04em", color: "#0B0B0D", background: GRAD, borderRadius: 9, padding: "9px 13px", textDecoration: "none" }}>
           {info.cta.label}
         </Link>
       )}

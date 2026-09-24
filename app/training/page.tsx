@@ -7,8 +7,8 @@ import { ratingLabel } from "@/app/theme"
 import { OG_TRAINING_PREIS_CHF } from "@/lib/opengames"
 
 const BG = "#0E0E10", CARD = "#1A1A1E", CELL = "#1A1A1E", W = "#FFFFFF"
-const MUT = "rgba(255,255,255,.82)", GREEN = "#5B9CFF"
-const GRAD = "linear-gradient(135deg,#5B9CFF,#A9C9FF)"
+const MUT = "rgba(255,255,255,.82)", GREEN = "#39FF14"
+const GRAD = "linear-gradient(135deg,#39FF14,#12D45C)"
 
 type Player = { user_id: string; name: string; elo: number; level: string }
 type Training = {
@@ -70,7 +70,7 @@ export default function TrainingPage() {
             <div style={{ fontSize: 14, fontWeight: 800, color: W }}>Elias Schmid <span style={{ color: MUT, fontWeight: 500 }}>· Schweizer Nr. 1</span></div>
             <div style={{ fontSize: 14, fontWeight: 800, color: W, marginTop: 2 }}>Simon Berglund <span style={{ color: MUT, fontWeight: 500 }}>· Schwedens Nr. 3</span></div>
             <div style={{ fontSize: 13, color: MUT, marginTop: 8, lineHeight: 1.5 }}>PPL24 Glattbrugg · für alle Levels · Halbtag CHF 75 · Ganztag CHF 150</div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 14, background: GRAD, color: "#FFFFFF", borderRadius: 12, padding: "11px 16px", fontSize: 13.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 14, background: GRAD, color: "#0B0B0D", borderRadius: 12, padding: "11px 16px", fontSize: 13.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em" }}>
               Jetzt anmelden →
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function TrainingPage() {
                     {frei === 0 ? (
                       <span style={{ fontSize:11.5, fontWeight: 800, textTransform: "uppercase", color: MUT, width: 96, textAlign: "center", flexShrink: 0 }}>Ausgebucht</span>
                     ) : (
-                      <span style={{ fontSize:11.5, fontWeight: 800, textTransform: "uppercase", color: "#FFFFFF", background: GRAD, borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", flexShrink: 0 }}>Mitmachen</span>
+                      <span style={{ fontSize:11.5, fontWeight: 800, textTransform: "uppercase", color: "#0B0B0D", background: GRAD, borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", flexShrink: 0 }}>Mitmachen</span>
                     )}
                   </Link>
 

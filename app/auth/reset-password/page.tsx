@@ -116,7 +116,7 @@ export default function PasswortAendernSeite() {
     padding: '15px 16px', color: CREME, fontFamily: INTER, fontSize: 16, outline: 'none',
   }
   const knopf: React.CSSProperties = {
-    width: '100%', textAlign: 'center', background: VIOLETT, color: CREME, border: 'none',
+    width: '100%', textAlign: 'center', background: VIOLETT, color: '#0B0B0D', border: 'none',
     borderRadius: 100, padding: '16px 24px', fontFamily: INTER, fontSize: 14, fontWeight: 900,
     letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer', textDecoration: 'none',
     display: 'inline-block',

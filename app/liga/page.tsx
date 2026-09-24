@@ -7,18 +7,23 @@ import PendingConfirmBanner from "@/app/components/PendingConfirmBanner"
 import NotificationBell from "@/app/components/NotificationBell"
 import { MAX_RANKED_PER_OPPONENT, RANKED_WINDOW_MONTHS, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO, TIERS, tierForElo, tierRangeLabel, type TierKey } from "@/lib/rewards"
 import {
-  BG, CARD, CELL, W, SUB, MUT, GREEN, LINE,
-  gt, GRAD, card, ratingLabel,
-  SCHWARZ, CREME, VIOLETT, AKZENT_TIEF, ANTON, INTER,
+  CARD, CELL, W, SUB, MUT, GREEN, LINE, ratingLabel,
+  SCHWARZ, VIOLETT, AKZENT_TIEF, ANTON, INTER,
 } from "@/app/theme"
-import HeroKopf from "@/app/components/HeroKopf"
+import PlayerKopf from "@/app/components/PlayerKopf"
+import { IconSpieler } from "@/app/components/Icons"
+/* 24.09.2026: Die Liga bezieht ihr Aussehen nicht mehr aus V2, sondern aus
+   denselben Klassen wie die Startseite (.p-hero, .p-karte, .p-kopf,
+   .p-zeile) und denselben Knopf-Stilen aus app/design.ts. Daten, Filter,
+   Saison-, Challenge- und Chatlogik sind unveraendert. */
 import {
-  Hero, Inhalt, AbschnittKopf, Feld, StatsReihe, GrosseZahl, ListenZeile, Pille,
-  knopfPrimaer, knopfKlein, knopfOutlineHell, TEXT_LEISE, FLAECHE,
-} from "@/app/components/V2"
+  TEXT as P_TEXT, LEISE as P_LEISE, BG as P_BG, AKZENT as P_AKZENT,
+  knopf as knopfPrimaer, knopfUmriss as knopfOutlineHell,
+} from "@/app/design"
+const TEXT_LEISE = P_LEISE
+const FLAECHE = P_BG
 
-const C=CARD, B=CELL, M=SUB
-const SHADOW="0 1px 4px rgba(0,0,0,.14)"
+const M=SUB
 
 type Season={id:string,name:string,city:string,skill_class:string,status:string,max_players:number,is_global?:boolean,is_private?:boolean}
 type Row={user_id:string,name:string,elo:number,level:string,real?:string|null,avatar?:string|null}
@@ -463,7 +468,7 @@ export default function LigaPage(){
   })()
 
   return (
-    <main style={{minHeight:"100vh",background:FLAECHE,paddingBottom:90}}>
+    <main style={{minHeight:"100dvh",background:FLAECHE,color:P_TEXT,fontFamily:INTER,paddingBottom:90}}>
       {/* Topbar — dunkel. Grün nur im Logo und im Zähler: eine grelle Leiste war
           das Lauteste auf dem Screen und sagte nichts. Ein Akzent pro Screen. */}
       {/* 07.09.2026: Der eigene Kopfbalken ist weg — PPL., Glocke und Menue
@@ -473,9 +478,9 @@ export default function LigaPage(){
       {/* Liga-Umschalter: öffentliche Liga ↔ private Firmen-Ligen */}
       {showCity&&(
         <div onClick={()=>setShowCity(false)} style={{position:"fixed",inset:0,zIndex:20}}>
-          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:74,right:14,background:"#121214",borderRadius:14,padding:6,minWidth:180}}>
+          <div onClick={e=>e.stopPropagation()} style={{position:"absolute",top:74,right:14,background:"#080B0D",border:"1px solid rgba(255,255,255,.20)",padding:6,minWidth:180}}>
             {seasons.map(s=>(
-              <div key={s.id} onClick={()=>{setSeasonId(s.id);setCity(s.city);setShowCity(false)}} style={{padding:"11px 12px",borderRadius:9,fontSize:14,fontWeight:s.id===seasonId?600:400,color:s.id===seasonId?GREEN:W,cursor:"pointer"}}>
+              <div key={s.id} onClick={()=>{setSeasonId(s.id);setCity(s.city);setShowCity(false)}} style={{padding:"11px 12px",borderRadius:0,fontSize:14,fontWeight:s.id===seasonId?600:400,color:s.id===seasonId?GREEN:W,cursor:"pointer"}}>
                 {s.name}{s.is_private?" · privat":""}
               </div>
             ))}
@@ -483,79 +488,102 @@ export default function LigaPage(){
         </div>
       )}
 
-      <div className="ppl-huelle">
-        {/* ══ HERO nach Referenz-Mockup ══════════════════════════════ */}
-        <Hero
-          bild="/hero-pokal.jpg" pos="58% 42%"
-          kopf={<HeroKopf/>}
-          etikett="PPL League"
-          titel={sel?.is_private?sel.name:<>Die Ping Pong<br/>Liga der Schweiz.</>}
-          subline={<>Steig im Ranking auf und fordere<br/>Spieler auf deinem Niveau heraus.</>}
-        />
+      <div>
+        {/* ══ KOPF — derselbe Aufbau wie auf der Startseite ══════════ */}
+        <header className="p-hero">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src="/liga-hero.jpg" alt="" aria-hidden className="p-foto" style={{objectPosition:"50% 45%"}}/>
+          <div aria-hidden className="p-hero-schleier"/>
+          <PlayerKopf/>
+          <div className="p-spalte p-hero-inhalt">
+            <h1 className="p-h1">{sel?.is_private?sel.name:"Liga"}</h1>
+            <p className="p-eyebrow">Steig im Ranking auf und fordere<br/>Spieler auf deinem Niveau heraus.</p>
+            <div className="p-streifen">
+              <div>
+                <span className="zahl">{rows.length||"—"}</span>
+                <span className="was">Spieler</span>
+              </div>
+              {myReg&&myRow?(
+                <>
+                  <div>
+                    <span className="zahl">#{meinRang}</span>
+                    <span className="was">Dein Rang</span>
+                  </div>
+                  <div>
+                    <span className="zahl">{ratingLabel(myRow.elo)}</span>
+                    <span className="was">Dein Rating</span>
+                  </div>
+                </>
+              ):(
+                <div>
+                  <span className="zahl">{rows[0]?ratingLabel(rows[0].elo):"—"}</span>
+                  <span className="was">Top-Rating</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </header>
 
         {/* ══ DEIN RANG — die Zahl gehoert auf die helle Flaeche ══ */}
-        <Inhalt unten={6}>
+        <div className="p-lese" style={{paddingTop:18}}>
           {seasons.length>1&&(
-            <div style={{marginBottom:16}}>
-              <button onClick={()=>setShowCity(v=>!v)} style={{background:"rgba(8,8,8,.06)",color:SCHWARZ,fontSize:12.5,fontWeight:800,cursor:"pointer",borderRadius:100,padding:"8px 14px",fontFamily:INTER}}>{sel?.name||"League"} ▾</button>
+            <div style={{marginBottom:14}}>
+              <button onClick={()=>setShowCity(v=>!v)} className="p-pille" style={{cursor:"pointer",minHeight:36}}>{sel?.name||"League"} ▾</button>
             </div>
           )}
 
           {myReg&&myRow?(
             <>
-              <Feld titel="Dein Rang" padding="18px 16px 0">
-                <GrosseZahl
-                  wert={`#${meinRang}`}
-                  rechts={
-                    <span style={{fontFamily:INTER,fontSize:14,color:TEXT_LEISE,lineHeight:1.5}}>
-                      {meineStufe?<b style={{display:"block",color:SCHWARZ,fontSize:15}}>{meineStufe.name}</b>:null}
-                      {sel?.city||city||"Schweiz"}
-                    </span>
-                  }
-                />
-                <div style={{borderTop:"1px solid rgba(8,8,8,.10)",marginTop:16}}>
-                  <StatsReihe werte={[
-                    {wert:ratingLabel(myRow.elo),label:"Rating"},
-                    {wert:monatCount,label:"Diesen Monat"},
-                    {wert:`${monatCount}/${MIN_MATCHES_PER_MONTH}`,label:"Monatssoll",akzent:!monatOk},
-                  ]}/>
+              <section className="p-karte">
+                <div className="p-kopf">
+                  <h2>Dein Rang</h2>
+                  <span className="p-mehr">{sel?.city||city||"Schweiz"}</span>
                 </div>
-              </Feld>
+                <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",gap:16,padding:"16px 18px"}}>
+                  <span style={{fontFamily:ANTON,fontWeight:400,fontSize:56,lineHeight:.9,letterSpacing:"-.01em"}}>#{meinRang}</span>
+                  <span style={{textAlign:"right",fontSize:13,lineHeight:1.5,color:P_LEISE}}>
+                    {meineStufe?<b style={{display:"block",fontSize:15,fontWeight:600,color:P_TEXT}}>{meineStufe.name}</b>:null}
+                    Rating {ratingLabel(myRow.elo)} · {monatCount}/{MIN_MATCHES_PER_MONTH} im Monat
+                  </span>
+                </div>
+              </section>
 
               {!monatOk&&(
-                <p style={{fontFamily:INTER,fontSize:13.5,color:TEXT_LEISE,margin:"10px 2px 0"}}>
+                <p style={{fontSize:13,color:P_LEISE,margin:"10px 2px 0",lineHeight:1.5}}>
                   Noch {MIN_MATCHES_PER_MONTH-monatCount} gewertete Spiele bis Monatsende, sonst −{MONTHLY_PENALTY_ELO} Punkte.
                 </p>
               )}
 
-              <div style={{display:"flex",gap:10,flexWrap:"wrap",marginTop:18,maxWidth:480}}>
+              <div className="p-knopfreihe">
                 {rows.length>1&&(
-                  <button onClick={()=>setPickOpen(true)} style={{...knopfPrimaer,flex:"1 1 170px"}}>Ergebnis eintragen</button>
+                  <button onClick={()=>setPickOpen(true)} style={knopfPrimaer}>Ergebnis eintragen</button>
                 )}
-                <button onClick={()=>setChatOpen(true)} style={{...knopfOutlineHell,flex:"1 1 130px",position:"relative"}}>
+                <button onClick={()=>setChatOpen(true)} style={{...knopfOutlineHell,position:"relative"}}>
                   Liga-Chat
                   {ungelesen>0&&(
-                    <span style={{marginLeft:9,minWidth:20,height:20,borderRadius:100,background:VIOLETT,color:"#06132E",fontSize:11.5,fontWeight:900,display:"inline-flex",alignItems:"center",justifyContent:"center",padding:"0 6px"}}>{ungelesen>9?"9+":ungelesen}</span>
+                    <span style={{marginLeft:9,minWidth:20,height:20,background:P_TEXT,color:"#FFFFFF",fontSize:11,fontWeight:600,display:"inline-flex",alignItems:"center",justifyContent:"center",padding:"0 6px"}}>{ungelesen>9?"9+":ungelesen}</span>
                   )}
                 </button>
               </div>
               {letzteNachricht&&(
-                <div style={{fontFamily:INTER,fontSize:13.5,color:TEXT_LEISE,marginTop:10,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{letzteNachricht}</div>
+                <div style={{fontSize:13,color:P_LEISE,marginTop:10,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{letzteNachricht}</div>
               )}
             </>
           ):(
-            <Feld padding={20}>
-              <p style={{fontFamily:INTER,fontSize:15.5,color:TEXT_LEISE,lineHeight:1.55,margin:"0 0 18px",maxWidth:"46ch"}}>
-                Eine Liga für alle — kein Beitreten in Klassen. Deine Stufe kommt aus deinem Rating. Fordere jeden, auch die Nummer eins.
-              </p>
-              <button onClick={join} disabled={busy} style={{...knopfPrimaer,width:"100%",maxWidth:360,opacity:busy?.6:1}}>
-                {busy?"…":"Los geht's"}
-              </button>
-            </Feld>
+            <section className="p-karte">
+              <div style={{padding:18}}>
+                <p style={{fontSize:15,color:P_LEISE,lineHeight:1.55,margin:"0 0 18px",maxWidth:"46ch"}}>
+                  Eine Liga für alle — kein Beitreten in Klassen. Deine Stufe kommt aus deinem Rating. Fordere jeden, auch die Nummer eins.
+                </p>
+                <button onClick={join} disabled={busy} style={{...knopfPrimaer,width:"100%",opacity:busy?.6:1}}>
+                  {busy?"…":"Los geht's"}
+                </button>
+              </div>
+            </section>
           )}
 
           <div style={{marginTop:18}}><PendingConfirmBanner/></div>
-        </Inhalt>
+        </div>
 
         {loading?(
           <p style={{textAlign:"center",color:M,padding:"40px 0"}}>Lädt …</p>
@@ -565,21 +593,22 @@ export default function LigaPage(){
 
           {/* Neu hier? — Erklärung (nur Nicht-Mitglieder) */}
           {!myReg&&(
-            <div style={{padding:"4px 14px 0"}}>
-              <div style={{borderRadius:16,padding:20,background:"#FFFFFF"}}>
-                <div style={{fontSize:11.5,fontWeight:900,letterSpacing:".14em",textTransform:"uppercase",color:AKZENT_TIEF}}>Neu hier?</div>
-                <div style={{fontFamily:INTER,fontWeight:900,fontSize:22,letterSpacing:"-.01em",textTransform:"uppercase",color:SCHWARZ,margin:"8px 0 16px"}}>So funktioniert die Liga</div>
+            <div className="p-lese p-abschnitt">
+              <div className="p-karte">
+                <div className="p-kopf"><h2>So funktioniert die Liga</h2></div>
+                <div style={{padding:18}}>
                 {([
                   ["1","Du bist automatisch dabei","Eine Liga für alle — kein Beitreten, keine Klassen. Deine Stufe kommt aus deiner Elo."],
                   ["2","Spielen & fordern","Fordere jeden — auch den Tabellenersten. Jedes bestätigte Resultat zählt."],
                   ["3","Aufsteigen","Gewinnst du, steigst du. Filtere die Rangliste nach Stadt, Land oder Freunden."],
                 ] as [string,string,string][]).map(([n,t,d])=>(
                   <div key={n} style={{display:"flex",gap:13,alignItems:"flex-start",marginBottom:14}}>
-                    <span style={{width:27,height:27,borderRadius:"50%",background:GRAD,color:"#FFFFFF",fontSize:13,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{n}</span>
-                    <div><div style={{fontSize:14.5,fontWeight:800,color:SCHWARZ}}>{t}</div><div style={{fontSize:13,color:TEXT_LEISE,marginTop:2,lineHeight:1.4}}>{d}</div></div>
+                    <span style={{width:26,flexShrink:0,fontFamily:ANTON,fontWeight:400,fontSize:22,lineHeight:1,color:P_AKZENT}}>{n}</span>
+                    <div><div style={{fontSize:15,fontWeight:600,color:P_TEXT}}>{t}</div><div style={{fontSize:13,color:P_LEISE,marginTop:3,lineHeight:1.45}}>{d}</div></div>
                   </div>
                 ))}
-                <button onClick={join} disabled={busy} style={{...knopfPrimaer,display:"flex",width:"100%",marginTop:6,cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":"Los geht's"}</button>
+                <button onClick={join} disabled={busy} style={{...knopfOutlineHell,width:"100%",marginTop:6,cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":"Los geht's"}</button>
+                </div>
               </div>
             </div>
           )}
@@ -592,27 +621,29 @@ export default function LigaPage(){
               Flaeche — dunkle Schrift, hoher Kontrast, keine dunkle Tabelle.
               Filter, Sprung-Tabs und die Aktionen pro Zeile sind unveraendert,
               nur neu gesetzt. */}
-          <section style={{background:FLAECHE,color:SCHWARZ}}>
-            <div className="ppl-breit" style={{paddingTop:26,paddingBottom:30}}>
-              <AbschnittKopf titel={`Ranking · ${sel?.city||city||"Schweiz"}`}/>
+          <section className="p-lese p-abschnitt">
+            <div className="p-karte">
+              <div className="p-kopf">
+                <h2>{`Ranking · ${sel?.city||city||"Schweiz"}`}</h2>
+                <button onClick={()=>setFilterOpen(true)} className="p-mehr" style={{cursor:"pointer",background:"none"}}>
+                  {filterAktiv?"Filter ändern":"Filtern"} →
+                </button>
+              </div>
 
-              {/* Filter */}
-              <button onClick={()=>setFilterOpen(true)} style={{display:"flex",alignItems:"center",justifyContent:"space-between",width:"100%",background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.14)",borderRadius:100,padding:"11px 16px",cursor:"pointer",fontFamily:INTER,marginBottom:12}}>
-                <span style={{display:"flex",alignItems:"center",gap:9,minWidth:0}}>
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={filterAktiv?AKZENT_TIEF:"rgba(8,8,8,.6)"} strokeWidth="2"><path d="M4 5h16M7 12h10M10 19h4"/></svg>
-                  <span style={{fontSize:14,fontWeight:700,color:filterAktiv?SCHWARZ:"rgba(8,8,8,.66)",whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{filterAktiv?filterLabel:"Rangliste filtern"}</span>
-                </span>
-                <span style={{fontSize:12,color:"rgba(8,8,8,.70)",flexShrink:0}}>{filterAktiv?"ändern":"▾"}</span>
-              </button>
+              {filterAktiv&&(
+                <div style={{padding:"12px 18px",borderBottom:"1px solid var(--p-kante)",fontSize:13,color:P_TEXT}}>
+                  {filterLabel}
+                </div>
+              )}
 
               {/* Sprung-Tabs zu den Stufen */}
-              <div style={{display:"flex",gap:6,overflowX:"auto",paddingBottom:4,marginBottom:14}}>
+              <div style={{display:"flex",gap:6,overflowX:"auto",padding:"14px 18px",borderBottom:"1px solid var(--p-kante)"}}>
                 {TIERS.map(l=>{
                   const on=l.key===ligaTab, meins=meineStufe?.key===l.key
                   const leer=!bands.some(b=>b.tier.key===l.key)
                   return(
                     <button key={l.key} onClick={()=>!leer&&springZu(l.key)} disabled={leer}
-                      style={{flex:"0 0 auto",borderRadius:100,padding:"8px 14px",background:on?SCHWARZ:"transparent",border:`1px solid ${on?SCHWARZ:"rgba(8,8,8,.2)"}`,color:leer?"rgba(8,8,8,.32)":on?CREME:"rgba(8,8,8,.7)",fontFamily:INTER,fontSize:12,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",cursor:leer?"default":"pointer",whiteSpace:"nowrap"}}>
+                      style={{flex:"0 0 auto",minHeight:36,padding:"0 13px",background:on?P_TEXT:"transparent",border:`1px solid ${on?P_TEXT:"var(--p-kante)"}`,color:leer?"#B8B8B4":on?"#FFFFFF":P_LEISE,fontFamily:INTER,fontSize:11,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase",cursor:leer?"default":"pointer",whiteSpace:"nowrap"}}>
                       {l.name}{meins?" ·":""}
                     </button>
                   )
@@ -620,49 +651,50 @@ export default function LigaPage(){
               </div>
 
               {bands.length===0&&(
-                <div style={{fontSize:16,color:"rgba(8,8,8,.6)",padding:"24px 0",lineHeight:1.6}}>
+                <p className="p-leer">
                   {filterAktiv?"Niemand passt zu diesem Filter.":"Noch niemand in der Rangliste."}
-                </div>
+                </p>
               )}
 
               {bands.map(b=>(
                 <div key={b.tier.key} ref={el=>{tierRefs.current[b.tier.key]=el}}>
-                  <div style={{display:"flex",alignItems:"center",gap:8,margin:"18px 0 2px"}}>
-                    <span style={{fontFamily:INTER,fontSize:12,fontWeight:900,letterSpacing:".13em",textTransform:"uppercase",color:b.tier.key===meineStufe?.key?AKZENT_TIEF:"rgba(8,8,8,.70)"}}>{b.tier.name}</span>
-                    <span style={{fontFamily:INTER,fontSize:13,color:"rgba(8,8,8,.70)"}}>{tierRangeLabel(b.tier.key)} · {b.rows.length}</span>
-                    <div style={{flex:1,height:1,background:"rgba(8,8,8,.16)"}}/>
+                  <div style={{display:"flex",alignItems:"center",gap:9,padding:"14px 18px 8px",borderTop:"1px solid var(--p-kante)"}}>
+                    <span style={{fontFamily:INTER,fontSize:11,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase",color:b.tier.key===meineStufe?.key?P_AKZENT:P_LEISE}}>{b.tier.name}</span>
+                    <span style={{fontFamily:INTER,fontSize:12,color:P_LEISE}}>{tierRangeLabel(b.tier.key)} · {b.rows.length}</span>
                   </div>
                   {b.rows.map(r=>{
                     const me=r.user_id===userId
                     const ini=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                     return(
-                      <div key={r.user_id} ref={me?meRef:null} style={{display:"flex",alignItems:"center",gap:11,padding:"12px 10px",marginLeft:me?-10:0,marginRight:me?-10:0,borderTop:"1px solid rgba(8,8,8,.12)",...(me?{background:"rgba(91,156,255,.13)",borderRadius:10,borderTop:"1px solid rgba(91,156,255,.28)"}:{})}}>
-                        <span style={{width:28,textAlign:"center",flexShrink:0,fontFamily:ANTON,fontSize:20,color:me?AKZENT_TIEF:"rgba(8,8,8,.70)",fontVariantNumeric:"tabular-nums"}}>{r.platz}</span>
-                        <div style={{width:38,height:38,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:"rgba(8,8,8,.10)",display:"grid",placeItems:"center"}}>
+                      <div key={r.user_id} ref={me?meRef:null} className="p-zeile" style={me?{background:"#FAFAF8"}:undefined}>
+                        <span style={{width:26,textAlign:"center",flexShrink:0,fontFamily:ANTON,fontWeight:400,fontSize:18,lineHeight:1,color:me?P_AKZENT:P_LEISE,fontVariantNumeric:"tabular-nums"}}>{r.platz}</span>
+                        <span style={{width:36,height:36,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:"#FFFFFF",border:"1px solid var(--p-kante)",display:"grid",placeItems:"center"}}>
                           {r.avatar
                             /* eslint-disable-next-line @next/next/no-img-element */
                             ? <img src={r.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                            : <span style={{fontFamily:INTER,fontSize:13,fontWeight:800,color:"rgba(8,8,8,.70)"}}>{ini}</span>}
-                        </div>
-                        <button onClick={()=>openPlayer(r.user_id)} style={{flex:1,minWidth:0,background:"none",border:"none",padding:0,textAlign:"left",cursor:"pointer",fontFamily:INTER,overflow:"hidden"}}>
-                          <span style={{display:"block",fontSize:17,fontWeight:700,color:SCHWARZ,whiteSpace:"nowrap",overflow:"hidden",textOverflow:"ellipsis"}}>{r.name}</span>
-                          <span style={{display:"block",fontSize:13,color:"rgba(8,8,8,.70)",marginTop:2}}>{me?"Du · ":""}{tierForElo(r.elo)?.name||"Ohne Stufe"}</span>
+                            : <span style={{fontSize:12.5,fontWeight:600,color:P_LEISE}}>{ini}</span>}
+                        </span>
+                        <button onClick={()=>openPlayer(r.user_id)} style={{flex:1,minWidth:0,background:"none",border:"none",padding:0,textAlign:"left",cursor:"pointer",fontFamily:INTER}}>
+                          <b style={{display:"block",fontSize:15.5,fontWeight:600,lineHeight:1.3,color:P_TEXT,overflowWrap:"anywhere"}}>{r.name}</b>
+                          <span style={{display:"block",fontSize:13,fontWeight:400,color:P_LEISE,marginTop:3}}>{me?"Du · ":""}{tierForElo(r.elo)?.name||"Ohne Stufe"}</span>
                         </button>
-                        <span style={{fontFamily:ANTON,fontSize:22,minWidth:56,textAlign:"right",flexShrink:0,color:me?AKZENT_TIEF:SCHWARZ,fontVariantNumeric:"tabular-nums"}}>{ratingLabel(r.elo)}</span>
+                        <span style={{fontFamily:ANTON,fontWeight:400,fontSize:21,lineHeight:1,minWidth:52,textAlign:"right",flexShrink:0,color:me?P_AKZENT:P_TEXT,fontVariantNumeric:"tabular-nums"}}>{ratingLabel(r.elo)}</span>
                       </div>
                     )
                   })}
                 </div>
               ))}
 
-              {/* ── Liga verstehen — die ECHTE Logik, keine erfundene ── */}
-              <div style={{marginTop:30,borderTop:"1px solid rgba(8,8,8,.18)",paddingTop:22}}>
-                <AbschnittKopf titel="Liga verstehen"/>
-                <h3 style={{fontFamily:INTER,fontWeight:900,fontSize:"clamp(21px,5.6vw,27px)",letterSpacing:"-.015em",lineHeight:.98,textTransform:"uppercase",margin:"8px 0 12px",color:SCHWARZ}}>Wie steige ich auf?</h3>
-                <p style={{fontFamily:INTER,fontSize:16,lineHeight:1.55,color:"rgba(8,8,8,.72)",margin:"0 0 10px",maxWidth:"52ch"}}>
+            </div>
+
+            {/* ── Liga verstehen — die ECHTE Logik, keine erfundene ── */}
+            <div className="p-karte p-abschnitt">
+              <div className="p-kopf"><h2>Wie steige ich auf?</h2></div>
+              <div style={{padding:18}}>
+                <p style={{fontSize:15,lineHeight:1.55,color:P_TEXT,margin:"0 0 10px",maxWidth:"52ch"}}>
                   Fordere Spieler rund um deinen Rang heraus. Jedes bestätigte Spiel verschiebt dein Rating — ein Sieg gegen jemand Stärkeren bringt am meisten, gegen jemand Schwächeren am wenigsten.
                 </p>
-                <p style={{fontFamily:INTER,fontSize:15,lineHeight:1.55,color:"rgba(8,8,8,.70)",margin:0,maxWidth:"52ch"}}>
+                <p style={{fontSize:14,lineHeight:1.55,color:P_LEISE,margin:0,maxWidth:"52ch"}}>
                   Gegen denselben Gegner zählen höchstens {MAX_RANKED_PER_OPPONENT} Spiele pro Jahr für die Wertung. Und wer weniger als {MIN_MATCHES_PER_MONTH} gewertete Spiele im Monat hat, verliert {MONTHLY_PENALTY_ELO} Punkte. Die Stufe ist kein eigener Aufstieg, sondern ein Etikett für deinen Rating-Bereich.
                 </p>
               </div>
@@ -677,36 +709,34 @@ export default function LigaPage(){
             const nah=idx<0?[]:displayRows.slice(Math.max(0,idx-2),idx+3).filter(r=>r.user_id!==userId).slice(0,4)
             if(!nah.length) return null
             return (
-              <section style={{background:FLAECHE}}>
-                <div className="ppl-breit" style={{paddingTop:4,paddingBottom:34}}>
-                <Feld titel="Who's next?">
+              <section className="p-lese p-abschnitt">
+                <div className="p-karte">
+                  <div className="p-kopf"><h2>Who&apos;s next?</h2></div>
                   {nah.map(r=>{
                     const ini=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                     const om=openMatches[r.user_id]
                     return (
-                      <ListenZeile
-                        key={r.user_id}
-                        erste={nah[0].user_id===r.user_id}
-                        links={
-                          <div style={{width:40,height:40,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:"rgba(8,8,8,.08)",display:"grid",placeItems:"center"}}>
-                            {r.avatar
-                              /* eslint-disable-next-line @next/next/no-img-element */
-                              ? <img src={r.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
-                              : <span style={{fontFamily:INTER,fontSize:13,fontWeight:800,color:TEXT_LEISE}}>{ini}</span>}
-                          </div>
-                        }
-                        titel={r.name}
-                        unter={`#${r.platz} · ${ratingLabel(r.elo)} Rating`}
-                        rechts={
-                          !om
-                            ? <button onClick={()=>openForder(r)} style={knopfKlein}>Herausfordern</button>
+                      <div key={r.user_id} className="p-zeile hat-cta">
+                        <span style={{width:36,height:36,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:"#FFFFFF",border:"1px solid var(--p-kante)",display:"grid",placeItems:"center"}}>
+                          {r.avatar
+                            /* eslint-disable-next-line @next/next/no-img-element */
+                            ? <img src={r.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
+                            : <span style={{fontSize:12.5,fontWeight:600,color:P_LEISE}}>{ini}</span>}
+                        </span>
+                        <span style={{flex:1,minWidth:0}}>
+                          <b style={{display:"block",fontSize:15.5,fontWeight:600,lineHeight:1.3,overflowWrap:"anywhere"}}>{r.name}</b>
+                          <span style={{display:"block",marginTop:3,fontSize:13,fontWeight:400,color:P_LEISE}}>#{r.platz} · {ratingLabel(r.elo)} Rating</span>
+                        </span>
+                        <span className="cta">
+                          {!om
+                            ? <button onClick={()=>openForder(r)} className="p-aktion">Herausfordern</button>
                             : om.status==="challenge_sent"&&!om.iAmP1
-                              ? <button onClick={()=>acceptChallenge(om.id)} style={knopfKlein}>Annehmen</button>
-                              : <button onClick={()=>openPlayer(r.user_id)} style={{background:"none",border:"none",padding:0,cursor:"pointer"}}><Pille text="Profil"/></button>}
-                      />
+                              ? <button onClick={()=>acceptChallenge(om.id)} className="p-aktion">Annehmen</button>
+                              : <button onClick={()=>openPlayer(r.user_id)} className="p-pille" style={{cursor:"pointer"}}>Profil</button>}
+                        </span>
+                      </div>
                     )
                   })}
-                </Feld>
                 </div>
               </section>
             )
@@ -714,26 +744,25 @@ export default function LigaPage(){
 
           {/* Liga anfragen — gehört ans Ende. Es richtet sich an Leute OHNE Liga,
               stand aber ganz oben bei Leuten, die längst in einer sind. */}
-          <div style={{padding:"18px 14px 6px",textAlign:"center"}}>
+          <div className="p-lese p-abschnitt" style={{paddingBottom:6,textAlign:"center"}}>
             {reqDone ? (
-              <div style={{fontSize:13,color:TEXT_LEISE,lineHeight:1.5}}>
+              <div style={{fontSize:13,color:P_LEISE,lineHeight:1.5}}>
                 {reqCount>1
                   ? `Danke — ${reqCount} Leute wollen eine Liga in ${reqCity}. Wir melden uns, sobald sie steht.`
                   : `Danke — wir melden uns, sobald sich genug Leute für ${reqCity} finden.`}
               </div>
             ) : reqOpen ? (
-              <div style={{background:"#FFFFFF",borderRadius:16,padding:16,textAlign:"left"}}>
-                <div style={{fontSize:14,fontWeight:800,color:SCHWARZ,marginBottom:10}}>In welcher Stadt fehlt dir eine Liga?</div>
+              <div className="p-karte" style={{padding:18,textAlign:"left"}}>
+                <span className="p-label" style={{marginBottom:8}}>In welcher Stadt fehlt dir eine Liga?</span>
                 <input value={reqCity} onChange={e=>setReqCity(e.target.value)} placeholder="z.B. Winterthur" autoFocus
-                  style={{width:"100%",boxSizing:"border-box",background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.14)",borderRadius:12,padding:"12px 14px",color:SCHWARZ,fontSize:14,outline:"none",fontFamily:"inherit",marginBottom:10}}/>
+                  className="p-feld" style={{marginBottom:10}}/>
                 <button onClick={sendLigaAnfrage} disabled={busy||!reqCity.trim()}
-                  style={{...knopfPrimaer,display:"flex",width:"100%",cursor:(busy||!reqCity.trim())?"not-allowed":"pointer",opacity:(busy||!reqCity.trim())?.5:1}}>
+                  style={{...knopfPrimaer,width:"100%",cursor:(busy||!reqCity.trim())?"not-allowed":"pointer",opacity:(busy||!reqCity.trim())?.5:1}}>
                   {busy?"…":"Anfrage senden"}
                 </button>
               </div>
             ) : (
-              <button onClick={()=>setReqOpen(true)}
-                style={{background:"none",color:AKZENT_TIEF,fontSize:13.5,fontWeight:700,cursor:"pointer",fontFamily:"inherit",padding:"12px 6px",minHeight:44}}>
+              <button onClick={()=>setReqOpen(true)} className="p-textlink" style={{minHeight:44,marginTop:0}}>
                 Keine Liga in deiner Stadt? Anfragen →
               </button>
             )}
@@ -744,13 +773,13 @@ export default function LigaPage(){
       {/* Gegner-Auswahl: "Gegen wen hast du gespielt?" → direkt ins Ergebnis-Formular */}
       {pickOpen&&(
         <div onClick={()=>setPickOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"84vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:"#080B0D",border:"1px solid rgba(255,255,255,.20)",padding:"22px 18px",maxHeight:"84vh",overflowY:"auto"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
               <div style={{fontSize:20,fontWeight:900,color:W}}>Gegen wen hast du gespielt?</div>
               <button onClick={()=>setPickOpen(false)} style={{background:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
             </div>
             <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Wähl deinen Gegner — danach trägst du das Resultat ein.</div>
-            <div style={{background:CELL,borderRadius:14,overflow:"hidden"}}>
+            <div style={{background:"#101316",borderRadius:0,overflow:"hidden"}}>
               {/* Nur Gegner aus dem eigenen Paar — sonst trägt ein Rookie ein
                   gewertetes Ergebnis gegen einen Elite-Spieler ein. */}
               {rows.filter(r=>r.user_id!==userId&&imPaar(r)).map((r,i)=>(
@@ -770,7 +799,7 @@ export default function LigaPage(){
       {/* Spieler-Popup: Bilanz, Siegquote, letzte Spiele, direkter Vergleich */}
       {pOpen&&(
         <div onClick={()=>setPOpen(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:"#080B0D",border:"1px solid rgba(255,255,255,.20)",padding:"22px 18px",maxHeight:"88vh",overflowY:"auto"}}>
             {pLoading&&<div style={{textAlign:"center",color:MUT,fontSize:13,padding:"30px 0"}}>lädt…</div>}
 
             {!pLoading&&pData&&(<>
@@ -779,7 +808,7 @@ export default function LigaPage(){
                   <div style={{fontSize:22,fontWeight:900,color:W}}>{pData.player.name}</div>
                   {pData.player.real_short&&<div style={{fontSize:12.5,color:MUT,marginTop:2}}>{pData.player.real_short}</div>}
                   <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8}}>
-                    <span style={{fontSize:14,fontWeight:800,...gt}}>Rating {ratingLabel(pData.player.elo)}</span>
+                    <span style={{fontSize:14,fontWeight:800,color:"#FFFFFF"}}>Rating {ratingLabel(pData.player.elo)}</span>
                   </div>
                 </div>
                 <button onClick={()=>setPOpen(null)} style={{background:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
@@ -792,7 +821,7 @@ export default function LigaPage(){
                   {v:String(pData.player.lost),        l:"Niederlagen"},
                   {v:pData.player.winRate!==null?`${pData.player.winRate}%`:"—", l:"Siegquote"},
                 ].map(s=>(
-                  <div key={s.l} style={{flex:1,background:CELL,borderRadius:14,padding:"13px 8px",textAlign:"center"}}>
+                  <div key={s.l} style={{flex:1,background:"#101316",borderRadius:0,padding:"13px 8px",textAlign:"center"}}>
                     <div style={{fontSize:20,fontWeight:900,color:W}}>{s.v}</div>
                     <div style={{fontSize:11.5,color:MUT,fontWeight:600,textTransform:"uppercase",letterSpacing:".05em",marginTop:2}}>{s.l}</div>
                   </div>
@@ -801,12 +830,12 @@ export default function LigaPage(){
 
               {/* Direkter Vergleich */}
               {pData.head&&(
-                <div style={{background:CELL,borderRadius:14,padding:"14px 15px",marginBottom:16}}>
+                <div style={{background:"#101316",borderRadius:0,padding:"14px 15px",marginBottom:16}}>
                   <div style={{fontSize:11.5,fontWeight:700,color:MUT,textTransform:"uppercase",letterSpacing:".08em",marginBottom:9}}>Ihr beide</div>
                   {pData.head.played===0
                     ? <div style={{fontSize:13,color:SUB,fontWeight:300}}>Ihr habt diese Saison noch nicht gegeneinander gespielt.</div>
                     : <div style={{display:"flex",alignItems:"baseline",gap:8}}>
-                        <span style={{fontSize:24,fontWeight:900,...gt}}>{pData.head.myWins}</span>
+                        <span style={{fontSize:24,fontWeight:900,color:"#FFFFFF"}}>{pData.head.myWins}</span>
                         <span style={{fontSize:16,fontWeight:900,color:MUT}}>:</span>
                         <span style={{fontSize:24,fontWeight:900,color:W}}>{pData.head.theirWins}</span>
                         <span style={{fontSize:12,color:MUT,marginLeft:6}}>aus {pData.head.played} Spielen</span>
@@ -822,11 +851,11 @@ export default function LigaPage(){
               {/* Letzte Spiele */}
               <div style={{fontSize:11.5,fontWeight:700,color:MUT,textTransform:"uppercase",letterSpacing:".08em",marginBottom:8}}>Letzte Spiele</div>
               {pData.recent.length===0
-                ? <div style={{background:CELL,borderRadius:14,padding:"16px 15px",fontSize:13,color:SUB,fontWeight:300}}>Noch keine bestätigten Spiele.</div>
-                : <div style={{background:CELL,borderRadius:14,overflow:"hidden"}}>
+                ? <div style={{background:"#101316",borderRadius:0,padding:"16px 15px",fontSize:13,color:SUB,fontWeight:300}}>Noch keine bestätigten Spiele.</div>
+                : <div style={{background:"#101316",borderRadius:0,overflow:"hidden"}}>
                     {pData.recent.map((m,i)=>(
                       <div key={m.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 14px",borderTop:i===0?"none":`1px solid ${LINE}`}}>
-                        <span style={{width:22,height:22,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11.5,fontWeight:900,background:m.won?GRAD:"#0E0E10",color:m.won?"#FFFFFF":MUT}}>{m.won?"S":"N"}</span>
+                        <span style={{width:22,height:22,borderRadius:0,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11.5,fontWeight:900,background:m.won?"#FFFFFF":"#101316",color:m.won?"#080B0D":MUT}}>{m.won?"S":"N"}</span>
                         <div style={{flex:1,minWidth:0}}>
                           <div style={{fontSize:13,fontWeight:700,color:W,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.opponent}</div>
                           {(m.date||!m.ranked)&&<div style={{fontSize:11.5,color:MUT,marginTop:1}}>
@@ -842,7 +871,7 @@ export default function LigaPage(){
               {/* Direkt fordern — auch hier nur im eigenen Paar */}
               {pOpen!==userId&&myReg&&(()=>{const row=rows.find(r=>r.user_id===pOpen); return !!row&&imPaar(row)})()&&(
                 <button onClick={()=>{const row=rows.find(r=>r.user_id===pOpen); setPOpen(null); if(row) openForder(row)}}
-                  style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:GRAD,color:"#FFFFFF",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit"}}>
+                  style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:"#FFFFFF",color:"#080B0D",borderRadius:0,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit"}}>
                   Fordern
                 </button>
               )}
@@ -855,7 +884,7 @@ export default function LigaPage(){
       {/* ─── FILTER-SHEET ─────────────────────────────────────────────────── */}
       {filterOpen&&(
         <div onClick={()=>setFilterOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:480,background:CARD,borderTopLeftRadius:24,borderTopRightRadius:24,padding:"20px 18px 28px",maxHeight:"88vh",overflowY:"auto"}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:480,background:"#080B0D",borderTop:"1px solid rgba(255,255,255,.20)",padding:"20px 18px 28px",maxHeight:"88vh",overflowY:"auto"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
               <div style={{fontSize:19,fontWeight:900,color:W}}>Rangliste filtern</div>
               <button onClick={()=>setFilter({scope:"world",canton:"",city:"",friends:false,category:"",hand:"",pips:"",anti:false})} style={{background:"none",color:GREEN,fontSize:12.5,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Zurücksetzen</button>
@@ -866,17 +895,17 @@ export default function LigaPage(){
             <div style={{fontSize:11.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"4px 2px 8px"}}>Reichweite</div>
             <div style={{display:"flex",gap:7,marginBottom:6}}>
               {[["country","Land"],["canton","Kanton"],["city","Stadt"]].map(([k,l])=>(
-                <button key={k} onClick={()=>setFilter(f=>({...f,scope:f.scope===k?"world":k}))} style={{flex:1,fontSize:12.5,fontWeight:700,padding:"9px 4px",borderRadius:10,cursor:"pointer",fontFamily:"inherit",...(filter.scope===k?{background:GRAD,color:"#FFFFFF"}:{background:CELL,color:SUB})}}>{l}</button>
+                <button key={k} onClick={()=>setFilter(f=>({...f,scope:f.scope===k?"world":k}))} style={{flex:1,fontSize:12.5,fontWeight:700,padding:"9px 4px",borderRadius:0,cursor:"pointer",fontFamily:"inherit",...(filter.scope===k?{background:"#FFFFFF",color:"#080B0D"}:{background:"#101316",color:SUB})}}>{l}</button>
               ))}
             </div>
             {filter.scope==="canton"&&(
-              <select value={filter.canton} onChange={e=>setFilter(f=>({...f,canton:e.target.value}))} style={{width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",color:W,fontSize:14,fontFamily:"inherit",marginTop:6}}>
+              <select value={filter.canton} onChange={e=>setFilter(f=>({...f,canton:e.target.value}))} style={{width:"100%",background:"#101316",borderRadius:0,padding:"12px 13px",color:W,fontSize:14,fontFamily:"inherit",marginTop:6}}>
                 <option value="">Alle Kantone</option>
                 {["ZH","SG","BS","LU","BE","AG"].map(c=><option key={c} value={c}>{c}</option>)}
               </select>
             )}
             {filter.scope==="city"&&(
-              <select value={filter.city} onChange={e=>setFilter(f=>({...f,city:e.target.value}))} style={{width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",color:W,fontSize:14,fontFamily:"inherit",marginTop:6}}>
+              <select value={filter.city} onChange={e=>setFilter(f=>({...f,city:e.target.value}))} style={{width:"100%",background:"#101316",borderRadius:0,padding:"12px 13px",color:W,fontSize:14,fontFamily:"inherit",marginTop:6}}>
                 <option value="">Alle Städte</option>
                 {["Glattbrugg","Zürich","St. Gallen","Basel","Luzern"].map(c=><option key={c} value={c}>{c}</option>)}
               </select>
@@ -884,13 +913,13 @@ export default function LigaPage(){
 
             {/* Freunde + Kategorie */}
             <div style={{fontSize:11.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"16px 2px 8px"}}>Gruppen</div>
-            <button onClick={()=>setFilter(f=>({...f,friends:!f.friends}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit",marginBottom:8}}>
-              <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.friends?{background:GRAD,color:"#FFFFFF"}:{background:"#0E0E10",color:"transparent"})}}>✓</span>
+            <button onClick={()=>setFilter(f=>({...f,friends:!f.friends}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:"#101316",borderRadius:0,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit",marginBottom:8}}>
+              <span style={{width:20,height:20,borderRadius:0,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.friends?{background:"#FFFFFF",color:"#080B0D"}:{background:"#101316",color:"transparent"})}}>✓</span>
               <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Nur Freunde</span>
-              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke={SUB} strokeWidth="2"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 20c0-3 2.5-5 5.5-5s5.5 2 5.5 5"/><path d="M17 8v5M14.5 10.5h5"/></svg>
+              <IconSpieler size={17} style={{ color: SUB }} />
             </button>
-            <button onClick={()=>setFilter(f=>({...f,category:f.category==="parkinson"?"":"parkinson"}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:CELL,borderRadius:12,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit"}}>
-              <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.category==="parkinson"?{background:GRAD,color:"#FFFFFF"}:{background:"#0E0E10",color:"transparent"})}}>✓</span>
+            <button onClick={()=>setFilter(f=>({...f,category:f.category==="parkinson"?"":"parkinson"}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:"#101316",borderRadius:0,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit"}}>
+              <span style={{width:20,height:20,borderRadius:0,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.category==="parkinson"?{background:"#FFFFFF",color:"#080B0D"}:{background:"#101316",color:"transparent"})}}>✓</span>
               <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Parkinson-Liga</span>
             </button>
 
@@ -909,22 +938,22 @@ export default function LigaPage(){
                   return {...f,[feld]:f[feld]===wert?"":wert}
                 })
                 return (
-                  <button key={label} onClick={toggle} style={{flex:"1 1 45%",display:"flex",alignItems:"center",gap:8,background:CELL,borderRadius:10,padding:"10px 11px",cursor:"pointer",fontFamily:"inherit"}}>
-                    <span style={{width:17,height:17,borderRadius:5,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11.5,fontWeight:900,...(on?{background:GRAD,color:"#FFFFFF"}:{background:"#0E0E10",color:"transparent"})}}>✓</span>
+                  <button key={label} onClick={toggle} style={{flex:"1 1 45%",display:"flex",alignItems:"center",gap:8,background:"#101316",borderRadius:0,padding:"10px 11px",cursor:"pointer",fontFamily:"inherit"}}>
+                    <span style={{width:17,height:17,borderRadius:0,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11.5,fontWeight:900,...(on?{background:"#FFFFFF",color:"#080B0D"}:{background:"#101316",color:"transparent"})}}>✓</span>
                     <span style={{fontSize:12.5,fontWeight:600,color:on?W:SUB}}>{label}</span>
                   </button>
                 )
               })}
             </div>
 
-            <button onClick={()=>setFilterOpen(false)} style={{width:"100%",background:GRAD,color:"#FFFFFF",borderRadius:14,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",marginTop:18}}>Anzeigen</button>
+            <button onClick={()=>setFilterOpen(false)} style={{width:"100%",background:"#FFFFFF",color:"#080B0D",borderRadius:0,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",marginTop:18}}>Anzeigen</button>
           </div>
         </div>
       )}
 
       {fTarget&&(
         <div onClick={()=>setFTarget(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:CARD,borderRadius:24,padding:"24px 20px",maxHeight:"88vh",overflowY:"auto",boxShadow:"0 30px 80px rgba(0,0,0,.6)"}}>
+          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:"#080B0D",border:"1px solid rgba(255,255,255,.20)",padding:"22px 18px",maxHeight:"88vh",overflowY:"auto"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
               <div style={{fontSize:20,fontWeight:900,color:W}}>vs {fTarget.name}</div>
               <button onClick={()=>setFTarget(null)} style={{background:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
@@ -943,7 +972,7 @@ export default function LigaPage(){
             <div style={{display:"flex",gap:8,margin:"16px 0 18px"}}>
               {(["challenge","result"] as const).map(t=>{
                 const on=fTab===t
-                return <button key={t} onClick={()=>setFTab(t)} style={{flex:1,borderRadius:12,padding:"11px 8px",fontSize:12.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",color:on?"#FFFFFF":W,background:on?GRAD:CELL}}>{t==="challenge"?"Herausfordern":"Ergebnis eintragen"}</button>
+                return <button key={t} onClick={()=>setFTab(t)} style={{flex:1,borderRadius:0,padding:"11px 8px",fontSize:12.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",color:on?"#FFFFFF":W,background:on?"#FFFFFF":"#101316"}}>{t==="challenge"?"Herausfordern":"Ergebnis eintragen"}</button>
               })}
             </div>
 
@@ -953,14 +982,14 @@ export default function LigaPage(){
                 <div style={{display:"flex",gap:12}}>
                   <div style={{flex:1}}>
                     <div style={{fontSize:11.5,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Datum</div>
-                    <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} style={{width:"100%",background:"#0E0E10",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                    <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} style={{width:"100%",background:"#101316",borderRadius:0,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                   </div>
                   <div style={{flex:1}}>
                     <div style={{fontSize:11.5,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Zeit</div>
-                    <input type="time" value={fTime} onChange={e=>setFTime(e.target.value)} style={{width:"100%",background:"#0E0E10",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                    <input type="time" value={fTime} onChange={e=>setFTime(e.target.value)} style={{width:"100%",background:"#101316",borderRadius:0,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                   </div>
                 </div>
-                <button onClick={sendChallenge} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:22,background:GRAD,color:"#FFFFFF",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":"Anfrage senden"}</button>
+                <button onClick={sendChallenge} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:22,background:"#FFFFFF",color:"#080B0D",borderRadius:0,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":"Anfrage senden"}</button>
               </>
             ):(
               <>
@@ -968,7 +997,7 @@ export default function LigaPage(){
 
                 <div style={{marginBottom:18}}>
                   <div style={{fontSize:11.5,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Wann gespielt?</div>
-                  <input type="date" max={today()} value={fRDate} onChange={e=>setFRDate(e.target.value)} style={{width:"100%",background:"#0E0E10",borderRadius:12,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                  <input type="date" max={today()} value={fRDate} onChange={e=>setFRDate(e.target.value)} style={{width:"100%",background:"#101316",borderRadius:0,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
                 </div>
 
                 {!fDetail?(
@@ -979,9 +1008,9 @@ export default function LigaPage(){
                         <div key={idx} style={{textAlign:"center"}}>
                           <div style={{fontSize:11.5,color:MUT,fontWeight:700,textTransform:"uppercase",marginBottom:9,maxWidth:110,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lab}</div>
                           <div style={{display:"flex",alignItems:"center",gap:9}}>
-                            <button onClick={()=>set(Math.max(0,val-1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>−</button>
-                            <span style={{fontSize:36,fontWeight:900,width:34,textAlign:"center",...gt}}>{val}</span>
-                            <button onClick={()=>set(Math.min(7,val+1))} style={{width:34,height:34,borderRadius:"50%",background:CELL,color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>+</button>
+                            <button onClick={()=>set(Math.max(0,val-1))} style={{width:34,height:34,borderRadius:0,background:"#101316",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>−</button>
+                            <span style={{fontSize:36,fontWeight:900,width:34,textAlign:"center",color:"#FFFFFF"}}>{val}</span>
+                            <button onClick={()=>set(Math.min(7,val+1))} style={{width:34,height:34,borderRadius:0,background:"#101316",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>+</button>
                           </div>
                         </div>
                       </>
@@ -1001,12 +1030,12 @@ export default function LigaPage(){
                         <input type="number" inputMode="numeric" min={0} max={30} value={s.p1}
                           onChange={e=>setFSets(v=>v.map((x,j)=>j===i?{...x,p1:e.target.value}:x))}
                           placeholder="11"
-                          style={{flex:1,minWidth:0,background:"#0E0E10",borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
+                          style={{flex:1,minWidth:0,background:"#101316",borderRadius:0,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
                         <span style={{width:10,textAlign:"center",color:MUT,fontWeight:800}}>:</span>
                         <input type="number" inputMode="numeric" min={0} max={30} value={s.p2}
                           onChange={e=>setFSets(v=>v.map((x,j)=>j===i?{...x,p2:e.target.value}:x))}
                           placeholder="7"
-                          style={{flex:1,minWidth:0,background:"#0E0E10",borderRadius:12,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
+                          style={{flex:1,minWidth:0,background:"#101316",borderRadius:0,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
                         {i>=3&&(
                           <button onClick={()=>setFSets(v=>v.filter((_,j)=>j!==i))} style={{background:"none",color:MUT,fontSize:16,cursor:"pointer",flexShrink:0}}>×</button>
                         )}
@@ -1014,9 +1043,9 @@ export default function LigaPage(){
                     ))}
                     {fSets.length<7&&(
                       <button onClick={()=>setFSets(v=>[...v,{p1:"",p2:""}])}
-                        style={{width:"100%",background:CELL,borderRadius:12,padding:10,color:MUT,fontSize:12.5,cursor:"pointer",fontFamily:"inherit"}}>+ Satz</button>
+                        style={{width:"100%",background:"#101316",borderRadius:0,padding:10,color:MUT,fontSize:12.5,cursor:"pointer",fontFamily:"inherit"}}>+ Satz</button>
                     )}
-                    <div style={{textAlign:"center",fontSize:13,fontWeight:800,marginTop:11,...gt}}>
+                    <div style={{textAlign:"center",fontSize:13,fontWeight:800,marginTop:11,color:"#FFFFFF"}}>
                       {satzBilanz().my} : {satzBilanz().opp} Sätze
                     </div>
                   </div>
@@ -1028,8 +1057,8 @@ export default function LigaPage(){
                   {fDetail?"Nur Sätze zählen":"Satzergebnisse genau eintragen"}
                 </button>
                 {/* Freundschaftsspiel: Ergebnis wird gespeichert und im Chat gezeigt, zählt aber nicht */}
-                <button onClick={()=>setFFriendly(v=>!v)} style={{display:"flex",alignItems:"center",gap:11,width:"100%",marginTop:20,background:CELL,borderRadius:14,padding:"13px 14px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
-                  <span style={{width:20,height:20,borderRadius:6,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:fFriendly?GRAD:CELL,color:"#FFFFFF",fontSize:13,fontWeight:900}}>{fFriendly?"✓":""}</span>
+                <button onClick={()=>setFFriendly(v=>!v)} style={{display:"flex",alignItems:"center",gap:11,width:"100%",marginTop:20,background:"#101316",borderRadius:0,padding:"13px 14px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
+                  <span style={{width:20,height:20,borderRadius:0,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:fFriendly?"#FFFFFF":"#101316",color:"#080B0D",fontSize:13,fontWeight:600}}>{fFriendly?"✓":""}</span>
                   <span style={{flex:1}}>
                     <span style={{display:"block",fontSize:13.5,fontWeight:700,color:W}}>Freundschaftsspiel</span>
                     <span style={{display:"block",fontSize:11.5,color:MUT,marginTop:1}}>Zählt nicht für ELO und Rang — erscheint nur im Verlauf.</span>
@@ -1037,21 +1066,21 @@ export default function LigaPage(){
                 </button>
 
                 {fNoteRanked&&(
-                  <div style={{marginTop:12,background:CELL,borderRadius:12,padding:"11px 13px",fontSize:12,color:SUB,lineHeight:1.5}}>{fNoteRanked}</div>
+                  <div style={{marginTop:12,background:"#101316",borderRadius:0,padding:"11px 13px",fontSize:12,color:SUB,lineHeight:1.5}}>{fNoteRanked}</div>
                 )}
 
-                <button onClick={sendResult} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:GRAD,color:"#FFFFFF",borderRadius:14,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":fDone.length?"Weiteres Ergebnis absenden":"Ergebnis absenden"}</button>
+                <button onClick={sendResult} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:"#FFFFFF",color:"#080B0D",borderRadius:0,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":fDone.length?"Weiteres Ergebnis absenden":"Ergebnis absenden"}</button>
 
                 {fDone.length>0&&(
-                  <div style={{marginTop:16,background:CELL,borderRadius:14,padding:"13px 14px"}}>
+                  <div style={{marginTop:16,background:"#101316",borderRadius:0,padding:"13px 14px"}}>
                     <div style={{fontSize:11.5,fontWeight:700,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:8}}>Eingetragen ({fDone.length})</div>
                     <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
                       {fDone.map((s,i)=>(
-                        <span key={i} style={{fontSize:13,fontWeight:800,color:W,background:"#0E0E10",borderRadius:8,padding:"5px 10px"}}>{s}</span>
+                        <span key={i} style={{fontSize:13,fontWeight:800,color:W,background:"#101316",borderRadius:0,padding:"5px 10px"}}>{s}</span>
                       ))}
                     </div>
                     <div style={{fontSize:11.5,color:SUB,fontWeight:300,marginTop:9,lineHeight:1.5}}>{fTarget.name} bekommt eine E-Mail und hat 24 Std. Zeit zu bestätigen — danach zählt das Ergebnis automatisch. Du kannst gleich den nächsten Match eintragen.</div>
-                    <button onClick={()=>setFTarget(null)} style={{display:"block",width:"100%",textAlign:"center",marginTop:11,background:CELL,borderRadius:12,padding:11,fontSize:13,fontWeight:800,color:W,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit"}}>Fertig</button>
+                    <button onClick={()=>setFTarget(null)} style={{display:"block",width:"100%",textAlign:"center",marginTop:11,background:"#101316",borderRadius:0,padding:11,fontSize:13,fontWeight:800,color:W,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit"}}>Fertig</button>
                   </div>
                 )}
               </>
@@ -1064,7 +1093,7 @@ export default function LigaPage(){
           bisher komplett verdeckt. Man sah es schlicht nicht. */}
       {chatOpen&&(
         <div onClick={()=>setChatOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.4)",zIndex:130,display:"flex",justifyContent:"flex-end"}}>
-          <div onClick={e=>e.stopPropagation()} style={{background:FLAECHE,borderLeft:"1px solid rgba(8,8,8,.10)",height:"100%",width:"83%",maxWidth:380,display:"flex",flexDirection:"column",boxShadow:"-22px 0 50px rgba(0,0,0,.35)"}}>
+          <div onClick={e=>e.stopPropagation()} style={{background:FLAECHE,borderLeft:"1px solid rgba(8,8,8,.10)",height:"100%",width:"83%",maxWidth:380,display:"flex",flexDirection:"column"}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"15px 16px",borderBottom:"1px solid rgba(8,8,8,.10)",background:"#FFFFFF"}}>
               <span style={{fontFamily:INTER,fontSize:12.5,fontWeight:900,letterSpacing:".14em",textTransform:"uppercase",color:SCHWARZ}}>Liga-Chat</span>
               <button onClick={()=>setChatOpen(false)} style={{background:"none",color:TEXT_LEISE,fontSize:18,cursor:"pointer"}}>✕</button>
@@ -1078,7 +1107,7 @@ export default function LigaPage(){
                   const r=m.reactions
                   return(
                     <div key={m.id} style={{alignSelf:"stretch"}}>
-                      <div style={{background:"#FFFFFF",borderRadius:14,padding:"11px 14px"}}>
+                      <div style={{background:"#FFFFFF",borderRadius:0,padding:"11px 14px"}}>
                         <div style={{fontSize:11.5,fontWeight:700,color:d?.pending?TEXT_LEISE:d?.ranked===false?TEXT_LEISE:AKZENT_TIEF,letterSpacing:".08em",textTransform:"uppercase",marginBottom:5}}>
                           {d?.pending?"Neues Ergebnis · wartet auf Bestätigung":d?.ranked===false?"Match · zählt nicht":"Match bestätigt"}
                         </div>
@@ -1095,7 +1124,7 @@ export default function LigaPage(){
                             const cnt=r[type]
                             const active=r.myReacts.includes(type)
                             return(
-                              <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:active?"rgba(91,156,255,.14)":"rgba(8,8,8,.05)",borderRadius:99,padding:"4px 10px",fontSize:13,cursor:"pointer",color:SCHWARZ,fontFamily:"inherit"}}>
+                              <button key={type} onClick={()=>react(m.id,type)} style={{display:"flex",alignItems:"center",gap:4,background:active?"rgba(11,122,51,.14)":"rgba(8,8,8,.05)",borderRadius:0,padding:"4px 10px",fontSize:13,cursor:"pointer",color:SCHWARZ,fontFamily:"inherit"}}>
                                 <span>{emoji}</span>
                                 {cnt>0&&<span style={{fontSize:11.5,fontWeight:700,color:active?AKZENT_TIEF:TEXT_LEISE}}>{cnt}</span>}
                               </button>
@@ -1103,7 +1132,7 @@ export default function LigaPage(){
                           })}
                           {/* Kommentieren — das Spiel selbst ist der Gesprächsanlass */}
                           <button onClick={()=>setCmtOpen(o=>({...o,[m.id]:!o[m.id]}))}
-                            style={{display:"flex",alignItems:"center",gap:5,marginLeft:"auto",background:"rgba(8,8,8,.05)",borderRadius:99,padding:"4px 10px",fontSize:11.5,fontWeight:700,color:kommentare.length?SCHWARZ:TEXT_LEISE,cursor:"pointer",fontFamily:"inherit"}}>
+                            style={{display:"flex",alignItems:"center",gap:5,marginLeft:"auto",background:"rgba(8,8,8,.05)",borderRadius:0,padding:"4px 10px",fontSize:11.5,fontWeight:700,color:kommentare.length?SCHWARZ:TEXT_LEISE,cursor:"pointer",fontFamily:"inherit"}}>
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4"><path d="M4 5h16v11H9l-4 3v-3H4z"/></svg>
                             {kommentare.length>0?kommentare.length:"Kommentieren"}
                           </button>
@@ -1125,9 +1154,9 @@ export default function LigaPage(){
                                   onChange={e=>setCmt(c=>({...c,[m.id]:e.target.value}))}
                                   onKeyDown={e=>{if(e.key==="Enter")sendComment(m.id)}}
                                   placeholder="Kommentar zum Spiel …"
-                                  style={{flex:1,minWidth:0,background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.12)",borderRadius:999,padding:"9px 12px",color:SCHWARZ,fontSize:12.5,outline:"none",fontFamily:"inherit"}}/>
+                                  style={{flex:1,minWidth:0,background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.12)",borderRadius:0,padding:"9px 12px",color:SCHWARZ,fontSize:12.5,outline:"none",fontFamily:"inherit"}}/>
                                 <button onClick={()=>sendComment(m.id)} aria-label="Kommentar senden"
-                                  style={{width:36,flexShrink:0,borderRadius:999,background:VIOLETT,color:"#06132E",fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>→</button>
+                                  style={{width:36,flexShrink:0,borderRadius:0,background:VIOLETT,color:"#06220E",fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>→</button>
                               </div>
                             )}
                           </div>
@@ -1140,15 +1169,15 @@ export default function LigaPage(){
                 return(
                   <div key={m.id} style={{maxWidth:"80%",alignSelf:mine?"flex-end":"flex-start"}}>
                     {!mine&&<div style={{fontSize:11.5,color:TEXT_LEISE,margin:"0 0 3px 4px"}}>{m.name}</div>}
-                    <div style={{background:mine?VIOLETT:"#FFFFFF",borderRadius:14,padding:"9px 12px",fontSize:13.5,fontWeight:500,color:mine?"#FFFFFF":SCHWARZ}}>{m.text}</div>
+                    <div style={{background:mine?VIOLETT:"#FFFFFF",borderRadius:0,padding:"9px 12px",fontSize:13.5,fontWeight:500,color:mine?"#FFFFFF":SCHWARZ}}>{m.text}</div>
                   </div>
                 )
               })}
             </div>
             {myReg?(
               <div style={{display:"flex",gap:8,padding:"12px 14px",borderTop:"1px solid rgba(8,8,8,.10)",background:"#FFFFFF"}}>
-                <input value={msg} onChange={e=>setMsg(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")send()}} placeholder="Nachricht an die Liga …" style={{flex:1,background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.12)",borderRadius:999,padding:"11px 14px",color:SCHWARZ,fontSize:13.5,outline:"none",fontFamily:"inherit"}}/>
-                <button onClick={send} style={{width:42,borderRadius:999,background:VIOLETT,color:"#06132E",fontWeight:800,cursor:"pointer"}}>→</button>
+                <input value={msg} onChange={e=>setMsg(e.target.value)} onKeyDown={e=>{if(e.key==="Enter")send()}} placeholder="Nachricht an die Liga …" style={{flex:1,background:"rgba(8,8,8,.05)",border:"1px solid rgba(8,8,8,.12)",borderRadius:0,padding:"11px 14px",color:SCHWARZ,fontSize:13.5,outline:"none",fontFamily:"inherit"}}/>
+                <button onClick={send} style={{width:42,borderRadius:0,background:VIOLETT,color:"#06220E",fontWeight:800,cursor:"pointer"}}>→</button>
               </div>
             ):(
               <p style={{padding:"14px",textAlign:"center",color:TEXT_LEISE,fontSize:13}}>Tritt der Liga bei, um mitzuschreiben.</p>
@@ -1157,7 +1186,7 @@ export default function LigaPage(){
         </div>
       )}
 
-      {toast&&<div style={{position:"fixed",bottom:84,left:0,right:0,display:"flex",justifyContent:"center",zIndex:120}}><div style={{background:CARD,color:W,borderRadius:999,padding:"10px 18px",fontSize:13}}>{toast}</div></div>}
+      {toast&&<div style={{position:"fixed",bottom:84,left:0,right:0,display:"flex",justifyContent:"center",zIndex:120}}><div style={{background:CARD,color:W,borderRadius:0,padding:"10px 18px",fontSize:13}}>{toast}</div></div>}
       <BottomNav />
     </main>
   )

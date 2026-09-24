@@ -1,7 +1,22 @@
-/* PLAYER V2 — das gemeinsame Bausystem (07.09.2026, verbindlich).
-   Grundlage ist das Referenz-Mockup mit den fuenf Screens HOME / SPIELEN /
-   LIGA / EVENTS / PROFIL. Kein zweites Designsystem: Farben und Schriften
-   kommen aus app/theme.ts.
+/* PLAYER — das gemeinsame Bausystem.
+   Angelegt 07.09.2026, am 23.09.2026 auf die Sprache von /entdecken gehoben
+   (Design-System V3, "Swiss Sports Editorial"). Die oeffentliche API ist
+   dabei UNVERAENDERT geblieben: gleiche Namen, gleiche Eigenschaften. Nur
+   die Innenseite spricht neu. Deshalb sehen Liga, Match, Rangliste,
+   Turniere, Spieler und Profil anders aus, ohne dass eine dieser Seiten
+   angefasst wurde.
+
+   Der Dateiname bleibt V2.tsx — ihn zu aendern hiesse, sechs Seiten und ein
+   Dutzend Importe anzufassen, ohne dass sich etwas verbessert.
+
+   Was sich geaendert hat:
+     - Grundflaeche neutral (#F5F5F2) statt warm (#F4F1EB)
+     - Kanten #DDDDDA, kein Radius, kein Schatten, kein Schein
+     - Abschnitts- und Feldtitel in Anton statt Inter 900
+     - Listentitel Inter 600 statt 700, Nebenzeilen Inter 400
+     - Datum in Anton, in einer Kachel mit Kante
+     - Knoepfe schwarz statt gruen, ohne Radius, Inter 600
+     - Gruen NUR noch als Signal: Status, freie Plaetze, Rang 1, Delta
 
    Jede Hauptseite besteht aus genau zwei Bereichen:
 
@@ -21,18 +36,43 @@
    kleine Hervorhebung, Link und Pfeil.
 
    Ohne "use client" — laeuft in Server- wie Client-Seiten. */
-import { SCHWARZ, CREME, VIOLETT, AKZENT_TIEF, ANTON_ZEILEN, ANTON, INTER } from "@/app/theme"
+/* VIOLETT ist der Name des Marken-Neon (#39FF14) in theme.ts, AKZENT_TIEF
+   der des tiefen Gruen (#0B7A33). Die Namen stammen aus der Violett-Zeit
+   und stimmen laengst nicht mehr — sie zu aendern hiesse, ueber 200
+   Importstellen anzufassen. Die WERTE sind aktuell. */
+import { VIOLETT, AKZENT_TIEF, ANTON_ZEILEN, ANTON, INTER } from "@/app/theme"
+import {
+  BG as D_BG, FLAECHE as D_WEISS, KANTE as D_KANTE_HELL, LEISE as D_LEISE_HELL,
+  TEXT as D_TEXT, DUNKEL as D_DUNKEL, DUNKEL_KANTE as D_DUNKEL_KANTE,
+  DUNKEL_LEISE as D_DUNKEL_LEISE,
+} from "@/app/design"
+import {
+  IconSuche, IconSpieler, IconOpenGames, IconMatches, IconTurniere,
+  IconCommunity, IconEinstellungen, IconKalender, IconFavorit, IconChevron,
+} from "@/app/components/Icons"
 
-/* Die Off-White-Flaeche und das, was darauf liegt. */
-export const FLAECHE = CREME          // #F4F1EB — der Inhaltsgrund
-export const PANEL = "#FFFFFF"        // gruppierte Listen sitzen auf Weiss
-export const LINIE = "rgba(8,8,8,.12)"
-/* 16.09.2026: stand auf .56. Bei 13px Nebentext waren das 5,0:1 — klein UND
-   blass, die doppelte Strafe. .70 bringt 6,8:1 bei gleichzeitig groesserer
-   Schrift. Kleine Schrift braucht MEHR Kontrast, nicht weniger. */
-export const TEXT_LEISE = "rgba(8,8,8,.70)"
-/* Feine Kante um die gruppierten Felder — Kaestchen statt Trennstriche. */
-export const FELD_KANTE = "rgba(8,8,8,.09)"
+/* ---------- App-Grundflaeche (Design-System V3) ---------------------------
+   Dieselben Werte wie in app/globals.css unter --p-*. Sie stehen hier als
+   Konstanten, weil V2 mit Inline-Styles arbeitet; es sind KEINE zweiten
+   Werte, sondern dieselben.
+
+   Grundregel: 90-95% der Flaeche bleiben neutral. Gruen ist Signal —
+   Status, freie Plaetze, Rang 1, Rating-Delta — nie Dekoration. */
+/* 24.09.2026: Die Werte standen hier als eigene Zeichenketten. Jetzt
+   kommen sie aus app/design.ts — derselben Datei, aus der auch die
+   Startseite und theme.ts sie beziehen. Die Namen bleiben, weil sechs
+   Seiten sie importieren; nur die Quelle ist jetzt eine einzige. */
+export const FLAECHE = D_BG           // Seitengrund, neutral statt warm
+export const PANEL = D_WEISS          // gruppierte Listen sitzen auf Weiss
+export const LINIE = D_KANTE_HELL     // Trennlinie
+export const TEXT_LEISE = D_LEISE_HELL// Sekundaertext
+export const FELD_KANTE = D_KANTE_HELL// Kante um ein Feld — gleiche Linie
+export const TEXT = D_TEXT            // Primaertext
+export const DUNKEL = D_DUNKEL        // dunkle Flaechen: Hero, Plakat, Knopf
+/* Flaeche, Kante und Sekundaertext innerhalb dunkler Bereiche. */
+const D_FLAECHE = "#101316"
+const D_KANTE = D_DUNKEL_KANTE
+const D_LEISE = D_DUNKEL_LEISE
 
 /* ---------- Hero ----------------------------------------------------------
    Foto, Verlauf, Etikett, Zeile, Erklaerung. Der Verlauf ist der einzige
@@ -52,38 +92,43 @@ export function Hero({
 }) {
   return (
     <header className="ppl-hero" style={{
-      position: "relative", background: SCHWARZ, overflow: "hidden",
+      position: "relative", background: DUNKEL, overflow: "hidden",
       display: "flex", flexDirection: "column",
     }}>
       {bild ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={bild} alt={alt} aria-hidden={alt ? undefined : true} className="ppl-hero-bild"
-          style={{ position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover", objectPosition: pos }} />
+          style={{
+            position: "absolute", inset: 0, width: "100%", height: "100%", objectFit: "cover",
+            objectPosition: pos,
+            /* Dieselbe Behandlung wie auf /entdecken: nur eine Spur dunkler,
+               damit weisse Schrift sicher darauf steht. */
+            filter: "brightness(.88) contrast(1.04)",
+          }} />
       ) : (
-        <div aria-hidden style={{
-          position: "absolute", inset: 0,
-          background:
-            "radial-gradient(120% 78% at 78% 8%, rgba(91,156,255,.26) 0%, rgba(91,156,255,.07) 42%, transparent 72%)," +
-            "radial-gradient(90% 60% at 8% 96%, rgba(20,71,230,.20) 0%, transparent 62%)",
-        }} />
+        /* 23.09.2026: der gruene Schein ist weg. Ein Glow ist Dekoration,
+           und die Marke traegt sich ueber Kontrast, nicht ueber Leuchten.
+           Ohne Foto steht hier jetzt eine ruhige dunkle Flaeche. */
+        <div aria-hidden style={{ position: "absolute", inset: 0, background: DUNKEL }} />
       )}
       {bild && <div aria-hidden style={{
         position: "absolute", inset: 0,
         /* 16.09.2026: unten deckender. Der Text steht im unteren Drittel —
            dort darf vom Motiv nichts mehr durchkommen, sonst liegt Schrift
            auf Schrift (Neonzeichen, Tischaufdrucke, Markennamen). */
-        background: "linear-gradient(to bottom, rgba(8,8,8,.62) 0%, rgba(8,8,8,.42) 24%, rgba(8,8,8,.74) 50%, rgba(8,8,8,.94) 74%, rgba(8,8,8,.98) 100%)",
+        background: "linear-gradient(to bottom, rgba(8,11,13,.80) 0%, rgba(8,11,13,.34) 30%, rgba(8,11,13,.62) 62%, rgba(8,11,13,.90) 82%, rgba(8,11,13,.97) 100%)",
       }} />}
 
       {kopf && <div style={{ position: "relative", zIndex: 2 }}>{kopf}</div>}
 
       <div className="ppl-breit" style={{
         position: "relative", zIndex: 2, marginTop: "auto",
-        paddingTop: 24, paddingBottom: 26,
+        paddingTop: 20, paddingBottom: 22,
       }}>
         {etikett && <div style={{
-          fontFamily: INTER, fontSize: 12.5, fontWeight: 900, letterSpacing: ".18em",
-          textTransform: "uppercase", color: VIOLETT, marginBottom: 8,
+          /* E - Eyebrow: Inter 600, moderates Tracking. War 900 / .18em. */
+          fontFamily: INTER, fontSize: 11.5, fontWeight: 600, letterSpacing: ".13em",
+          textTransform: "uppercase", color: VIOLETT, marginBottom: 10,
         }}>{etikett}</div>}
 
         <h1 className="ppl-hero-titel" style={{
@@ -92,13 +137,16 @@ export function Hero({
              dass sich die Zeilen bei mehrzeiligen Titeln beruehrt haben —
              "PLAY. MEET. REPEAT." klebte aufeinander. .96 laesst Luft,
              ohne dass der Block auseinanderfaellt. */
-          letterSpacing: ".004em", lineHeight: ANTON_ZEILEN, color: "#FFFFFF", margin: 0,
+          /* A - Display. Kein kuenstliches Tracking mehr; Anton traegt sich
+             selbst. Die Groesse kommt aus .ppl-hero-titel in globals.css. */
+          letterSpacing: "-.005em", lineHeight: ANTON_ZEILEN, color: "#FFFFFF", margin: 0,
         }}>{titel}</h1>
 
         {subline && (
           <p style={{
-            fontFamily: INTER, fontSize: 17, lineHeight: 1.5, margin: "16px 0 0",
-            color: "rgba(255,255,255,.93)", maxWidth: "38ch",
+            /* D - Fliesstext: Inter 400. */
+            fontFamily: INTER, fontSize: 16, fontWeight: 400, lineHeight: 1.5, margin: "15px 0 0",
+            color: "rgba(255,255,255,.88)", maxWidth: "40ch",
           }}>{subline}</p>
         )}
       </div>
@@ -111,7 +159,7 @@ export function Hero({
 export function Inhalt({ children, oben = 26, unten = 34 }:
   { children: React.ReactNode; oben?: number; unten?: number }) {
   return (
-    <section style={{ background: FLAECHE, color: SCHWARZ }}>
+    <section style={{ background: FLAECHE, color: TEXT }}>
       <div className="ppl-breit" style={{ paddingTop: oben, paddingBottom: unten }}>
         {children}
       </div>
@@ -128,19 +176,24 @@ export function AbschnittKopf({ titel, mehr, href, dunkel = false }:
       display: "flex", alignItems: "baseline", justifyContent: "space-between",
       gap: 14, marginBottom: 12,
     }}>
+      {/* B - Abschnitts-Ueberschrift: Anton, ohne kuenstliches Tracking.
+          War Inter 900 / .08em und damit so schwer wie ein Seitentitel. */}
       <h2 style={{
-        fontFamily: INTER, fontSize: 15, fontWeight: 900, letterSpacing: ".08em",
-        textTransform: "uppercase", margin: 0, color: dunkel ? CREME : SCHWARZ,
+        fontFamily: ANTON, fontSize: 19, fontWeight: 400, letterSpacing: ".012em",
+        lineHeight: 1.05, textTransform: "uppercase", margin: 0,
+        color: dunkel ? "#FFFFFF" : TEXT,
       }}>{titel}</h2>
       {mehr && href && (
         <a href={href} style={{
           /* Akzent je nach Grund: helles Blau auf Schwarz, tiefes auf Creme.
              Padding/Margin schaffen 44px Tippflaeche ohne optische Verschiebung. */
-          fontFamily: INTER, fontSize: 14, fontWeight: 700,
-          color: dunkel ? VIOLETT : AKZENT_TIEF,
+          /* E - Meta: klein, Inter 600, zurueckhaltend in Grau statt in
+             Akzentfarbe. Ein "Alle" ist kein Statussignal. */
+          fontFamily: INTER, fontSize: 11, fontWeight: 600, letterSpacing: ".12em",
+          textTransform: "uppercase", color: dunkel ? D_LEISE : TEXT_LEISE,
           textDecoration: "none", whiteSpace: "nowrap",
           padding: "12px 8px", margin: "-12px -8px",
-        }}>{mehr} ›</a>
+        }}>{mehr} →</a>
       )}
     </div>
   )
@@ -155,8 +208,10 @@ export function Feld({ children, padding = 0, titel, mehr, href, dunkel = false 
 }) {
   return (
     <div style={{
-      background: dunkel ? "#15151A" : PANEL, borderRadius: 16, overflow: "hidden",
-      border: `1px solid ${dunkel ? "rgba(244,241,235,.10)" : FELD_KANTE}`,
+      /* Kein Radius, kein Schatten: Struktur entsteht aus Linie und
+         Weissraum. War borderRadius 16. */
+      background: dunkel ? D_FLAECHE : PANEL, overflow: "hidden",
+      border: `1px solid ${dunkel ? D_KANTE : FELD_KANTE}`, minWidth: 0,
     }}>
       {titel && (
         <div style={{
@@ -164,15 +219,17 @@ export function Feld({ children, padding = 0, titel, mehr, href, dunkel = false 
           gap: 16, padding: "16px 16px 12px",
         }}>
           <h2 style={{
-            fontFamily: INTER, fontSize: 17, fontWeight: 900, letterSpacing: ".04em",
-            textTransform: "uppercase", margin: 0, color: dunkel ? CREME : SCHWARZ,
+            fontFamily: ANTON, fontSize: 19, fontWeight: 400, letterSpacing: ".012em",
+            lineHeight: 1.05, textTransform: "uppercase", margin: 0,
+            color: dunkel ? "#FFFFFF" : TEXT,
           }}>{titel}</h2>
           {mehr && href && (
             <a href={href} style={{
-              fontFamily: INTER, fontSize: 14, fontWeight: 700,
-              color: dunkel ? VIOLETT : AKZENT_TIEF, textDecoration: "none", whiteSpace: "nowrap",
+              fontFamily: INTER, fontSize: 11, fontWeight: 600, letterSpacing: ".12em",
+              textTransform: "uppercase", color: dunkel ? D_LEISE : TEXT_LEISE,
+              textDecoration: "none", whiteSpace: "nowrap",
               padding: "12px 8px", margin: "-12px -8px",
-            }}>{mehr} ›</a>
+            }}>{mehr} →</a>
           )}
         </div>
       )}
@@ -188,10 +245,10 @@ export function Feld({ children, padding = 0, titel, mehr, href, dunkel = false 
 export type StatKachel = { wert: string | number; label: string; ziel?: string; zielLabel?: string; akzent?: boolean }
 
 export function StatsKacheln({ werte, dunkel = false }: { werte: StatKachel[]; dunkel?: boolean }) {
-  const flaeche = dunkel ? "#15151A" : PANEL
-  const kante = dunkel ? "rgba(244,241,235,.10)" : FELD_KANTE
+  const flaeche = dunkel ? D_FLAECHE : PANEL
+  const kante = dunkel ? D_KANTE : FELD_KANTE
   const akzent = dunkel ? VIOLETT : AKZENT_TIEF
-  const leise = dunkel ? "rgba(244,241,235,.80)" : TEXT_LEISE
+  const leise = dunkel ? D_LEISE : TEXT_LEISE
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 10 }} className="ppl-kacheln">
       {werte.map(x => {
@@ -199,10 +256,11 @@ export function StatsKacheln({ werte, dunkel = false }: { werte: StatKachel[]; d
           <>
             <span style={{
               fontFamily: ANTON, fontWeight: 400, fontSize: 32, lineHeight: ANTON_ZEILEN,
-              fontVariantNumeric: "tabular-nums", color: x.akzent ? akzent : (dunkel ? CREME : SCHWARZ),
+              fontVariantNumeric: "tabular-nums", color: x.akzent ? akzent : (dunkel ? "#FFFFFF" : TEXT),
             }}>{x.wert}</span>
             <span style={{
-              fontFamily: INTER, fontSize: 12, fontWeight: 700, letterSpacing: ".09em",
+              /* E - Meta: Inter 600 statt 700, kleiner, moderates Tracking. */
+              fontFamily: INTER, fontSize: 10.5, fontWeight: 600, letterSpacing: ".13em",
               textTransform: "uppercase", color: leise,
             }}>{x.label}</span>
             {x.ziel && <span style={{ fontFamily: INTER, fontSize: 11.5, fontWeight: 600, color: akzent }}>{x.zielLabel ?? "Ansehen"} →</span>}
@@ -211,7 +269,7 @@ export function StatsKacheln({ werte, dunkel = false }: { werte: StatKachel[]; d
         const stil: React.CSSProperties = {
           display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
           gap: 7, minHeight: 96, padding: "16px 10px", textAlign: "center",
-          background: flaeche, border: `1px solid ${kante}`, borderRadius: 16,
+          background: flaeche, border: `1px solid ${kante}`,
           textDecoration: "none",
         }
         return x.ziel
@@ -228,7 +286,7 @@ export type StatWert = { wert: string | number; label: string; akzent?: boolean 
 
 export function StatsReihe({ werte, hell = true, padding = "16px 0" }:
   { werte: StatWert[]; hell?: boolean; padding?: string }) {
-  const linie = hell ? LINIE : "rgba(244,241,235,.14)"
+  const linie = hell ? LINIE : D_KANTE
   return (
     <div style={{ display: "grid", gridTemplateColumns: `repeat(${werte.length},1fr)`, padding }}>
       {werte.map((x, i) => (
@@ -239,11 +297,12 @@ export function StatsReihe({ werte, hell = true, padding = "16px 0" }:
           <div style={{
             fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(24px,6.6vw,32px)",
             lineHeight: ANTON_ZEILEN, fontVariantNumeric: "tabular-nums",
-            color: x.akzent ? (hell ? AKZENT_TIEF : VIOLETT) : (hell ? SCHWARZ : CREME),
+            color: x.akzent ? (hell ? AKZENT_TIEF : VIOLETT) : (hell ? TEXT : "#FFFFFF"),
           }}>{x.wert}</div>
           <div style={{
-            fontFamily: INTER, fontSize: 12, fontWeight: 700, marginTop: 7,
-            color: hell ? TEXT_LEISE : "rgba(244,241,235,.80)",
+            fontFamily: INTER, fontSize: 10.5, fontWeight: 600, letterSpacing: ".13em",
+            textTransform: "uppercase", marginTop: 7,
+            color: hell ? TEXT_LEISE : D_LEISE,
           }}>{x.label}</div>
         </div>
       ))}
@@ -263,27 +322,24 @@ export function AktionsZeile({ symbol, titel, unter, erste = false }:
       borderTop: erste ? "none" : `1px solid ${LINIE}`,
     }}>
       <span aria-hidden style={{
-        width: 34, height: 34, flexShrink: 0, display: "grid", placeItems: "center", color: SCHWARZ,
+        width: 34, height: 34, flexShrink: 0, display: "grid", placeItems: "center", color: TEXT,
       }}>{symbol}</span>
       <span style={{ flex: 1, minWidth: 0 }}>
+        {/* C - UI-Titel: Inter 600, normale Schreibweise. War Inter 900 in
+            Versalien und damit lauter als die Abschnitts-Ueberschrift. */}
         <b style={{
-          display: "block", fontFamily: INTER, fontSize: 14.5, fontWeight: 900,
-          letterSpacing: ".05em", textTransform: "uppercase", color: SCHWARZ,
+          display: "block", fontFamily: INTER, fontSize: 15.5, fontWeight: 600,
+          lineHeight: 1.3, color: TEXT,
         }}>{titel}</b>
-        <span style={{ display: "block", fontFamily: INTER, fontSize: 14.5, color: TEXT_LEISE, marginTop: 4 }}>{unter}</span>
+        <span style={{ display: "block", fontFamily: INTER, fontSize: 13, fontWeight: 400, color: TEXT_LEISE, marginTop: 3, lineHeight: 1.4 }}>{unter}</span>
       </span>
       <Pfeil />
     </div>
   )
 }
 
-export function Pfeil({ farbe = "rgba(8,8,8,.46)" }: { farbe?: string }) {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={farbe}
-      strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ flexShrink: 0 }}>
-      <path d="M9 5l7 7-7 7" />
-    </svg>
-  )
+export function Pfeil({ farbe = TEXT_LEISE }: { farbe?: string }) {
+  return <IconChevron size={19} style={{ color: farbe }} />
 }
 
 /* ---------- Listenzeile ---------------------------------------------------
@@ -294,24 +350,31 @@ export function ListenZeile({ links, titel, unter, meta, rechts, erste = false, 
   meta?: React.ReactNode; rechts?: React.ReactNode; erste?: boolean; aktiv?: boolean
 }) {
   return (
-    <div style={{
-      display: "flex", alignItems: "center", gap: 13, padding: "13px 16px",
+    <div className="ppl-zeile" style={{
+      display: "flex", alignItems: "center", gap: 13, padding: "14px 16px",
       borderTop: erste ? "none" : `1px solid ${LINIE}`,
-      background: aktiv ? "rgba(91,156,255,.10)" : "transparent",
+      background: aktiv ? "rgba(7,138,59,.09)" : "transparent", color: TEXT,
     }}>
       {links}
       <div style={{ flex: 1, minWidth: 0 }}>
         {/* Zwei Zeilen statt Abschneiden: "Ping Pong Lounge Open Glattbrugg" wurde neben
             dem ANMELDEN-Knopf abgeschnitten — der Ort, also genau
             das Unterscheidende, fiel weg. */}
+        {/* C - UI-Titel: Inter 600 statt 700, eine Spur kleiner. Ein Name in
+            einer Liste soll kein Schlagzeilengewicht haben. */}
+        {/* Drei Zeilen statt zwei, und der Aufruf rutscht auf schmalen
+            Schirmen darunter (.ppl-zeile-cta). Ein Eventname wird nicht
+            abgeschnitten, damit ein Knopf daneben Platz hat. */}
         <div style={{
-          fontFamily: INTER, fontSize: 16.5, fontWeight: 700, lineHeight: 1.3, color: SCHWARZ,
-          display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden",
+          fontFamily: INTER, fontSize: 15.5, fontWeight: 600, lineHeight: 1.3, color: TEXT,
+          display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden",
         }}>{titel}</div>
-        {unter && <div style={{ fontFamily: INTER, fontSize: 14.5, color: TEXT_LEISE, marginTop: 4, lineHeight: 1.4 }}>{unter}</div>}
-        {meta && <div style={{ fontFamily: INTER, fontSize: 14.5, color: TEXT_LEISE, marginTop: 2, lineHeight: 1.4 }}>{meta}</div>}
+        {/* D - Nebenzeilen: Inter 400, 13px. Waren 14.5 und damit fast so
+            gross wie der Titel. */}
+        {unter && <div style={{ fontFamily: INTER, fontSize: 13, fontWeight: 400, color: TEXT_LEISE, marginTop: 3, lineHeight: 1.45 }}>{unter}</div>}
+        {meta && <div style={{ fontFamily: INTER, fontSize: 13, fontWeight: 400, color: TEXT_LEISE, marginTop: 2, lineHeight: 1.45 }}>{meta}</div>}
       </div>
-      {rechts && <div style={{ flexShrink: 0 }}>{rechts}</div>}
+      {rechts && <div className="ppl-zeile-cta" style={{ flexShrink: 0 }}>{rechts}</div>}
     </div>
   )
 }
@@ -321,7 +384,7 @@ export function ZeilenBild({ src, groesse = 44 }: { src: string; groesse?: numbe
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img src={src} alt="" aria-hidden style={{
-      width: groesse * 1.35, height: groesse, borderRadius: 8, objectFit: "cover", flexShrink: 0,
+      width: groesse * 1.35, height: groesse, objectFit: "cover", flexShrink: 0,
     }} />
   )
 }
@@ -330,16 +393,21 @@ export function ZeilenBild({ src, groesse = 44 }: { src: string; groesse?: numbe
    Referenz EVENTS: Tag gross, Monat klein darunter, links neben der Zeile. */
 export function DatumBlock({ tag, monat }: { tag: string | number; monat: string }) {
   return (
-    <div aria-hidden style={{ textAlign: "center", width: 42, flexShrink: 0 }}>
+    /* 23.09.2026: zurueck zu Anton und in eine Kachel mit Kante — wie auf
+       /entdecken. Ein Datum IST eine Sportzahl: es ist der Termin, und der
+       ist das Erste, was jemand in einer Terminliste sucht. Die Notiz vom
+       16.09. ("ein Datum ist keine Kennzahl") galt fuer ein anderes System. */
+    <div aria-hidden style={{
+      width: 48, flexShrink: 0, textAlign: "center", lineHeight: 1,
+      border: `1px solid ${LINIE}`, padding: "6px 0",
+    }}>
       <div style={{
-        /* 16.09.: Anton steht nur noch im Hero und bei den Kennzahlen.
-           Ein Datum ist keine Kennzahl. */
-        fontFamily: INTER, fontWeight: 900, fontSize: 24, lineHeight: 1.15,
-        color: SCHWARZ, fontVariantNumeric: "tabular-nums", letterSpacing: "-.02em",
+        fontFamily: ANTON, fontWeight: 400, fontSize: 27, lineHeight: 1,
+        color: TEXT, fontVariantNumeric: "tabular-nums", margin: "2px 0",
       }}>{tag}</div>
       <div style={{
-        fontFamily: INTER, fontSize: 11.5, fontWeight: 900, letterSpacing: ".12em",
-        textTransform: "uppercase", marginTop: 3, color: TEXT_LEISE,
+        fontFamily: INTER, fontSize: 10, fontWeight: 600, letterSpacing: ".12em",
+        textTransform: "uppercase", color: TEXT_LEISE,
       }}>{monat}</div>
     </div>
   )
@@ -353,7 +421,7 @@ export function GrosseZahl({ wert, rechts }:
     <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
       <strong style={{
         fontFamily: ANTON, fontWeight: 400, fontSize: "clamp(52px,15vw,76px)",
-        lineHeight: ANTON_ZEILEN, letterSpacing: "0", fontVariantNumeric: "tabular-nums", color: SCHWARZ,
+        lineHeight: ANTON_ZEILEN, letterSpacing: "-.01em", fontVariantNumeric: "tabular-nums", color: TEXT,
       }}>{wert}</strong>
       {rechts}
     </div>
@@ -362,56 +430,69 @@ export function GrosseZahl({ wert, rechts }:
 
 /* ---------- Pillen und Knoepfe ------------------------------------------- */
 export function Pille({ text, ton = "neutral" }: { text: string; ton?: "neutral" | "violett" | "gut" | "warn" }) {
-  const stil = ton === "violett" ? { background: "rgba(20,71,230,.10)", color: AKZENT_TIEF }
-    : ton === "gut" ? { background: "rgba(22,142,90,.12)", color: "#12764B" }
-    : ton === "warn" ? { background: "rgba(229,72,77,.12)", color: "#C0353A" }
-    : { background: "rgba(8,8,8,.06)", color: TEXT_LEISE }
+  /* Status statt Dekoration: Kante und Schrift tragen die Bedeutung, nicht
+     eine gefuellte Flaeche. Ohne Radius, wie alles andere auch. */
+  const stil = ton === "violett" ? { borderColor: AKZENT_TIEF, color: AKZENT_TIEF }
+    : ton === "gut" ? { borderColor: "#12764B", color: "#12764B" }
+    : ton === "warn" ? { borderColor: "#C0353A", color: "#C0353A" }
+    : { borderColor: LINIE, color: TEXT_LEISE }
   return (
     <span style={{
-      ...stil, display: "inline-block", borderRadius: 999, padding: "4px 10px",
-      fontFamily: INTER, fontSize: 11.5, fontWeight: 900, letterSpacing: ".06em",
+      ...stil, display: "inline-block", borderWidth: 1, borderStyle: "solid",
+      background: "transparent", padding: "4px 9px",
+      fontFamily: INTER, fontSize: 10.5, fontWeight: 600, letterSpacing: ".11em",
       textTransform: "uppercase", whiteSpace: "nowrap",
     }}>{text}</span>
   )
 }
 
+/* Ein Knopf ist ein Knopf, keine Schlagzeile: Inter 600, kein Radius,
+   moderates Tracking. War Inter 900 mit borderRadius 100. */
 const knopfBasis: React.CSSProperties = {
   display: "inline-flex", alignItems: "center", justifyContent: "center",
-  borderRadius: 100, fontFamily: INTER, fontWeight: 900, letterSpacing: ".08em",
+  fontFamily: INTER, fontWeight: 600, letterSpacing: ".12em",
   textTransform: "uppercase", textDecoration: "none", cursor: "pointer",
   border: "none", whiteSpace: "nowrap",
 }
-/* Gefuellte Knoepfe tragen das TIEFE Blau: weisse Schrift darauf ergibt
-   6,1:1. Auf dem hellen Blau waeren es 2,4:1 — unlesbar. */
-export const knopfPrimaer: React.CSSProperties = { ...knopfBasis, background: AKZENT_TIEF, color: "#FFFFFF", padding: "15px 24px", fontSize: 13.5, minHeight: 48 }
-export const knopfKlein: React.CSSProperties = { ...knopfBasis, background: AKZENT_TIEF, color: "#FFFFFF", padding: "11px 16px", fontSize: 12.5, minHeight: 44 }
+/* 23.09.2026: der gefuellte Knopf ist SCHWARZ, nicht gruen. Gruen ist in
+   PLAYER ein Signal (frei, offen, Rang 1, Delta) — sitzt es auf jedem
+   Knopf, sagt es nichts mehr. Ein gruener Knopf bleibt dem einen
+   Haupt-Aufruf auf dunklem Grund vorbehalten (knopfNeon). */
+export const knopfPrimaer: React.CSSProperties = { ...knopfBasis, background: DUNKEL, color: "#FFFFFF", padding: "15px 26px", fontSize: 12.5, minHeight: 50 }
+export const knopfKlein: React.CSSProperties = { ...knopfBasis, background: DUNKEL, color: "#FFFFFF", padding: "11px 18px", fontSize: 11.5, minHeight: 44 }
 export const knopfOutlineHell: React.CSSProperties = {
-  ...knopfBasis, background: "transparent", color: SCHWARZ,
-  border: "1.5px solid rgba(8,8,8,.32)", padding: "13.5px 24px", fontSize: 13.5, minHeight: 48,
+  ...knopfBasis, background: "transparent", color: TEXT,
+  border: `1px solid ${LINIE}`, padding: "14px 26px", fontSize: 12.5, minHeight: 50,
 }
 /** Auf dunklem Grund (im Hero oder in schwarzen Bereichen). */
 export const knopfOutline: React.CSSProperties = {
-  ...knopfBasis, background: "transparent", color: CREME,
-  border: "1.5px solid rgba(244,241,235,.40)", padding: "13.5px 24px", fontSize: 13.5, minHeight: 48,
+  ...knopfBasis, background: "transparent", color: "#FFFFFF",
+  border: `1px solid ${D_KANTE}`, padding: "14px 26px", fontSize: 12.5, minHeight: 50,
+}
+/** Der eine kraeftige Aufruf auf dunklem Grund — Neon mit dunkler Schrift.
+    Bewusst NICHT fuer helle Flaechen: dort waere er eine gruene Flaeche. */
+export const knopfNeon: React.CSSProperties = {
+  ...knopfBasis, background: VIOLETT, color: DUNKEL,
+  padding: "15px 26px", fontSize: 12.5, minHeight: 50,
 }
 
-/* ---------- Strichsymbole -------------------------------------------------
-   Ein Stil fuer die ganze App: 24er Raster, 1.8 Strichstaerke, keine Emojis. */
+/* ---------- Symbole -------------------------------------------------------
+   24.09.2026: Diese Funktion zeichnete neun eigene Strichsymbole — eine
+   zweite Icon-Familie neben app/components/Icons.tsx. Sie reicht die Namen
+   jetzt an den echten PLAYER-Satz weiter (aus Olivers Icon-Blatt). Die
+   Signatur bleibt gleich, damit /profil und /match unveraendert bleiben.
+
+   Zwei Namen hatten kein Gegenstueck auf dem Blatt und sind sinngemaess
+   zugeordnet — wenn ein anderes Motiv besser passt, steht die Zuordnung
+   an genau dieser Stelle:
+     plus  ("Spiel erstellen") -> Open Games
+     blitz ("PingPoints")      -> Stern */
 export function Symbol({ art, groesse = 24, farbe = "currentColor" }:
   { art: "suche" | "spieler" | "plus" | "verlauf" | "pokal" | "freunde" | "zahnrad" | "kalender" | "blitz"; groesse?: number; farbe?: string }) {
-  const p: Record<string, React.ReactNode> = {
-    suche: <><circle cx="11" cy="11" r="6.5" /><path d="M16 16l4.5 4.5" /></>,
-    spieler: <><circle cx="12" cy="8.2" r="3.6" /><path d="M5.5 20c1.3-3.4 3.8-5.1 6.5-5.1s5.2 1.7 6.5 5.1" /></>,
-    plus: <><circle cx="12" cy="12" r="8.5" /><path d="M12 8.5v7M8.5 12h7" /></>,
-    verlauf: <><circle cx="12" cy="12" r="8.5" /><path d="M12 7.5V12l3 2" /></>,
-    pokal: <><path d="M7 4h10v5a5 5 0 0 1-10 0z" /><path d="M7 6H4.5v1.5A3 3 0 0 0 7.5 10M17 6h2.5v1.5A3 3 0 0 1 16.5 10" /><path d="M12 14v3M9 20h6" /></>,
-    freunde: <><circle cx="9.5" cy="8.5" r="3.2" /><path d="M3.5 19c1.1-2.9 3.3-4.4 6-4.4s4.9 1.5 6 4.4" /><path d="M16.5 6.2a3.2 3.2 0 0 1 0 6.1M17.5 14.9c2 .6 3.4 1.9 4.2 4.1" /></>,
-    zahnrad: <><circle cx="12" cy="12" r="3.1" /><path d="M12 3.5v2.2M12 18.3v2.2M20.5 12h-2.2M5.7 12H3.5M18 6l-1.6 1.6M7.6 16.4 6 18M18 18l-1.6-1.6M7.6 7.6 6 6" /></>,
-    kalender: <><rect x="4" y="6" width="16" height="14" rx="2.5" /><path d="M8 3.5V7M16 3.5V7M4 11h16" /></>,
-    blitz: <><path d="M13 3 5 13.5h6L10 21l8-10.5h-6z" /></>,
-  }
-  return (
-    <svg width={groesse} height={groesse} viewBox="0 0 24 24" fill="none" stroke={farbe}
-      strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden>{p[art]}</svg>
-  )
+  const K = {
+    suche: IconSuche, spieler: IconSpieler, plus: IconOpenGames,
+    verlauf: IconMatches, pokal: IconTurniere, freunde: IconCommunity,
+    zahnrad: IconEinstellungen, kalender: IconKalender, blitz: IconFavorit,
+  }[art]
+  return <span style={{ color: farbe, display: "inline-flex" }}><K size={groesse} /></span>
 }

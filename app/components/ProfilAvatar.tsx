@@ -9,7 +9,7 @@
 import { useRef, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 
-const CREME = "#F4F1EB", VIOLETT = "#5B9CFF", SCHWARZ = "#080808"
+const CREME = "#F4F1EB", VIOLETT = "#39FF14", SCHWARZ = "#080808"
 
 export function initialen(name?: string | null): string {
   if (!name) return "PP"
@@ -80,7 +80,9 @@ export default function ProfilAvatar({
       <div style={{ position: "relative", width: groesse, height: groesse }}>
         <div style={{
           width: groesse, height: groesse, borderRadius: "50%", overflow: "hidden",
-          background: "rgba(244,241,235,.08)", border: `2px solid ${VIOLETT}`,
+          /* Der Ring war neongruen und damit das lauteste Element des
+             Profils. Ein Avatar ist kein Statussignal. */
+          background: "rgba(244,241,235,.08)", border: `2px solid rgba(244,241,235,.28)`,
           display: "grid", placeItems: "center", opacity: laedt ? .5 : 1,
         }}>
           {bild

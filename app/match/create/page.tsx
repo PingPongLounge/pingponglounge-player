@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import { BG, CARD, CELL, W, SUB, MUT, LINE, GREEN, INK, DANGER, CITIES, btn, btnOutline, lvLabel } from "@/app/theme"
+import { IconChevron } from "@/app/components/Icons"
 
 const HOURS = Array.from({ length: 16 }, (_, i) => i + 7) // 7–22 Uhr
 const LEVELS = ["1", "2", "3", "4", "5", "6", "7"]
@@ -121,7 +122,7 @@ export default function CreateMatchPage() {
   const TopBar = (
     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2, marginBottom: 12 }}>
       <button onClick={() => step > 1 ? setStep(step - 1) : router.push("/erstellen")} aria-label="Zurück" style={{ background: "none", border: "none", padding: 0, display: "inline-flex", cursor: "pointer" }}>
-        <svg viewBox="0 0 24 24" width={22} height={22} fill="none" stroke={W} strokeWidth={2} strokeLinecap="round" strokeLinejoin="round"><path d="M15 6l-6 6 6 6" /></svg>
+        <IconChevron size={22} style={{ color: W, transform: "rotate(180deg)" }} />
       </button>
       <Link href="/match" style={{ color: MUT, fontSize: 14, fontWeight: 500, textDecoration: "none" }}>Abbrechen</Link>
     </div>

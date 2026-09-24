@@ -5,7 +5,7 @@ import NotificationBell from "./NotificationBell"
 
 const CARD = "#1A1A1E", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.88)", MUT = "rgba(255,255,255,.82)"
-const GRAD = "linear-gradient(135deg,#5B9CFF,#A9C9FF)"
+const GRAD = "linear-gradient(135deg,#39FF14,#12D45C)"
 const SHADOW = "0 1px 4px rgba(0,0,0,.14)"
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
 
@@ -21,7 +21,7 @@ export function SectionTopBar({ section: _section }: { section: string }) {
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "12px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/entdecken" aria-label="Zur Startseite" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
           <svg width="21" height="21" viewBox="0 0 80 80" fill="none" aria-hidden>
-            <defs><linearGradient id="stbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#5B9CFF" /><stop offset="1" stopColor="#A9C9FF" /></linearGradient></defs>
+            <defs><linearGradient id="stbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14" /><stop offset="1" stopColor="#12D45C" /></linearGradient></defs>
             <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#stbg)" strokeWidth="3.6" strokeLinejoin="round" />
             <circle cx="63" cy="58" r="6.5" fill="url(#stbg)" />
           </svg>
@@ -35,7 +35,7 @@ export function SectionTopBar({ section: _section }: { section: string }) {
   )
 }
 
-const HERO = "#121214", LINE = "rgba(255,255,255,.07)", GREEN = "#5B9CFF"
+const HERO = "#121214", LINE = "rgba(255,255,255,.07)", GREEN = "#39FF14"
 
 /**
  * DAS MUSTER — ein Block für jede Sektion, wie in der Liga:
@@ -120,17 +120,25 @@ export function SectionIntro({ storageKey, title, steps, cta }: { storageKey: st
   if (!show) return null
   const dismiss = () => { try { localStorage.setItem(storageKey, "1") } catch {} ; setShow(false) }
   return (
-    <div style={{ position: "relative", marginTop: 16, borderRadius: 24, padding: 22, boxShadow: SHADOW, background: CARD }}>
+    /* A.1: Radius 24 und Schlagschatten raus — im neuen Bausystem traegt
+       die Kante, nicht der Schatten. */
+    <div style={{ position: "relative", marginTop: 16, padding: 22, background: CARD, border: "1px solid rgba(255,255,255,.12)" }}>
       <button onClick={dismiss} aria-label="Ausblenden" style={{ position: "absolute", top: 14, right: 14, background: "none", color: MUT, fontSize: 16, cursor: "pointer", lineHeight: 1 }}>✕</button>
-      <div style={{ fontSize:11.5, fontWeight: 800, letterSpacing: ".1em", textTransform: "uppercase", ...gt }}>Neu hier?</div>
-      <div style={{ fontSize: 22, fontWeight: 900, color: W, margin: "6px 0 16px", paddingRight: 20 }}>{title}</div>
+      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".13em", textTransform: "uppercase", color: "#39FF14" }}>Neu hier?</div>
+      {/* Anton statt Inter 900 — dieselbe Abschnitts-Ebene wie ueberall. */}
+      <div style={{ fontFamily: "var(--font-anton), Impact, sans-serif", fontWeight: 400, fontSize: 21, letterSpacing: ".012em", textTransform: "uppercase", color: W, margin: "8px 0 16px", paddingRight: 24 }}>{title}</div>
       {steps.map(([n, t, d]) => (
         <div key={n} style={{ display: "flex", gap: 13, alignItems: "flex-start", marginBottom: 14 }}>
-          <span style={{ width: 27, height: 27, borderRadius: "50%", background: GRAD, color: "#FFFFFF", fontSize: 13, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>{n}</span>
-          <div><div style={{ fontSize: 14.5, fontWeight: 800, color: W }}>{t}</div><div style={{ fontSize: 12.5, color: MUT, marginTop: 2, lineHeight: 1.4 }}>{d}</div></div>
+          {/* Die Ziffer war ein gefuellter Neonkreis — drei davon
+              untereinander waren drei gruene Flecken. Jetzt Anton in
+              Neon auf dem dunklen Grund, ohne Flaeche. */}
+          <span style={{ width: 24, flexShrink: 0, fontFamily: "var(--font-anton), Impact, sans-serif", fontWeight: 400, fontSize: 21, lineHeight: 1.15, color: "#39FF14" }}>{n}</span>
+          <div><div style={{ fontSize: 15, fontWeight: 600, color: W }}>{t}</div><div style={{ fontSize: 13, fontWeight: 400, color: MUT, marginTop: 3, lineHeight: 1.45 }}>{d}</div></div>
         </div>
       ))}
-      {cta && <Link href={cta.href} style={{ display: "block", textAlign: "center", marginTop: 6, background: GRAD, color: "#FFFFFF", borderRadius: 14, padding: 15, fontSize: 15, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }}>{cta.label}</Link>}
+      {/* Der eine kraeftige Aufruf auf dunklem Grund darf Neon bleiben —
+          aber flaechig, ohne Verlauf und ohne Radius. */}
+      {cta && <Link href={cta.href} style={{ display: "block", textAlign: "center", marginTop: 8, background: "#39FF14", color: "#080B0D", padding: "15px", fontSize: 12.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".12em", textDecoration: "none" }}>{cta.label}</Link>}
     </div>
   )
 }

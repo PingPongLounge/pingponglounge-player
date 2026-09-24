@@ -9,11 +9,12 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 
-const CREME = "#F4F1EB", VIOLETT = "#5B9CFF"
+
 const INTER = "var(--font-inter), system-ui, sans-serif"
 
+/* 23.09.2026 (A.1): kein Radius mehr, wie alles im neuen Bausystem. */
 const basis: React.CSSProperties = {
-  flex: "1 1 150px", textAlign: "center", borderRadius: 100, padding: "15px 20px",
+  flex: "1 1 150px", textAlign: "center", padding: "15px 20px",
   fontFamily: INTER, fontSize: 14, fontWeight: 900, letterSpacing: ".1em",
   textTransform: "uppercase", textDecoration: "none", cursor: "pointer", border: "none",
 }
@@ -47,15 +48,24 @@ export default function ProfilAktionen({ spielerId, name, angemeldet }:
     <div>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 22 }}>
         <button type="button" onClick={fordern}
-          style={{ ...basis, background: VIOLETT, color: CREME }}>
+          /* Der Sportwert soll dominieren, nicht die Knopffarbe. Neon war
+             hier eine leuchtende Flaeche quer ueber das halbe Profil; jetzt
+             traegt Schwarz die Hauptaktion, wie ueberall auf hellem Grund. */
+          style={{ ...basis, background: '#080B0D', color: '#FFFFFF' }}>
           Herausfordern
         </button>
         <button type="button" onClick={freund} disabled={stand === "sendet" || stand === "ok"}
           style={{
-            ...basis, background: "transparent", color: CREME,
-            border: `1.5px solid ${stand === "ok" ? VIOLETT : "rgba(244,241,235,.34)"}`,
-            padding: "13.5px 20px",
-            opacity: stand === "sendet" ? .6 : 1,
+            /* Dieser Knopf stand auf color: CREME (#F4F1EB) — eine Farbe aus
+               der Zeit, als die Profilseite dunkel war. Auf der hellen
+               Flaeche war er praktisch unsichtbar (1,1:1). Jetzt dunkle
+               Schrift mit klarer Kante; im gesperrten Zustand sichtbar
+               gedaempft statt unlesbar. (A.1, 23.09.2026) */
+            ...basis, background: "transparent",
+            color: stand === "ok" || stand === "sendet" ? "#686868" : "#111111",
+            border: `1px solid ${stand === "ok" || stand === "sendet" ? "#DDDDDA" : "#9A9A95"}`,
+            padding: "14px 20px",
+            cursor: stand === "ok" || stand === "sendet" ? "default" : "pointer",
           }}>
           {stand === "ok" ? "Angefragt" : stand === "sendet" ? "Sendet …" : "+ Freund"}
         </button>

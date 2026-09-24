@@ -109,6 +109,7 @@ export default function HauptMenu() {
     <>
       <button
         type="button"
+        className="ppl-menue-knopf"
         onClick={() => setOffen(o => !o)}
         aria-label={offen ? "Menü schliessen" : "Menü öffnen"}
         aria-expanded={offen}
