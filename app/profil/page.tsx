@@ -16,12 +16,55 @@ import LogoutButton from "@/app/components/LogoutButton"
 import { createClient } from "@/lib/supabase/client"
 import {
   IconMatches, IconTurniere, IconFavorit, IconCommunity, IconBuchungen,
-  IconEinstellungen, IconKalender, IconChevron,
+  IconEinstellungen, IconKalender, IconChevron, IconLiga,
 } from "@/app/components/Icons"
 import { ANTON, INTER, TEXT, LEISE, BG, AKZENT, knopf } from "@/app/design"
 
 type RecentMatch = { id: string; sets: Array<{ p1: number, p2: number }> | null; winner_id: string | null; confirmed_at: string; p1_id: string; p2_id: string; p1: { name: string } | null; p2: { name: string } | null; season: { name: string, city: string } | null }
-type Profile = { id: string; name: string; real_name?: string | null; elo: number; level: string; matches_played: number; matches_won: number; canton: string | null; avatar_url?: string | null; allow_challenges?: boolean | null; allow_friend_requests?: boolean | null; visible_in_ranking?: boolean | null }
+type Profile = { id: string; name: string; real_name?: string | null; elo: number; level: string; matches_played: number; matches_won: number; canton: string | null; avatar_url?: string | null; allow_challenges?: boolean | null; allow_friend_requests?: boolean | null; visible_in_ranking?: boolean | null; home_location?: string | null; handedness?: string | null; pips?: string | null; anti?: boolean | null; blade?: string | null; rubber_fh?: string | null; rubber_bh?: string | null; player_category?: string | null }
+
+/* Spielprofil — Hauptspielort, Hand, Noppen, Anti, Material, Kategorie.
+   /api/profil/style gibt es seit dem 06.09.2026, und die Liga filtert seit
+   demselben Tag nach hand/pips/anti/category. Eine Oberflaeche zum Setzen
+   dieser Werte gab es nie: die Filter konnten niemanden finden, weil sie
+   bei allen leer standen. */
+type Stil = {
+  home_location: string
+  handedness: "" | "left" | "right"
+  pips: "" | "none" | "short" | "long"
+  anti: boolean
+  blade: string
+  rubber_fh: string
+  rubber_bh: string
+  parkinson: boolean
+}
+const LEER_STIL: Stil = { home_location: "", handedness: "", pips: "", anti: false, blade: "", rubber_fh: "", rubber_bh: "", parkinson: false }
+
+/* Eine Reihe sich gegenseitig ausschliessender Knoepfe. Optik wie die
+   Stufenfilter in der Liga — dieselben Kanten, dieselbe Schriftgroesse. */
+function Wahl<T extends string>({ label, wert, optionen, onWahl }: {
+  label: string; wert: T; optionen: Array<[T, string]>; onWahl: (v: T) => void
+}) {
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <span className="p-label" style={{ marginBottom: 8 }}>{label}</span>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+        {optionen.map(([v, t]) => {
+          const on = wert === v
+          return (
+            <button key={v || "_"} type="button" onClick={() => onWahl(v)}
+              style={{
+                minHeight: 40, padding: "0 13px", background: on ? TEXT : "transparent",
+                border: `1px solid ${on ? TEXT : "var(--p-kante)"}`, color: on ? "#FFFFFF" : LEISE,
+                fontFamily: INTER, fontSize: 11, fontWeight: 600, letterSpacing: ".12em",
+                textTransform: "uppercase", cursor: "pointer", whiteSpace: "nowrap",
+              }}>{t}</button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 const CM: Record<string, string> = { "Aargau": "AG", "Appenzell Ausserrhoden": "AR", "Appenzell Innerrhoden": "AI", "Basel-Landschaft": "BL", "Basel-Stadt": "BS", "Bern": "BE", "Freiburg": "FR", "Genf": "GE", "Glarus": "GL", "Graubünden": "GR", "Jura": "JU", "Luzern": "LU", "Neuenburg": "NE", "Nidwalden": "NW", "Obwalden": "OW", "Schaffhausen": "SH", "Schwyz": "SZ", "Solothurn": "SO", "St. Gallen": "SG", "Tessin": "TI", "Thurgau": "TG", "Uri": "UR", "Waadt": "VD", "Wallis": "VS", "Zug": "ZG", "Zürich": "ZH" }
 const CANTONS = Object.keys(CM)
@@ -66,6 +109,9 @@ export default function ProfilPage() {
   const [done, setDone] = useState(false)
   const [ruhe, setRuhe] = useState<{ c: boolean; f: boolean; r: boolean } | null>(null)
   const [ruheSaving, setRuheSaving] = useState(false)
+  const [stil, setStil] = useState<Stil>(LEER_STIL)
+  const [stilSaving, setStilSaving] = useState(false)
+  const [stilMeldung, setStilMeldung] = useState("")
 
   async function load() {
     setError("")
@@ -79,6 +125,17 @@ export default function ProfilPage() {
       const h = rr.eloHistory || []
       setLastDelta(h.length ? h[h.length - 1].delta : null)
       setRuhe({ c: rr.profile?.allow_challenges !== false, f: rr.profile?.allow_friend_requests !== false, r: rr.profile?.visible_in_ranking !== false })
+      const pr: Profile | null = rr.profile || null
+      setStil({
+        home_location: pr?.home_location || "",
+        handedness: pr?.handedness === "left" || pr?.handedness === "right" ? pr.handedness : "",
+        pips: pr?.pips === "none" || pr?.pips === "short" || pr?.pips === "long" ? pr.pips : "",
+        anti: pr?.anti === true,
+        blade: pr?.blade || "",
+        rubber_fh: pr?.rubber_fh || "",
+        rubber_bh: pr?.rubber_bh || "",
+        parkinson: pr?.player_category === "parkinson",
+      })
     } catch { setError("Profil konnte nicht geladen werden") }
     finally { setLoading(false) }
   }
@@ -96,6 +153,31 @@ export default function ProfilPage() {
       if (!error) { setDone(true); await load() }
     }
     setSaving(false)
+  }
+
+  /* Leere Felder werden bewusst als null geschickt: so laesst sich eine
+     Angabe auch wieder entfernen. */
+  async function saveStil() {
+    setStilSaving(true); setStilMeldung("")
+    try {
+      const r = await fetch("/api/profil/style", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          home_location: stil.home_location.trim() || null,
+          handedness: stil.handedness || null,
+          pips: stil.pips || null,
+          anti: stil.anti,
+          blade: stil.blade.trim() || null,
+          rubber_fh: stil.rubber_fh.trim() || null,
+          rubber_bh: stil.rubber_bh.trim() || null,
+          player_category: stil.parkinson ? "parkinson" : null,
+        }),
+      })
+      const j = await r.json().catch(() => ({}))
+      setStilMeldung(r.ok ? "Gespeichert ✓" : (j.error || "Konnte nicht gespeichert werden"))
+      if (r.ok) await load()
+    } catch { setStilMeldung("Konnte nicht gespeichert werden") }
+    finally { setStilSaving(false) }
   }
 
   async function toggle(f: "allow_challenges" | "allow_friend_requests" | "visible_in_ranking", v: boolean) {
@@ -204,6 +286,60 @@ export default function ProfilPage() {
             </section>
           )}
 
+          {/* ── Spielprofil ──────────────────────────────────────────────
+              Diese Angaben speisen die Liga-Filter (Hand, Noppen, Anti,
+              Kategorie). Ohne diese Karte standen sie bei jedem leer. */}
+          <section className="p-karte p-abschnitt">
+            <div className="p-kopf"><h2>Dein Spiel</h2></div>
+            <div style={{ padding: 18 }}>
+              <p style={{ margin: "0 0 16px", fontSize: 14, color: LEISE, lineHeight: 1.55, maxWidth: "46ch" }}>
+                Alles freiwillig. Wer etwas angibt, ist über die Filter in der Rangliste auffindbar — und findet dort leichter passende Gegner.
+              </p>
+
+              <div style={{ marginBottom: 16 }}>
+                <span className="p-label" style={{ marginBottom: 8 }}>Wo du meistens spielst</span>
+                <input value={stil.home_location} onChange={e => setStil(v => ({ ...v, home_location: e.target.value }))}
+                  placeholder="z.B. Ping Pong Lounge Zürich" className="p-feld" />
+              </div>
+
+              <Wahl label="Schlaghand" wert={stil.handedness}
+                optionen={[["", "Keine Angabe"], ["right", "Rechts"], ["left", "Links"]]}
+                onWahl={v => setStil(x => ({ ...x, handedness: v }))} />
+
+              <Wahl label="Noppen" wert={stil.pips}
+                optionen={[["", "Keine Angabe"], ["none", "Keine"], ["short", "Kurz"], ["long", "Lang"]]}
+                onWahl={v => setStil(x => ({ ...x, pips: v }))} />
+
+              <div className="p-zeile" style={{ justifyContent: "space-between", padding: "13px 0", borderTop: "1px solid var(--p-kante)" }}>
+                <span style={{ fontSize: 15.5, fontWeight: 600 }}>Anti-Belag</span>
+                <button type="button" aria-pressed={stil.anti} aria-label="Anti-Belag" className="p-schalter"
+                  onClick={() => setStil(v => ({ ...v, anti: !v.anti }))}><span /></button>
+              </div>
+              <div className="p-zeile" style={{ justifyContent: "space-between", padding: "13px 0", marginBottom: 16 }}>
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>Parkinson-Kategorie</b>
+                  <span style={{ display: "block", marginTop: 3, fontSize: 13, color: LEISE }}>Eigene Wertung und eigener Filter</span>
+                </span>
+                <button type="button" aria-pressed={stil.parkinson} aria-label="Parkinson-Kategorie" className="p-schalter"
+                  onClick={() => setStil(v => ({ ...v, parkinson: !v.parkinson }))}><span /></button>
+              </div>
+
+              <span className="p-label" style={{ marginBottom: 8 }}>Material</span>
+              <input value={stil.blade} onChange={e => setStil(v => ({ ...v, blade: e.target.value }))}
+                placeholder="Holz" className="p-feld" style={{ marginBottom: 8 }} />
+              <input value={stil.rubber_fh} onChange={e => setStil(v => ({ ...v, rubber_fh: e.target.value }))}
+                placeholder="Belag Vorhand" className="p-feld" style={{ marginBottom: 8 }} />
+              <input value={stil.rubber_bh} onChange={e => setStil(v => ({ ...v, rubber_bh: e.target.value }))}
+                placeholder="Belag Rückhand" className="p-feld" style={{ marginBottom: 14 }} />
+
+              <button onClick={saveStil} disabled={stilSaving}
+                style={{ ...knopf, width: "100%", opacity: stilSaving ? .6 : 1 }}>
+                {stilSaving ? "Speichert …" : "Spielprofil speichern"}
+              </button>
+              {stilMeldung && <p className="p-hinweis" style={{ fontSize: 13, margin: "10px 0 0" }}>{stilMeldung}</p>}
+            </div>
+          </section>
+
           {/* ── Letzte Matches ── */}
           <section className="p-karte p-abschnitt">
             <div className="p-kopf">
@@ -232,6 +368,10 @@ export default function ProfilPage() {
           {/* ── Navigation: was frueher im Hamburger-Menue stand ── */}
           <section className="p-karte p-abschnitt">
             <div className="p-kopf"><h2>Dein Player</h2></div>
+            {/* 24.09.2026: Vom Profil fuehrte kein Weg in die Liga zurueck —
+                die Rating-Zahl stand oben, die Liga dazu war nur ueber die
+                untere Leiste erreichbar. */}
+            <Weg href="/liga" icon={<IconLiga size={24} />} titel="Liga" unter={`Rating ${profile.elo ?? 1000} · Rangliste und Forderungen`} />
             <Weg href="/matchhistorie" icon={<IconMatches size={24} />} titel="Match-History" unter={`${played} Matches gespielt`} />
             <Weg href="/achievements" icon={<IconTurniere size={24} />} titel="Achievements" unter={`${earned} verdient`} />
             <Weg href="/pingpoints" icon={<IconFavorit size={24} />} titel="PingPoints" unter={`${pp} PP Guthaben`} />

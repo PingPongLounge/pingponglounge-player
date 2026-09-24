@@ -55,3 +55,6 @@ _player_audit.tar.gz
 /_to_delete/
 .sync.tgz
 .c.jpg
+
+# Screenshots aus QA-Laeufen — nicht ins Repo.
+.proto/

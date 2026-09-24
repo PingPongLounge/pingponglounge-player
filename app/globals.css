@@ -406,8 +406,12 @@ main.p-seite{background:var(--p-bg);padding-bottom:0}
 .p-zeile>.cta{flex-shrink:0}
 @media(max-width:460px){
   .p-zeile.hat-cta{flex-wrap:wrap}
-  .p-zeile.hat-cta>.cta{width:100%;margin-top:12px}
-  .p-zeile.hat-cta>.cta>a,.p-zeile.hat-cta>.cta>button{width:100%}
+  .p-zeile.hat-cta>.cta{width:100%;margin-top:12px;display:flex;gap:8px}
+  /* width:100% JE Knopf schob den zweiten aus der Karte, sobald eine Zeile
+     zwei Aktionen hat (Annehmen + Ablehnen in "Offen fuer dich"). flex:1
+     teilt die Breite stattdessen auf und ergibt bei einem Knopf dasselbe
+     Bild wie vorher. */
+  .p-zeile.hat-cta>.cta>a,.p-zeile.hat-cta>.cta>button{width:auto;flex:1}
 }
 
 /* Bildraster (Community-Impressionen). Kein Radius — wie jede Flaeche. */
@@ -503,3 +507,59 @@ main.p-dunkel .p-lese > * > .p-textlink{color:var(--p-dark-leise)}
 main.p-dunkel .p-lese > * > .p-textlink:hover{color:#FFFFFF}
 main.p-dunkel .p-pille:not(.p-karte *){color:var(--p-dark-leise);border-color:var(--p-dark-kante);background:transparent}
 main.p-dunkel .p-hinweis{color:var(--p-dark-leise)}
+
+/* ── Aktion in einer Ranglistenzeile (24.09.2026) ────────────────────────
+   Bis zum V2-Umbau am 07.09. trug jede Zeile der Liga-Rangliste eine
+   Aktion, die zugleich den Zustand zeigte: Fordern · Annehmen · Offen ·
+   Eintragen · Bestaetigen · Wartet. Das kommt zurueck — aber in der neuen
+   kompakten Zeile, nicht in der alten Optik.
+
+   Auf 375px bleibt die Zeile einzeilig: der Name wird mit Auslassungs-
+   punkten gekuerzt (er steht vollstaendig im Profil), die Hauptaktion ist
+   kurz, die zweite nur ein Zeichen. */
+.p-zeile.kompakt{gap:9px}
+/* Der Name wird NICHT abgeschnitten — er darf auf zwei Zeilen umbrechen.
+   Mit Ellipse stand in der Ranglistenzeile "Q.." und "Elia Sc...", sobald
+   rechts eine Aktion sass. Die Stufe darunter ist Beiwerk und bleibt
+   einzeilig. */
+.p-zeile.kompakt .name{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word}
+.p-zeile.kompakt .name.unter{-webkit-line-clamp:1;word-break:keep-all;overflow-wrap:normal}
+.p-tat{display:inline-flex;align-items:center;gap:5px;flex-shrink:0}
+/* Zeile mit Haupt- UND Zweitknopf: auf schmalen Schirmen unter den Namen. */
+@media(max-width:480px){
+  .p-zeile.kompakt.tat-zwei{flex-wrap:wrap}
+  .p-zeile.kompakt.tat-zwei>.p-tat{display:flex;width:100%;margin-top:10px}
+  .p-zeile.kompakt.tat-zwei>.p-tat>.p-tat-haupt,
+  .p-zeile.kompakt.tat-zwei>.p-tat>.p-tat-status{flex:1;justify-content:center}
+}
+/* Hauptaktion — schmaler als .p-aktion, damit der Name Platz behaelt. */
+.p-tat-haupt{display:inline-flex;align-items:center;justify-content:center;
+  min-height:36px;padding:0 9px;background:none;border:1px solid var(--p-text);
+  cursor:pointer;white-space:nowrap;font-family:var(--p-inter);font-size:10px;
+  font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--p-text);
+  text-decoration:none}
+.p-tat-haupt:hover{background:var(--p-text);color:#FFFFFF}
+/* Zweite Aktion — nur ein Zeichen, aber mit 36px Tippflaeche. */
+.p-tat-zweit{display:inline-flex;align-items:center;justify-content:center;
+  width:28px;height:36px;background:none;border:1px solid var(--p-kante);
+  cursor:pointer;font-family:var(--p-inter);font-size:13px;color:var(--p-leise)}
+.p-tat-zweit:hover{border-color:var(--p-text);color:var(--p-text)}
+/* Zustand ohne Aktion (Offen · Wartet). */
+.p-tat-status{display:inline-flex;align-items:center;min-height:36px;padding:0 8px;
+  font-family:var(--p-inter);font-size:10.5px;font-weight:600;letter-spacing:.08em;
+  text-transform:uppercase;color:var(--p-leise);white-space:nowrap}
+
+/* Fortschritt (Monatssoll). Eine Linie, kein Balkendiagramm. */
+.p-fortschritt{height:3px;background:var(--p-kante);overflow:hidden;margin-top:9px}
+.p-fortschritt > span{display:block;height:100%;background:var(--p-akzent)}
+
+/* Auf der dunklen Liga-Flaeche sind Kante und Schrift der Zeilenaktion
+   hell — die Karten selbst bleiben weiss, dort gilt weiter der Normalfall. */
+main.p-dunkel .p-tat-haupt:not(.p-karte *){border-color:rgba(255,255,255,.28);color:#FFFFFF}
+
+/* 24.09.2026: In "Offen fuer dich" und "Who's next?" bricht die Aktion auf
+   schmalen Schirmen unter die Zeile — dort soll sie die volle Breite nehmen. */
+.p-zeile.hat-cta>.cta>.p-tat{display:flex}
+@media(max-width:560px){
+  .p-zeile.hat-cta>.cta>.p-tat>.p-aktion{flex:1}
+}

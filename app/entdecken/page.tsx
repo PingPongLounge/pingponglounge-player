@@ -289,6 +289,14 @@ export default async function EntdeckenPage() {
                   background: '#FFFFFF', color: P_DARK, fontSize: 12, fontWeight: 600,
                   letterSpacing: '.12em', textTransform: 'uppercase', textDecoration: 'none',
                 }}>Login / Registrieren</Link>
+                {/* 24.09.2026: /spielen — der Einstieg OHNE Konto — war von
+                    keiner Seite aus verlinkt. Wer kein Konto hat, kam nicht
+                    mehr hin, obwohl die Seite und /api/spielen/preview
+                    durchgehend liefen. */}
+                <Link href="/spielen" style={{
+                  display: 'block', marginTop: 12, textAlign: 'center', minHeight: 44, lineHeight: '44px',
+                  fontSize: 13, color: 'rgba(255,255,255,.72)', textDecoration: 'none',
+                }}>Noch kein Konto? Finde in zwei Schritten dein Rating →</Link>
               </div>
             </div>
           </div>

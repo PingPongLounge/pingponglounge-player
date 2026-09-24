@@ -44,6 +44,51 @@ type PlayerInfo={
 type Reactions={heart:number,fire:number,laugh:number,myReacts:string[]}
 type Msg={id:string,user_id:string|null,name:string,text:string,kind?:string,match_id?:string,parent_id?:string|null,created_at?:string,reactions:Reactions}
 
+/* ── DIE AKTION JE ZUSTAND ────────────────────────────────────────────
+   Eine Stelle, sechs Zustaende. Sie wird in der Ranglistenzeile, in
+   "Offen fuer dich" und in "Who's next?" benutzt — damit keine Ansicht
+   je wieder einen Zustand verschluckt.
+
+     kein Spiel                      → Fordern
+     gefordert worden                → Annehmen + ✕ (ablehnen)
+     selbst gefordert                → Offen + ✕ (zurueckziehen)
+     vereinbart (accepted/pending)   → Eintragen
+     Gegner hat eingetragen          → Bestaetigen
+     ich habe eingetragen            → Wartet                            */
+function Tat({ om, userId, onFordern, onAnnehmen, onAblehnen, breit=false }:{
+  om?: OpenMatch|null
+  userId: string|null
+  onFordern: ()=>void
+  onAnnehmen: (id:string)=>void
+  onAblehnen: (id:string)=>void
+  /** true in "Offen fuer dich": dort ist Platz fuer die lange Beschriftung. */
+  breit?: boolean
+}){
+  const H = breit ? "p-aktion" : "p-tat-haupt"
+  if(!om) return <span className="p-tat"><button onClick={onFordern} className={H}>Fordern</button></span>
+
+  if(om.status==="challenge_sent"&&!om.iAmP1) return (
+    <span className="p-tat">
+      <button onClick={()=>onAnnehmen(om.id)} className={H}>Annehmen</button>
+      <button onClick={()=>onAblehnen(om.id)} className="p-tat-zweit" title="Ablehnen" aria-label="Forderung ablehnen">✕</button>
+    </span>
+  )
+  if(om.status==="challenge_sent"&&om.iAmP1) return (
+    <span className="p-tat">
+      <span className="p-tat-status">Offen</span>
+      <button onClick={()=>onAblehnen(om.id)} className="p-tat-zweit" title="Zurückziehen" aria-label="Forderung zurückziehen">✕</button>
+    </span>
+  )
+  if(om.status==="accepted"||om.status==="pending") return (
+    <span className="p-tat"><Link href={`/liga/match/${om.id}`} className={H}>Eintragen</Link></span>
+  )
+  if(om.status==="p1_entered"&&om.enteredBy&&om.enteredBy!==userId) return (
+    <span className="p-tat"><Link href={`/liga/match/${om.id}`} className={H}>Bestätigen</Link></span>
+  )
+  if(om.status==="p1_entered") return <span className="p-tat"><span className="p-tat-status">Wartet</span></span>
+  return <span className="p-tat"><button onClick={onFordern} className={H}>Fordern</button></span>
+}
+
 export default function LigaPage(){
   const [userId,setUserId]=useState<string|null>(null)
   const [myLevel,setMyLevel]=useState<string|null>(null)
@@ -60,6 +105,17 @@ export default function LigaPage(){
   const [ligaTab,setLigaTab]=useState<TierKey|null>(null)   // welche Stufe ist im Tab angesteuert (Sprung, nicht Filter)
   const [saison,setSaison]=useState(false)                  // Saison-Infos (mehr) auf-/zugeklappt
   const [openMatches,setOpenMatches]=useState<Record<string,OpenMatch>>({})
+  /* 24.09.2026: Die eigene Zeile wurde bisher ausschliesslich in `rows`
+     gesucht. `rows` ist die OEFFENTLICHE Liste — wer dort fehlt (Filter,
+     Sichtbarkeit, unvollstaendiges Profil), verlor damit Rangkarte, Chat
+     und "Ergebnis eintragen", obwohl er laengst in der Liga ist.
+     Mitgliedschaft haengt jetzt an `myReg` (league_registrations), die
+     eigenen Zahlen an diesem separaten Eintrag. */
+  const [meinEintrag,setMeinEintrag]=useState<Row|null>(null)
+  /* Alle offenen Forderungen und Matches MIT Gegnernamen — unabhaengig
+     davon, ob der Gegner gerade in der Liste steht. Grundlage fuer die
+     Uebersicht "Offen fuer dich" und fuer die Aktion in jeder Zeile. */
+  const [offene,setOffene]=useState<Array<OpenMatch&{oppId:string,oppName:string}>>([])
   // ─── FILTER (das Herzstück) ───────────────────────────────────────────────
   // scope: Reichweite · plus Freunde / Kategorie / Spielstil. Alle kombinierbar.
   const [filter,setFilter]=useState<{scope:string,canton:string,city:string,friends:boolean,category:string,hand:string,pips:string,anti:boolean}>({scope:"world",canton:"",city:"",friends:false,category:"",hand:"",pips:"",anti:false})
@@ -167,6 +223,17 @@ export default function LigaPage(){
     const {data:profs}=await sb.from("public_profiles").select("id,name,elo,level,real_short,avatar_url").in("id",ids)
     const list=(profs||[]).map(p=>({user_id:p.id,name:p.name,elo:p.elo??1000,level:p.level||"",real:(p as {real_short?:string|null}).real_short,avatar:(p as {avatar_url?:string|null}).avatar_url})).sort((a,b)=>b.elo-a.elo)
     setRows(list)
+
+    /* Die eigene Zeile IMMER separat holen. RLS gibt jedem seine eigene
+       Profilzeile heraus — auch wenn er in der oeffentlichen Liste fehlt. */
+    if(userId&&isReg){
+      const gefunden=list.find(r=>r.user_id===userId)
+      if(gefunden) setMeinEintrag(gefunden)
+      else{
+        const {data:mp}=await sb.from("profiles").select("id,name,elo,level,avatar_url").eq("id",userId).maybeSingle()
+        setMeinEintrag(mp?{user_id:mp.id,name:mp.name,elo:mp.elo??1000,level:mp.level||"",real:null,avatar:(mp as {avatar_url?:string|null}).avatar_url}:null)
+      }
+    } else setMeinEintrag(null)
     // Offene Matches des eingeloggten Spielers laden
     if(userId&&isReg){
       const {data:myMs}=await sb.from("league_matches")
@@ -180,6 +247,17 @@ export default function LigaPage(){
         map[oppId]={id:m.id,status:m.status,iAmP1:m.p1_id===userId,enteredBy:(m as {entered_by?:string|null}).entered_by??null}
       }
       setOpenMatches(map)
+
+      /* Gegnernamen fuer die Uebersicht — auch fuer Gegner, die gerade
+         nicht in der Liste stehen. Ohne das waere eine Forderung von
+         jemandem ausserhalb der vier Nachbarn wieder unsichtbar. */
+      const oppIds=Object.keys(map)
+      let namen=new Map<string,string>()
+      if(oppIds.length){
+        const {data:op}=await sb.from("public_profiles").select("id,name").in("id",oppIds)
+        namen=new Map((op||[]).map(p=>[p.id as string,p.name as string]))
+      }
+      setOffene(oppIds.map(oid=>({...map[oid],oppId:oid,oppName:namen.get(oid)||"Spieler"})))
 
       // Wie viele GEWERTETE Spiele habe ich gegen wen schon? → "noch X×"
       const {data:rk}=await sb.from("league_matches")
@@ -206,6 +284,7 @@ export default function LigaPage(){
       setMonatCount(mc??0)
     } else {
       setOpenMatches({})
+      setOffene([])
       setRankedVs({})
       setMonatCount(0)
     }
@@ -432,14 +511,18 @@ export default function LigaPage(){
   // Keine Stadt-/Klassen-Auswahl mehr (cities/citySeasons/isPro sind entfallen):
   // es gibt genau eine öffentliche Liga. `sel` ist die gerade gezeigte.
   const sel=seasons.find(s=>s.id===seasonId)
-  const myIndex=rows.findIndex(r=>r.user_id===userId)
-  const myRow=myIndex>=0?rows[myIndex]:null
+  /* myRow ist die eigene Zeile — aus der Liste, wenn sie dort steht, sonst
+     aus dem separat geladenen Eintrag. Sie entscheidet ueber NICHTS mehr
+     ausser der Anzeige der eigenen Zahlen; Mitgliedschaft ist `myReg`. */
+  const myRow=rows.find(r=>r.user_id===userId)??meinEintrag
 
   // Die Liga ist ein PLATZ in der Tabelle, kein Level-Etikett:
   // Stufen kommen aus der ELO, NICHT mehr aus dem Tabellenplatz. Damit hat ein
   // Spieler überall dieselbe Stufe — egal wie viele Leute gerade angezeigt
   // werden oder wie gefiltert wird. Die Stufe ist ein Etikett, keine Liga.
-  const meinRang=myIndex>=0?myIndex+1:0
+  /* Rang = wie viele stehen besser. Das funktioniert auch dann, wenn die
+     eigene Zeile nicht in der oeffentlichen Liste auftaucht. */
+  const meinRang=myRow?rows.filter(r=>r.user_id!==userId&&r.elo>myRow.elo).length+1:0
   const meineStufe=myRow?tierForElo(myRow.elo):null
 
   // Ist irgendein Filter aktiv? (world ohne Zusätze = kein Filter)
@@ -580,7 +663,11 @@ export default function LigaPage(){
             </div>
           )}
 
-          {myReg&&myRow?(
+          {/* Mitgliedschaft haengt an `myReg`, NICHT an der eigenen Zeile in der
+              oeffentlichen Liste. Vorher stand hier `myReg&&myRow`: wer aus der
+              Liste fiel, bekam trotz Mitgliedschaft die Beitrittskarte
+              "Los geht's" — und verlor Chat und "Ergebnis eintragen" gleich mit. */}
+          {myReg?(
             <>
               <section className="p-karte">
                 <div className="p-kopf">
@@ -588,11 +675,28 @@ export default function LigaPage(){
                   <span className="p-mehr">{sel?.city||city||"Schweiz"}</span>
                 </div>
                 <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",gap:16,padding:"16px 18px"}}>
-                  <span style={{fontFamily:ANTON,fontWeight:400,fontSize:56,lineHeight:.9,letterSpacing:"-.01em"}}>#{meinRang}</span>
+                  <span style={{fontFamily:ANTON,fontWeight:400,fontSize:56,lineHeight:.9,letterSpacing:"-.01em"}}>{meinRang?`#${meinRang}`:"—"}</span>
                   <span style={{textAlign:"right",fontSize:13,lineHeight:1.5,color:P_LEISE}}>
                     {meineStufe?<b style={{display:"block",fontSize:15,fontWeight:600,color:P_TEXT}}>{meineStufe.name}</b>:null}
-                    Rating {ratingLabel(myRow.elo)} · {monatCount}/{MIN_MATCHES_PER_MONTH} im Monat
+                    Rating {myRow?ratingLabel(myRow.elo):"—"}
                   </span>
+                </div>
+
+                {/* ── MONATSSOLL ───────────────────────────────────────────
+                    Bis zum 24.09.2026 stand das Soll nur als "2/4 im Monat"
+                    in einer Nebenzeile. Der Fortschritt und die Bestaetigung
+                    "Soll erfuellt" waren im Redesign verloren gegangen —
+                    genau die zwei Dinge, die man auf einen Blick sucht. */}
+                <div style={{padding:"0 18px 16px"}}>
+                  <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:12,fontSize:13}}>
+                    <span style={{color:P_LEISE}}>Monatssoll · {monatCount}/{MIN_MATCHES_PER_MONTH} gewertete Spiele</span>
+                    <span style={{fontWeight:600,whiteSpace:"nowrap",color:monatOk?P_AKZENT:P_TEXT}}>
+                      {monatOk?"Soll erfüllt ✓":`noch ${MIN_MATCHES_PER_MONTH-monatCount}`}
+                    </span>
+                  </div>
+                  <div className="p-fortschritt" role="progressbar" aria-valuemin={0} aria-valuemax={MIN_MATCHES_PER_MONTH} aria-valuenow={Math.min(monatCount,MIN_MATCHES_PER_MONTH)} aria-label="Monatssoll">
+                    <span style={{width:`${Math.min(100,Math.round(monatCount/MIN_MATCHES_PER_MONTH*100))}%`}}/>
+                  </div>
                 </div>
               </section>
 
@@ -631,6 +735,56 @@ export default function LigaPage(){
           )}
 
           <div style={{marginTop:18}}><PendingConfirmBanner/></div>
+
+          {/* ══ OFFEN FÜR DICH ═══════════════════════════════════════════════
+              Bis zum 24.09.2026 gab es fuer offene Forderungen und laufende
+              Spiele keine Oberflaeche mehr. Sichtbar war nur, wer zufaellig
+              unter den vier Nachbarn in "Who's next?" stand — eine Forderung
+              von weiter weg sah man ausschliesslich in der Mail. Ablehnen und
+              Zuruecknehmen waren ueberhaupt nicht mehr moeglich, obwohl
+              /api/liga/challenge/decline die ganze Zeit lief.
+              Diese Karte zeigt JEDEN offenen Zustand mit genau der Handlung,
+              die dran ist. */}
+          {myReg&&offene.length>0&&(
+            <section className="p-karte" style={{marginTop:18}}>
+              <div className="p-kopf"><h2>Offen für dich</h2></div>
+              {offene.map(o=>{
+                const ichHabeEingetragen=o.enteredBy===userId
+                let lage=""
+                if(o.status==="challenge_sent") lage=o.iAmP1?"Du hast gefordert — wartet auf Antwort":"fordert dich heraus"
+                else if(o.status==="p1_entered") lage=ichHabeEingetragen?"Eingetragen — wartet auf Bestätigung":"hat ein Resultat eingetragen"
+                else lage="Spiel vereinbart — Resultat fehlt noch"
+                return (
+                  <div key={o.id} className="p-zeile hat-cta">
+                    <span style={{flex:1,minWidth:0}}>
+                      <b style={{display:"block",fontSize:15.5,fontWeight:600,lineHeight:1.3,overflowWrap:"anywhere"}}>{o.oppName}</b>
+                      <span style={{display:"block",marginTop:3,fontSize:13,fontWeight:400,color:P_LEISE}}>{lage}</span>
+                    </span>
+                    <span className="cta" style={{display:"flex",gap:8,alignItems:"center"}}>
+                      {o.status==="challenge_sent"&&!o.iAmP1&&(
+                        <>
+                          <button onClick={()=>acceptChallenge(o.id)} className="p-aktion">Annehmen</button>
+                          <button onClick={()=>declineChallenge(o.id)} className="p-pille" style={{cursor:"pointer"}}>Ablehnen</button>
+                        </>
+                      )}
+                      {o.status==="challenge_sent"&&o.iAmP1&&(
+                        <button onClick={()=>declineChallenge(o.id)} className="p-pille" style={{cursor:"pointer"}}>Zurückziehen</button>
+                      )}
+                      {o.status==="p1_entered"&&!ichHabeEingetragen&&(
+                        <a href={`/liga/match/${o.id}`} className="p-aktion">Bestätigen</a>
+                      )}
+                      {o.status==="p1_entered"&&ichHabeEingetragen&&(
+                        <span className="p-pille">Wartet</span>
+                      )}
+                      {(o.status==="accepted"||o.status==="pending")&&(
+                        <a href={`/liga/match/${o.id}`} className="p-aktion">Eintragen</a>
+                      )}
+                    </span>
+                  </div>
+                )
+              })}
+            </section>
+          )}
         </div>
 
         {loading?(
@@ -713,20 +867,31 @@ export default function LigaPage(){
                   {b.rows.map(r=>{
                     const me=r.user_id===userId
                     const ini=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
+                    /* Die zwei Zustaende mit Zweitknopf (Annehmen ✕ / Offen ✕)
+                       brauchen 120px. Auf 375px blieben dem Namen dann 49px
+                       ("QA Clau…"). Diese — seltenen — Zeilen legen die Aktion
+                       darum auf eine eigene Zeile; alle anderen bleiben einzeilig. */
+                    const zweiKnoepfe=!me&&myReg&&openMatches[r.user_id]?.status==="challenge_sent"
                     return(
-                      <div key={r.user_id} ref={me?meRef:null} className="p-zeile" style={me?{background:"#FAFAF8"}:undefined}>
-                        <span style={{width:26,textAlign:"center",flexShrink:0,fontFamily:ANTON,fontWeight:400,fontSize:18,lineHeight:1,color:me?P_AKZENT:P_LEISE,fontVariantNumeric:"tabular-nums"}}>{r.platz}</span>
-                        <span style={{width:36,height:36,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:"#FFFFFF",border:"1px solid var(--p-kante)",display:"grid",placeItems:"center"}}>
+                      <div key={r.user_id} ref={me?meRef:null} className={zweiKnoepfe?"p-zeile kompakt tat-zwei":"p-zeile kompakt"} style={me?{background:"#FAFAF8"}:undefined}>
+                        <span style={{width:20,textAlign:"center",flexShrink:0,fontFamily:ANTON,fontWeight:400,fontSize:18,lineHeight:1,color:me?P_AKZENT:P_LEISE,fontVariantNumeric:"tabular-nums"}}>{r.platz}</span>
+                        <span style={{width:32,height:32,borderRadius:"50%",flexShrink:0,overflow:"hidden",background:"#FFFFFF",border:"1px solid var(--p-kante)",display:"grid",placeItems:"center"}}>
                           {r.avatar
                             /* eslint-disable-next-line @next/next/no-img-element */
                             ? <img src={r.avatar} alt="" style={{width:"100%",height:"100%",objectFit:"cover"}}/>
                             : <span style={{fontSize:12.5,fontWeight:600,color:P_LEISE}}>{ini}</span>}
                         </span>
                         <button onClick={()=>openPlayer(r.user_id)} style={{flex:1,minWidth:0,background:"none",border:"none",padding:0,textAlign:"left",cursor:"pointer",fontFamily:INTER}}>
-                          <b style={{display:"block",fontSize:15.5,fontWeight:600,lineHeight:1.3,color:P_TEXT,overflowWrap:"anywhere"}}>{r.name}</b>
-                          <span style={{display:"block",fontSize:13,fontWeight:400,color:P_LEISE,marginTop:3}}>{me?"Du · ":""}{tierForElo(r.elo)?.name||"Ohne Stufe"}</span>
+                          <b className="name" style={{fontSize:15.5,fontWeight:600,lineHeight:1.3,color:P_TEXT}}>{r.name}</b>
+                          <span className="name unter" style={{fontSize:13,fontWeight:400,color:P_LEISE,marginTop:3}}>{me?"Du · ":""}{tierForElo(r.elo)?.name||"Ohne Stufe"}</span>
                         </button>
-                        <span style={{fontFamily:ANTON,fontWeight:400,fontSize:21,lineHeight:1,minWidth:52,textAlign:"right",flexShrink:0,color:me?P_AKZENT:P_TEXT,fontVariantNumeric:"tabular-nums"}}>{ratingLabel(r.elo)}</span>
+                        <span style={{fontFamily:ANTON,fontWeight:400,fontSize:20,lineHeight:1,minWidth:40,textAlign:"right",flexShrink:0,color:me?P_AKZENT:P_TEXT,fontVariantNumeric:"tabular-nums"}}>{ratingLabel(r.elo)}</span>
+                        {/* Die Rangliste ist wieder die Handlungsflaeche: jede fremde
+                            Zeile zeigt genau den Schritt, der gerade dran ist. */}
+                        {!me&&myReg&&(
+                          <Tat om={openMatches[r.user_id]} userId={userId}
+                            onFordern={()=>openForder(r)} onAnnehmen={acceptChallenge} onAblehnen={declineChallenge}/>
+                        )}
                       </div>
                     )
                   })}
@@ -776,11 +941,8 @@ export default function LigaPage(){
                           <span style={{display:"block",marginTop:3,fontSize:13,fontWeight:400,color:P_LEISE}}>#{r.platz} · {ratingLabel(r.elo)} Rating</span>
                         </span>
                         <span className="cta">
-                          {!om
-                            ? <button onClick={()=>openForder(r)} className="p-aktion">Herausfordern</button>
-                            : om.status==="challenge_sent"&&!om.iAmP1
-                              ? <button onClick={()=>acceptChallenge(om.id)} className="p-aktion">Annehmen</button>
-                              : <button onClick={()=>openPlayer(r.user_id)} className="p-pille" style={{cursor:"pointer"}}>Profil</button>}
+                          <Tat om={om} userId={userId} breit
+                            onFordern={()=>openForder(r)} onAnnehmen={acceptChallenge} onAblehnen={declineChallenge}/>
                         </span>
                       </div>
                     )
@@ -1017,10 +1179,13 @@ export default function LigaPage(){
               </div>
             )}
 
+            {/* 24.09.2026: Der AKTIVE Reiter stand weiss auf weiss — die
+                Beschriftung war unsichtbar. Aufgefallen ist es nie, weil der
+                Dialog bis heute nur ueber die vier Nachbarn erreichbar war. */}
             <div style={{display:"flex",gap:8,margin:"16px 0 18px"}}>
               {(["challenge","result"] as const).map(t=>{
                 const on=fTab===t
-                return <button key={t} onClick={()=>setFTab(t)} style={{flex:1,borderRadius:0,padding:"11px 8px",fontSize:12.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",color:on?"#FFFFFF":W,background:on?"#FFFFFF":"#101316"}}>{t==="challenge"?"Herausfordern":"Ergebnis eintragen"}</button>
+                return <button key={t} onClick={()=>setFTab(t)} style={{flex:1,borderRadius:0,padding:"11px 8px",fontSize:12.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",color:on?"#080B0D":W,background:on?"#FFFFFF":"#101316"}}>{t==="challenge"?"Herausfordern":"Ergebnis eintragen"}</button>
               })}
             </div>
 

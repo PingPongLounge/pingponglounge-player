@@ -16,7 +16,8 @@ import BottomNav from "./BottomNav"
 import PendingConfirmBanner from "./PendingConfirmBanner"
 import ProfilAvatar from "./ProfilAvatar"
 import PlayerKopf from "./PlayerKopf"
-import { IconChevron } from "./Icons"
+import CampaignOverlay from "./CampaignOverlay"
+import { IconChevron, IconOpenGames, IconCommunity } from "./Icons"
 import { INTER, TEXT, LEISE, BG } from "@/app/design"
 
 export type Game = { id: string; href: string; day: string; time: string; title: string; sub: string; frei: number; full: boolean; ratio: string }
@@ -191,6 +192,32 @@ export default function StartHomeV2(d: StartData) {
             </section>
           )}
 
+          {/* ── Selbst loslegen ──────────────────────────────────────────
+              24.09.2026: /erstellen und /freunde hatten von der eingeloggten
+              Startseite aus keinen Einstieg mehr. /erstellen war im ganzen
+              Frontend von keiner Seite aus verlinkt — erreichbar nur noch
+              ueber die Adresszeile oder den Zurueck-Pfeil zweier
+              Unterseiten. */}
+          <section className="p-karte p-abschnitt">
+            <div className="p-kopf"><h2>Selbst loslegen</h2></div>
+            <Link href="/erstellen" className="p-zeile">
+              <span style={{ flexShrink: 0, display: "inline-flex", color: TEXT }}><IconOpenGames size={24} /></span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>Spiel erstellen</b>
+                <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 400, color: LEISE }}>Open Game, Turnier, Training oder Single Night</span>
+              </span>
+              <IconChevron size={19} style={{ color: LEISE }} />
+            </Link>
+            <Link href="/freunde" className="p-zeile">
+              <span style={{ flexShrink: 0, display: "inline-flex", color: TEXT }}><IconCommunity size={24} /></span>
+              <span style={{ flex: 1, minWidth: 0 }}>
+                <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>Freunde</b>
+                <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 400, color: LEISE }}>Anfragen beantworten und Spieler finden</span>
+              </span>
+              <IconChevron size={19} style={{ color: LEISE }} />
+            </Link>
+          </section>
+
           {/* ── Naechstes Turnier ── */}
           {d.tour && (
             <section className="p-karte p-abschnitt">
@@ -209,6 +236,9 @@ export default function StartHomeV2(d: StartData) {
           )}
         </div>
       </main>
+      {/* 24.09.2026: seit dem 03.09. nicht mehr im Baum — eine im Admin
+          angelegte Kampagne wurde nirgends mehr gezeigt. */}
+      <CampaignOverlay />
       <BottomNav />
     </>
   )
