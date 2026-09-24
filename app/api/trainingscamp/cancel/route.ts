@@ -48,7 +48,10 @@ export async function POST(req: NextRequest) {
 
   const { data: upd } = await admin.from("camp_bookings")
     .update({ payment_status: "cancelled", cancelled_at: new Date().toISOString(), reserved_until: null })
-    .eq("id", booking_id).in("payment_status", ["paid", "reserved"]).select("id").maybeSingle()
+    // b.id, nicht booking_id: storniert der Gast ueber den Token aus seiner
+    // Mail, ist booking_id gar nicht gesetzt. Die Bedingung traf dann auf
+    // keine Zeile zu, und er bekam "Bereits verarbeitet" statt einer Absage.
+    .eq("id", b.id).in("payment_status", ["paid", "reserved"]).select("id").maybeSingle()
   if (!upd) return NextResponse.json({ error: "Bereits verarbeitet" }, { status: 409 })
 
   return NextResponse.json({ ok: true, refundHint: "Der Platz ist frei. Die Rückerstattung wird manuell bearbeitet." })

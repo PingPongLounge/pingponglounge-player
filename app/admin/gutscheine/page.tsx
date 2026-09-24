@@ -118,7 +118,7 @@ export default function GutscheinePage() {
                     style={{
                       minHeight: 44, padding: "0 16px", borderRadius: 999, cursor: "pointer",
                       fontFamily: "inherit", fontSize: 14, fontWeight: an ? 800 : 600,
-                      border: "none", background: an ? VIOLETT : CELL, color: an ? "#06132E" : SUB,
+                      border: "none", background: an ? VIOLETT : CELL, color: an ? "#06220E" : SUB,
                     }}>{a.label}</button>
                 )
               })}
@@ -157,7 +157,7 @@ export default function GutscheinePage() {
           <button onClick={speichern} disabled={speichert || !f.code}
             style={{
               minHeight: 50, borderRadius: 999, border: "none", cursor: "pointer", fontFamily: "inherit",
-              background: VIOLETT, color: "#06132E", fontSize: 14, fontWeight: 900,
+              background: VIOLETT, color: "#06220E", fontSize: 14, fontWeight: 900,
               letterSpacing: ".07em", textTransform: "uppercase", opacity: speichert || !f.code ? .5 : 1,
             }}>{speichert ? "Speichert …" : "Speichern"}</button>
 
@@ -192,7 +192,7 @@ export default function GutscheinePage() {
               <button onClick={() => umschalten(c)} style={{
                 minHeight: 44, padding: "0 16px", borderRadius: 999, cursor: "pointer", fontFamily: "inherit",
                 border: "none", fontSize: 13, fontWeight: 800, letterSpacing: ".06em", textTransform: "uppercase",
-                background: c.is_active ? VIOLETT : CELL, color: c.is_active ? "#06132E" : SUB,
+                background: c.is_active ? VIOLETT : CELL, color: c.is_active ? "#06220E" : SUB,
               }}>{c.is_active ? "Aktiv" : "Aus"}</button>
             </div>
           ))}

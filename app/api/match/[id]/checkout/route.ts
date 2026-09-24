@@ -184,7 +184,9 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         error: erg.grund === "doppelt" ? "Du bist schon angemeldet" : "Ausgebucht",
       }, { status: erg.grund === "doppelt" ? 400 : 409 })
     }
-    return NextResponse.json({ gratis: true, prozent, preis: 0, redirect: `/match/${game.id}?bezahlt=1` })
+    // successPath, nicht der Player-Pfad: ein Gast von pingponglounge.ch
+    // wuerde sonst auf eine Adresse geschickt, die es dort nicht gibt.
+    return NextResponse.json({ gratis: true, prozent, preis: 0, redirect: successPath })
   }
 
   // PingPoints einlösen: GANZ oder gar nicht — keine anteilige Zahlung. Man

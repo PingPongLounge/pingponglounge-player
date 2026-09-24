@@ -59,6 +59,20 @@ const PUBLIC_API = [
   '/api/cron/daily',
   '/api/liga/inactivity',
   '/api/single-night/checkout',
+  // 18.09.: Die Gutscheinvorschau. pingponglounge.ch ruft sie SERVERSEITIG auf
+  // (ueber /api/gutschein-pruefen dort) — ohne Cookies, also ohne Session. Ohne
+  // diese Zeile antwortete die Middleware mit 401, und der Knopf ANWENDEN sagte
+  // auf der Webseite bei JEDEM Code "konnte nicht geprueft werden". Die Route
+  // ist bewusst auth-frei: sie reserviert nichts, aendert nichts, laedt den
+  // Preis aus der Veranstaltung und ist ratenbegrenzt (12 Versuche pro Minute
+  // und IP), damit sich die Codetabelle nicht durchprobieren laesst.
+  '/api/gutschein/pruefen',
+  // Stornieren aus der Bestaetigungsmail. Der Gast hat keine Session — er hat
+  // den cancel_token aus seiner Mail. Ohne diese beiden Zeilen antwortete die
+  // Middleware mit 401, und der Link in der Mail lief ins Leere. Die Routen
+  // pruefen den Token selbst und lassen ohne ihn niemanden durch.
+  '/api/single-night/cancel',
+  '/api/trainingscamp/cancel',
 ]
 
 // Routen mit dynamischem Segment, die ebenfalls ohne Login erreichbar sein
