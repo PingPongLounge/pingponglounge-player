@@ -10,6 +10,7 @@ import {
   ratingLabel, ANTON, INTER,
 } from "@/app/theme"
 import PlayerKopf from "@/app/components/PlayerKopf"
+import OffenFuerDich from "@/app/components/OffenFuerDich"
 import { IconSpieler } from "@/app/components/Icons"
 /* 24.09.2026: Die Liga bezieht ihr Aussehen nicht mehr aus V2, sondern aus
    denselben Klassen wie die Startseite (.p-hero, .p-karte, .p-kopf,
@@ -798,61 +799,13 @@ export default function LigaPage(){
           <div style={{marginTop:18}}><PendingConfirmBanner/></div>
 
           {/* ══ OFFEN FÜR DICH ═══════════════════════════════════════════════
-              Bis zum 24.09.2026 gab es fuer offene Forderungen und laufende
-              Spiele keine Oberflaeche mehr. Sichtbar war nur, wer zufaellig
-              unter den vier Nachbarn in "Who's next?" stand — eine Forderung
-              von weiter weg sah man ausschliesslich in der Mail. Ablehnen und
-              Zuruecknehmen waren ueberhaupt nicht mehr moeglich, obwohl
-              /api/liga/challenge/decline die ganze Zeit lief.
+              Eine Komponente fuer Liga, Profil und Startseite. Sie laedt ihre
+              Daten selbst und haengt nicht an der Rangliste: ein Gegner, der
+              durch einen Filter herausfaellt, bleibt hier sichtbar. Annehmen,
+              Ablehnen, Zurueckziehen, Satzstand eintragen und Bestaetigen
+              passieren an Ort und Stelle. */}
+          <OffenFuerDich onChange={()=>loadStandings(seasonId)}/>
 
-              Diese Karte zeigt JEDEN offenen Zustand mit genau der Handlung,
-              die dran ist. Sie ist KEINE Dopplung der Zeilenaktionen: die
-              Ranglistenzeile zeigt nur, wer gerade in der Liste steht — bei
-              aktivem Filter, in einer anderen Stufe oder ausserhalb der
-              geladenen Seite faellt der Gegner dort heraus, und ohne diese
-              Karte waere seine Forderung wieder unsichtbar. Genau dieser
-              Fall war der P0-Befund des Regressionsaudits.
-              (24.09.2026 kurz aus dem Baum genommen — hier wieder drin.) */}
-          {myReg&&offene.length>0&&(
-            <section className="p-karte" style={{marginTop:18}}>
-              <div className="p-kopf"><h2>Offen für dich</h2></div>
-              {offene.map(o=>{
-                const ichHabeEingetragen=o.enteredBy===userId
-                let lage=""
-                if(o.status==="challenge_sent") lage=o.iAmP1?"Du hast gefordert — wartet auf Antwort":"fordert dich heraus"
-                else if(o.status==="p1_entered") lage=ichHabeEingetragen?"Eingetragen — wartet auf Bestätigung":"hat ein Resultat eingetragen"
-                else lage="Spiel vereinbart — Resultat fehlt noch"
-                return (
-                  <div key={o.id} className="p-zeile hat-cta">
-                    <span style={{flex:1,minWidth:0}}>
-                      <b style={{display:"block",fontSize:15.5,fontWeight:600,lineHeight:1.3,overflowWrap:"anywhere"}}>{o.oppName}</b>
-                      <span style={{display:"block",marginTop:3,fontSize:13,fontWeight:400,color:P_LEISE}}>{lage}</span>
-                    </span>
-                    <span className="cta" style={{display:"flex",gap:8,alignItems:"center"}}>
-                      {o.status==="challenge_sent"&&!o.iAmP1&&(
-                        <>
-                          <button onClick={()=>acceptChallenge(o.id)} className="p-aktion">Annehmen</button>
-                          <button onClick={()=>declineChallenge(o.id)} className="p-pille" style={{cursor:"pointer"}}>Ablehnen</button>
-                        </>
-                      )}
-                      {o.status==="challenge_sent"&&o.iAmP1&&(
-                        <button onClick={()=>declineChallenge(o.id)} className="p-pille" style={{cursor:"pointer"}}>Zurückziehen</button>
-                      )}
-                      {o.status==="p1_entered"&&!ichHabeEingetragen&&(
-                        <a href={`/liga/match/${o.id}`} className="p-aktion">Bestätigen</a>
-                      )}
-                      {o.status==="p1_entered"&&ichHabeEingetragen&&(
-                        <span className="p-pille">Wartet</span>
-                      )}
-                      {(o.status==="accepted"||o.status==="pending")&&(
-                        <a href={`/liga/match/${o.id}`} className="p-aktion">Eintragen</a>
-                      )}
-                    </span>
-                  </div>
-                )
-              })}
-            </section>
-          )}
         </div>
 
         {loading?(

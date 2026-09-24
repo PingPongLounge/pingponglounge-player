@@ -16,6 +16,7 @@ import BottomNav from "./BottomNav"
 import PendingConfirmBanner from "./PendingConfirmBanner"
 import ProfilAvatar from "./ProfilAvatar"
 import PlayerKopf from "./PlayerKopf"
+import OffenFuerDich from "./OffenFuerDich"
 import CampaignOverlay from "./CampaignOverlay"
 import { IconChevron, IconOpenGames, IconCommunity } from "./Icons"
 import { INTER, TEXT, LEISE, BG } from "@/app/design"
@@ -78,6 +79,10 @@ export default function StartHomeV2(d: StartData) {
 
         <div className="p-lese" style={{ paddingTop: 18, paddingBottom: 34 }}>
           <PendingConfirmBanner />
+
+          {/* 24.09.2026: Eine offene Forderung stand nur in der Glocke —
+              darunter las man weiter "Noch kein Spiel eingetragen". */}
+          <OffenFuerDich />
 
           {/* ── Dein naechstes Match ── */}
           <section className="p-karte">

@@ -11,6 +11,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import ProfilAvatar from "@/app/components/ProfilAvatar"
 import PlayerKopf from "@/app/components/PlayerKopf"
+import OffenFuerDich from "@/app/components/OffenFuerDich"
 import BottomNav from "@/app/components/BottomNav"
 import LogoutButton from "@/app/components/LogoutButton"
 import { createClient } from "@/lib/supabase/client"
@@ -285,6 +286,9 @@ export default function ProfilPage() {
               </div>
             </section>
           )}
+
+          {/* Offene Forderungen und laufende Spiele — direkt hier erledigen. */}
+          <OffenFuerDich onChange={load}/>
 
           {/* ── Spielprofil ──────────────────────────────────────────────
               Diese Angaben speisen die Liga-Filter (Hand, Noppen, Anti,

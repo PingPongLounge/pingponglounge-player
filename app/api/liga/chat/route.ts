@@ -91,8 +91,14 @@ export async function POST(req: NextRequest) {
     parent = post.id
   }
 
+  // 24.09.2026: Hier stand `kind: parent ? "comment" : null`. Die Spalte
+  // league_messages.kind ist NOT NULL mit DEFAULT 'chat' — ein explizites
+  // null uebersteuert den Default und laeuft in die Constraint. Jede
+  // normale Chatnachricht scheiterte damit mit 400; nur Kommentare (mit
+  // parent) und die vom System erzeugten Match-Eintraege kamen durch.
+  // Die letzte gespeicherte Chatnachricht stammt vom 12.07.2026.
   const { error } = await admin.from("league_messages")
-    .insert({ season_id, user_id: user.id, text: clean, parent_id: parent, kind: parent ? "comment" : null })
+    .insert({ season_id, user_id: user.id, text: clean, parent_id: parent, kind: parent ? "comment" : "chat" })
   if (error) return NextResponse.json({ error: error.message }, { status: 400 })
   return NextResponse.json({ ok: true })
 }
