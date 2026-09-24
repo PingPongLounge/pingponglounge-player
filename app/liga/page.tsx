@@ -18,12 +18,76 @@ import { IconSpieler } from "@/app/components/Icons"
    Saison-, Challenge- und Chatlogik sind unveraendert. */
 import {
   TEXT as P_TEXT, LEISE as P_LEISE, BG as P_BG, AKZENT as P_AKZENT,
-  knopf as knopfPrimaer, knopfUmriss as knopfOutlineHell, knopfHell,
+  DUNKEL as P_DUNKEL, DUNKEL_LEISE as P_D_LEISE, DUNKEL_KANTE as P_D_KANTE,
+  ANTON_ZEILEN as P_ANTON_ZEILEN,
+  knopf as knopfPrimaer, knopfUmriss as knopfOutlineHell, knopfHell, knopfKlein,
 } from "@/app/design"
 /* Umriss auf dunklem Grund — dieselbe Form, nur helle Kante und Schrift. */
 const knopfDunkelUmriss: React.CSSProperties = {
   ...knopfHell, background: "transparent", color: "#FFFFFF",
   border: "1px solid rgba(255,255,255,.28)",
+}
+
+/* ══ OVERLAYS ══════════════════════════════════════════════════════════
+   24.09.2026: Die fuenf Overlays der Liga — Gegnerwahl, Spielerkarte,
+   Filter, Forderungsdialog und Chat — liefen innen noch auf den alten
+   V2-Mitteln: Inter 800/900 als normale Schrift, #101316 als Fuellung
+   statt einer Kante, das Off-White #F4F1EB neben reinem Weiss und im
+   Chat sogar Neon auf heller Flaeche. Ab hier dieselben Tokens wie der
+   Rest von PLAYER. Rein visuell — kein Zustand, keine Logik angefasst. */
+const O_HUELLE: React.CSSProperties = {
+  position: "fixed", inset: 0, background: "rgba(8,11,13,.72)", zIndex: 200,
+  display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+}
+const O_BLATT: React.CSSProperties = {
+  width: "100%", maxWidth: 420, background: P_DUNKEL,
+  border: `1px solid ${P_D_KANTE}`, padding: "22px 18px",
+  maxHeight: "88vh", overflowY: "auto", fontFamily: INTER,
+}
+/** Ueberschrift eines Overlays — ein Moment, also Anton. */
+const O_TITEL: React.CSSProperties = {
+  fontFamily: ANTON, fontWeight: 400, fontSize: 26, lineHeight: P_ANTON_ZEILEN,
+  letterSpacing: "-.01em", textTransform: "uppercase", color: "#FFFFFF",
+  overflowWrap: "anywhere",
+}
+/** Schliessen — 38px Tippflaeche, dieselbe Kante wie alles andere. */
+const O_ZU: React.CSSProperties = {
+  width: 38, height: 38, flexShrink: 0, background: "transparent",
+  border: `1px solid ${P_D_KANTE}`, borderRadius: 0, color: "#FFFFFF",
+  fontSize: 14, cursor: "pointer", display: "inline-flex",
+  alignItems: "center", justifyContent: "center", fontFamily: INTER,
+}
+/** Abschnittsmarke im Overlay. */
+const O_LABEL: React.CSSProperties = {
+  display: "block", fontFamily: INTER, fontSize: 11, fontWeight: 600,
+  letterSpacing: ".12em", textTransform: "uppercase", color: P_D_LEISE,
+  margin: "18px 0 8px",
+}
+/** Fliesstext im Overlay. Gewicht 400 — nicht 300, nicht 700. */
+const O_TEXT: React.CSSProperties = {
+  fontFamily: INTER, fontSize: 13.5, fontWeight: 400, lineHeight: 1.55, color: P_D_LEISE,
+}
+const O_FELD: React.CSSProperties = {
+  width: "100%", background: "transparent", border: `1px solid ${P_D_KANTE}`,
+  borderRadius: 0, padding: "12px 13px", color: "#FFFFFF", fontSize: 15,
+  fontFamily: INTER, outline: "none", minHeight: 46,
+}
+/** Auswaehlbare Flaeche: Kante im Ruhezustand, Weiss wenn gewaehlt. */
+const o_wahl = (on: boolean): React.CSSProperties => ({
+  background: on ? "#FFFFFF" : "transparent",
+  border: `1px solid ${on ? "#FFFFFF" : P_D_KANTE}`, borderRadius: 0,
+  color: on ? P_DUNKEL : "#FFFFFF", fontFamily: INTER, cursor: "pointer",
+})
+const o_haken = (on: boolean): React.CSSProperties => ({
+  width: 18, height: 18, flexShrink: 0, display: "flex", alignItems: "center",
+  justifyContent: "center", fontSize: 11, fontWeight: 600, borderRadius: 0,
+  border: `1px solid ${on ? "#FFFFFF" : P_D_KANTE}`,
+  background: on ? "#FFFFFF" : "transparent", color: on ? P_DUNKEL : "transparent",
+})
+/** Sportzahl im Overlay — Anton, wie ueberall sonst. */
+const O_ZAHL: React.CSSProperties = {
+  fontFamily: ANTON, fontWeight: 400, lineHeight: 1, color: "#FFFFFF",
+  fontVariantNumeric: "tabular-nums",
 }
 const TEXT_LEISE = P_LEISE
 const FLAECHE = P_BG
@@ -736,55 +800,6 @@ export default function LigaPage(){
 
           <div style={{marginTop:18}}><PendingConfirmBanner/></div>
 
-          {/* ══ OFFEN FÜR DICH ═══════════════════════════════════════════════
-              Bis zum 24.09.2026 gab es fuer offene Forderungen und laufende
-              Spiele keine Oberflaeche mehr. Sichtbar war nur, wer zufaellig
-              unter den vier Nachbarn in "Who's next?" stand — eine Forderung
-              von weiter weg sah man ausschliesslich in der Mail. Ablehnen und
-              Zuruecknehmen waren ueberhaupt nicht mehr moeglich, obwohl
-              /api/liga/challenge/decline die ganze Zeit lief.
-              Diese Karte zeigt JEDEN offenen Zustand mit genau der Handlung,
-              die dran ist. */}
-          {myReg&&offene.length>0&&(
-            <section className="p-karte" style={{marginTop:18}}>
-              <div className="p-kopf"><h2>Offen für dich</h2></div>
-              {offene.map(o=>{
-                const ichHabeEingetragen=o.enteredBy===userId
-                let lage=""
-                if(o.status==="challenge_sent") lage=o.iAmP1?"Du hast gefordert — wartet auf Antwort":"fordert dich heraus"
-                else if(o.status==="p1_entered") lage=ichHabeEingetragen?"Eingetragen — wartet auf Bestätigung":"hat ein Resultat eingetragen"
-                else lage="Spiel vereinbart — Resultat fehlt noch"
-                return (
-                  <div key={o.id} className="p-zeile hat-cta">
-                    <span style={{flex:1,minWidth:0}}>
-                      <b style={{display:"block",fontSize:15.5,fontWeight:600,lineHeight:1.3,overflowWrap:"anywhere"}}>{o.oppName}</b>
-                      <span style={{display:"block",marginTop:3,fontSize:13,fontWeight:400,color:P_LEISE}}>{lage}</span>
-                    </span>
-                    <span className="cta" style={{display:"flex",gap:8,alignItems:"center"}}>
-                      {o.status==="challenge_sent"&&!o.iAmP1&&(
-                        <>
-                          <button onClick={()=>acceptChallenge(o.id)} className="p-aktion">Annehmen</button>
-                          <button onClick={()=>declineChallenge(o.id)} className="p-pille" style={{cursor:"pointer"}}>Ablehnen</button>
-                        </>
-                      )}
-                      {o.status==="challenge_sent"&&o.iAmP1&&(
-                        <button onClick={()=>declineChallenge(o.id)} className="p-pille" style={{cursor:"pointer"}}>Zurückziehen</button>
-                      )}
-                      {o.status==="p1_entered"&&!ichHabeEingetragen&&(
-                        <a href={`/liga/match/${o.id}`} className="p-aktion">Bestätigen</a>
-                      )}
-                      {o.status==="p1_entered"&&ichHabeEingetragen&&(
-                        <span className="p-pille">Wartet</span>
-                      )}
-                      {(o.status==="accepted"||o.status==="pending")&&(
-                        <a href={`/liga/match/${o.id}`} className="p-aktion">Eintragen</a>
-                      )}
-                    </span>
-                  </div>
-                )
-              })}
-            </section>
-          )}
         </div>
 
         {loading?(
@@ -982,23 +997,21 @@ export default function LigaPage(){
 
       {/* Gegner-Auswahl: "Gegen wen hast du gespielt?" → direkt ins Ergebnis-Formular */}
       {pickOpen&&(
-        <div onClick={()=>setPickOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:"#080B0D",border:"1px solid rgba(255,255,255,.20)",padding:"22px 18px",maxHeight:"84vh",overflowY:"auto"}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:6}}>
-              <div style={{fontSize:20,fontWeight:900,color:W}}>Gegen wen hast du gespielt?</div>
-              <button onClick={()=>setPickOpen(false)} style={{background:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
+        <div onClick={()=>setPickOpen(false)} style={O_HUELLE}>
+          <div onClick={e=>e.stopPropagation()} style={{...O_BLATT,maxHeight:"84vh"}}>
+            <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:14}}>
+              <h2 style={O_TITEL}>Gegen wen hast du gespielt?</h2>
+              <button onClick={()=>setPickOpen(false)} style={O_ZU} aria-label="Schliessen">✕</button>
             </div>
-            <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Wähl deinen Gegner — danach trägst du das Resultat ein.</div>
-            <div style={{background:"#101316",borderRadius:0,overflow:"hidden"}}>
+            <p style={{...O_TEXT,margin:"12px 0 18px",maxWidth:"42ch"}}>Wähl deinen Gegner — danach trägst du das Resultat ein.</p>
+            <div style={{border:`1px solid ${P_D_KANTE}`}}>
               {/* Nur Gegner aus dem eigenen Paar — sonst trägt ein Rookie ein
                   gewertetes Ergebnis gegen einen Elite-Spieler ein. */}
               {rows.filter(r=>r.user_id!==userId&&imPaar(r)).map((r,i)=>(
                 <button key={r.user_id} onClick={()=>{setPickOpen(false); openForder(r,"result")}}
-                  style={{display:"flex",alignItems:"center",gap:11,width:"100%",padding:"13px 14px",background:"none",borderTop:i===0?"none":`1px solid ${LINE}`,cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
-                  <div style={{flex:1,minWidth:0}}>
-                    <div style={{fontSize:14.5,fontWeight:800,color:W}}>{r.name}</div>
-                  </div>
-                  <span style={{fontSize:14,fontWeight:800,color:SUB}}>{ratingLabel(r.elo)}</span>
+                  style={{display:"flex",alignItems:"center",gap:12,width:"100%",minHeight:52,padding:"12px 14px",background:"none",border:"none",borderTop:i===0?"none":`1px solid ${P_D_KANTE}`,cursor:"pointer",fontFamily:INTER,textAlign:"left"}}>
+                  <span style={{flex:1,minWidth:0,fontSize:15,fontWeight:600,color:"#FFFFFF",overflowWrap:"anywhere"}}>{r.name}</span>
+                  <span style={{...O_ZAHL,fontSize:19,flexShrink:0}}>{ratingLabel(r.elo)}</span>
                 </button>
               ))}
             </div>
@@ -1008,72 +1021,70 @@ export default function LigaPage(){
 
       {/* Spieler-Popup: Bilanz, Siegquote, letzte Spiele, direkter Vergleich */}
       {pOpen&&(
-        <div onClick={()=>setPOpen(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:"#080B0D",border:"1px solid rgba(255,255,255,.20)",padding:"22px 18px",maxHeight:"88vh",overflowY:"auto"}}>
-            {pLoading&&<div style={{textAlign:"center",color:MUT,fontSize:13,padding:"30px 0"}}>lädt…</div>}
+        <div onClick={()=>setPOpen(null)} style={O_HUELLE}>
+          <div onClick={e=>e.stopPropagation()} style={O_BLATT}>
+            {pLoading&&<p style={{...O_TEXT,textAlign:"center",padding:"30px 0"}}>Lädt …</p>}
 
             {!pLoading&&pData&&(<>
-              <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",marginBottom:18}}>
-                <div>
-                  <div style={{fontSize:22,fontWeight:900,color:W}}>{pData.player.name}</div>
-                  {pData.player.real_short&&<div style={{fontSize:12.5,color:MUT,marginTop:2}}>{pData.player.real_short}</div>}
-                  <div style={{display:"flex",alignItems:"center",gap:8,marginTop:8}}>
-                    <span style={{fontSize:14,fontWeight:800,color:"#FFFFFF"}}>Rating {ratingLabel(pData.player.elo)}</span>
-                  </div>
+              <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:14}}>
+                <div style={{minWidth:0}}>
+                  <h2 style={O_TITEL}>{pData.player.name}</h2>
+                  {pData.player.real_short&&<p style={{...O_TEXT,fontSize:13,margin:"6px 0 0"}}>{pData.player.real_short}</p>}
+                  <p style={{...O_TEXT,fontSize:13,margin:"6px 0 0",color:"#FFFFFF"}}>Rating {ratingLabel(pData.player.elo)}</p>
                 </div>
-                <button onClick={()=>setPOpen(null)} style={{background:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
+                <button onClick={()=>setPOpen(null)} style={O_ZU} aria-label="Schliessen">✕</button>
               </div>
 
               {/* Bilanz */}
-              <div style={{display:"flex",gap:8,marginBottom:16}}>
+              <div style={{display:"flex",marginTop:18,border:`1px solid ${P_D_KANTE}`}}>
                 {[
                   {v:String(pData.player.matches_won), l:"Siege"},
                   {v:String(pData.player.lost),        l:"Niederlagen"},
                   {v:pData.player.winRate!==null?`${pData.player.winRate}%`:"—", l:"Siegquote"},
-                ].map(s=>(
-                  <div key={s.l} style={{flex:1,background:"#101316",borderRadius:0,padding:"13px 8px",textAlign:"center"}}>
-                    <div style={{fontSize:20,fontWeight:900,color:W}}>{s.v}</div>
-                    <div style={{fontSize:11.5,color:MUT,fontWeight:600,textTransform:"uppercase",letterSpacing:".05em",marginTop:2}}>{s.l}</div>
+                ].map((s,i)=>(
+                  <div key={s.l} style={{flex:1,padding:"14px 8px",textAlign:"center",borderLeft:i===0?"none":`1px solid ${P_D_KANTE}`}}>
+                    <div style={{...O_ZAHL,fontSize:26}}>{s.v}</div>
+                    <div style={{fontFamily:INTER,fontSize:10,color:P_D_LEISE,fontWeight:600,textTransform:"uppercase",letterSpacing:".12em",marginTop:6}}>{s.l}</div>
                   </div>
                 ))}
               </div>
 
               {/* Direkter Vergleich */}
               {pData.head&&(
-                <div style={{background:"#101316",borderRadius:0,padding:"14px 15px",marginBottom:16}}>
-                  <div style={{fontSize:11.5,fontWeight:700,color:MUT,textTransform:"uppercase",letterSpacing:".08em",marginBottom:9}}>Ihr beide</div>
+                <div style={{border:`1px solid ${P_D_KANTE}`,padding:"14px 15px",marginTop:14}}>
+                  <span style={{...O_LABEL,margin:"0 0 9px"}}>Ihr beide</span>
                   {pData.head.played===0
-                    ? <div style={{fontSize:13,color:SUB,fontWeight:300}}>Ihr habt diese Saison noch nicht gegeneinander gespielt.</div>
+                    ? <p style={{...O_TEXT,margin:0}}>Ihr habt diese Saison noch nicht gegeneinander gespielt.</p>
                     : <div style={{display:"flex",alignItems:"baseline",gap:8}}>
-                        <span style={{fontSize:24,fontWeight:900,color:"#FFFFFF"}}>{pData.head.myWins}</span>
-                        <span style={{fontSize:16,fontWeight:900,color:MUT}}>:</span>
-                        <span style={{fontSize:24,fontWeight:900,color:W}}>{pData.head.theirWins}</span>
-                        <span style={{fontSize:12,color:MUT,marginLeft:6}}>aus {pData.head.played} Spielen</span>
+                        <span style={{...O_ZAHL,fontSize:30}}>{pData.head.myWins}</span>
+                        <span style={{...O_ZAHL,fontSize:20,color:P_D_LEISE}}>:</span>
+                        <span style={{...O_ZAHL,fontSize:30}}>{pData.head.theirWins}</span>
+                        <span style={{...O_TEXT,fontSize:12.5,marginLeft:6}}>aus {pData.head.played} Spielen</span>
                       </div>}
-                  <div style={{fontSize:11.5,color:pData.head.rankedLeft<=0?MUT:SUB,marginTop:9,lineHeight:1.5}}>
+                  <p style={{...O_TEXT,fontSize:12.5,margin:"10px 0 0"}}>
                     {pData.head.rankedLeft<=0
                       ? `Limit erreicht — weitere Spiele gegen ${pData.player.name} zählen nicht mehr für ELO und Rang.`
                       : `Noch ${pData.head.rankedLeft} von ${pData.maxRanked} gewerteten Spielen diese Saison.`}
-                  </div>
+                  </p>
                 </div>
               )}
 
               {/* Letzte Spiele */}
-              <div style={{fontSize:11.5,fontWeight:700,color:MUT,textTransform:"uppercase",letterSpacing:".08em",marginBottom:8}}>Letzte Spiele</div>
+              <span style={O_LABEL}>Letzte Spiele</span>
               {pData.recent.length===0
-                ? <div style={{background:"#101316",borderRadius:0,padding:"16px 15px",fontSize:13,color:SUB,fontWeight:300}}>Noch keine bestätigten Spiele.</div>
-                : <div style={{background:"#101316",borderRadius:0,overflow:"hidden"}}>
+                ? <p style={{...O_TEXT,border:`1px solid ${P_D_KANTE}`,padding:"16px 15px",margin:0}}>Noch keine bestätigten Spiele.</p>
+                : <div style={{border:`1px solid ${P_D_KANTE}`}}>
                     {pData.recent.map((m,i)=>(
-                      <div key={m.id} style={{display:"flex",alignItems:"center",gap:10,padding:"11px 14px",borderTop:i===0?"none":`1px solid ${LINE}`}}>
-                        <span style={{width:22,height:22,borderRadius:0,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11.5,fontWeight:900,background:m.won?"#FFFFFF":"#101316",color:m.won?"#080B0D":MUT}}>{m.won?"S":"N"}</span>
+                      <div key={m.id} style={{display:"flex",alignItems:"center",gap:11,padding:"11px 14px",borderTop:i===0?"none":`1px solid ${P_D_KANTE}`}}>
+                        <span style={{width:22,height:22,borderRadius:0,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontFamily:INTER,fontSize:11,fontWeight:600,border:`1px solid ${m.won?"#FFFFFF":P_D_KANTE}`,background:m.won?"#FFFFFF":"transparent",color:m.won?P_DUNKEL:P_D_LEISE}}>{m.won?"S":"N"}</span>
                         <div style={{flex:1,minWidth:0}}>
-                          <div style={{fontSize:13,fontWeight:700,color:W,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.opponent}</div>
-                          {(m.date||!m.ranked)&&<div style={{fontSize:11.5,color:MUT,marginTop:1}}>
+                          <div style={{fontFamily:INTER,fontSize:13.5,fontWeight:600,color:"#FFFFFF",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{m.opponent}</div>
+                          {(m.date||!m.ranked)&&<div style={{...O_TEXT,fontSize:12,marginTop:2}}>
                             {m.date?new Date(m.date).toLocaleDateString("de-CH",{day:"2-digit",month:"2-digit",year:"2-digit"}):""}
                             {!m.ranked?(m.date?" · ":"")+"ohne Punkte":""}
                           </div>}
                         </div>
-                        <span style={{fontSize:14,fontWeight:900,color:m.won?W:MUT}}>{m.score}</span>
+                        <span style={{...O_ZAHL,fontSize:18,color:m.won?"#FFFFFF":P_D_LEISE}}>{m.score}</span>
                       </div>
                     ))}
                   </div>}
@@ -1081,7 +1092,7 @@ export default function LigaPage(){
               {/* Direkt fordern — auch hier nur im eigenen Paar */}
               {pOpen!==userId&&myReg&&(()=>{const row=rows.find(r=>r.user_id===pOpen); return !!row&&imPaar(row)})()&&(
                 <button onClick={()=>{const row=rows.find(r=>r.user_id===pOpen); setPOpen(null); if(row) openForder(row)}}
-                  style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:"#FFFFFF",color:"#080B0D",borderRadius:0,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit"}}>
+                  style={{...knopfHell,width:"100%",marginTop:18}}>
                   Fordern
                 </button>
               )}
@@ -1093,50 +1104,54 @@ export default function LigaPage(){
       {/* Fordern-Popup */}
       {/* ─── FILTER-SHEET ─────────────────────────────────────────────────── */}
       {filterOpen&&(
-        <div onClick={()=>setFilterOpen(false)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"flex-end",justifyContent:"center"}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:480,background:"#080B0D",borderTop:"1px solid rgba(255,255,255,.20)",padding:"20px 18px 28px",maxHeight:"88vh",overflowY:"auto"}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:16}}>
-              <div style={{fontSize:19,fontWeight:900,color:W}}>Rangliste filtern</div>
-              <button onClick={()=>setFilter({scope:"world",canton:"",city:"",friends:false,category:"",hand:"",pips:"",anti:false})} style={{background:"none",color:GREEN,fontSize:12.5,fontWeight:700,cursor:"pointer",fontFamily:"inherit"}}>Zurücksetzen</button>
+        <div onClick={()=>setFilterOpen(false)} style={{...O_HUELLE,alignItems:"flex-end",padding:0}}>
+          <div onClick={e=>e.stopPropagation()} style={{...O_BLATT,maxWidth:480,border:"none",borderTop:`1px solid ${P_D_KANTE}`,padding:"20px 18px 28px"}}>
+            <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:14}}>
+              <h2 style={O_TITEL}>Rangliste filtern</h2>
+              <button onClick={()=>setFilter({scope:"world",canton:"",city:"",friends:false,category:"",hand:"",pips:"",anti:false})}
+                style={{background:"none",border:"none",color:"#FFFFFF",fontFamily:INTER,fontSize:11,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase",cursor:"pointer",flexShrink:0,minHeight:38,textDecoration:"underline",textUnderlineOffset:4}}>Zurücksetzen</button>
             </div>
 
             {/* Reichweite — Land / Kanton / Stadt. "Weltweit" bewusst weggelassen
                 (kommt später, wenn gebraucht). Nochmal Tippen schaltet wieder ab. */}
-            <div style={{fontSize:11.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"4px 2px 8px"}}>Reichweite</div>
-            <div style={{display:"flex",gap:7,marginBottom:6}}>
+            <span style={O_LABEL}>Reichweite</span>
+            <div style={{display:"flex",gap:8}}>
               {[["country","Land"],["canton","Kanton"],["city","Stadt"]].map(([k,l])=>(
-                <button key={k} onClick={()=>setFilter(f=>({...f,scope:f.scope===k?"world":k}))} style={{flex:1,fontSize:12.5,fontWeight:700,padding:"9px 4px",borderRadius:0,cursor:"pointer",fontFamily:"inherit",...(filter.scope===k?{background:"#FFFFFF",color:"#080B0D"}:{background:"#101316",color:SUB})}}>{l}</button>
+                <button key={k} onClick={()=>setFilter(f=>({...f,scope:f.scope===k?"world":k}))}
+                  style={{...o_wahl(filter.scope===k),flex:1,minHeight:44,fontSize:11,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase"}}>{l}</button>
               ))}
             </div>
             {filter.scope==="canton"&&(
-              <select value={filter.canton} onChange={e=>setFilter(f=>({...f,canton:e.target.value}))} style={{width:"100%",background:"#101316",borderRadius:0,padding:"12px 13px",color:W,fontSize:14,fontFamily:"inherit",marginTop:6}}>
+              <select value={filter.canton} onChange={e=>setFilter(f=>({...f,canton:e.target.value}))} style={{...O_FELD,fontSize:14,marginTop:8}}>
                 <option value="">Alle Kantone</option>
                 {["ZH","SG","BS","LU","BE","AG"].map(c=><option key={c} value={c}>{c}</option>)}
               </select>
             )}
             {filter.scope==="city"&&(
-              <select value={filter.city} onChange={e=>setFilter(f=>({...f,city:e.target.value}))} style={{width:"100%",background:"#101316",borderRadius:0,padding:"12px 13px",color:W,fontSize:14,fontFamily:"inherit",marginTop:6}}>
+              <select value={filter.city} onChange={e=>setFilter(f=>({...f,city:e.target.value}))} style={{...O_FELD,fontSize:14,marginTop:8}}>
                 <option value="">Alle Städte</option>
                 {["Glattbrugg","Zürich","St. Gallen","Basel","Luzern"].map(c=><option key={c} value={c}>{c}</option>)}
               </select>
             )}
 
             {/* Freunde + Kategorie */}
-            <div style={{fontSize:11.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"16px 2px 8px"}}>Gruppen</div>
-            <button onClick={()=>setFilter(f=>({...f,friends:!f.friends}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:"#101316",borderRadius:0,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit",marginBottom:8}}>
-              <span style={{width:20,height:20,borderRadius:0,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.friends?{background:"#FFFFFF",color:"#080B0D"}:{background:"#101316",color:"transparent"})}}>✓</span>
-              <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Nur Freunde</span>
-              <IconSpieler size={17} style={{ color: SUB }} />
+            <span style={O_LABEL}>Gruppen</span>
+            <button onClick={()=>setFilter(f=>({...f,friends:!f.friends}))} aria-pressed={filter.friends}
+              style={{...o_wahl(false),display:"flex",alignItems:"center",gap:11,width:"100%",minHeight:48,padding:"0 13px",marginBottom:8}}>
+              <span style={o_haken(filter.friends)}>✓</span>
+              <span style={{flex:1,textAlign:"left",fontSize:14.5,fontWeight:600,color:"#FFFFFF"}}>Nur Freunde</span>
+              <IconSpieler size={17} style={{ color: P_D_LEISE }} />
             </button>
-            <button onClick={()=>setFilter(f=>({...f,category:f.category==="parkinson"?"":"parkinson"}))} style={{display:"flex",alignItems:"center",gap:10,width:"100%",background:"#101316",borderRadius:0,padding:"12px 13px",cursor:"pointer",fontFamily:"inherit"}}>
-              <span style={{width:20,height:20,borderRadius:0,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:13,fontWeight:900,...(filter.category==="parkinson"?{background:"#FFFFFF",color:"#080B0D"}:{background:"#101316",color:"transparent"})}}>✓</span>
-              <span style={{flex:1,textAlign:"left",fontSize:14,fontWeight:600,color:W}}>Parkinson-Liga</span>
+            <button onClick={()=>setFilter(f=>({...f,category:f.category==="parkinson"?"":"parkinson"}))} aria-pressed={filter.category==="parkinson"}
+              style={{...o_wahl(false),display:"flex",alignItems:"center",gap:11,width:"100%",minHeight:48,padding:"0 13px"}}>
+              <span style={o_haken(filter.category==="parkinson")}>✓</span>
+              <span style={{flex:1,textAlign:"left",fontSize:14.5,fontWeight:600,color:"#FFFFFF"}}>Parkinson-Liga</span>
             </button>
 
             {/* Spielstil — kleine gleich große Ja/Nein-Haken. "Beläge" entfällt;
                 Hand und Noppen sind je für sich exklusiv, Anti ist unabhängig. */}
-            <div style={{fontSize:11.5,fontWeight:800,letterSpacing:".06em",textTransform:"uppercase",color:MUT,margin:"16px 2px 8px"}}>Spielstil</div>
-            <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
+            <span style={O_LABEL}>Spielstil</span>
+            <div style={{display:"flex",flexWrap:"wrap",gap:8}}>
               {([
                 ["hand","left","Links"],["hand","right","Rechts"],
                 ["pips","short","Kurze Noppen"],["pips","long","Lange Noppen"],
@@ -1148,82 +1163,84 @@ export default function LigaPage(){
                   return {...f,[feld]:f[feld]===wert?"":wert}
                 })
                 return (
-                  <button key={label} onClick={toggle} style={{flex:"1 1 45%",display:"flex",alignItems:"center",gap:8,background:"#101316",borderRadius:0,padding:"10px 11px",cursor:"pointer",fontFamily:"inherit"}}>
-                    <span style={{width:17,height:17,borderRadius:0,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",fontSize:11.5,fontWeight:900,...(on?{background:"#FFFFFF",color:"#080B0D"}:{background:"#101316",color:"transparent"})}}>✓</span>
-                    <span style={{fontSize:12.5,fontWeight:600,color:on?W:SUB}}>{label}</span>
+                  <button key={label} onClick={toggle} aria-pressed={on}
+                    style={{...o_wahl(false),flex:"1 1 45%",display:"flex",alignItems:"center",gap:9,minHeight:44,padding:"0 11px"}}>
+                    <span style={o_haken(on)}>✓</span>
+                    <span style={{fontSize:13,fontWeight:600,color:on?"#FFFFFF":P_D_LEISE,textAlign:"left"}}>{label}</span>
                   </button>
                 )
               })}
             </div>
 
-            <button onClick={()=>setFilterOpen(false)} style={{width:"100%",background:"#FFFFFF",color:"#080B0D",borderRadius:0,padding:15,fontSize:15,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",marginTop:18}}>Anzeigen</button>
+            <button onClick={()=>setFilterOpen(false)} style={{...knopfHell,width:"100%",marginTop:20}}>Anzeigen</button>
           </div>
         </div>
       )}
 
       {fTarget&&(
-        <div onClick={()=>setFTarget(null)} style={{position:"fixed",inset:0,background:"rgba(0,0,0,.6)",zIndex:200,display:"flex",alignItems:"center",justifyContent:"center",padding:20}}>
-          <div onClick={e=>e.stopPropagation()} style={{width:"100%",maxWidth:420,background:"#080B0D",border:"1px solid rgba(255,255,255,.20)",padding:"22px 18px",maxHeight:"88vh",overflowY:"auto"}}>
-            <div style={{display:"flex",alignItems:"center",justifyContent:"space-between"}}>
-              <div style={{fontSize:20,fontWeight:900,color:W}}>vs {fTarget.name}</div>
-              <button onClick={()=>setFTarget(null)} style={{background:"none",color:MUT,fontSize:20,cursor:"pointer"}}>✕</button>
+        <div onClick={()=>setFTarget(null)} style={O_HUELLE}>
+          <div onClick={e=>e.stopPropagation()} style={O_BLATT}>
+            <div style={{display:"flex",alignItems:"flex-start",justifyContent:"space-between",gap:14}}>
+              <h2 style={O_TITEL}>vs {fTarget.name}</h2>
+              <button onClick={()=>setFTarget(null)} style={O_ZU} aria-label="Schliessen">✕</button>
             </div>
 
             {/* Zählt dieses Spiel? Steht VOR der Partie da — nicht erst danach.
                 Sonst wirkt ein nicht gewertetes Spiel wie ein Fehler der App. */}
             {fWertung&&(
-              <div style={{marginTop:10,fontSize:12.5,fontWeight:600,color:fWertung.ranked?SUB:MUT,lineHeight:1.5}}>
+              <p style={{...O_TEXT,fontSize:12.5,margin:"12px 0 0",maxWidth:"46ch"}}>
                 {fWertung.ranked
                   ? `Zählt für ELO & Rang · ${fWertung.bisher} von ${fWertung.limit} gewerteten Spielen gegen ${fTarget.name} in den letzten 12 Monaten`
                   : `Freundschaftsspiel — ${fWertung.limit} gewertete Spiele gegen ${fTarget.name} in den letzten 12 Monaten erreicht. Das Ergebnis wird gespeichert, ändert aber ELO und Rang nicht.`}
-              </div>
+              </p>
             )}
 
             {/* 24.09.2026: Der AKTIVE Reiter stand weiss auf weiss — die
                 Beschriftung war unsichtbar. Aufgefallen ist es nie, weil der
                 Dialog bis heute nur ueber die vier Nachbarn erreichbar war. */}
-            <div style={{display:"flex",gap:8,margin:"16px 0 18px"}}>
+            <div style={{display:"flex",gap:8,margin:"18px 0"}}>
               {(["challenge","result"] as const).map(t=>{
                 const on=fTab===t
-                return <button key={t} onClick={()=>setFTab(t)} style={{flex:1,borderRadius:0,padding:"11px 8px",fontSize:12.5,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit",color:on?"#080B0D":W,background:on?"#FFFFFF":"#101316"}}>{t==="challenge"?"Herausfordern":"Ergebnis eintragen"}</button>
+                return <button key={t} onClick={()=>setFTab(t)} aria-pressed={on}
+                  style={{...o_wahl(on),flex:1,minHeight:44,padding:"0 8px",fontSize:10.5,fontWeight:600,letterSpacing:".1em",textTransform:"uppercase"}}>{t==="challenge"?"Herausfordern":"Ergebnis eintragen"}</button>
               })}
             </div>
 
             {fTab==="challenge"?(
               <>
-                <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Schlag eine Zeit vor — {fTarget.name} bekommt die Anfrage.</div>
+                <p style={{...O_TEXT,margin:"0 0 16px",maxWidth:"44ch"}}>Schlag eine Zeit vor — {fTarget.name} bekommt die Anfrage.</p>
                 <div style={{display:"flex",gap:12}}>
-                  <div style={{flex:1}}>
-                    <div style={{fontSize:11.5,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Datum</div>
-                    <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} style={{width:"100%",background:"#101316",borderRadius:0,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                  <div style={{flex:1,minWidth:0}}>
+                    <span style={{...O_LABEL,margin:"0 0 8px"}}>Datum</span>
+                    <input type="date" value={fDate} onChange={e=>setFDate(e.target.value)} style={O_FELD}/>
                   </div>
-                  <div style={{flex:1}}>
-                    <div style={{fontSize:11.5,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Zeit</div>
-                    <input type="time" value={fTime} onChange={e=>setFTime(e.target.value)} style={{width:"100%",background:"#101316",borderRadius:0,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                  <div style={{flex:1,minWidth:0}}>
+                    <span style={{...O_LABEL,margin:"0 0 8px"}}>Zeit</span>
+                    <input type="time" value={fTime} onChange={e=>setFTime(e.target.value)} style={O_FELD}/>
                   </div>
                 </div>
-                <button onClick={sendChallenge} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:22,background:"#FFFFFF",color:"#080B0D",borderRadius:0,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":"Anfrage senden"}</button>
+                <button onClick={sendChallenge} disabled={busy} style={{...knopfHell,width:"100%",marginTop:22,cursor:busy?"wait":"pointer",opacity:busy?.7:1}}>{busy?"…":"Anfrage senden"}</button>
               </>
             ):(
               <>
-                <div style={{fontSize:13,color:SUB,fontWeight:300,marginBottom:16}}>Schon gespielt? Trag die Sätze ein — {fTarget.name} bestätigt, dann zählt&apos;s für ELO &amp; Rangliste.</div>
+                <p style={{...O_TEXT,margin:"0 0 16px",maxWidth:"46ch"}}>Schon gespielt? Trag die Sätze ein — {fTarget.name} bestätigt, dann zählt&apos;s für ELO &amp; Rangliste.</p>
 
                 <div style={{marginBottom:18}}>
-                  <div style={{fontSize:11.5,fontWeight:600,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:7}}>Wann gespielt?</div>
-                  <input type="date" max={today()} value={fRDate} onChange={e=>setFRDate(e.target.value)} style={{width:"100%",background:"#101316",borderRadius:0,padding:"12px 14px",color:W,fontSize:15,outline:"none",fontFamily:"inherit"}}/>
+                  <span style={{...O_LABEL,margin:"0 0 8px"}}>Wann gespielt?</span>
+                  <input type="date" max={today()} value={fRDate} onChange={e=>setFRDate(e.target.value)} style={O_FELD}/>
                 </div>
 
                 {!fDetail?(
                   <div style={{display:"flex",alignItems:"flex-end",justifyContent:"center",gap:14}}>
                     {([["Du",fMy,setFMy],[fTarget.name,fOpp,setFOpp]] as [string,number,(n:number)=>void][]).map(([lab,val,set],idx)=>(
                       <>
-                        {idx===1&&<span style={{fontSize:30,fontWeight:900,color:MUT,paddingBottom:4}}>:</span>}
+                        {idx===1&&<span style={{...O_ZAHL,fontSize:30,color:P_D_LEISE,paddingBottom:4}}>:</span>}
                         <div key={idx} style={{textAlign:"center"}}>
-                          <div style={{fontSize:11.5,color:MUT,fontWeight:700,textTransform:"uppercase",marginBottom:9,maxWidth:110,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lab}</div>
+                          <div style={{fontFamily:INTER,fontSize:10.5,color:P_D_LEISE,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase",marginBottom:10,maxWidth:110,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{lab}</div>
                           <div style={{display:"flex",alignItems:"center",gap:9}}>
-                            <button onClick={()=>set(Math.max(0,val-1))} style={{width:34,height:34,borderRadius:0,background:"#101316",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>−</button>
-                            <span style={{fontSize:36,fontWeight:900,width:34,textAlign:"center",color:"#FFFFFF"}}>{val}</span>
-                            <button onClick={()=>set(Math.min(7,val+1))} style={{width:34,height:34,borderRadius:0,background:"#101316",color:W,fontSize:20,fontWeight:800,cursor:"pointer",fontFamily:"inherit"}}>+</button>
+                            <button onClick={()=>set(Math.max(0,val-1))} aria-label="weniger" style={{width:38,height:38,borderRadius:0,background:"transparent",border:`1px solid ${P_D_KANTE}`,color:"#FFFFFF",fontSize:18,cursor:"pointer",fontFamily:INTER}}>−</button>
+                            <span style={{...O_ZAHL,fontSize:40,width:36,textAlign:"center"}}>{val}</span>
+                            <button onClick={()=>set(Math.min(7,val+1))} aria-label="mehr" style={{width:38,height:38,borderRadius:0,background:"transparent",border:`1px solid ${P_D_KANTE}`,color:"#FFFFFF",fontSize:18,cursor:"pointer",fontFamily:INTER}}>+</button>
                           </div>
                         </div>
                       </>
@@ -1232,68 +1249,70 @@ export default function LigaPage(){
                 ):(
                   /* Genaue Sätze — dann steht in der Historie, was wirklich gespielt wurde */
                   <div>
-                    <div style={{display:"flex",gap:10,marginBottom:9,paddingLeft:52}}>
-                      <div style={{flex:1,fontSize:11.5,color:MUT,fontWeight:700,textTransform:"uppercase",textAlign:"center"}}>Du</div>
+                    <div style={{display:"flex",gap:10,marginBottom:10,paddingLeft:52}}>
+                      <div style={{flex:1,fontFamily:INTER,fontSize:10.5,color:P_D_LEISE,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase",textAlign:"center"}}>Du</div>
                       <div style={{width:10}}/>
-                      <div style={{flex:1,fontSize:11.5,color:MUT,fontWeight:700,textTransform:"uppercase",textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{fTarget.name}</div>
+                      <div style={{flex:1,fontFamily:INTER,fontSize:10.5,color:P_D_LEISE,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase",textAlign:"center",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{fTarget.name}</div>
                     </div>
                     {fSets.map((s,i)=>(
                       <div key={i} style={{display:"flex",alignItems:"center",gap:10,marginBottom:8}}>
-                        <span style={{width:42,flexShrink:0,fontSize:11.5,color:MUT,fontWeight:700}}>Satz {i+1}</span>
+                        <span style={{width:42,flexShrink:0,fontFamily:INTER,fontSize:10.5,color:P_D_LEISE,fontWeight:600,letterSpacing:".08em",textTransform:"uppercase"}}>Satz {i+1}</span>
                         <input type="number" inputMode="numeric" min={0} max={30} value={s.p1}
                           onChange={e=>setFSets(v=>v.map((x,j)=>j===i?{...x,p1:e.target.value}:x))}
                           placeholder="11"
-                          style={{flex:1,minWidth:0,background:"#101316",borderRadius:0,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
-                        <span style={{width:10,textAlign:"center",color:MUT,fontWeight:800}}>:</span>
+                          style={{...O_FELD,flex:1,minWidth:0,width:"auto",padding:"10px 6px",fontSize:17,fontWeight:600,textAlign:"center",minHeight:44}}/>
+                        <span style={{width:10,textAlign:"center",color:P_D_LEISE,fontFamily:INTER}}>:</span>
                         <input type="number" inputMode="numeric" min={0} max={30} value={s.p2}
                           onChange={e=>setFSets(v=>v.map((x,j)=>j===i?{...x,p2:e.target.value}:x))}
                           placeholder="7"
-                          style={{flex:1,minWidth:0,background:"#101316",borderRadius:0,padding:"11px 8px",color:W,fontSize:17,fontWeight:800,textAlign:"center",outline:"none",fontFamily:"inherit"}}/>
+                          style={{...O_FELD,flex:1,minWidth:0,width:"auto",padding:"10px 6px",fontSize:17,fontWeight:600,textAlign:"center",minHeight:44}}/>
                         {i>=3&&(
-                          <button onClick={()=>setFSets(v=>v.filter((_,j)=>j!==i))} style={{background:"none",color:MUT,fontSize:16,cursor:"pointer",flexShrink:0}}>×</button>
+                          <button onClick={()=>setFSets(v=>v.filter((_,j)=>j!==i))} aria-label={`Satz ${i+1} entfernen`} style={{background:"none",border:"none",color:P_D_LEISE,fontSize:15,cursor:"pointer",flexShrink:0,width:24,fontFamily:INTER}}>✕</button>
                         )}
                       </div>
                     ))}
                     {fSets.length<7&&(
                       <button onClick={()=>setFSets(v=>[...v,{p1:"",p2:""}])}
-                        style={{width:"100%",background:"#101316",borderRadius:0,padding:10,color:MUT,fontSize:12.5,cursor:"pointer",fontFamily:"inherit"}}>+ Satz</button>
+                        style={{...o_wahl(false),width:"100%",minHeight:44,color:P_D_LEISE,fontSize:11,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase"}}>+ Satz</button>
                     )}
-                    <div style={{textAlign:"center",fontSize:13,fontWeight:800,marginTop:11,color:"#FFFFFF"}}>
-                      {satzBilanz().my} : {satzBilanz().opp} Sätze
+                    <div style={{textAlign:"center",marginTop:13}}>
+                      <span style={{...O_ZAHL,fontSize:22}}>{satzBilanz().my} : {satzBilanz().opp}</span>
+                      <span style={{...O_TEXT,fontSize:12.5,marginLeft:8}}>Sätze</span>
                     </div>
                   </div>
                 )}
 
                 {/* Umschalter: schnell zählen oder genau eintragen */}
                 <button onClick={()=>setFDetail(v=>!v)}
-                  style={{display:"block",width:"100%",marginTop:14,background:"none",color:MUT,fontSize:12,fontWeight:700,cursor:"pointer",fontFamily:"inherit",padding:6,textDecoration:"underline"}}>
+                  style={{display:"block",width:"100%",marginTop:16,minHeight:44,background:"none",border:"none",color:P_D_LEISE,fontFamily:INTER,fontSize:11,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase",cursor:"pointer",textDecoration:"underline",textUnderlineOffset:4}}>
                   {fDetail?"Nur Sätze zählen":"Satzergebnisse genau eintragen"}
                 </button>
                 {/* Freundschaftsspiel: Ergebnis wird gespeichert und im Chat gezeigt, zählt aber nicht */}
-                <button onClick={()=>setFFriendly(v=>!v)} style={{display:"flex",alignItems:"center",gap:11,width:"100%",marginTop:20,background:"#101316",borderRadius:0,padding:"13px 14px",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}}>
-                  <span style={{width:20,height:20,borderRadius:0,flexShrink:0,display:"flex",alignItems:"center",justifyContent:"center",background:fFriendly?"#FFFFFF":"#101316",color:"#080B0D",fontSize:13,fontWeight:600}}>{fFriendly?"✓":""}</span>
-                  <span style={{flex:1}}>
-                    <span style={{display:"block",fontSize:13.5,fontWeight:700,color:W}}>Freundschaftsspiel</span>
-                    <span style={{display:"block",fontSize:11.5,color:MUT,marginTop:1}}>Zählt nicht für ELO und Rang — erscheint nur im Verlauf.</span>
+                <button onClick={()=>setFFriendly(v=>!v)} aria-pressed={fFriendly}
+                  style={{...o_wahl(false),display:"flex",alignItems:"center",gap:11,width:"100%",marginTop:20,padding:"13px 14px",textAlign:"left"}}>
+                  <span style={o_haken(fFriendly)}>✓</span>
+                  <span style={{flex:1,minWidth:0}}>
+                    <span style={{display:"block",fontFamily:INTER,fontSize:14,fontWeight:600,color:"#FFFFFF"}}>Freundschaftsspiel</span>
+                    <span style={{...O_TEXT,display:"block",fontSize:12.5,marginTop:3}}>Zählt nicht für ELO und Rang — erscheint nur im Verlauf.</span>
                   </span>
                 </button>
 
                 {fNoteRanked&&(
-                  <div style={{marginTop:12,background:"#101316",borderRadius:0,padding:"11px 13px",fontSize:12,color:SUB,lineHeight:1.5}}>{fNoteRanked}</div>
+                  <p style={{...O_TEXT,fontSize:12.5,border:`1px solid ${P_D_KANTE}`,padding:"11px 13px",margin:"12px 0 0"}}>{fNoteRanked}</p>
                 )}
 
-                <button onClick={sendResult} disabled={busy} style={{display:"block",width:"100%",textAlign:"center",marginTop:18,background:"#FFFFFF",color:"#080B0D",borderRadius:0,padding:16,fontSize:16,fontWeight:800,textTransform:"uppercase",letterSpacing:".03em",cursor:busy?"wait":"pointer",opacity:busy?.7:1,fontFamily:"inherit"}}>{busy?"…":fDone.length?"Weiteres Ergebnis absenden":"Ergebnis absenden"}</button>
+                <button onClick={sendResult} disabled={busy} style={{...knopfHell,width:"100%",marginTop:18,cursor:busy?"wait":"pointer",opacity:busy?.7:1}}>{busy?"…":fDone.length?"Weiteres Ergebnis absenden":"Ergebnis absenden"}</button>
 
                 {fDone.length>0&&(
-                  <div style={{marginTop:16,background:"#101316",borderRadius:0,padding:"13px 14px"}}>
-                    <div style={{fontSize:11.5,fontWeight:700,color:MUT,letterSpacing:".04em",textTransform:"uppercase",marginBottom:8}}>Eingetragen ({fDone.length})</div>
+                  <div style={{marginTop:16,border:`1px solid ${P_D_KANTE}`,padding:"13px 14px"}}>
+                    <span style={{...O_LABEL,margin:"0 0 9px"}}>Eingetragen ({fDone.length})</span>
                     <div style={{display:"flex",flexWrap:"wrap",gap:7}}>
                       {fDone.map((s,i)=>(
-                        <span key={i} style={{fontSize:13,fontWeight:800,color:W,background:"#101316",borderRadius:0,padding:"5px 10px"}}>{s}</span>
+                        <span key={i} style={{fontFamily:INTER,fontSize:12.5,fontWeight:600,color:"#FFFFFF",border:`1px solid ${P_D_KANTE}`,padding:"5px 10px"}}>{s}</span>
                       ))}
                     </div>
-                    <div style={{fontSize:11.5,color:SUB,fontWeight:300,marginTop:9,lineHeight:1.5}}>{fTarget.name} bekommt eine E-Mail und hat 24 Std. Zeit zu bestätigen — danach zählt das Ergebnis automatisch. Du kannst gleich den nächsten Match eintragen.</div>
-                    <button onClick={()=>setFTarget(null)} style={{display:"block",width:"100%",textAlign:"center",marginTop:11,background:"#101316",borderRadius:0,padding:11,fontSize:13,fontWeight:800,color:W,textTransform:"uppercase",letterSpacing:".03em",cursor:"pointer",fontFamily:"inherit"}}>Fertig</button>
+                    <p style={{...O_TEXT,fontSize:12.5,margin:"11px 0 0"}}>{fTarget.name} bekommt eine E-Mail und hat 24 Std. Zeit zu bestätigen — danach zählt das Ergebnis automatisch. Du kannst gleich den nächsten Match eintragen.</p>
+                    <button onClick={()=>setFTarget(null)} style={{...knopfDunkelUmriss,width:"100%",marginTop:12,minHeight:44}}>Fertig</button>
                   </div>
                 )}
               </>
