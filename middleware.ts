@@ -13,8 +13,16 @@ const PUBLIC_PATHS = ['/', '/login', '/onboarding', '/auth', '/spielen', '/entde
   '/liga', '/feed', '/spieler', '/training', '/trainingscamp']
 
 // Diese Unterseiten brauchen trotzdem ein Konto: erstellen, mitspielen, eintragen.
+//
+// 24.09.2026: /trainingscamp/storno und /single-night/storno standen hier und
+// waren damit hinter der Login-Wand — obwohl genau sie die Landeseiten der
+// Storno-Links aus der Bestaetigungsmail sind. Ein Gast hat kein Konto; er hat
+// den cancel_token in der Adresse. Am 18.09. wurden die beiden API-Routen
+// dahinter freigegeben, die SEITEN davor aber nicht: der Link aus der Mail
+// endete weiter auf /login. Beide Seiten tun ohne Token nichts, und die Route
+// dahinter prueft den Token selbst (Token ODER eingeloggter Besitzer).
 const GESCHUETZT = ['/match/create', '/match/erstellen', '/erstellen',
-  '/liga/join', '/turniere/neu', '/trainingscamp/storno', '/single-night/storno']
+  '/liga/join', '/turniere/neu']
 
 // Oeffentlich lesbare API-Routen — ausschliesslich GET. Ohne diese Zeilen
 // antwortete die API einem ausgeloggten Besucher mit 401; die Seite zeigte
@@ -162,7 +170,13 @@ export async function middleware(request: NextRequest) {
     // die Clients prüften auf 401, sahen aber einen 200 mit HTML, und res.json()
     // ist gescheitert. Jede abgelaufene Session endete so in einem Blindflug.
     if (pathname.startsWith('/api/')) {
-      const res = NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+      // Die Meldung wird gelesen: mehrere Seiten schreiben j.error direkt in
+      // ihre Fehlerzeile. "Unauthorized" stand dort englisch und technisch.
+      // Der Status bleibt 401 — daran haengt die Weiterleitung zum Login.
+      const res = NextResponse.json(
+        { error: 'Bitte melde dich an.', code: 'unauthorized' },
+        { status: 401 },
+      )
       supabaseResponse.cookies.getAll().forEach(c => res.cookies.set(c))
       return res
     }

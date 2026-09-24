@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import Link from "next/link"
+import { zumLogin, pruefeAuth } from "@/lib/auth-client"
 
 type Assignment = {
   id: string
@@ -59,7 +60,7 @@ export default function SeasonPage() {
     setLoading(true)
     setError("")
     const r = await fetch("/api/liga/season", { cache: "no-store" })
-    if (r.status === 401) { window.location.href = "/login"; return }
+    if (!pruefeAuth(r)) return
     const j = await r.json().catch(() => ({}))
     if (!r.ok) setError(j.error || "Season konnte nicht geladen werden")
     setSeasons(j.seasons || [])
@@ -79,6 +80,7 @@ export default function SeasonPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ season_id: seasonId, action }),
     })
+    if (!pruefeAuth(r)) return
     const j = await r.json().catch(() => ({}))
     if (!r.ok) setError(j.error || "Aktion fehlgeschlagen")
     await load()
@@ -99,6 +101,7 @@ export default function SeasonPage() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ match_id: a.id }),
     })
+    if (!pruefeAuth(r)) return
     const j = await r.json().catch(() => ({}))
     if (!r.ok) setError(j.error || "Resultat konnte nicht bestätigt werden")
     await load()
@@ -118,7 +121,7 @@ export default function SeasonPage() {
 
     const me = await fetch("/api/me").then(r => r.ok ? r.json() : null).catch(() => null)
     const myId = me?.id || me?.user?.id
-    if (!myId) { window.location.href = "/login"; return }
+    if (!myId) { zumLogin(); return }
 
     const r = await fetch("/api/liga/result", {
       method: "POST",

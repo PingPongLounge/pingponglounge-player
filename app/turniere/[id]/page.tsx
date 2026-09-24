@@ -4,6 +4,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 import { BG, CELL, W, MUT, GREEN, DANGER, card, cardPad, cell, btn, btnInCard, btnGhost, chipBtn, levelBadge, h1, body, backLink } from "@/app/theme"
+import { zumLogin, pruefeAuth } from "@/lib/auth-client"
 
 const M=MUT, B=CELL, G=GREEN
 
@@ -68,7 +69,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
     try{
       const res=await fetch(`/api/turniere/${tournamentId}`)
       // Abgelaufene Session → sauber zum Login statt weisser Seite
-      if(res.status===401){ window.location.href="/login"; return }
+      if(!pruefeAuth(res)) return
       const json=await res.json()
       // Ohne diese Prüfung war `data` bei einem 404 zwar gesetzt, aber ohne
       // `tournament` — die Seite ist dann beim Rendern abgestürzt (weisser Screen).
@@ -85,7 +86,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
   async function register(){
     setRegistering(true); setRegError("")
     const res=await fetch(`/api/turniere/${tournamentId}/register`,{method:"POST"})
-    if(res.status===401){ window.location.href="/login"; return }
+    if(!pruefeAuth(res)) return
     const json=await res.json().catch(()=>({}))
     if(!res.ok){setRegError(json.error||"Fehler bei der Anmeldung");setRegistering(false);return}
     load()
@@ -95,7 +96,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
   async function unregister(){
     setRegistering(true); setRegError("")
     const res=await fetch(`/api/turniere/${tournamentId}/unregister`,{method:"POST"})
-    if(res.status===401){ window.location.href="/login"; return }
+    if(!pruefeAuth(res)) return
     const json=await res.json().catch(()=>({}))
     if(!res.ok){setRegError(json.error||"Abmeldung fehlgeschlagen");setRegistering(false);return}
     load()
@@ -105,7 +106,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
   async function cancelTournament(){
     if(!confirm("Turnier wirklich absagen? Das lässt sich nicht rückgängig machen.")) return
     const res=await fetch(`/api/turniere/${tournamentId}/cancel`,{method:"POST"})
-    if(res.status===401){ window.location.href="/login"; return }
+    if(!pruefeAuth(res)) return
     if(res.ok) router.push("/turniere")
     else { const j=await res.json().catch(()=>({})); setRegError(j.error||"Absagen fehlgeschlagen") }
   }
@@ -129,7 +130,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
       headers:{"Content-Type":"application/json"},
       body:JSON.stringify({match_id:resultMatch.id,sets:sets.filter(s=>s.p1!==""&&s.p2!=="").map(s=>`${s.p1}:${s.p2}`),action})
     })
-    if(res.status===401){ window.location.href="/login"; return }
+    if(!pruefeAuth(res)) return
     if(res.ok){setResultMatch(null);setResultError("");load()}
     else{const j=await res.json().catch(()=>({}));setResultError(j.error||"Fehler beim Eintragen")}
   }

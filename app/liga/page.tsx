@@ -18,8 +18,13 @@ import { IconSpieler } from "@/app/components/Icons"
    Saison-, Challenge- und Chatlogik sind unveraendert. */
 import {
   TEXT as P_TEXT, LEISE as P_LEISE, BG as P_BG, AKZENT as P_AKZENT,
-  knopf as knopfPrimaer, knopfUmriss as knopfOutlineHell,
+  knopf as knopfPrimaer, knopfUmriss as knopfOutlineHell, knopfHell,
 } from "@/app/design"
+/* Umriss auf dunklem Grund — dieselbe Form, nur helle Kante und Schrift. */
+const knopfDunkelUmriss: React.CSSProperties = {
+  ...knopfHell, background: "transparent", color: "#FFFFFF",
+  border: "1px solid rgba(255,255,255,.28)",
+}
 const TEXT_LEISE = P_LEISE
 const FLAECHE = P_BG
 
@@ -96,7 +101,7 @@ export default function LigaPage(){
     setBusy(true)
     try{
       const r=await fetch("/api/liga/anfrage",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({city:reqCity.trim()})})
-      if(r.status===401){ window.location.href="/login"; return }
+      if(!checkAuth(r)){ setBusy(false); return }
       const j=await r.json().catch(()=>({}))
       if(r.ok){ setReqDone(true); setReqCount(j.count||1) }
       else flash(j.error||"Anfrage fehlgeschlagen")
@@ -269,15 +274,21 @@ export default function LigaPage(){
   },[fTarget])
 
   async function join(){
+    // Ohne Konto gar nicht erst anfragen: sonst antwortet die Middleware mit
+    // 401 und der Besucher liest "Unauthorized".
+    if(!userId){ zumLogin(); return }
     setBusy(true)
     // season_id wird serverseitig gesetzt — es gibt nur eine öffentliche Liga.
     const r=await fetch("/api/liga/register",{method:"POST",headers:{"Content-Type":"application/json"},body:"{}"})
+    if(!checkAuth(r)){ setBusy(false); return }
     const j=await r.json().catch(()=>({}))
     if(r.ok){flash("✓ Du bist dabei!");loadStandings(seasonId)} else flash(j.error||"Fehler")
     setBusy(false)
   }
   async function challenge(pid:string){
+    if(!userId){ zumLogin(); return }
     const r=await fetch("/api/liga/challenge",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,challenged_id:pid})})
+    if(!checkAuth(r)) return
     const j=await r.json().catch(()=>({}))
     if(r.ok){flash("⚔️ Herausforderung gesendet!");loadStandings(seasonId)}
     else flash(j.error||"Fehler")
@@ -299,6 +310,7 @@ export default function LigaPage(){
     setBusy(true)
     const when=[fDate,fTime].filter(Boolean).join(" ")
     const r=await fetch("/api/liga/challenge",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,challenged_id:fTarget.id,when})})
+    if(!checkAuth(r)){ setBusy(false); return }
     const j=await r.json().catch(()=>({}))
     if(r.ok){
       if(fDate||fTime){
@@ -309,9 +321,18 @@ export default function LigaPage(){
     } else flash(j.error||"Fehler")
     setBusy(false)
   }
-  // Session abgelaufen → sauber zum Login statt "Fehler" anzuzeigen
+  /* 401 heisst: keine (oder abgelaufene) Session. Bis zum 24.09.2026 haben
+     mehrere Aufrufer diesen Fall gar nicht geprueft und stattdessen die
+     Fehlermeldung der Middleware angezeigt — woertlich "Unauthorized".
+     Genau das sah, wer aus der Forderungs-Mail kam und "Los geht's" drueckte.
+     Jetzt geht es zum Login und danach GENAU HIERHIN zurueck, samt
+     Suchparametern (z.B. ?annehmen=<id>). */
+  function zumLogin(){
+    const zurueck=window.location.pathname+window.location.search
+    window.location.href="/login?returnTo="+encodeURIComponent(zurueck)
+  }
   function checkAuth(r:Response){
-    if(r.status===401){ window.location.href="/login"; return false }
+    if(r.status===401){ zumLogin(); return false }
     return true
   }
 
@@ -362,27 +383,51 @@ export default function LigaPage(){
   }
   async function acceptChallenge(matchId:string){
     const r=await fetch("/api/liga/challenge/accept",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId})})
+    if(!checkAuth(r)) return
     const j=await r.json().catch(()=>({}))
     if(r.ok){flash("✓ Angenommen — jetzt Spiel eintragen");loadStandings(seasonId)}
     else flash(j.error||"Fehler")
   }
   async function react(messageId:string,type:string){
-    await fetch("/api/liga/message-react",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message_id:messageId,type})})
+    const r=await fetch("/api/liga/message-react",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({message_id:messageId,type})})
+    if(!checkAuth(r)) return
     loadChat(seasonId)
   }
   async function send(){
     const t=msg.trim(); if(!t) return
     setMsg("")
-    await fetch("/api/liga/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,text:t})})
+    const r=await fetch("/api/liga/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,text:t})})
+    if(!checkAuth(r)) return
     loadChat(seasonId)
   }
   // Kommentar zu EINEM Spiel — hängt als Antwort unter dem Match-Post.
   async function sendComment(parentId:string){
     const t=(cmt[parentId]||"").trim(); if(!t) return
     setCmt(c=>({...c,[parentId]:""}))
-    await fetch("/api/liga/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,text:t,parent_id:parentId})})
+    const r=await fetch("/api/liga/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:seasonId,text:t,parent_id:parentId})})
+    if(!checkAuth(r)) return
     loadChat(seasonId)
   }
+
+  /* ── Aus der Forderungs-Mail: /liga?annehmen=<match_id> ──────────────
+     Bis zum 24.09.2026 zeigte der Knopf "Annehmen" in der Mail einfach auf
+     /liga — ohne Match und ohne Rueckweg. Wer auf diesem Geraet keine
+     Session hatte (Mail am Handy, App am Rechner), landete auf der
+     oeffentlichen Liga-Seite, sah dort die Beitrittskarte mit "Los geht's"
+     und bekam beim Druecken die Fehlermeldung der Middleware zu lesen.
+     Jetzt traegt der Link das Match, und ohne Session geht es zuerst zum
+     Login und danach genau hierher zurueck. */
+  const annahmeLaeuft=useRef(false)
+  useEffect(()=>{
+    if(loading||annahmeLaeuft.current) return
+    const id=new URLSearchParams(window.location.search).get("annehmen")
+    if(!id) return
+    annahmeLaeuft.current=true
+    if(!userId){ zumLogin(); return }
+    window.history.replaceState({},"",window.location.pathname)
+    acceptChallenge(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[loading,userId])
 
   // Keine Stadt-/Klassen-Auswahl mehr (cities/citySeasons/isPro sind entfallen):
   // es gibt genau eine öffentliche Liga. `sel` ist die gerade gezeigte.
@@ -467,8 +512,11 @@ export default function LigaPage(){
     return `${wer}: ${letzte.text}`
   })()
 
+  // 24.09.2026 (Oliver): Auf der Liga liegt hinter den Kaestchen die dunkle
+  // Flaeche statt Off-White. Die Karten selbst bleiben weiss — Ranking ist
+  // Information und wird gelesen.
   return (
-    <main style={{minHeight:"100dvh",background:FLAECHE,color:P_TEXT,fontFamily:INTER,paddingBottom:90}}>
+    <main className="p-dunkel" style={{minHeight:"100dvh",fontFamily:INTER,paddingBottom:90}}>
       {/* Topbar — dunkel. Grün nur im Logo und im Zähler: eine grelle Leiste war
           das Lauteste auf dem Screen und sagte nichts. Ein Akzent pro Screen. */}
       {/* 07.09.2026: Der eigene Kopfbalken ist weg — PPL., Glocke und Menue
@@ -549,24 +597,24 @@ export default function LigaPage(){
               </section>
 
               {!monatOk&&(
-                <p style={{fontSize:13,color:P_LEISE,margin:"10px 2px 0",lineHeight:1.5}}>
+                <p className="p-hinweis" style={{fontSize:13,margin:"10px 2px 0",lineHeight:1.5}}>
                   Noch {MIN_MATCHES_PER_MONTH-monatCount} gewertete Spiele bis Monatsende, sonst −{MONTHLY_PENALTY_ELO} Punkte.
                 </p>
               )}
 
               <div className="p-knopfreihe">
                 {rows.length>1&&(
-                  <button onClick={()=>setPickOpen(true)} style={knopfPrimaer}>Ergebnis eintragen</button>
+                  <button onClick={()=>setPickOpen(true)} style={knopfHell}>Ergebnis eintragen</button>
                 )}
-                <button onClick={()=>setChatOpen(true)} style={{...knopfOutlineHell,position:"relative"}}>
+                <button onClick={()=>setChatOpen(true)} style={{...knopfDunkelUmriss,position:"relative"}}>
                   Liga-Chat
                   {ungelesen>0&&(
-                    <span style={{marginLeft:9,minWidth:20,height:20,background:P_TEXT,color:"#FFFFFF",fontSize:11,fontWeight:600,display:"inline-flex",alignItems:"center",justifyContent:"center",padding:"0 6px"}}>{ungelesen>9?"9+":ungelesen}</span>
+                    <span style={{marginLeft:9,minWidth:20,height:20,background:"#FFFFFF",color:P_TEXT,fontSize:11,fontWeight:600,display:"inline-flex",alignItems:"center",justifyContent:"center",padding:"0 6px"}}>{ungelesen>9?"9+":ungelesen}</span>
                   )}
                 </button>
               </div>
               {letzteNachricht&&(
-                <div style={{fontSize:13,color:P_LEISE,marginTop:10,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{letzteNachricht}</div>
+                <div className="p-hinweis" style={{fontSize:13,marginTop:10,overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>{letzteNachricht}</div>
               )}
             </>
           ):(
@@ -576,7 +624,7 @@ export default function LigaPage(){
                   Eine Liga für alle — kein Beitreten in Klassen. Deine Stufe kommt aus deinem Rating. Fordere jeden, auch die Nummer eins.
                 </p>
                 <button onClick={join} disabled={busy} style={{...knopfPrimaer,width:"100%",opacity:busy?.6:1}}>
-                  {busy?"…":"Los geht's"}
+                  {busy?"…":userId?"Los geht's":"Anmelden und mitmachen"}
                 </button>
               </div>
             </section>
@@ -607,7 +655,7 @@ export default function LigaPage(){
                     <div><div style={{fontSize:15,fontWeight:600,color:P_TEXT}}>{t}</div><div style={{fontSize:13,color:P_LEISE,marginTop:3,lineHeight:1.45}}>{d}</div></div>
                   </div>
                 ))}
-                <button onClick={join} disabled={busy} style={{...knopfOutlineHell,width:"100%",marginTop:6,cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":"Los geht's"}</button>
+                <button onClick={join} disabled={busy} style={{...knopfOutlineHell,width:"100%",marginTop:6,cursor:busy?"not-allowed":"pointer",opacity:busy?.6:1}}>{busy?"…":userId?"Los geht's":"Anmelden und mitmachen"}</button>
                 </div>
               </div>
             </div>
@@ -746,7 +794,7 @@ export default function LigaPage(){
               stand aber ganz oben bei Leuten, die längst in einer sind. */}
           <div className="p-lese p-abschnitt" style={{paddingBottom:6,textAlign:"center"}}>
             {reqDone ? (
-              <div style={{fontSize:13,color:P_LEISE,lineHeight:1.5}}>
+              <div className="p-hinweis" style={{fontSize:13,lineHeight:1.5}}>
                 {reqCount>1
                   ? `Danke — ${reqCount} Leute wollen eine Liga in ${reqCity}. Wir melden uns, sobald sie steht.`
                   : `Danke — wir melden uns, sobald sich genug Leute für ${reqCity} finden.`}

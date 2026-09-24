@@ -9,6 +9,7 @@ import {
 } from "@/app/theme"
 import { MATCH_SPRUECHE } from "@/lib/rewards"
 import StreakBanner from "@/app/components/StreakBanner"
+import { pruefeAuth, zumLogin } from "@/lib/auth-client"
 
 type SetScore={p1:string,p2:string}
 type MatchData={id:string,season_id:string,round:number,p1_id:string,p1_name:string,p2_id:string,p2_name:string,sets:Array<{p1:number,p2:number}>|null,winner_id:string|null,status:string,entered_by:string|null}
@@ -32,7 +33,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
     async function load(){
       const sb=createClient()
       const {data:{user}}=await sb.auth.getUser()
-      if(!user){window.location.href="/login";return}
+      if(!user){zumLogin();return}
       setUserId(user.id)
       const {data}=await sb.from("league_matches")
         .select("id,season_id,round,p1_id,p2_id,sets,winner_id,status,entered_by")
@@ -58,6 +59,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
     if(!confirm("Ergebnis ablehnen? Es wird verworfen und nicht gewertet. Ihr könnt danach das korrekte Ergebnis neu eintragen.")) return
     setSaving(true)
     const res=await fetch("/api/liga/decline",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId})})
+    if(!pruefeAuth(res)){setSaving(false);return}
     if(res.ok){ window.location.href="/liga" }
     else{const d=await res.json().catch(()=>({}));setError(d.error||"Ablehnen fehlgeschlagen");setSaving(false)}
   }
@@ -90,6 +92,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
     if(!valid){setError("Trag mindestens einen Satz ein — und kein Unentschieden.");return}
     setSaving(true);setError("")
     const res=await fetch("/api/liga/result",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId,sets:parsedSets,winner_id:winner})})
+    if(!pruefeAuth(res)){setSaving(false);return}
     if(res.ok){setSubmitted(true);setSaving(false)}
     else{const d=await res.json();setError(d.error||"Fehler");setSaving(false)}
   }
@@ -99,6 +102,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
     setSaving(true)
     const oppId=match.p1_id===userId?match.p2_id:match.p1_id
     const res=await fetch("/api/liga/direct-match",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({season_id:match.season_id,opponent_id:oppId})})
+    if(!pruefeAuth(res)){setSaving(false);return}
     const d=await res.json().catch(()=>({}))
     if(res.ok&&d.id){setNextMatchId(d.id);window.location.href=`/liga/match/${d.id}`}
     else{setError(d.error||"Fehler");setSaving(false)}
@@ -109,6 +113,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
   async function handleConfirm(){
     setSaving(true)
     const res=await fetch("/api/liga/confirm",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({match_id:matchId})})
+    if(!pruefeAuth(res)){setSaving(false);return}
     if(res.ok){setSaving(false);setAskComment(true)}
     else{const d=await res.json();setError(d.error||"Fehler");setSaving(false)}
   }
@@ -122,6 +127,16 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
     window.location.href=`/liga?chat=1`
   }
 
+  /* 24.09.2026: Gab es das Match nicht (alter Link aus einer Mail, geloeschtes
+     Spiel, Tippfehler in der ID), blieb match null — und die Seite stand fuer
+     immer auf "Laedt …". */
+  if(!loading&&!match) return <main style={{minHeight:"100dvh",background:BG,display:"grid",placeItems:"center",padding:20,textAlign:"center"}}>
+    <div>
+      <p style={{fontSize:22,fontWeight:700,color:W,marginBottom:10}}>Match nicht gefunden</p>
+      <p style={{color:MUT,fontSize:14,marginBottom:18,lineHeight:1.5}}>Der Link ist alt, oder das Spiel wurde entfernt.</p>
+      <Link href="/liga" style={{color:W,fontSize:12,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase",textDecoration:"none",border:"1px solid rgba(255,255,255,.3)",padding:"14px 22px",display:"inline-block"}}>Zur Liga</Link>
+    </div>
+  </main>
   if(loading||!match) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:MUT}}>Lädt …</p></main>
 
   const isP1=match.p1_id===userId

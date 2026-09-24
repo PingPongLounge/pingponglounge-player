@@ -107,6 +107,10 @@ export async function sendChallengeNotice(opts: {
   challengerLevel?: string | null
   challengerElo?: number | null
   when?: string | null
+  /** Das geforderte Match. Ohne diese Angabe zeigte "Annehmen" nur auf /liga —
+      der Empfaenger landete auf der oeffentlichen Seite und wusste nicht,
+      was er dort annehmen sollte (24.09.2026). */
+  matchId?: string | null
 }) {
   return sendEmail({
     to: opts.to,
@@ -121,7 +125,7 @@ export async function sendChallengeNotice(opts: {
         <div style="font-size:11px;color:rgba(255,255,255,.5);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">Vorgeschlagen</div>
         <div style="font-size:17px;font-weight:900;color:#fff">${opts.when}</div>
       </div>` : ""}
-      ${outlineButton(`${BASE_URL}/liga`, "Annehmen")}
+      ${outlineButton(`${BASE_URL}/liga${opts.matchId ? `?annehmen=${opts.matchId}` : ""}`, "Annehmen")}
       <p style="color:rgba(255,255,255,.5);font-size:12.5px;line-height:1.5;margin:16px 0 0">
         Passt der Termin nicht? Schreib ihm im Liga-Chat.
       </p>

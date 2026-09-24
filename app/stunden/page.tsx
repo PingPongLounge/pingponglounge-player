@@ -5,6 +5,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { BG, CELL, W, MUT, GREEN, DANGER, gt, cardPad, h1, meta, eyebrow, btn, btnGhost, statusPill } from "@/app/theme"
 import { IconCommunity } from "@/app/components/Icons"
+import { zumLogin, pruefeAuth } from "@/lib/auth-client"
 
 type Credit = {
   id: string
@@ -101,7 +102,7 @@ export default function StundenPage() {
     async function load() {
       const supabase = createClient()
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) { window.location.href = "/login"; return }
+      if (!user) { zumLogin(); return }
 
       const { data } = await supabase
         .from("credits")

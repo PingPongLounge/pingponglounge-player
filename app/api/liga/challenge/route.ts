@@ -76,12 +76,13 @@ export async function POST(req: NextRequest) {
         challengerLevel: me?.level ?? null,
         challengerElo: me?.elo ?? null,
         when: typeof when === "string" && when.trim() ? when.trim().slice(0, 60) : null,
+        matchId: data.id,
       })
     }
     // In-App-Benachrichtigung an den Geforderten.
     await notify(admin, challenged_id, "challenge", `${me?.name || "Ein Spieler"} fordert dich heraus`, {
       body: when ? `Vorschlag: ${String(when).slice(0, 60)}` : "Nimm die Herausforderung an.",
-      link: "/liga",
+      link: `/liga?annehmen=${data.id}`,
     })
   } catch (e) {
     console.error("Forderungs-Mail fehlgeschlagen:", e)

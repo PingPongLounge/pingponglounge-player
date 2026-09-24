@@ -16,6 +16,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import { useRouter } from "next/navigation"
 import { OG_PREIS_CHF, OG_STORNO_STUNDEN } from "@/lib/opengames"
+import { pruefeAuth } from "@/lib/auth-client"
 import PlayerKopf from "@/app/components/PlayerKopf"
 import { IconSuche, IconSpieler, IconOpenGames } from "@/app/components/Icons"
 import { INTER, TEXT, LEISE, BG, knopf, knopfUmriss } from "@/app/design"
@@ -64,6 +65,7 @@ export default function MatchPage() {
   async function join(id: string) {
     setJoining(id); setJoinError("")
     const res = await fetch(`/api/match/${id}/join`, { method: "POST" })
+    if (!pruefeAuth(res)) return
     if (res.ok) router.push(`/match/${id}`)
     else { const j = await res.json().catch(() => ({})); setJoinError(j.error || "Fehler beim Beitreten"); setJoining(null) }
   }
@@ -159,6 +161,11 @@ export default function MatchPage() {
               const cur = g.current_players || 1
               const frei = Math.max(0, max - cur)
               const dabei = g.players?.some(p => p.user_id === userId)
+              // Kostet der Platz etwas, fuehrt der Knopf auf die Detailseite —
+              // dort haengen Stripe, PingPoints und Gutschein dran. Ein
+              // "Mitmachen" direkt aus der Liste wuerde den Gratis-Beitritt
+              // aufrufen und die Bezahlung ueberspringen.
+              const kostet = !!g.is_official && (g.price_per_player ?? 0) > 0
               // Ohne Anmeldung gehoert niemandem ein Spiel — sonst zeigte die
               // ausgeloggte Seite an jeder Zeile ein Loesch-Kreuz.
               const meins = !!userId && g.created_by === userId
@@ -194,9 +201,11 @@ export default function MatchPage() {
                       ? <span className="p-pille gut">Dabei</span>
                       : frei === 0
                         ? <span className="p-pille">Voll</span>
-                        : <button onClick={() => join(g.id)} disabled={joining === g.id} className="p-aktion">
-                            {joining === g.id ? "…" : "Mitmachen"}
-                          </button>}
+                        : kostet
+                          ? <Link href={`/match/${g.id}`} className="p-aktion">Platz sichern · CHF {g.price_per_player}</Link>
+                          : <button onClick={() => join(g.id)} disabled={joining === g.id} className="p-aktion">
+                              {joining === g.id ? "…" : "Mitmachen"}
+                            </button>}
                     {meins && (
                       <button onClick={() => cancel(g.id)} title="Mein Spiel löschen" aria-label="Mein Spiel löschen"
                         style={{ background: "none", border: "none", color: LEISE, cursor: "pointer", fontSize: 15, padding: "0 2px" }}>✕</button>
