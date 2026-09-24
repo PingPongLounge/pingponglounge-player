@@ -17,7 +17,9 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import PlayerKopf from "@/app/components/PlayerKopf"
-import { IconChevron } from "@/app/components/Icons"
+import {
+  IconChevron, IconCommunity, IconFavorit,
+} from "@/app/components/Icons"
 import { zumLogin, pruefeAuth } from "@/lib/auth-client"
 import { INTER, TEXT, LEISE, BG, AKZENT, knopf, knopfUmriss } from "@/app/design"
 
@@ -126,14 +128,14 @@ export default function FreundePage() {
   }
 
   if (loading) return (
-    <main style={{ minHeight: "100dvh", background: BG, color: LEISE, fontFamily: INTER, display: "grid", placeItems: "center" }}>
+    <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER, display: "grid", placeItems: "center" }}>
       Lädt …<BottomNav />
     </main>
   )
 
   return (
     <>
-      <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+      <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER }}>
         <header className="p-hero">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/ppl-home.jpg" alt="" aria-hidden className="p-foto" style={{ objectPosition: "50% 45%" }} />
@@ -166,7 +168,7 @@ export default function FreundePage() {
           {/* ── Eingehende Anfragen ── */}
           {stand.incoming.length > 0 && (
             <section className="p-karte">
-              <div className="p-kopf"><h2>Möchten dein Freund sein</h2></div>
+              <div className="p-kopf"><h2><IconCommunity size={22}/>Möchten dein Freund sein</h2></div>
               {stand.incoming.map(p => (
                 <Zeile key={p.id} p={p} rechts={
                   <span style={{ display: "inline-flex", gap: 8 }}>
@@ -181,7 +183,7 @@ export default function FreundePage() {
           {/* ── Meine Freunde ── */}
           <section className={stand.incoming.length ? "p-karte p-abschnitt" : "p-karte"}>
             <div className="p-kopf">
-              <h2>Deine Freunde</h2>
+              <h2><IconCommunity size={22}/>Deine Freunde</h2>
               <Link href="/rangliste" className="p-mehr">Spieler finden →</Link>
             </div>
             {stand.friends.length === 0
@@ -196,7 +198,7 @@ export default function FreundePage() {
           {/* ── Ausgehende Anfragen ── */}
           {stand.outgoing.length > 0 && (
             <section className="p-karte p-abschnitt">
-              <div className="p-kopf"><h2>Angefragt</h2></div>
+              <div className="p-kopf"><h2><IconCommunity size={22}/>Angefragt</h2></div>
               {stand.outgoing.map(p => (
                 <Zeile key={p.id} p={p} rechts={
                   <button disabled={busy === p.id} onClick={() => aktion("remove", p.id)} className="p-textlink" style={{ marginTop: 0, width: "auto", padding: "0 8px" }}>Zurückziehen</button>
@@ -207,7 +209,7 @@ export default function FreundePage() {
 
           {/* ── Werbeprogramm ── */}
           <section className="p-karte p-abschnitt">
-            <div className="p-kopf"><h2>Freunde werben</h2></div>
+            <div className="p-kopf"><h2><IconFavorit size={22}/>Freunde werben</h2></div>
             <div style={{ padding: 18 }}>
               <p style={{ margin: "0 0 14px", fontSize: 15, lineHeight: 1.55 }}>
                 Du und dein Freund bekommen je <b style={{ color: AKZENT, fontWeight: 600 }}>2 Gratisstunden</b> in der Ping Pong Lounge.

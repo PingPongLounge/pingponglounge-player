@@ -120,7 +120,7 @@ export default function StundenPage() {
     .reduce((a, c) => a + c.hours, 0)
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, padding: "20px 20px 80px" }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", padding: "20px 20px 80px" }}>
       <div className="ppl-huelle">
         <Link href="/entdecken" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex", color: MUT, textDecoration: "none", fontSize: 13 }}>← Dashboard</Link>
 

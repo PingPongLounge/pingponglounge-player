@@ -130,14 +130,14 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
   /* 24.09.2026: Gab es das Match nicht (alter Link aus einer Mail, geloeschtes
      Spiel, Tippfehler in der ID), blieb match null — und die Seite stand fuer
      immer auf "Laedt …". */
-  if(!loading&&!match) return <main style={{minHeight:"100dvh",background:BG,display:"grid",placeItems:"center",padding:20,textAlign:"center"}}>
+  if(!loading&&!match) return <main className="p-dunkel" style={{minHeight:"100dvh",display:"grid",placeItems:"center",padding:20,textAlign:"center"}}>
     <div>
       <p style={{fontSize:22,fontWeight:700,color:W,marginBottom:10}}>Match nicht gefunden</p>
       <p style={{color:MUT,fontSize:14,marginBottom:18,lineHeight:1.5}}>Der Link ist alt, oder das Spiel wurde entfernt.</p>
       <Link href="/liga" style={{color:W,fontSize:12,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase",textDecoration:"none",border:"1px solid rgba(255,255,255,.3)",padding:"14px 22px",display:"inline-block"}}>Zur Liga</Link>
     </div>
   </main>
-  if(loading||!match) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:MUT}}>Lädt …</p></main>
+  if(loading||!match) return <main className="p-dunkel" style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:MUT}}>Lädt …</p></main>
 
   const isP1=match.p1_id===userId
   const isP2=match.p2_id===userId
@@ -146,7 +146,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
   const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(matchUrl)}&color=39FF14&bgcolor=15161A&margin=8`
 
   return(
-    <main style={{minHeight:"100vh",background:BG,padding:"20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
+    <main className="p-dunkel" style={{minHeight:"100vh",padding:"20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
       <div style={{maxWidth:440,width:"100%"}}>
         <Link href="/liga" style={{...backLink,display:"block",marginBottom:24}}>← Liga</Link>
 

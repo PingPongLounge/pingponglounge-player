@@ -15,6 +15,7 @@ import { useRouter, useSearchParams } from "next/navigation"
 import PlayerKopf from "@/app/components/PlayerKopf"
 import { ratingLabel } from "@/app/theme"
 import { INTER, TEXT, LEISE, BG, AKZENT, knopf } from "@/app/design"
+import { IconKalender, IconMatches } from "@/app/components/Icons"
 
 // Level 1–7 wie im Rest der App. Hier standen noch die abgeschafften Namen
 // Rookie/Challenger/Advanced/Elite — der Neuling bekam ein Level angezeigt,
@@ -114,7 +115,7 @@ function SpielenInner() {
 
   // ── Screen A: Gerade gespielt? ────────────────────────────────
   if (screen === "A") return (
-    <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+    <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER }}>
       <header className="p-hero">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/ppl-liga.jpg" alt="" aria-hidden className="p-foto" style={{ objectPosition: "50% 45%" }} />
@@ -131,7 +132,7 @@ function SpielenInner() {
       <div className="p-lese" style={{ paddingTop: 18, paddingBottom: 34, maxWidth: 560 }}>
         <section className="p-karte">
           <div className="p-kopf">
-            <h2>Sätze</h2>
+            <h2><IconMatches size={22}/>Sätze</h2>
             <span className="p-mehr">Du · Gegner</span>
           </div>
 
@@ -173,7 +174,7 @@ function SpielenInner() {
 
   // ── Screen B: Du bist jetzt Spieler (Aha) ─────────────────────
   return (
-    <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+    <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER }}>
       <header className="p-hero">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/ppl-liga.jpg" alt="" aria-hidden className="p-foto" style={{ objectPosition: "50% 45%" }} />
@@ -198,7 +199,7 @@ function SpielenInner() {
 
       <div className="p-lese" style={{ paddingTop: 18, paddingBottom: 34, maxWidth: 560 }}>
         <section className="p-karte">
-          <div className="p-kopf"><h2>Was jetzt passiert</h2></div>
+          <div className="p-kopf"><h2><IconKalender size={22}/>Was jetzt passiert</h2></div>
           <div style={{ padding: 18 }}>
             <p style={{ margin: 0, fontSize: 15, lineHeight: 1.55, color: TEXT }}>
               {won

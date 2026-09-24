@@ -80,10 +80,18 @@ export const knopfHell: React.CSSProperties = {
   ...knopfBasis, minHeight: 50, padding: "0 26px", fontSize: 12,
   background: "#FFFFFF", color: DUNKEL,
 }
-/** Umriss auf hellem Grund — sekundaer. */
+/** Umriss — sekundaer, auf hellem UND dunklem Grund.
+    24.09.2026: Stand hier fest auf color:TEXT (#111111) und der hellen
+    Kante. Seit die Flaeche hinter den Kaestchen ueberall dunkel ist,
+    war dieser Knopf ausserhalb einer Karte schwarz auf schwarz —
+    "Abmelden" im Profil, "Liga" auf /turniere, "Eigenes Spiel erstellen"
+    auf /match. currentColor erbt die Schriftfarbe der Umgebung: auf der
+    weissen Karte #111111, auf der dunklen Flaeche Weiss. Die Kante nimmt
+    dieselbe Farbe mit 22 % — auf hell praktisch der alte Wert. */
 export const knopfUmriss: React.CSSProperties = {
   ...knopfBasis, minHeight: 50, padding: "0 26px", fontSize: 12.5,
-  background: "transparent", color: TEXT, border: `1px solid ${KANTE}`,
+  background: "transparent", color: "inherit",
+  border: "1px solid color-mix(in srgb, currentColor 22%, transparent)",
 }
 /** Der EINE hervorgehobene CTA pro Seite — nur auf dunkler Flaeche. */
 export const knopfNeon: React.CSSProperties = {

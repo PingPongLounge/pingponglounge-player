@@ -43,10 +43,10 @@ export default function KampagnenAdmin() {
   const input: React.CSSProperties = { width: "100%", background: CELL, border: `1px solid ${LINE}`, borderRadius: 10, padding: "11px 13px", fontSize: 14, color: W, outline: "none", fontFamily: "inherit", marginBottom: 10 }
   const lab: React.CSSProperties = { color: MUT, fontSize: 12, fontWeight: 700, marginBottom: 4, display: "block" }
 
-  if (forbidden) return <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center" }}><p style={{ color: MUT }}>Kein Zugriff.</p></main>
+  if (forbidden) return <main className="p-dunkel" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}><p style={{ color: MUT }}>Kein Zugriff.</p></main>
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, padding: "24px 16px 80px" }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", padding: "24px 16px 80px" }}>
       <div style={{ maxWidth: 520, margin: "0 auto" }}>
         <h1 style={{ fontSize: 26, fontWeight: 800, color: W, marginBottom: 18 }}>Kampagnen</h1>
 

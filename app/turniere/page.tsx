@@ -15,7 +15,9 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import PlayerKopf from "@/app/components/PlayerKopf"
-import { IconChevron } from "@/app/components/Icons"
+import {
+  IconChevron, IconCommunity, IconKalender, IconMatches,
+} from "@/app/components/Icons"
 import { INTER, TEXT, LEISE, BG, knopf, knopfUmriss } from "@/app/design"
 
 type Tournament = {
@@ -62,7 +64,7 @@ export default function TurnierePage() {
 
   return (
     <>
-      <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+      <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER }}>
 
         <header className="p-hero">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -93,7 +95,7 @@ export default function TurnierePage() {
           {/* ── Naechste Events ── */}
           <section className="p-karte">
             <div className="p-kopf">
-              <h2>Nächste Events</h2>
+              <h2><IconKalender size={22}/>Nächste Events</h2>
               <Link href="/turniere/neu" className="p-mehr">Erstellen →</Link>
             </div>
 
@@ -150,7 +152,7 @@ export default function TurnierePage() {
           {/* ── Community: echte Bilder aus der Lounge ── */}
           <section className="p-karte p-abschnitt">
             <div className="p-kopf">
-              <h2>Community</h2>
+              <h2><IconCommunity size={22}/>Community</h2>
               <Link href="/feed" className="p-mehr">Feed →</Link>
             </div>
             <div style={{ padding: 18 }}>
@@ -172,7 +174,7 @@ export default function TurnierePage() {
           {/* ── Zuletzt gespielt ── */}
           {vorbei.length > 0 && (
             <section className="p-karte p-abschnitt">
-              <div className="p-kopf"><h2>Zuletzt gespielt</h2></div>
+              <div className="p-kopf"><h2><IconMatches size={22}/>Zuletzt gespielt</h2></div>
               {vorbei.map(t => (
                 <Link key={t.id} href={`/turniere/${t.id}`} className="p-zeile">
                   <span style={{ flex: 1, minWidth: 0 }}>

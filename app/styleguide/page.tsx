@@ -17,7 +17,7 @@ const swatch = (c: string, name: string) => (
 
 export default function StyleguidePage() {
   return (
-    <main style={{ minHeight: '100vh', background: BG, padding: '20px 16px 100px' }}>
+    <main className="p-dunkel" style={{ minHeight: '100vh', padding: '20px 16px 100px' }}>
       <div style={{ maxWidth: 480, margin: '0 auto' }}>
         <div style={{ fontSize:11.5, color: MUT, fontWeight: 700, letterSpacing: '.22em', textTransform: 'uppercase' }}>PPL Player</div>
         <h1 style={{ ...h1, marginTop: 6 }}>Styleguide</h1>

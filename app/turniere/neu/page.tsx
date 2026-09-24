@@ -52,7 +52,7 @@ export default function NeuesTurnierPage(){
   )
 
   return(
-    <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
+    <main className="p-dunkel" style={{minHeight:"100vh",padding:"20px 16px 100px"}}>
       <div style={{maxWidth:560,margin:"0 auto"}}>
         <Link href="/turniere" style={backLink}>← Turniere</Link>
 

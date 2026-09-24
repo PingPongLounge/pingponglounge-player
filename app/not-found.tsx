@@ -8,7 +8,7 @@ export const metadata = { title: "Seite nicht gefunden | PLAYER" }
 
 export default function NichtGefunden() {
   return (
-    <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+    <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER }}>
       <header className="p-hero">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src="/player-hero.jpg" alt="" aria-hidden className="p-foto" style={{ objectPosition: "50% 45%" }} />

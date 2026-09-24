@@ -99,7 +99,7 @@ export default function TrainingscampPage() {
   const inp: React.CSSProperties = { width: "100%", background: BG, borderRadius: 10, padding: "12px 14px", color: W, fontSize: 14, border: "none", outline: "none", fontFamily: "inherit" }
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, padding: "0 0 100px" }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", padding: "0 0 100px" }}>
       <div className="ppl-huelle">
 
         {/* STEP 1 — DETAIL */}

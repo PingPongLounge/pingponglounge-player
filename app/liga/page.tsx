@@ -11,7 +11,9 @@ import {
 } from "@/app/theme"
 import PlayerKopf from "@/app/components/PlayerKopf"
 import OffenFuerDich from "@/app/components/OffenFuerDich"
-import { IconSpieler } from "@/app/components/Icons"
+import {
+  IconLiga, IconRangliste, IconSpieler, IconStatistiken,
+} from "@/app/components/Icons"
 /* 24.09.2026: Die Liga bezieht ihr Aussehen nicht mehr aus V2, sondern aus
    denselben Klassen wie die Startseite (.p-hero, .p-karte, .p-kopf,
    .p-zeile) und denselben Knopf-Stilen aus app/design.ts. Daten, Filter,
@@ -733,7 +735,7 @@ export default function LigaPage(){
             <>
               <section className="p-karte">
                 <div className="p-kopf">
-                  <h2>Dein Rang</h2>
+                  <h2><IconRangliste size={22}/>Dein Rang</h2>
                   <span className="p-mehr">{sel?.city||city||"Schweiz"}</span>
                 </div>
                 <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",gap:16,padding:"16px 18px"}}>
@@ -818,7 +820,7 @@ export default function LigaPage(){
           {!myReg&&(
             <div className="p-lese p-abschnitt">
               <div className="p-karte">
-                <div className="p-kopf"><h2>So funktioniert die Liga</h2></div>
+                <div className="p-kopf"><h2><IconLiga size={22}/>So funktioniert die Liga</h2></div>
                 <div style={{padding:18}}>
                 {([
                   ["1","Du bist automatisch dabei","Eine Liga für alle — kein Beitreten, keine Klassen. Deine Stufe kommt aus deiner Elo."],
@@ -847,7 +849,7 @@ export default function LigaPage(){
           <section className="p-lese p-abschnitt">
             <div className="p-karte">
               <div className="p-kopf">
-                <h2>{`Ranking · ${sel?.city||city||"Schweiz"}`}</h2>
+                <h2><IconRangliste size={22}/>{`Ranking · ${sel?.city||city||"Schweiz"}`}</h2>
                 <button onClick={()=>setFilterOpen(true)} className="p-mehr" style={{cursor:"pointer",background:"none"}}>
                   {filterAktiv?"Filter ändern":"Filtern"} →
                 </button>
@@ -923,7 +925,7 @@ export default function LigaPage(){
 
             {/* ── Liga verstehen — die ECHTE Logik, keine erfundene ── */}
             <div className="p-karte p-abschnitt">
-              <div className="p-kopf"><h2>Wie steige ich auf?</h2></div>
+              <div className="p-kopf"><h2><IconStatistiken size={22}/>Wie steige ich auf?</h2></div>
               <div style={{padding:18}}>
                 <p style={{fontSize:15,lineHeight:1.55,color:P_TEXT,margin:"0 0 10px",maxWidth:"52ch"}}>
                   Fordere Spieler rund um deinen Rang heraus. Jedes bestätigte Spiel verschiebt dein Rating — ein Sieg gegen jemand Stärkeren bringt am meisten, gegen jemand Schwächeren am wenigsten.
@@ -945,7 +947,7 @@ export default function LigaPage(){
             return (
               <section className="p-lese p-abschnitt">
                 <div className="p-karte">
-                  <div className="p-kopf"><h2>Who&apos;s next?</h2></div>
+                  <div className="p-kopf"><h2><IconSpieler size={22}/>Who&apos;s next?</h2></div>
                   {nah.map(r=>{
                     const ini=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
                     const om=openMatches[r.user_id]

@@ -140,7 +140,7 @@ export default function SeasonPage() {
   }
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, color: W, paddingBottom: 80 }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", paddingBottom: 80 }}>
       <div style={{ maxWidth: 620, margin: "0 auto", padding: "18px 16px 0" }}>
         <Link href="/liga" style={{ color: MUT, textDecoration: "none", fontSize: 13 }}>← Liga</Link>
 

@@ -19,6 +19,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { LEISE, TEXT, KANTE, AKZENT, ANTON, INTER } from "@/app/design"
+import { IconLiga } from "./Icons"
 
 type Offen = {
   id: string; seasonId: string; status: string
@@ -115,7 +116,7 @@ export default function OffenFuerDich({ onChange }: { onChange?: () => void }) {
 
   return (
     <section className="p-karte p-abschnitt">
-      <div className="p-kopf"><h2>Offen für dich</h2></div>
+      <div className="p-kopf"><h2><IconLiga size={22}/>Offen für dich</h2></div>
 
       {offene.map(o => {
         const selbst = !!o.enteredBy && !!ich && o.enteredBy === ich

@@ -38,7 +38,7 @@ export default function JoinLeaguePage({ params }: { params: Promise<{ code: str
   }
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
       <div style={{ width: "100%", maxWidth: 380, background: CARD, borderRadius: 22, padding: "28px 22px", textAlign: "center" }}>
         <div style={{ fontSize: 12, fontWeight: 800, letterSpacing: ".16em", textTransform: "uppercase", color: MUT, marginBottom: 8 }}>Einladung</div>
         <div style={{ fontSize: 24, fontWeight: 900, color: W, marginBottom: 6 }}>Firmen-Liga beitreten</div>

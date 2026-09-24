@@ -28,7 +28,7 @@ export default function CampStornoPage() {
   }
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, padding: "24px 16px 60px", display: "flex", flexDirection: "column" }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", padding: "24px 16px 60px", display: "flex", flexDirection: "column" }}>
       <div style={{ maxWidth: 420, margin: "0 auto", width: "100%" }}>
         <h1 style={{ fontSize: 28, fontWeight: 800, color: W, letterSpacing: "-.4px", margin: "8px 0 16px" }}>Trainingscamp stornieren</h1>
 

@@ -52,7 +52,7 @@ export default function TrainingPage() {
   }
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, padding: "0 0 100px" }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", padding: "0 0 100px" }}>
       <SectionTopBar section="Training" />
       <div className="ppl-huelle" style={{ padding: "6px 16px 0" }}>
         <SectionBlock title="Training" meta={`Geführtes Coaching · CHF ${OG_TRAINING_PREIS_CHF} · alle Level`} img="/training-hero.jpg" />

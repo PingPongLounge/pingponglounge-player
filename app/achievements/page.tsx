@@ -53,7 +53,7 @@ export default function AchievementsPage() {
   const pct = total > 0 ? Math.round((earned / total) * 100) : 0
 
   if (error) return (
-    <main style={{ minHeight: "100vh", background: BG, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "20px" }}>
       <div style={{ textAlign: "center" }}>
         <p style={{ fontSize: 36, marginBottom: 12 }}>⚠️</p>
         <p style={{ fontSize: 14, fontWeight: 700, color: W, marginBottom: 6 }}>Verbindungsfehler</p>
@@ -65,7 +65,7 @@ export default function AchievementsPage() {
   )
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, padding: "20px 16px 100px" }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", padding: "20px 16px 100px" }}>
       <div className="ppl-huelle">
 
         <Link href="/profil" style={{ color: MUT, textDecoration: "none", fontSize: 13 }}>← Profil</Link>

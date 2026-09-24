@@ -73,10 +73,10 @@ export default function AdminLigaPage(){
     setSeasons(s=>s.map(x=>x.id===seasonId?{...x,status}:x))
   }
 
-  if(loading||!authed) return <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>Lädt...</p></main>
+  if(loading||!authed) return <main className="p-dunkel" style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center"}}><p style={{color:M}}>Lädt...</p></main>
 
   return(
-    <main style={{minHeight:"100vh",background:BG,padding:"20px 20px 80px"}}>
+    <main className="p-dunkel" style={{minHeight:"100vh",padding:"20px 20px 80px"}}>
       <div style={{maxWidth:600,margin:"0 auto"}}>
         <Link href="/dashboard" style={{position:"absolute",left:"50%",transform:"translateX(-50%)",display:"flex",color:M,textDecoration:"none",fontSize:13}}>← dashboard</Link>
         <h1 style={{fontSize:28,fontWeight:900,fontFamily:"var(--font-anton), Impact, sans-serif",textTransform:"uppercase",letterSpacing:".1em",margin:"16px 0 24px",background:GRAD,WebkitBackgroundClip:"text",WebkitTextFillColor:"transparent",backgroundClip:"text"}}>liga admin</h1>

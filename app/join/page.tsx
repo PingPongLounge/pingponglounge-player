@@ -16,7 +16,7 @@ function JoinContent() {
   }, [ref])
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "20px" }}>
       <div style={{ maxWidth: 380, width: "100%", textAlign: "center" }}>
         <p style={{ ...eyebrow, letterSpacing: "0.16em", textTransform: "uppercase", marginBottom: 12 }}>Einladung</p>
         <h1 style={{ ...h1, fontSize: 36, letterSpacing: ".1em", marginBottom: 16, ...gt }}>

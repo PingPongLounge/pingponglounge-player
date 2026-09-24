@@ -228,7 +228,7 @@ export default async function EntdeckenPage() {
     const uhr = (h?: number | null) => h != null ? `${String(h).padStart(2, '0')}:00` : ''
 
     return (
-      <main className="p-seite" style={{ minHeight: '100dvh', background: P_BG, color: P_TEXT, fontFamily: P_INTER }}>
+      <main className="p-dunkel p-seite" style={{ minHeight: '100dvh', fontFamily: P_INTER }}>
 
         {/* ══════════ HERO ══════════
             Dunkles Ping-Pong-Foto, kein Verlaufsschein. PLAYER gross und

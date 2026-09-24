@@ -16,8 +16,7 @@ import BottomNav from "@/app/components/BottomNav"
 import LogoutButton from "@/app/components/LogoutButton"
 import { createClient } from "@/lib/supabase/client"
 import {
-  IconMatches, IconTurniere, IconFavorit, IconCommunity, IconBuchungen,
-  IconEinstellungen, IconKalender, IconChevron, IconLiga,
+  IconBuchungen, IconChevron, IconCommunity, IconEinstellungen, IconFavorit, IconKalender, IconLiga, IconMatches, IconProfil, IconStatistiken, IconTurniere,
 } from "@/app/components/Icons"
 import { ANTON, INTER, TEXT, LEISE, BG, AKZENT, knopf } from "@/app/design"
 
@@ -194,12 +193,12 @@ export default function ProfilPage() {
   }
 
   if (loading) return (
-    <main style={{ minHeight: "100dvh", background: BG, color: LEISE, fontFamily: INTER, display: "grid", placeItems: "center" }}>
+    <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER, display: "grid", placeItems: "center" }}>
       Profil wird geladen …<BottomNav />
     </main>
   )
   if (error || !profile) return (
-    <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER, display: "grid", placeItems: "center", padding: 20 }}>
+    <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER, display: "grid", placeItems: "center", padding: 20 }}>
       {error || "Nicht eingeloggt."}<BottomNav />
     </main>
   )
@@ -209,7 +208,7 @@ export default function ProfilPage() {
 
   return (
     <>
-      <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+      <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER }}>
 
         <header className="p-hero">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -266,7 +265,7 @@ export default function ProfilPage() {
           {/* ── Profil vervollstaendigen ── */}
           {(!profile.real_name || !profile.canton) && !done && (
             <section className="p-karte p-abschnitt">
-              <div className="p-kopf"><h2>Profil vervollständigen</h2></div>
+              <div className="p-kopf"><h2><IconProfil size={22}/>Profil vervollständigen</h2></div>
               <div style={{ padding: 18 }}>
                 <p style={{ margin: "0 0 12px", fontSize: 14, color: LEISE }}>Name und Kanton helfen bei Liga und Zuordnung.</p>
                 {!profile.real_name && (
@@ -294,7 +293,7 @@ export default function ProfilPage() {
               Diese Angaben speisen die Liga-Filter (Hand, Noppen, Anti,
               Kategorie). Ohne diese Karte standen sie bei jedem leer. */}
           <section className="p-karte p-abschnitt">
-            <div className="p-kopf"><h2>Dein Spiel</h2></div>
+            <div className="p-kopf"><h2><IconStatistiken size={22}/>Dein Spiel</h2></div>
             <div style={{ padding: 18 }}>
               <p style={{ margin: "0 0 16px", fontSize: 14, color: LEISE, lineHeight: 1.55, maxWidth: "46ch" }}>
                 Alles freiwillig. Wer etwas angibt, ist über die Filter in der Rangliste auffindbar — und findet dort leichter passende Gegner.
@@ -347,7 +346,7 @@ export default function ProfilPage() {
           {/* ── Letzte Matches ── */}
           <section className="p-karte p-abschnitt">
             <div className="p-kopf">
-              <h2>Letzte Matches</h2>
+              <h2><IconMatches size={22}/>Letzte Matches</h2>
               {matches.length > 0 && <Link href="/matchhistorie" className="p-mehr">Alle →</Link>}
             </div>
             {matches.length === 0
@@ -371,7 +370,7 @@ export default function ProfilPage() {
 
           {/* ── Navigation: was frueher im Hamburger-Menue stand ── */}
           <section className="p-karte p-abschnitt">
-            <div className="p-kopf"><h2>Dein Player</h2></div>
+            <div className="p-kopf"><h2><IconProfil size={22}/>Dein Player</h2></div>
             {/* 24.09.2026: Vom Profil fuehrte kein Weg in die Liga zurueck —
                 die Rating-Zahl stand oben, die Liga dazu war nur ueber die
                 untere Leiste erreichbar. */}
@@ -385,7 +384,7 @@ export default function ProfilPage() {
 
           {/* ── Einstellungen ── */}
           <section id="einstellungen" className="p-karte p-abschnitt" style={{ scrollMarginTop: 16 }}>
-            <div className="p-kopf"><h2>Einstellungen</h2></div>
+            <div className="p-kopf"><h2><IconEinstellungen size={22}/>Einstellungen</h2></div>
             <div style={{ padding: "14px 18px" }}>
               <p style={{ margin: 0, fontSize: 13, color: LEISE, lineHeight: 1.5 }}>
                 Du entscheidest, wer dich erreichen darf. Spiele und Rating bleiben erhalten.

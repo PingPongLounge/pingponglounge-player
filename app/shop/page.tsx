@@ -8,7 +8,7 @@ const GRAD = 'linear-gradient(135deg,#39FF14,#12D45C)'
 
 export default function ShopPage() {
   return (
-    <main style={{ minHeight: '100vh', background: BG, padding: '20px 16px 110px' }}>
+    <main className="p-dunkel" style={{ minHeight: '100vh', padding: '20px 16px 110px' }}>
       <div className="ppl-huelle">
         <Link href="/entdecken" style={{ color: MUT, textDecoration: 'none', fontSize: 13, fontWeight: 500 }}>← Start</Link>
 

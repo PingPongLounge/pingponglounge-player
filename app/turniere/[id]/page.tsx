@@ -136,7 +136,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
   }
 
   if(loadError) return(
-    <main style={{minHeight:"100vh",background:BG,display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:20}}>
+    <main className="p-dunkel" style={{minHeight:"100vh",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",padding:20}}>
       <p style={{...body,marginBottom:16,textAlign:"center"}}>{loadError}</p>
       <Link href="/turniere" style={{...btn,display:"inline-block",padding:"12px 24px",textDecoration:"none"}}>Zurück zu den Turnieren</Link>
       <BottomNav />
@@ -144,7 +144,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
   )
 
   if(loading||!data) return(
-    <main style={{minHeight:"100vh",background:BG,display:"flex",alignItems:"center",justifyContent:"center"}}>
+    <main className="p-dunkel" style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center"}}>
       <p style={body}>Lädt …</p>
       <BottomNav />
     </main>
@@ -156,7 +156,7 @@ export default function TurnierDetailPage({params}:{params:Promise<{id:string}>}
   const maxRound=rounds.length>0?Math.max(...rounds):1
 
   return(
-    <main style={{minHeight:"100vh",background:BG,padding:"20px 16px 100px"}}>
+    <main className="p-dunkel" style={{minHeight:"100vh",padding:"20px 16px 100px"}}>
       <div style={{maxWidth:700,margin:"0 auto"}}>
         <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",gap:12,flexWrap:"wrap"}}>
           <Link href="/turniere" style={backLink}>← Turniere</Link>

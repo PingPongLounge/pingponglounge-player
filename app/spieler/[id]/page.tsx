@@ -14,6 +14,7 @@ import ProfilAvatar from "@/app/components/ProfilAvatar"
 import ProfilAktionen from "@/app/components/ProfilAktionen"
 import PlayerKopf from "@/app/components/PlayerKopf"
 import { ANTON, INTER, TEXT, LEISE, BG, knopf, knopfUmriss } from "@/app/design"
+import { IconMatches } from "@/app/components/Icons"
 
 type Satz = { p1: number; p2: number }
 type Spiel = { id: string; p1_id: string; p2_id: string; winner_id: string | null; sets: Satz[] | null; played_at: string | null }
@@ -69,7 +70,7 @@ export default async function SpielerSeite({ params }: { params: Promise<{ id: s
   const quote = gespielt ? Math.round((gewonnen / gespielt) * 100) : null
 
   return (
-    <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+    <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER }}>
 
       <header className="p-hero">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -127,7 +128,7 @@ export default async function SpielerSeite({ params }: { params: Promise<{ id: s
         </div>
 
         <section className="p-karte p-abschnitt">
-          <div className="p-kopf"><h2>Letzte Spiele</h2></div>
+          <div className="p-kopf"><h2><IconMatches size={22}/>Letzte Spiele</h2></div>
           {spiele.length ? spiele.map(m => {
             const meins = m.p1_id === id
             const gewann = m.winner_id === id

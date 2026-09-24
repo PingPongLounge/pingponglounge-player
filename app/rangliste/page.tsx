@@ -13,6 +13,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import PlayerKopf from "@/app/components/PlayerKopf"
 import { ANTON, INTER, TEXT, LEISE, AKZENT, BG } from "@/app/design"
+import { IconRangliste } from "@/app/components/Icons"
 
 const CANTONS = ["AG","AI","AR","BE","BL","BS","FR","GE","GL","GR","JU","LU","NE","NW","OW","SG","SH","SO","SZ","TG","TI","UR","VD","VS","ZG","ZH"]
 type Player = { user_id: string; name: string; elo: number; level: string; city?: string | null; canton?: string | null; rank_global: number; rank_filtered: number; avatar?: string | null }
@@ -43,7 +44,7 @@ export default function RanglistePage() {
 
   return (
     <>
-      <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+      <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER }}>
 
         {/* ══════════ KOPF ══════════
             Derselbe Aufbau wie auf der Startseite: Foto, Schleier,
@@ -93,7 +94,7 @@ export default function RanglistePage() {
           {me && (
             <section className="p-karte">
               <div className="p-kopf">
-                <h2>Dein Rang</h2>
+                <h2><IconRangliste size={22}/>Dein Rang</h2>
                 <span className="p-mehr">{canton || "Ganze Schweiz"}</span>
               </div>
               <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, padding: "16px 18px" }}>
@@ -110,7 +111,7 @@ export default function RanglistePage() {
 
           <section className={me ? "p-karte p-abschnitt" : "p-karte"}>
             <div className="p-kopf">
-              <h2>{canton ? `Rangliste ${canton}` : "Rangliste"}</h2>
+              <h2><IconRangliste size={22}/>{canton ? `Rangliste ${canton}` : "Rangliste"}</h2>
               <select
                 aria-label="Nach Kanton filtern"
                 className="p-auswahl"

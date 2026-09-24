@@ -60,7 +60,7 @@ export default function SingleNightPage() {
   const input: React.CSSProperties = { width: "100%", background: CELL, border: `1px solid ${LINE}`, borderRadius: 12, padding: "13px 15px", fontSize: 15, color: W, outline: "none", fontFamily: "inherit", marginBottom: 10 }
 
   return (
-    <main style={{ minHeight: "100vh", background: BG, padding: "16px 16px 110px" }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", padding: "16px 16px 110px" }}>
       <div className="ppl-huelle">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2, marginBottom: 14 }}>
           <Link href="/erstellen" aria-label="Zurück" style={{ display: "inline-flex" }}>

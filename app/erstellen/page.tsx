@@ -38,7 +38,7 @@ const OPTIONS: Opt[] = [
 
 export default function ErstellenPage() {
   return (
-    <main style={{ minHeight: "100vh", background: BG, padding: "16px 16px 110px" }}>
+    <main className="p-dunkel" style={{ minHeight: "100vh", padding: "16px 16px 110px" }}>
       <div className="ppl-huelle">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 2, marginBottom: 18 }}>
           <Link href="/entdecken" aria-label="Zurück" style={{ display: "inline-flex" }}>

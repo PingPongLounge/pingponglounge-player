@@ -18,7 +18,9 @@ import ProfilAvatar from "./ProfilAvatar"
 import PlayerKopf from "./PlayerKopf"
 import OffenFuerDich from "./OffenFuerDich"
 import CampaignOverlay from "./CampaignOverlay"
-import { IconChevron, IconOpenGames, IconCommunity } from "./Icons"
+import {
+  IconChevron, IconCommunity, IconMatches, IconOpenGames, IconStatistiken, IconTurniere,
+} from "./Icons"
 import { INTER, TEXT, LEISE, BG } from "@/app/design"
 
 export type Game = { id: string; href: string; day: string; time: string; title: string; sub: string; frei: number; full: boolean; ratio: string }
@@ -44,7 +46,7 @@ export default function StartHomeV2(d: StartData) {
 
   return (
     <>
-      <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+      <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER }}>
 
         {/* 16.09.2026 (Oliver): Auf der Startseite steht der Name und der
             Claim — sonst nichts. Was zu tun ist, steht in den Kaestchen
@@ -87,7 +89,7 @@ export default function StartHomeV2(d: StartData) {
           {/* ── Dein naechstes Match ── */}
           <section className="p-karte">
             <div className="p-kopf">
-              <h2>Dein nächstes Match</h2>
+              <h2><IconMatches size={22}/>Dein nächstes Match</h2>
               {d.games.length > 0 && <Link href="/match" className="p-mehr">Alle →</Link>}
             </div>
             {d.nextGame ? (
@@ -112,7 +114,7 @@ export default function StartHomeV2(d: StartData) {
 
           {/* ── Dein Stand: vier Kaestchen, jedes fuehrt irgendwohin ── */}
           <section className="p-karte p-abschnitt">
-            <div className="p-kopf"><h2>Dein Stand</h2></div>
+            <div className="p-kopf"><h2><IconStatistiken size={22}/>Dein Stand</h2></div>
             <div className="p-kacheln">
               <Link href="/profil" className="p-kachel">
                 <span className="zahl">{d.elo}</span><span className="was">Rating</span>
@@ -133,7 +135,7 @@ export default function StartHomeV2(d: StartData) {
           {letzte.length > 0 && (
             <section className="p-karte p-abschnitt">
               <div className="p-kopf">
-                <h2>Deine letzten Matches</h2>
+                <h2><IconMatches size={22}/>Deine letzten Matches</h2>
                 <Link href="/matchhistorie" className="p-mehr">Alle →</Link>
               </div>
               {letzte.map(m => (
@@ -155,7 +157,7 @@ export default function StartHomeV2(d: StartData) {
           {aktiv.length > 0 && (
             <section className="p-karte p-abschnitt">
               <div className="p-kopf">
-                <h2>Was läuft</h2>
+                <h2><IconOpenGames size={22}/>Was läuft</h2>
                 <Link href="/feed" className="p-mehr">Feed →</Link>
               </div>
               {aktiv.map(a => (
@@ -179,7 +181,7 @@ export default function StartHomeV2(d: StartData) {
           {d.games.length > 0 && (
             <section className="p-karte p-abschnitt">
               <div className="p-kopf">
-                <h2>Heute wird gespielt</h2>
+                <h2><IconOpenGames size={22}/>Heute wird gespielt</h2>
                 <Link href="/match" className="p-mehr">Alle →</Link>
               </div>
               {d.games.slice(0, 3).map(g => (
@@ -204,7 +206,7 @@ export default function StartHomeV2(d: StartData) {
               ueber die Adresszeile oder den Zurueck-Pfeil zweier
               Unterseiten. */}
           <section className="p-karte p-abschnitt">
-            <div className="p-kopf"><h2>Selbst loslegen</h2></div>
+            <div className="p-kopf"><h2><IconOpenGames size={22}/>Selbst loslegen</h2></div>
             <Link href="/erstellen" className="p-zeile">
               <span style={{ flexShrink: 0, display: "inline-flex", color: TEXT }}><IconOpenGames size={24} /></span>
               <span style={{ flex: 1, minWidth: 0 }}>
@@ -227,7 +229,7 @@ export default function StartHomeV2(d: StartData) {
           {d.tour && (
             <section className="p-karte p-abschnitt">
               <div className="p-kopf">
-                <h2>Nächstes Turnier</h2>
+                <h2><IconTurniere size={22}/>Nächstes Turnier</h2>
                 <Link href="/turniere" className="p-mehr">Alle →</Link>
               </div>
               <Link href="/turniere" className="p-zeile">

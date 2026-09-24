@@ -18,7 +18,9 @@ import { useRouter } from "next/navigation"
 import { OG_PREIS_CHF, OG_STORNO_STUNDEN } from "@/lib/opengames"
 import { pruefeAuth } from "@/lib/auth-client"
 import PlayerKopf from "@/app/components/PlayerKopf"
-import { IconSuche, IconSpieler, IconOpenGames } from "@/app/components/Icons"
+import {
+  IconOpenGames, IconSpieler, IconSuche,
+} from "@/app/components/Icons"
 import { INTER, TEXT, LEISE, BG, knopf, knopfUmriss } from "@/app/design"
 
 type Player = { user_id: string; name: string; elo: number; level: string }
@@ -76,7 +78,7 @@ export default function MatchPage() {
 
   return (
     <>
-      <main style={{ minHeight: "100dvh", background: BG, color: TEXT, fontFamily: INTER }}>
+      <main className="p-dunkel" style={{ minHeight: "100dvh", fontFamily: INTER }}>
 
         <header className="p-hero">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -107,7 +109,7 @@ export default function MatchPage() {
           {/* ── Die drei Wege: eine Liste, keine Matrix. Die Reihenfolge ist
                 die Empfehlung — suchen, fordern, selbst anlegen. ── */}
           <section className="p-karte">
-            <div className="p-kopf"><h2>Was willst du machen?</h2></div>
+            <div className="p-kopf"><h2><IconOpenGames size={22}/>Was willst du machen?</h2></div>
             <a href="#heute" className="p-zeile">
               <IconSuche size={24} />
               <span style={{ flex: 1, minWidth: 0 }}>
@@ -134,7 +136,7 @@ export default function MatchPage() {
           {/* ── Heute wird gespielt ── */}
           <section id="heute" className="p-karte p-abschnitt" style={{ scrollMarginTop: 16 }}>
             <div className="p-kopf">
-              <h2>Heute wird gespielt</h2>
+              <h2><IconOpenGames size={22}/>Heute wird gespielt</h2>
               {alle.length > 0 && <span className="p-mehr">{alle.length}</span>}
             </div>
 
