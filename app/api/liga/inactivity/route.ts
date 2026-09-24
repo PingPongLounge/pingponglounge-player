@@ -5,9 +5,15 @@ import { LIGA_CONFIG } from "@/lib/rewards"
 // Täglich via Cron (03:00 UTC)
 // Authorization: Bearer <CRON_SECRET>  (in Vercel Dashboard setzen, nicht .env.local)
 export async function POST(req: NextRequest) {
+  // 24.09.2026: Der Vergleich war "secret !== process.env.CRON_SECRET".
+  // Ist CRON_SECRET nicht gesetzt, sind beide Seiten undefined — die
+  // Bedingung war falsch und JEDER kam durch. Die Route steht in der
+  // PUBLIC_API-Liste der Middleware, es gibt also keine zweite Tuer davor.
+  // Ein fehlendes Geheimnis heisst ab jetzt: zu.
+  const erwartet = process.env.CRON_SECRET
   const secret = req.headers.get("authorization")?.replace("Bearer ", "")
-  if (secret !== process.env.CRON_SECRET)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  if (!erwartet || secret !== erwartet)
+    return NextResponse.json({ error: "Nicht berechtigt" }, { status: 401 })
 
   const admin = createAdminClient()
   const cutoff = new Date()
