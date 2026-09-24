@@ -12,6 +12,11 @@ export async function POST(req: NextRequest) {
   // Ein fehlendes Geheimnis heisst ab jetzt: zu.
   const erwartet = process.env.CRON_SECRET
   const secret = req.headers.get("authorization")?.replace("Bearer ", "")
+  if (!erwartet) {
+    // Fehlkonfiguration, kein Angriff: ohne Geheimnis laeuft der Job nicht
+    // mehr. Das gehoert sichtbar ins Log, sonst bleibt es still stehen.
+    console.error("[cron] CRON_SECRET ist nicht gesetzt — Lauf abgewiesen.")
+  }
   if (!erwartet || secret !== erwartet)
     return NextResponse.json({ error: "Nicht berechtigt" }, { status: 401 })
 
