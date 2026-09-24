@@ -492,3 +492,14 @@ main.p-seite{background:var(--p-bg);padding-bottom:0}
   background:var(--p-kante);transition:left .15s,background .15s}
 .p-schalter[aria-pressed="true"] span{left:23px;background:#FFFFFF}
 .p-schalter[disabled]{opacity:.6;cursor:default}
+
+/* ── Liga: dunkle Flaeche hinter den Kaestchen (Oliver, 24.09.2026) ──────
+   Die weissen Karten bleiben weiss; nur der Grund dahinter ist dunkel.
+   Alles, was NICHT in einer Karte steht, braucht dort helle Schrift —
+   :not(.p-karte *) trifft genau diese Elemente. */
+main.p-dunkel{background:var(--p-dark);color:#FFFFFF}
+main.p-dunkel .p-lese > .p-textlink,
+main.p-dunkel .p-lese > * > .p-textlink{color:var(--p-dark-leise)}
+main.p-dunkel .p-lese > * > .p-textlink:hover{color:#FFFFFF}
+main.p-dunkel .p-pille:not(.p-karte *){color:var(--p-dark-leise);border-color:var(--p-dark-kante);background:transparent}
+main.p-dunkel .p-hinweis{color:var(--p-dark-leise)}

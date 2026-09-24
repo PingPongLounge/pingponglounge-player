@@ -37,3 +37,23 @@ describe("Middleware — ohne Login", () => {
       expect(r.status).toBe(401)
     })
 })
+
+/* 24.09.2026: Die Storno-Seiten sind die Landeseiten der Mail-Links. Ein Gast
+   hat keine Session — nur den cancel_token in der Adresse. Standen sie in
+   GESCHUETZT, lief der Link aus der Bestaetigungsmail auf /login. */
+describe("Middleware — Storno-Seiten aus der Bestaetigungsmail", () => {
+  it.each(["/single-night/storno?token=abc", "/trainingscamp/storno?token=abc"])(
+    "%s ist ohne Konto erreichbar", async (pfad) => {
+      const { middleware } = await import("@/middleware")
+      const r = await middleware(anfrage(pfad, "GET"))
+      expect(r.headers.get("location")).toBeNull()
+      expect(r.status).not.toBe(401)
+    })
+
+  it.each(["/match/create", "/erstellen", "/turniere/neu", "/liga/join/ABC"])(
+    "%s verlangt weiterhin ein Konto", async (pfad) => {
+      const { middleware } = await import("@/middleware")
+      const r = await middleware(anfrage(pfad, "GET"))
+      expect(r.headers.get("location")).toContain("/login")
+    })
+})

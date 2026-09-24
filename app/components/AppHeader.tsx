@@ -1,19 +1,33 @@
 "use client"
-import { useEffect, useState } from "react"
-import Link from "next/link"
+/* Der Kopfbalken fuer die Seiten, die noch keinen eigenen Kopf mitbringen
+   (Feed, Matchhistorie, Achievements, PingPoints, Stunden, Erstellen,
+   Benachrichtigungen, Admin, Staff …).
+
+   24.09.2026: Hier stand ein ZWEITER Kopf — schwarz, "PPL.PLAYER" in Inter
+   900, daneben ein neongrun umrandeter Avatarkreis. Auf jeder Seite, die
+   inzwischen PlayerKopf mitbringt, standen dadurch zwei Koepfe
+   uebereinander, und auf den uebrigen Seiten stand ein anderes Logo als im
+   Rest der App. Gerendert wird jetzt derselbe PlayerKopf wie ueberall; nur
+   die dunkle, klebende Leiste darum ist hier geblieben. */
 import { usePathname } from "next/navigation"
-import { createClient } from "@/lib/supabase/client"
-import NotificationBell from "./NotificationBell"
+import PlayerKopf from "./PlayerKopf"
+import { DUNKEL } from "@/app/design"
 
-// 07.09.2026: /entdecken bringt seit V2 seinen eigenen Kopf mit (HeroKopf ueber
-// dem Foto bzw. die oeffentliche Navigation) — hier stand bisher ein zweiter
-// Kopf darueber.
-const HIDE=["/","/entdecken","/rangliste","/profil","/spieler","/login","/onboarding","/spielen","/join","/auth","/liga","/match","/turniere","/training","/shop"]
-const BLACK="#080808",OFF="#F4F1EB",V="#39FF14"
+// Seiten, die ihren Kopf selbst mitbringen (Hero mit PlayerKopf darin).
+const HIDE = ["/", "/entdecken", "/rangliste", "/profil", "/spieler", "/login",
+  "/onboarding", "/spielen", "/join", "/auth", "/liga", "/match", "/turniere",
+  "/training", "/shop", "/freunde"]
 
-export default function AppHeader(){
- const path=usePathname()||"/";const[initialen,setInitialen]=useState("")
- useEffect(()=>{;(async()=>{const sb=createClient();const{data:{user}}=await sb.auth.getUser();if(!user)return;const{data:p}=await sb.from("profiles").select("name").eq("id",user.id).maybeSingle();const n=(p?.name||"").trim();if(n)setInitialen(n.split(/\s+/).map((w:string)=>w[0]).join("").slice(0,2).toUpperCase())})()},[])
- if(HIDE.some(h=>h===path||(h!=="/"&&path.startsWith(h))))return null
- return <header style={{position:"sticky",top:0,zIndex:50,background:BLACK,/* keine Linie unter dem Kopf (07.09.) */}}><div style={{maxWidth:1100,margin:"0 auto",padding:"14px clamp(16px,4vw,32px)",paddingRight:"calc(clamp(16px,4vw,32px) + 52px)",display:"flex",alignItems:"center",justifyContent:"space-between"}}><Link href="/entdecken" aria-label="PPL Player Startseite" style={{display:"inline-flex",alignItems:"baseline",textDecoration:"none",fontWeight:900,letterSpacing:"-.035em",lineHeight:1,fontSize:21}}><span style={{color:OFF}}>PPL</span><span style={{color:V}}>.</span><span style={{color:V,marginLeft:6}}>PLAYER</span></Link><div style={{display:"flex",alignItems:"center",gap:9}}>{initialen&&<NotificationBell/>}{initialen&&<Link href="/profil" aria-label="Profil" style={{width:38,height:38,borderRadius:"50%",border:`1px solid ${V}`,background:"transparent",color:OFF,fontSize:12,fontWeight:900,display:"flex",alignItems:"center",justifyContent:"center",textDecoration:"none",flexShrink:0}}>{initialen}</Link>}</div></div></header>
+export default function AppHeader() {
+  const path = usePathname() || "/"
+  /* 24.09.2026: Der Vergleich war path.startsWith(h) OHNE Schraegstrich.
+     "/matchhistorie" beginnt mit "/match" und "/trainingscamp" mit
+     "/training" — auf beiden Seiten fiel der Kopf deshalb ersatzlos weg,
+     und es gab von dort keinen Weg zurueck ausser der unteren Leiste. */
+  if (HIDE.some(h => h === path || (h !== "/" && path.startsWith(h + "/")))) return null
+  return (
+    <header style={{ position: "sticky", top: 0, zIndex: 50, background: DUNKEL }}>
+      <PlayerKopf />
+    </header>
+  )
 }

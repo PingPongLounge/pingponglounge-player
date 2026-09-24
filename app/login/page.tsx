@@ -37,6 +37,24 @@ export default function LoginPage() {
   const router = useRouter()
   const [msg, setMsg] = useState("")
 
+  /* Supabase antwortet auf Englisch und technisch ("Invalid login
+     credentials", "User already registered"). Genau das stand bisher im
+     Formular. Uebersetzt wird nur, was haeufig vorkommt; alles andere
+     bleibt im Original, damit kein Fehler unter den Tisch faellt. */
+  function verstaendlich(m: string): string {
+    const t = m.toLowerCase()
+    if (t.includes("invalid login credentials")) return "E-Mail oder Passwort stimmt nicht."
+    if (t.includes("email not confirmed")) return "Bitte bestätige zuerst den Link in deiner E-Mail."
+    if (t.includes("user already registered")) return "Für diese Adresse gibt es schon ein Konto. Melde dich an."
+    if (t.includes("password should be at least")) return "Das Passwort braucht mindestens 6 Zeichen."
+    if (t.includes("unable to validate email")) return "Diese E-Mail-Adresse sieht nicht gültig aus."
+    if (t.includes("email rate limit") || t.includes("too many requests"))
+      return "Zu viele Versuche. Bitte warte einen Moment."
+    if (t.includes("failed to fetch") || t.includes("network"))
+      return "Keine Verbindung. Prüfe dein Netz und versuch es nochmals."
+    return m
+  }
+
   // Wohin nach dem Anmelden? Die Middleware haengt returnTo an, aeltere Links
   // benutzen next. Nur relative Pfade — sonst waere das eine offene Weiterleitung.
   // Bewusst aus window.location statt useSearchParams: das braucht sonst eine
@@ -62,7 +80,7 @@ export default function LoginPage() {
     setLoading(true); setError("")
     const supabase = createClient()
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) { setError(error.message); setLoading(false); return }
+    if (error) { setError(verstaendlich(error.message)); setLoading(false); return }
     router.refresh(); router.push(ziel)
   }
 
@@ -74,7 +92,7 @@ export default function LoginPage() {
       email, password,
       options: { emailRedirectTo: rueckweg() },
     })
-    if (error) { setError(error.message); setLoading(false); return }
+    if (error) { setError(verstaendlich(error.message)); setLoading(false); return }
     setSent(true); setLoading(false)
   }
 
@@ -99,7 +117,7 @@ export default function LoginPage() {
       // Seite, die es wirklich gibt und die die Sitzung selbst herstellt.
       redirectTo: window.location.origin + "/auth/callback?next=/auth/reset-password&type=recovery",
     })
-    if (error) { setError(error.message); setLoading(false); return }
+    if (error) { setError(verstaendlich(error.message)); setLoading(false); return }
     setMsg("Passwort-Reset Link geschickt — check deine Emails.")
     setLoading(false)
   }

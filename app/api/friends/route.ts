@@ -63,7 +63,7 @@ export async function POST(req: NextRequest) {
     if (gegen) {
       if (gegen.status === "pending") {
         await admin.from("friendships").update({ status: "accepted", accepted_at: new Date().toISOString() }).eq("id", gegen.id)
-        await notify(admin, user_id, "friend_accepted", `${await meinName(admin, user.id)} ist jetzt dein Freund`, { link: "/liga" })
+        await notify(admin, user_id, "friend_accepted", `${await meinName(admin, user.id)} ist jetzt dein Freund`, { link: "/freunde" })
       }
       return NextResponse.json({ ok: true, accepted: true })
     }
@@ -71,7 +71,7 @@ export async function POST(req: NextRequest) {
       .upsert({ requester: user.id, addressee: user_id, status: "pending" }, { onConflict: "requester,addressee", ignoreDuplicates: true })
     if (error) return NextResponse.json({ error: error.message }, { status: 400 })
     await notify(admin, user_id, "friend_request", `${await meinName(admin, user.id)} möchte dein Freund sein`, {
-      body: "Nimm die Anfrage an, dann seht ihr euch im Freunde-Filter.", link: "/liga",
+      body: "Nimm die Anfrage an, dann seht ihr euch im Freunde-Filter.", link: "/freunde",
     })
     return NextResponse.json({ ok: true })
   }
@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
       .eq("addressee", user.id).eq("requester", user_id).eq("status", "pending")
     if (error) return NextResponse.json({ error: error.message }, { status: 400 })
     // Den Anfragenden benachrichtigen, dass angenommen wurde.
-    await notify(admin, user_id, "friend_accepted", `${await meinName(admin, user.id)} hat deine Freundschaftsanfrage angenommen`, { link: "/liga" })
+    await notify(admin, user_id, "friend_accepted", `${await meinName(admin, user.id)} hat deine Freundschaftsanfrage angenommen`, { link: "/freunde" })
     return NextResponse.json({ ok: true })
   }
 
