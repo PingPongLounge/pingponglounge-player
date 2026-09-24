@@ -895,10 +895,27 @@ export default function LigaPage(){
 
               {bands.map(b=>(
                 <div key={b.tier.key} ref={el=>{tierRefs.current[b.tier.key]=el}}>
-                  <div style={{display:"flex",alignItems:"center",gap:9,padding:"14px 18px 8px",borderTop:"1px solid var(--p-kante)"}}>
-                    <span style={{fontFamily:INTER,fontSize:11,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase",color:b.tier.key===meineStufe?.key?P_AKZENT:P_LEISE}}>{b.tier.name}</span>
-                    <span style={{fontFamily:INTER,fontSize:12,color:P_LEISE}}>{tierRangeLabel(b.tier.key)} · {b.rows.length}</span>
-                  </div>
+                  {/* 24.09.2026 (Oliver): "die ranking muessen groesser und
+                      sichtbarer sein". Die Stufe stand als 11px-Laufschrift
+                      neben einer 12px-Zeile und ging zwischen den Spielern
+                      unter. Jetzt eine echte Zwischenueberschrift: Anton,
+                      eigene Flaeche, klare Kante. Die eigene Stufe traegt
+                      zusaetzlich den gruenen Balken links. */}
+                  {(()=>{ const meins=b.tier.key===meineStufe?.key; return (
+                  <div style={{
+                    padding:"16px 18px 13px",
+                    borderTop:"1px solid var(--p-kante)",
+                    borderBottom:"1px solid var(--p-kante)",
+                    background:meins?"#F5F5F2":"#FAFAF8",
+                    borderLeft:meins?`4px solid ${P_AKZENT}`:"4px solid transparent",
+                  }}>
+                    <div style={{fontFamily:ANTON,fontWeight:400,fontSize:24,lineHeight:1.05,letterSpacing:".01em",textTransform:"uppercase",color:meins?P_AKZENT:P_TEXT}}>
+                      {b.tier.name}
+                    </div>
+                    <div style={{fontFamily:INTER,fontSize:12.5,fontWeight:400,color:P_LEISE,marginTop:5}}>
+                      {tierRangeLabel(b.tier.key)} · {b.rows.length} {b.rows.length===1?"Spieler":"Spieler"}{meins?" · deine Stufe":""}
+                    </div>
+                  </div>)})()}
                   {b.rows.map(r=>{
                     const me=r.user_id===userId
                     const ini=r.name.split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase()
