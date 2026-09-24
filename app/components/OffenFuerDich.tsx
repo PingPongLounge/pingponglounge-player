@@ -25,6 +25,8 @@ type Offen = {
   id: string; seasonId: string; status: string
   iAmP1: boolean; enteredBy: string | null
   oppId: string; oppName: string
+  /** Frist fuer ein vereinbartes Spiel — danach verfaellt es. */
+  deadline: string | null
 }
 
 export default function OffenFuerDich({ onChange }: { onChange?: () => void }) {
@@ -46,7 +48,7 @@ export default function OffenFuerDich({ onChange }: { onChange?: () => void }) {
     const seasons = (regs || []).map(r => r.season_id)
     if (!seasons.length) { setOffene([]); return }
     const { data: ms } = await sb.from("league_matches")
-      .select("id,season_id,p1_id,p2_id,status,entered_by")
+      .select("id,season_id,p1_id,p2_id,status,entered_by,deadline")
       .in("season_id", seasons)
       .in("status", ["challenge_sent", "accepted", "pending", "p1_entered"])
       .or(`p1_id.eq.${user.id},p2_id.eq.${user.id}`)
@@ -61,6 +63,7 @@ export default function OffenFuerDich({ onChange }: { onChange?: () => void }) {
         id: m.id, seasonId: m.season_id, status: m.status, iAmP1: m.p1_id === user.id,
         enteredBy: (m as { entered_by?: string | null }).entered_by ?? null,
         oppId, oppName: namen.get(oppId) || "Spieler",
+        deadline: (m as { deadline?: string | null }).deadline ?? null,
       }
     }))
   }, [])
@@ -124,7 +127,17 @@ export default function OffenFuerDich({ onChange }: { onChange?: () => void }) {
         let lage = ""
         if (o.status === "challenge_sent") lage = o.iAmP1 ? "Du hast gefordert — wartet auf Antwort" : "fordert dich heraus"
         else if (o.status === "p1_entered") lage = selbst ? "Eingetragen — wartet auf Bestätigung" : "hat ein Resultat eingetragen"
-        else lage = "Spiel vereinbart — trag den Satzstand ein"
+        else {
+          lage = "Spiel vereinbart — trag den Satzstand ein"
+          // Ein vereinbartes Spiel verfaellt nach zwei Wochen. Die Frist
+          // gehoert sichtbar dazu, sonst verschwindet es unangekuendigt.
+          if (o.deadline) {
+            const tage = Math.ceil((new Date(o.deadline).getTime() - Date.now()) / 86400000)
+            if (tage <= 0) lage += " · läuft heute ab"
+            else if (tage === 1) lage += " · noch 1 Tag"
+            else if (tage <= 14) lage += ` · noch ${tage} Tage`
+          }
+        }
         const laeuft = busy === o.id
 
         return (

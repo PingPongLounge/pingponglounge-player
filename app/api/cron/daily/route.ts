@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin"
-import { autoConfirmOverdue, remindStuckOnboarding, expireOldChallenges } from "@/lib/cron-tasks"
+import { autoConfirmOverdue, remindStuckOnboarding, expireOldChallenges, expireStaleMatches } from "@/lib/cron-tasks"
 import { ensureOpenGames } from "@/lib/opengames"
 import { releaseStaleReservations } from "@/lib/tournaments"
 import { applyMonthlyPenalties, warnMonthlyOpen } from "@/lib/monthly"
@@ -32,6 +32,11 @@ async function run(req: NextRequest) {
   const reminded = await remindStuckOnboarding(admin)
   const expired = await expireOldChallenges(admin)
 
+  // Vereinbarte Spiele ohne Resultat verfallen nach zwei Wochen.
+  let abgelaufen = 0
+  try { abgelaufen = await expireStaleMatches(admin) }
+  catch (e) { console.error("Vereinbarte Spiele verfallen lassen fehlgeschlagen:", e) }
+
   let angelegt = 0
   try { angelegt = await ensureOpenGames(admin) }
   catch (e) { console.error("Open Games anlegen fehlgeschlagen:", e) }
@@ -53,7 +58,7 @@ async function run(req: NextRequest) {
   // (aktuell 3 gewertete Matches pro Kalendermonat). Optionale Seasons dürfen
   // keinen zusätzlichen Rating-Abzug auslösen.
 
-  return NextResponse.json({ ok: true, confirmed, reminded, expired, angelegt, penalties, warned, freigegeben })
+  return NextResponse.json({ ok: true, confirmed, reminded, expired, abgelaufen, angelegt, penalties, warned, freigegeben })
 }
 
 export const GET = run

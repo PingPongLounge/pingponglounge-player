@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
+import { MATCH_EXPIRY_DAYS } from "@/lib/cron-tasks"
 
 export async function POST(req: NextRequest) {
   const { match_id } = await req.json()
@@ -17,7 +18,10 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Nicht mehr offen" }, { status: 400 })
 
   const { error } = await admin.from("league_matches")
-    .update({ status: "pending" })
+    // 24.09.2026 (Oliver): "das muss nach 2 wochen verfallen". Ein
+    // vereinbartes Spiel bekommt ab jetzt eine Frist. Die Spalte deadline
+    // gibt es laengst, sie wurde nur nie gefuellt — keine Migration noetig.
+    .update({ status: "pending", deadline: new Date(Date.now() + MATCH_EXPIRY_DAYS * 24 * 3600 * 1000).toISOString() })
     .eq("id", match_id).eq("status", "challenge_sent")
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 

@@ -67,6 +67,9 @@ export async function autoConfirmOverdue(admin: SupabaseClient): Promise<number>
 
 // Wie lange darf eine Forderung offen liegen, bevor sie verfällt?
 export const CHALLENGE_EXPIRY_DAYS = 7
+/** Ein VEREINBARTES Spiel verfaellt, wenn nach zwei Wochen kein Resultat
+    da ist. Vorher blieb es fuer immer in "Offen fuer dich" stehen. */
+export const MATCH_EXPIRY_DAYS = 14
 
 /**
  * Lässt Forderungen verfallen, auf die niemand reagiert hat.
@@ -117,4 +120,40 @@ export async function remindStuckOnboarding(admin: SupabaseClient): Promise<numb
     }
   }
   return sent
+}
+
+/**
+ * Vereinbarte Spiele ohne Resultat verfallen nach MATCH_EXPIRY_DAYS.
+ *
+ * 24.09.2026 (Oliver): "das muss nach 2 wochen verfallen". Eine offene
+ * FORDERUNG verfiel schon (expireOldChallenges, 7 Tage) — ein angenommenes
+ * Spiel dagegen nie. Es stand auf Dauer in "Offen fuer dich", auch wenn
+ * die beiden nie gespielt haben.
+ *
+ * Massgeblich ist `deadline`, die beim Annehmen gesetzt wird. Fuer Spiele
+ * aus der Zeit davor steht dort nichts — die rechnen wir ersatzweise ab
+ * `created_at`, damit auch die Altbestaende aufgeraeumt werden.
+ * Angefasst wird NUR, was noch kein Resultat hat (accepted/pending).
+ * Ein p1_entered bleibt unberuehrt: dort laeuft die 24-Stunden-Frist.
+ */
+export async function expireStaleMatches(admin: SupabaseClient): Promise<number> {
+  const jetzt = new Date().toISOString()
+  const cutoff = new Date(Date.now() - MATCH_EXPIRY_DAYS * 24 * 3600 * 1000).toISOString()
+
+  const { data: alt } = await admin
+    .from("league_matches")
+    .select("id")
+    .in("status", ["accepted", "pending"])
+    .or(`deadline.lt.${jetzt},and(deadline.is.null,created_at.lt.${cutoff})`)
+    .limit(200)
+
+  let verfallen = 0
+  for (const m of alt || []) {
+    const { data: upd } = await admin.from("league_matches")
+      .update({ status: "cancelled" })
+      .eq("id", m.id).in("status", ["accepted", "pending"])
+      .select("id").maybeSingle()
+    if (upd) verfallen++
+  }
+  return verfallen
 }
