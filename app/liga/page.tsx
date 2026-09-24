@@ -797,16 +797,17 @@ export default function LigaPage(){
               )}
             </>
           ):(
-            <section className="p-karte">
-              <div style={{padding:18}}>
-                <p style={{fontSize:15,color:P_LEISE,lineHeight:1.55,margin:"0 0 18px",maxWidth:"46ch"}}>
-                  Eine Liga für alle — kein Beitreten in Klassen. Deine Stufe kommt aus deinem Rating. Fordere jeden, auch die Nummer eins.
-                </p>
-                <button onClick={join} disabled={busy} style={{...knopfPrimaer,width:"100%",opacity:busy?.6:1}}>
-                  {busy?"…":userId?"Los geht's":"Anmelden und mitmachen"}
-                </button>
-              </div>
-            </section>
+            /* 24.09.2026 (Oliver): "bei liga das oben mit los gehts weg".
+               Die Karte war ohnehin eine Sackgasse: sichtbar wurde sie nur
+               bei unvollstaendigem Profil, und ihr Knopf lief fuer genau
+               diese Leute in "Schliess zuerst dein Profil ab". Wer Name und
+               Level hat, wird beim Oeffnen automatisch eingetragen. Bleibt
+               eine Zeile, damit die Seite nicht leer ist. */
+            <p className="p-hinweis" style={{fontSize:14,lineHeight:1.55,margin:0}}>
+              {userId
+                ? <>Sobald dein Profil vollständig ist, stehst du automatisch in der Liga. <Link href="/profil" className="p-textlink">Profil ergänzen →</Link></>
+                : <>Melde dich an, dann bist du automatisch dabei. <Link href="/login" className="p-textlink">Anmelden →</Link></>}
+            </p>
           )}
 
           <div style={{marginTop:18}}><PendingConfirmBanner/></div>

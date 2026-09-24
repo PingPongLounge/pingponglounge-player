@@ -183,10 +183,10 @@ main { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
    neben der Anton-Zeile zum Staubkorn. Die Groesse steht jetzt hier — CSS
    schlaegt das width/height-Attribut des SVG, also gilt sie fuer jede
    Ueberschrift auf einen Schlag und waechst auf dem Desktop mit. */
-.p-kopf h2 svg{width:34px;height:34px;flex-shrink:0}
+.p-kopf h2 svg{width:46px;height:46px;flex-shrink:0}
 @media(min-width:1100px){
   .p-kopf h2{font-size:22px;gap:11px}
-  .p-kopf h2 svg{width:40px;height:40px}
+  .p-kopf h2 svg{width:54px;height:54px}
 }
 @media(min-width:1100px){.p-kopf{padding:18px 22px}.p-kopf h2{font-size:22px}}
 /* E · Meta. 600 statt 800, Tracking .12em statt .16em. */
