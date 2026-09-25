@@ -1,5 +1,5 @@
 "use client"
-/* PLAYER · OFFEN FÜR DICH — offene Forderungen und laufende Matches.
+/* PLAYER · OFFENE SPIELE — offene Forderungen und laufende Matches.
 
    24.09.2026 (Oliver): "wenn ich gefordert wurde muss dies auch im Profil
    stehen und direkt dort eintragbar sein wenns mehrere matches waren" und
@@ -18,8 +18,8 @@
    faellt, bleibt hier sichtbar. */
 import { useCallback, useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { IconMatches } from "./Icons"
 import { LEISE, TEXT, KANTE, AKZENT, ANTON, INTER } from "@/app/design"
-import { IconLiga } from "./Icons"
 
 type Offen = {
   id: string; seasonId: string; status: string
@@ -119,7 +119,7 @@ export default function OffenFuerDich({ onChange }: { onChange?: () => void }) {
 
   return (
     <section className="p-karte p-abschnitt">
-      <div className="p-kopf"><h2><IconLiga size={22}/>Offen für dich</h2></div>
+      <div className="p-kopf"><h2><IconMatches size={22}/>Offene Spiele</h2></div>
 
       {offene.map(o => {
         const selbst = !!o.enteredBy && !!ich && o.enteredBy === ich

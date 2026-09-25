@@ -19,7 +19,7 @@ import PlayerKopf from "./PlayerKopf"
 import OffenFuerDich from "./OffenFuerDich"
 import CampaignOverlay from "./CampaignOverlay"
 import {
-  IconChevron, IconCommunity, IconMatches, IconOpenGames, IconStatistiken, IconTurniere,
+  IconChevron, IconCommunity, IconKalender, IconOpenGames, IconOrt, IconRangliste, IconStatistiken, IconTraining, IconTurniere,
 } from "./Icons"
 import { INTER, TEXT, LEISE, BG } from "@/app/design"
 
@@ -89,7 +89,7 @@ export default function StartHomeV2(d: StartData) {
           {/* ── Dein naechstes Match ── */}
           <section className="p-karte">
             <div className="p-kopf">
-              <h2><IconMatches size={22}/>Dein nächstes Match</h2>
+              <h2><IconKalender size={22}/>Dein nächstes Match</h2>
               {d.games.length > 0 && <Link href="/match" className="p-mehr">Alle →</Link>}
             </div>
             {d.nextGame ? (
@@ -135,7 +135,7 @@ export default function StartHomeV2(d: StartData) {
           {letzte.length > 0 && (
             <section className="p-karte p-abschnitt">
               <div className="p-kopf">
-                <h2><IconMatches size={22}/>Deine letzten Matches</h2>
+                <h2><IconRangliste size={22}/>Deine letzten Matches</h2>
                 <Link href="/matchhistorie" className="p-mehr">Alle →</Link>
               </div>
               {letzte.map(m => (
@@ -181,7 +181,7 @@ export default function StartHomeV2(d: StartData) {
           {d.games.length > 0 && (
             <section className="p-karte p-abschnitt">
               <div className="p-kopf">
-                <h2><IconOpenGames size={22}/>Heute wird gespielt</h2>
+                <h2><IconOrt size={22}/>Heute wird gespielt</h2>
                 <Link href="/match" className="p-mehr">Alle →</Link>
               </div>
               {d.games.slice(0, 3).map(g => (
@@ -206,7 +206,7 @@ export default function StartHomeV2(d: StartData) {
               ueber die Adresszeile oder den Zurueck-Pfeil zweier
               Unterseiten. */}
           <section className="p-karte p-abschnitt">
-            <div className="p-kopf"><h2><IconOpenGames size={22}/>Selbst loslegen</h2></div>
+            <div className="p-kopf"><h2><IconTraining size={22}/>Selbst loslegen</h2></div>
             <Link href="/erstellen" className="p-zeile">
               <span style={{ flexShrink: 0, display: "inline-flex", color: TEXT }}><IconOpenGames size={24} /></span>
               <span style={{ flex: 1, minWidth: 0 }}>

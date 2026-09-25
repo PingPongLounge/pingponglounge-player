@@ -12,7 +12,7 @@ import {
 import PlayerKopf from "@/app/components/PlayerKopf"
 import OffenFuerDich from "@/app/components/OffenFuerDich"
 import {
-  IconLiga, IconRangliste, IconSpieler, IconStatistiken,
+  IconLiga, IconProfil, IconRangliste, IconSpieler, IconStatistiken,
 } from "@/app/components/Icons"
 /* 24.09.2026: Die Liga bezieht ihr Aussehen nicht mehr aus V2, sondern aus
    denselben Klassen wie die Startseite (.p-hero, .p-karte, .p-kopf,
@@ -746,7 +746,7 @@ export default function LigaPage(){
             <>
               <section className="p-karte">
                 <div className="p-kopf">
-                  <h2><IconRangliste size={22}/>Dein Rang</h2>
+                  <h2><IconProfil size={22}/>Dein Rang</h2>
                   <span className="p-mehr">{sel?.city||city||"Schweiz"}</span>
                 </div>
                 <div style={{display:"flex",alignItems:"flex-end",justifyContent:"space-between",gap:16,padding:"16px 18px"}}>

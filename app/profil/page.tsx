@@ -16,7 +16,7 @@ import BottomNav from "@/app/components/BottomNav"
 import LogoutButton from "@/app/components/LogoutButton"
 import { createClient } from "@/lib/supabase/client"
 import {
-  IconBuchungen, IconChevron, IconCommunity, IconEinstellungen, IconFavorit, IconKalender, IconLiga, IconMatches, IconProfil, IconStatistiken, IconTurniere,
+  IconBuchungen, IconChevron, IconCommunity, IconEinstellungen, IconFavorit, IconKalender, IconLiga, IconMatches, IconProfil, IconStatistiken, IconTraining, IconTurniere,
 } from "@/app/components/Icons"
 import { ANTON, INTER, TEXT, LEISE, BG, AKZENT, knopf } from "@/app/design"
 
@@ -293,7 +293,7 @@ export default function ProfilPage() {
               Diese Angaben speisen die Liga-Filter (Hand, Noppen, Anti,
               Kategorie). Ohne diese Karte standen sie bei jedem leer. */}
           <section className="p-karte p-abschnitt">
-            <div className="p-kopf"><h2><IconStatistiken size={22}/>Dein Spiel</h2></div>
+            <div className="p-kopf"><h2><IconTraining size={22}/>Dein Spiel</h2></div>
             <div style={{ padding: 18 }}>
               <p style={{ margin: "0 0 16px", fontSize: 14, color: LEISE, lineHeight: 1.55, maxWidth: "46ch" }}>
                 Alles freiwillig. Wer etwas angibt, ist über die Filter in der Rangliste auffindbar — und findet dort leichter passende Gegner.
@@ -346,7 +346,7 @@ export default function ProfilPage() {
           {/* ── Letzte Matches ── */}
           <section className="p-karte p-abschnitt">
             <div className="p-kopf">
-              <h2><IconMatches size={22}/>Letzte Matches</h2>
+              <h2><IconStatistiken size={22}/>Letzte Matches</h2>
               {matches.length > 0 && <Link href="/matchhistorie" className="p-mehr">Alle →</Link>}
             </div>
             {matches.length === 0
@@ -370,7 +370,7 @@ export default function ProfilPage() {
 
           {/* ── Navigation: was frueher im Hamburger-Menue stand ── */}
           <section className="p-karte p-abschnitt">
-            <div className="p-kopf"><h2><IconProfil size={22}/>Dein Player</h2></div>
+            <div className="p-kopf"><h2><IconFavorit size={22}/>Dein Player</h2></div>
             {/* 24.09.2026: Vom Profil fuehrte kein Weg in die Liga zurueck —
                 die Rating-Zahl stand oben, die Liga dazu war nur ueber die
                 untere Leiste erreichbar. */}

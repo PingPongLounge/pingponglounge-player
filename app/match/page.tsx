@@ -19,7 +19,7 @@ import { OG_PREIS_CHF, OG_STORNO_STUNDEN } from "@/lib/opengames"
 import { pruefeAuth } from "@/lib/auth-client"
 import PlayerKopf from "@/app/components/PlayerKopf"
 import {
-  IconOpenGames, IconSpieler, IconSuche,
+  IconOpenGames, IconOrt, IconSpieler, IconSuche,
 } from "@/app/components/Icons"
 import { INTER, TEXT, LEISE, BG, knopf, knopfUmriss } from "@/app/design"
 
@@ -136,7 +136,7 @@ export default function MatchPage() {
           {/* ── Heute wird gespielt ── */}
           <section id="heute" className="p-karte p-abschnitt" style={{ scrollMarginTop: 16 }}>
             <div className="p-kopf">
-              <h2><IconOpenGames size={22}/>Heute wird gespielt</h2>
+              <h2><IconOrt size={22}/>Heute wird gespielt</h2>
               {alle.length > 0 && <span className="p-mehr">{alle.length}</span>}
             </div>
 

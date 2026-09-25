@@ -18,7 +18,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import PlayerKopf from "@/app/components/PlayerKopf"
 import {
-  IconChevron, IconCommunity, IconFavorit,
+  IconChevron, IconCommunity, IconFavorit, IconGlocke, IconSpieler,
 } from "@/app/components/Icons"
 import { zumLogin, pruefeAuth } from "@/lib/auth-client"
 import { INTER, TEXT, LEISE, BG, AKZENT, knopf, knopfUmriss } from "@/app/design"
@@ -168,7 +168,7 @@ export default function FreundePage() {
           {/* ── Eingehende Anfragen ── */}
           {stand.incoming.length > 0 && (
             <section className="p-karte">
-              <div className="p-kopf"><h2><IconCommunity size={22}/>Möchten dein Freund sein</h2></div>
+              <div className="p-kopf"><h2><IconSpieler size={22}/>Möchten dein Freund sein</h2></div>
               {stand.incoming.map(p => (
                 <Zeile key={p.id} p={p} rechts={
                   <span style={{ display: "inline-flex", gap: 8 }}>
@@ -198,7 +198,7 @@ export default function FreundePage() {
           {/* ── Ausgehende Anfragen ── */}
           {stand.outgoing.length > 0 && (
             <section className="p-karte p-abschnitt">
-              <div className="p-kopf"><h2><IconCommunity size={22}/>Angefragt</h2></div>
+              <div className="p-kopf"><h2><IconGlocke size={22}/>Angefragt</h2></div>
               {stand.outgoing.map(p => (
                 <Zeile key={p.id} p={p} rechts={
                   <button disabled={busy === p.id} onClick={() => aktion("remove", p.id)} className="p-textlink" style={{ marginTop: 0, width: "auto", padding: "0 8px" }}>Zurückziehen</button>

@@ -16,7 +16,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import PlayerKopf from "@/app/components/PlayerKopf"
 import {
-  IconChevron, IconCommunity, IconKalender, IconMatches,
+  IconChevron, IconCommunity, IconKalender, IconStatistiken,
 } from "@/app/components/Icons"
 import { INTER, TEXT, LEISE, BG, knopf, knopfUmriss } from "@/app/design"
 
@@ -174,7 +174,7 @@ export default function TurnierePage() {
           {/* ── Zuletzt gespielt ── */}
           {vorbei.length > 0 && (
             <section className="p-karte p-abschnitt">
-              <div className="p-kopf"><h2><IconMatches size={22}/>Zuletzt gespielt</h2></div>
+              <div className="p-kopf"><h2><IconStatistiken size={22}/>Zuletzt gespielt</h2></div>
               {vorbei.map(t => (
                 <Link key={t.id} href={`/turniere/${t.id}`} className="p-zeile">
                   <span style={{ flex: 1, minWidth: 0 }}>
