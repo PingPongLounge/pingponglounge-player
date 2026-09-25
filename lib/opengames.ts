@@ -16,15 +16,17 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 export const OG_PREIS_CHF = 10          // pro Person
 export const OG_STORNO_STUNDEN = 24     // bis dahin Absage mit Rückerstattung
 export const OG_VORLAUF_TAGE = 21       // so weit im Voraus werden Termine angelegt
-export const OG_BIS_DATUM = "2026-10-31" // testweise bis Ende Oktober — danach keine neuen
+export const OG_BIS_DATUM = "2027-01-31" // 25.09.2026: war "2026-10-31" — ab 1.11. waere kein Abend mehr entstanden
 
 export const OG_TRAINING_PREIS_CHF = 29 // geführtes Training, pro Person
 
 /** Geführte Trainings (mit Trainer). Level offen, feste Platzzahl, eigener Preis. */
-export type OgTraining = { location_id: string; location_name: string; day: number; start: number; end: number; dauerMin: number; plaetze: number }
+/* Kein "end": 19:00 + 90 Minuten ist 20:30, und end_hour kennt nur ganze
+   Stunden. Die Dauer steht in dauerMin, die Anzeige rechnet damit. */
+export type OgTraining = { location_id: string; location_name: string; day: number; start: number; dauerMin: number; plaetze: number }
 export const OG_TRAININGS: OgTraining[] = [
   // Glattbrugg, jeden Donnerstag 19:00–20:30, 10 Plätze, alle Level
-  { location_id: "glattbrugg", location_name: "Glattbrugg", day: 4, start: 19, end: 20, dauerMin: 90, plaetze: 10 },
+  { location_id: "glattbrugg", location_name: "Glattbrugg", day: 4, start: 19, dauerMin: 90, plaetze: 10 },
 ]
 
 // =====================================================================
@@ -249,7 +251,7 @@ export async function ensureOpenGames(admin: SupabaseClient): Promise<number> {
         location_name: t.location_name,
         date: ds,
         start_hour: t.start,
-        end_hour: t.end,
+        end_hour: null,
         duration_minutes: t.dauerMin,
         max_players: t.plaetze,
         current_players: 0,

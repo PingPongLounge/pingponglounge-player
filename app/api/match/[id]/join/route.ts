@@ -12,6 +12,15 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
   const { data: game } = await admin.from("open_games")
     .select("id,status,max_players,is_official,price_per_player,kind").eq("id", id).single()
   if (!game) return NextResponse.json({ error: "Spiel nicht gefunden" }, { status: 404 })
+  /* Single Night: eigenes Ticket, eigene Buchung. Ein Beitritt hier wuerde
+     einen Platz vergeben, den niemand bezahlt hat. */
+  if (game.kind === "single_night") {
+    return NextResponse.json({
+      error: "Single Nights werden mit Ticket gebucht.",
+      code: "single_night",
+      redirect: "/single-night",
+    }, { status: 402 })
+  }
   if (!["open", "full"].includes(game.status)) return NextResponse.json({ error: "Spiel nicht mehr offen" }, { status: 409 })
 
   /* 24.09.2026: Diese Route ist der GRATIS-Beitritt — gedacht fuer Spiele, die

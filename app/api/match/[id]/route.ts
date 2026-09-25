@@ -12,6 +12,11 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     .eq("id", id)
     .single()
   if (!game) return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 })
+  /* 25.09.2026: Single Nights sind KEINE Open Games. Sie haben ein eigenes
+     Ticket (lib/opengames.ts) und eine eigene Buchung (single_night_bookings).
+     Die Liste unter /match blendet sie aus — diese Detailroute tat es nicht,
+     also fuehrte ein direkter Link auf eine Seite mit "Mitspielen"-Knopf. */
+  if (game.kind === "single_night") return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 })
   // Noch nicht veröffentlichte Games (Tischbuchung ausstehend) sieht nur der Ersteller.
   if (game.status === "booking_pending" && game.created_by !== user?.id) {
     return NextResponse.json({ error: "Nicht gefunden" }, { status: 404 })

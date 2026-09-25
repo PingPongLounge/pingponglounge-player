@@ -9,7 +9,7 @@
 import { useRef, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 
-const CREME = "#F4F1EB", VIOLETT = "#39FF14", SCHWARZ = "#080808"
+const NEON = "#39FF14", SCHWARZ = "#080808"
 
 export function initialen(name?: string | null): string {
   if (!name) return "PP"
@@ -73,7 +73,7 @@ export default function ProfilAvatar({
     } finally { setLaedt(false) }
   }
 
-  const knopf = Math.round(groesse * 0.31)
+  const knopf = Math.max(30, Math.round(groesse * 0.34))
 
   return (
     <div style={{ display: "inline-block" }}>
@@ -82,7 +82,8 @@ export default function ProfilAvatar({
           width: groesse, height: groesse, borderRadius: "50%", overflow: "hidden",
           /* Der Ring war neongruen und damit das lauteste Element des
              Profils. Ein Avatar ist kein Statussignal. */
-          background: "rgba(244,241,235,.08)", border: `2px solid rgba(244,241,235,.28)`,
+          background: "color-mix(in srgb, currentColor 9%, transparent)",
+          border: "2px solid color-mix(in srgb, currentColor 26%, transparent)",
           display: "grid", placeItems: "center", opacity: laedt ? .5 : 1,
         }}>
           {bild
@@ -90,7 +91,7 @@ export default function ProfilAvatar({
             ? <img src={bild} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
             : <span style={{
                 fontFamily: "var(--font-anton), Impact, sans-serif",
-                fontSize: Math.round(groesse * 0.36), color: CREME, lineHeight: 1, letterSpacing: ".02em",
+                fontSize: Math.round(groesse * 0.36), color: "currentColor", lineHeight: 1, letterSpacing: ".02em",
               }}>{initialen(name)}</span>}
         </div>
 
@@ -104,12 +105,12 @@ export default function ProfilAvatar({
               style={{
                 position: "absolute", right: -2, bottom: -2,
                 width: knopf, height: knopf, borderRadius: "50%",
-                background: VIOLETT, border: `3px solid ${SCHWARZ}`, cursor: laedt ? "default" : "pointer",
+                background: NEON, border: `3px solid ${SCHWARZ}`, cursor: laedt ? "default" : "pointer",
                 display: "grid", placeItems: "center", padding: 0,
               }}
             >
               <svg width={Math.round(knopf * 0.5)} height={Math.round(knopf * 0.5)} viewBox="0 0 24 24"
-                fill="none" stroke={CREME} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                fill="none" stroke={SCHWARZ} strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="M3 8.5h3.2l1.4-2h7.8l1.4 2H20a1 1 0 0 1 1 1V19a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9.5a1 1 0 0 1 1-1Z" />
                 <circle cx="12" cy="13.5" r="3.4" />
               </svg>
@@ -119,6 +120,16 @@ export default function ProfilAvatar({
           </>
         )}
       </div>
+      {editierbar && (
+        <button type="button" onClick={() => feld.current?.click()} disabled={laedt}
+          style={{
+            display: "block", width: groesse, margin: "7px auto 0", padding: 0,
+            background: "transparent", border: "none", textAlign: "center",
+            cursor: laedt ? "default" : "pointer", whiteSpace: "nowrap",
+            fontSize: 10.5, fontWeight: 600, letterSpacing: ".05em", textTransform: "uppercase",
+            color: "color-mix(in srgb, currentColor 62%, transparent)",
+          }}>{laedt ? "lädt …" : "Bild ändern"}</button>
+      )}
       {fehler && <div style={{ fontSize: 13, color: "#FF7A72", marginTop: 8, maxWidth: 200 }}>{fehler}</div>}
     </div>
   )
