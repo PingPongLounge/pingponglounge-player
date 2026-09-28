@@ -77,7 +77,7 @@ export default function TrainingPage() {
         </a>
 
         <SectionIntro storageKey="intro_training_v2" title="So funktioniert's" steps={[
-          ["1", "Termin wählen", "Jeden Donnerstag in Glattbrugg, 19:00–20:30 — 8 Plätze, alle Level."],
+          ["1", "Termin wählen", "Jeden Donnerstag in Glattbrugg, 19:00–20:30 — 10 Plätze, alle Level."],
           ["2", "Platz sichern", `CHF ${OG_TRAINING_PREIS_CHF} pro Person, direkt bezahlt. Absage bis 24 h vorher, Geld zurück.`],
           ["3", "Besser werden", "Drills und Matchpraxis mit Trainer. Zutritt per QR an der Tür."],
         ]} />
