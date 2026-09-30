@@ -249,7 +249,7 @@ export default async function EntdeckenPage() {
                 eingeloggte Startseite tragen. Gerendert wird exakt dasselbe
                 wie vorher; eigeneSpalte=false, weil die p-spalte hier schon
                 den Hero-Block traegt. */}
-            <PlayerKopf eigeneSpalte={false} />
+            <PlayerKopf eigeneSpalte={false} markenLogo />
 
             <div className="ent-heroBlock">
               <div>

@@ -36,6 +36,7 @@ export default function PlayerKopf({
   eigeneSpalte = true,
   oben = 16,
   unten = 16,
+  markenLogo = false,
 }: {
   ziel?: string
   /** true, wenn der Kopf auf Off-White statt auf dunklem Grund sitzt. */
@@ -47,6 +48,12 @@ export default function PlayerKopf({
   eigeneSpalte?: boolean
   oben?: number
   unten?: number
+  /** Volles Logo im Markenverlauf statt der weissen Fassung.
+      30.09.2026, Entscheid Oliver: nur die oeffentliche Startseite traegt
+      das Logo in Farbe. Im angemeldeten Bereich bleibt es weiss mit
+      gruenem Ball — Gruen ist dort Signal, nicht Flaeche (Design-System
+      V3). Wer eine zweite Seite umstellt, bricht diese Regel. */
+  markenLogo?: boolean
 }) {
   const [angemeldet, setAngemeldet] = useState(false)
   useEffect(() => {
@@ -68,7 +75,7 @@ export default function PlayerKopf({
         {/* 30.09.2026: vorher ein nachgezeichnetes P plus die Wortmarke in
             Anton. Jetzt das echte waagrechte Lockup aus public/logo/ —
             eine Grafik statt zwei Teile, die auseinanderlaufen koennen. */}
-        <PlayerLockup hoehe={26} aufHell={aufHell} />
+        <PlayerLockup hoehe={26} aufHell={aufHell} marke={markenLogo} />
       </Link>
 
       <span style={{ display: "flex", alignItems: "center", gap: 18 }}>

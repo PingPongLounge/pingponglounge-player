@@ -106,8 +106,14 @@ export function PlayerLockup({
   hoehe = 28,
   mitClaim = false,
   aufHell = false,
-}: { hoehe?: number; mitClaim?: boolean; aufHell?: boolean }) {
-  const farbe = aufHell ? "schwarz-ball-akzent" : "weiss-ball-neon"
+  marke = false,
+}: { hoehe?: number; mitClaim?: boolean; aufHell?: boolean; marke?: boolean }) {
+  // marke=true: das volle Logo im Markenverlauf. 30.09.2026 auf Entscheid
+  // hin nur fuer die oeffentliche Startseite — im angemeldeten Bereich
+  // bleibt Gruen Signal und wird nicht zur Flaeche.
+  const farbe = marke
+    ? (aufHell ? "hell" : "verlauf")
+    : (aufHell ? "schwarz-ball-akzent" : "weiss-ball-neon")
   const datei = mitClaim
     ? `/logo/lockup-horizontal-${farbe}.svg`
     : `/logo/lockup-horizontal-ohne-claim-${farbe}.svg`
