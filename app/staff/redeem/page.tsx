@@ -132,7 +132,7 @@ export default function StaffRedeemPage() {
         )}
 
         <p style={{ marginTop: 32, fontSize:11.5, color: M, textAlign: "center" }}>
-          nur für ppl mitarbeiter · playerapp.ch/staff/redeem
+          nur für ppl mitarbeiter · playerliga.ch/staff/redeem
         </p>
       </div>
     </main>

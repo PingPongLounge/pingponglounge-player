@@ -6,7 +6,7 @@ const RESEND_URL = "https://api.resend.com/emails"
 // Absender frei konfigurierbar via Vercel-Env RESEND_FROM.
 // Die Domain muss in Resend verifiziert sein, sonst lehnt Resend den Versand ab.
 const FROM = process.env.RESEND_FROM || "Player <points@playerapp.ch>"
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"
 
 const G = "#39FF14"
 
@@ -80,7 +80,7 @@ function shell(inner: string): string {
             <td style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#ffffff">
               <img src="${BASE_URL}/logo-mail.png" alt="Player — Pingpong Next Level" width="180" style="display:block;width:180px;max-width:180px;height:auto;margin:0 auto 28px;border:0">
               ${inner}
-              <p style="color:rgba(255,255,255,.45);font-size:11px;margin-top:28px;border-top:1px solid rgba(255,255,255,.1);padding-top:14px;text-align:center">Player · playerapp.ch</p>
+              <p style="color:rgba(255,255,255,.45);font-size:11px;margin-top:28px;border-top:1px solid rgba(255,255,255,.1);padding-top:14px;text-align:center">Player · ${BASE_URL.replace(/^https?:\/\//, "")}</p>
             </td>
           </tr>
         </table>

@@ -91,10 +91,11 @@ const PUBLIC_API_PATTERNS = [
   /^\/api\/match\/[^/]+\/checkout$/,
 ]
 
-// Kanonische Domain: playerapp.ch. Die alten *.vercel.app-Adressen sind
+// Kanonische Domain: playerliga.ch (seit 30.09.2026, vorher playerapp.ch).
+// Die alten *.vercel.app-Adressen sind
 // weiterhin erreichbar und landeten auf dem alten Login — sie leiten jetzt
-// dauerhaft (308) auf dieselbe Seite unter playerapp.ch um.
-const KANONISCH = "playerapp.ch"
+// dauerhaft (308) auf dieselbe Seite unter der kanonischen Domain um.
+const KANONISCH = "playerliga.ch"
 
 export async function middleware(request: NextRequest) {
   const host = request.headers.get("host") || ""

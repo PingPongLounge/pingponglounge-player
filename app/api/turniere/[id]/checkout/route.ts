@@ -23,7 +23,7 @@ function getStripe() {
   if (!key) throw new Error("STRIPE_SECRET_KEY nicht gesetzt")
   return new Stripe(key)
 }
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params

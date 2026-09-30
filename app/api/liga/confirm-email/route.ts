@@ -9,7 +9,7 @@ import { NextRequest, NextResponse } from "next/server"
 // genau diesen Spieler. Ohne gültige Signatur passiert nichts.
 export const runtime = "nodejs"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"
 const G = "#39FF14"
 
 const GRAD = "linear-gradient(135deg,#39FF14,#12D45C)"

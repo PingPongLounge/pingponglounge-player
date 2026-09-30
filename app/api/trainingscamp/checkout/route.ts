@@ -20,7 +20,7 @@ export const runtime = "nodejs"
 // las "Zahlung konnte nicht gestartet werden", obwohl an seiner Anmeldung
 // nichts falsch war. 30 Minuten sind der kleinste Wert, den Stripe erlaubt.
 const RESERVE_MINUTES = 30
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"
 
 function getStripe() {
   const key = process.env.STRIPE_SECRET_KEY

@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
       whenLabel: `${d}${d ? " · " : ""}${zeit}${isTraining ? "–20:30" : ""}`,
       priceChf: Number(game.price_per_player ?? 0),
       hatZutritt: true,
-      appUrl: `https://playerapp.ch/match/${gameId}`,
+      appUrl: `${process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"}/match/${gameId}`,
     })
     ergebnisse.push({ name: p.display_name || "Spieler", ok: res.ok, skipped: res.skipped })
   }

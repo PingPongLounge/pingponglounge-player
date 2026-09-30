@@ -6,7 +6,10 @@ import SplashScreen from "./components/SplashScreen"
 import InvitePopup from "./components/InvitePopup"
 import HauptMenu from "./components/HauptMenu"
 
-const BASE = "https://playerapp.ch"
+/* 30.09.2026: playerliga.ch ist die neue Hauptadresse. Der Wert kommt aus
+   NEXT_PUBLIC_BASE_URL (Vercel, Production) — dieselbe Quelle wie in den
+   Mails und den Checkout-Routen. playerapp.ch bleibt dauerhaft erreichbar. */
+const BASE = process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"
 
 // 06.09.2026: League Spartan raus. Zwei Schriften, mehr nicht — Anton fuer
 // Titel, Inter fuer die Oberflaeche, dasselbe System wie pingponglounge.ch.

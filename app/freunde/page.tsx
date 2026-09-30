@@ -65,7 +65,7 @@ export default function FreundePage() {
 
   const referralLink = typeof window !== "undefined"
     ? `${window.location.origin}/join?ref=${nick}`
-    : `https://playerapp.ch/join?ref=${nick}`
+    : `https://playerliga.ch/join?ref=${nick}`
 
   const ladeFreunde = useCallback(async () => {
     const r = await fetch("/api/friends", { cache: "no-store" })
@@ -216,7 +216,7 @@ export default function FreundePage() {
               </p>
               <span className="p-label" style={{ marginBottom: 6 }}>Dein persönlicher Link</span>
               <p style={{ margin: "0 0 14px", fontSize: 14.5, fontWeight: 600, wordBreak: "break-all" }}>
-                playerapp.ch/join?ref={nick}
+                {referralLink.replace(/^https?:\/\//, "")}
               </p>
               <button onClick={handleShare} style={{ ...knopf, width: "100%" }}>Link teilen →</button>
               <button onClick={handleCopy} style={{ ...knopfUmriss, width: "100%", marginTop: 10 }}>

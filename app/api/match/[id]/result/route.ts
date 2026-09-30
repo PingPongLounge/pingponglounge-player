@@ -11,7 +11,7 @@ import { NextRequest, NextResponse } from "next/server"
 // steigt", ein Open Game konnte aber nie enden und gab nie ELO.
 export const runtime = "nodejs"
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params

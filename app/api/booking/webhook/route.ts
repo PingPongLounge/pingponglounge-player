@@ -108,7 +108,7 @@ export async function POST(req: NextRequest) {
                 to = authU?.user?.email || null
               }
               if (to) {
-                const base = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
+                const base = process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"
                 const stornoLink = b.cancel_token ? `${base}/trainingscamp/storno?token=${b.cancel_token}` : `${base}/trainingscamp`
                 const anzahl = (b.session_ids || []).length
                 await sendEmail({

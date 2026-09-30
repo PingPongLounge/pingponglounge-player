@@ -27,7 +27,7 @@ import { bestaetigeGutschein } from "@/lib/gutschein"
    Kein Abschluss darf am Mailversand scheitern: die Zahlung ist da, der Platz
    gehört der Person. Mailfehler werden protokolliert, nie geworfen.           */
 
-const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerapp.ch"
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"
 
 export type AbschlussErgebnis =
   | { ok: true }
@@ -148,7 +148,7 @@ export async function schliesseAbOpenGame(
         hatZutritt,
         appUrl: istGast
           ? "https://pingponglounge.ch/events/open-games"
-          : `https://playerapp.ch/match/${a.gameId}`,
+          : `${process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"}/match/${a.gameId}`,
       })
     }
   } catch (e) {
