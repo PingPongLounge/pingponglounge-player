@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { createClient } from "@/lib/supabase/client"
 import { IconSuche, IconProfil, IconRangliste, IconMatches, IconFavorit, IconBuchungen, IconLiga, IconOpenGames, IconTurniere, IconKalender } from "@/app/components/Icons"
 
-const C = "#121214", B = "#1A1A1E", W = "#fff", M = "rgba(255,255,255,.85)"
+const C = "#231F20", B = "#2C2728", W = "#fff", M = "rgba(255,255,255,.85)"
 
 /* 24.09.2026: Das Menue zeichnete neun eigene Strichsymbole als rohe
    SVG-Strings. Jetzt kommt jedes aus app/components/Icons.tsx — dem
@@ -22,7 +22,7 @@ function buchenLink(): string {
   } catch { return basis }
 }
 
-const row: React.CSSProperties = { display: "flex", alignItems: "center", gap: 4, padding: "13px 15px", borderTop: `1px solid #1A1A1E`, textDecoration: "none" }
+const row: React.CSSProperties = { display: "flex", alignItems: "center", gap: 4, padding: "13px 15px", borderTop: `1px solid #2C2728`, textDecoration: "none" }
 
 /* 07.09.2026, Oliver: "menu immer unten". Der Ausloeser sitzt jetzt als
    sechster Punkt in der unteren Navigation (variant="nav") — dort, wo im
@@ -67,19 +67,19 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
           <span style={{ fontSize:11.5, fontWeight: open ? 900 : 700, letterSpacing: ".07em", textTransform: "uppercase" }}>Menü</span>
         </button>
       ) : avatar ? (
-        <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#39FF14,#12D45C)", color: "#FFFFFF", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
+        <button onClick={() => setOpen(true)} aria-label="Profil & Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)", color: "#FFFFFF", fontSize: 17, fontWeight: 900, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
           {avatar}
         </button>
       ) : (
         <button onClick={() => setOpen(true)} aria-label="Menü" style={{ ...(inline ? { position: "relative" } : { position: "absolute", top: 18, right: 16, zIndex: 20 }), background: C, borderRadius: 11, width: 40, height: 40, display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#39FF14"/><stop offset="1" stopColor="#12D45C"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="url(#igm)" strokeWidth="2" strokeLinecap="round"><defs><linearGradient id="igm" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#67F9A8"/><stop offset="1" stopColor="#20F8BE"/></linearGradient></defs><path d="M4 7h16M4 12h16M4 17h16"/></svg>
         </button>
       )}
 
       {open && (
         <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,.6)", zIndex: 200, display: "flex", justifyContent: variant === "nav" ? "center" : "flex-end", alignItems: variant === "nav" ? "flex-end" : "stretch" }}>
           <div onClick={e => e.stopPropagation()} style={variant === "nav"
-            ? { width: "100%", maxWidth: 620, maxHeight: "84dvh", background: "#0E1013", borderTop: "2px solid #39FF14", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "18px 16px calc(22px + env(safe-area-inset-bottom))", overflowY: "auto", boxShadow: "0 -24px 70px rgba(0,0,0,.6)" }
+            ? { width: "100%", maxWidth: 620, maxHeight: "84dvh", background: "#0E1013", borderTop: "2px solid #67F9A8", borderTopLeftRadius: 22, borderTopRightRadius: 22, padding: "18px 16px calc(22px + env(safe-area-inset-bottom))", overflowY: "auto", boxShadow: "0 -24px 70px rgba(0,0,0,.6)" }
             : { width: "82%", maxWidth: 340, height: "100%", background: "#0E1013", borderLeft: `1px solid ${B}`, padding: "22px 16px", overflowY: "auto" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18 }}>
               <span style={{ fontSize: 21, fontWeight: 600 }}>menü</span>
@@ -90,22 +90,22 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
 
             {authed ? (
             <Link href="/profil" onClick={() => setOpen(false)} style={{ display: "flex", alignItems: "center", gap: 13, padding: "13px 14px", background: C, borderRadius: 16, textDecoration: "none" }}>
-              <span style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#39FF14,#12D45C)", padding: 2, flexShrink: 0, display: "block" }}>
+              <span style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)", padding: 2, flexShrink: 0, display: "block" }}>
                 <span style={{ width: "100%", height: "100%", borderRadius: "50%", background: "#13161B", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 20 }}><IconSuche size={22} /></span>
               </span>
               <span style={{ flex: 1 }}>
                 <span style={{ display: "block", fontSize: 16, fontWeight: 500, color: W }}>{name}</span>
                 <span style={{ display: "block", fontSize:11.5, color: M, marginTop: 2 }}>{sub || "profil ansehen"}</span>
               </span>
-              <span style={{ color: "#39FF14", fontSize: 18 }}>›</span>
+              <span style={{ color: "#67F9A8", fontSize: 18 }}>›</span>
             </Link>
             ) : (
             <div style={{ background: C, borderRadius: 16, padding: "15px 15px 13px" }}>
               <p style={{ fontSize: 15, fontWeight: 600, color: W, margin: 0 }}>noch nicht angemeldet</p>
               <p style={{ fontSize: 12.5, color: M, margin: "5px 0 12px" }}>mit konto: liga, pingpoints, deine spiele und ergebnisse.</p>
               <div style={{ display: "flex", gap: 8 }}>
-                <Link href="/login" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#39FF14", color: "#06220E", borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>anmelden</Link>
-                <Link href="/onboarding" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#1A1A1E", color: W, borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>konto erstellen</Link>
+                <Link href="/login" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#67F9A8", color: "#231F20", borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>anmelden</Link>
+                <Link href="/onboarding" onClick={() => setOpen(false)} style={{ flex: 1, textAlign: "center", background: "#2C2728", color: W, borderRadius: 100, padding: "11px 14px", fontSize: 13, fontWeight: 700, textDecoration: "none" }}>konto erstellen</Link>
               </div>
             </div>
             )}
@@ -129,7 +129,7 @@ export default function StartMenu({ name = "Spieler", sub = "", inline = false, 
             </div>
 
             {authed && (
-              <button onClick={logout} style={{ width: "100%", marginTop: 20, background: "#1A1A1E", color: W, borderRadius: 12, padding: 12, fontSize: 13, fontWeight: 500, textTransform: "lowercase", cursor: "pointer" }}>abmelden</button>
+              <button onClick={logout} style={{ width: "100%", marginTop: 20, background: "#2C2728", color: W, borderRadius: 12, padding: 12, fontSize: 13, fontWeight: 500, textTransform: "lowercase", cursor: "pointer" }}>abmelden</button>
             )}
           </div>
         </div>

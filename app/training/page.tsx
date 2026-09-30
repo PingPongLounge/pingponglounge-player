@@ -6,9 +6,9 @@ import { SectionBlock, SectionIntro, SectionTopBar } from "@/app/components/Sect
 import { ratingLabel } from "@/app/theme"
 import { OG_TRAINING_PREIS_CHF } from "@/lib/opengames"
 
-const BG = "#0E0E10", CARD = "#1A1A1E", CELL = "#1A1A1E", W = "#FFFFFF"
-const MUT = "rgba(255,255,255,.82)", GREEN = "#39FF14"
-const GRAD = "linear-gradient(135deg,#39FF14,#12D45C)"
+const BG = "#231F20", CARD = "#2C2728", CELL = "#2C2728", W = "#FFFFFF"
+const MUT = "rgba(255,255,255,.82)", GREEN = "#67F9A8"
+const GRAD = "linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)"
 
 type Player = { user_id: string; name: string; elo: number; level: string }
 type Training = {
@@ -70,7 +70,7 @@ export default function TrainingPage() {
             <div style={{ fontSize: 14, fontWeight: 800, color: W }}>Elias Schmid <span style={{ color: MUT, fontWeight: 500 }}>· Schweizer Nr. 1</span></div>
             <div style={{ fontSize: 14, fontWeight: 800, color: W, marginTop: 2 }}>Simon Berglund <span style={{ color: MUT, fontWeight: 500 }}>· Schwedens Nr. 3</span></div>
             <div style={{ fontSize: 13, color: MUT, marginTop: 8, lineHeight: 1.5 }}>PPL24 Glattbrugg · für alle Levels · Halbtag CHF 75 · Ganztag CHF 150</div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 14, background: GRAD, color: "#0B0B0D", borderRadius: 12, padding: "11px 16px", fontSize: 13.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em" }}>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 14, background: GRAD, color: "#231F20", borderRadius: 12, padding: "11px 16px", fontSize: 13.5, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em" }}>
               Jetzt anmelden →
             </div>
           </div>
@@ -107,7 +107,7 @@ export default function TrainingPage() {
                     {frei === 0 ? (
                       <span style={{ fontSize:11.5, fontWeight: 800, textTransform: "uppercase", color: MUT, width: 96, textAlign: "center", flexShrink: 0 }}>Ausgebucht</span>
                     ) : (
-                      <span style={{ fontSize:11.5, fontWeight: 800, textTransform: "uppercase", color: "#0B0B0D", background: GRAD, borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", flexShrink: 0 }}>Mitmachen</span>
+                      <span style={{ fontSize:11.5, fontWeight: 800, textTransform: "uppercase", color: "#231F20", background: GRAD, borderRadius: 9, padding: "9px 0", width: 96, textAlign: "center", flexShrink: 0 }}>Mitmachen</span>
                     )}
                   </Link>
 
@@ -140,7 +140,7 @@ export default function TrainingPage() {
               <div style={{ fontSize: 14.5, fontWeight: 800, color: W }}>Elias Schmid <span style={{ color: MUT, fontWeight: 500 }}>· Schweizer Nr. 1</span></div>
               <div style={{ fontSize: 14.5, fontWeight: 800, color: W, marginTop: 3 }}>Simon Berglund <span style={{ color: MUT, fontWeight: 500 }}>· Schwedens Nr. 3</span></div>
               <div style={{ fontSize: 13, color: MUT, marginTop: 10, lineHeight: 1.5 }}>PPL24 Glattbrugg · für alle Levels · Halbtag CHF 75 · Ganztag CHF 150</div>
-              <a href="/trainingscamp" onClick={campSchliessen} style={{ display: "block", textAlign: "center", marginTop: 16, background: `linear-gradient(#1A1A1E,#1A1A1E) padding-box, ${GRAD} border-box`, border: "1.5px solid transparent", color: "#FFF9F3", borderRadius: 14, padding: 15, fontSize: 15, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }}>Zum Trainingscamp →</a>
+              <a href="/trainingscamp" onClick={campSchliessen} style={{ display: "block", textAlign: "center", marginTop: 16, background: `linear-gradient(#2C2728,#2C2728) padding-box, ${GRAD} border-box`, border: "1.5px solid transparent", color: "#FFF9F3", borderRadius: 14, padding: 15, fontSize: 15, fontWeight: 900, textTransform: "uppercase", letterSpacing: ".03em", textDecoration: "none" }}>Zum Trainingscamp →</a>
               <button onClick={campSchliessen} style={{ display: "block", width: "100%", textAlign: "center", marginTop: 8, background: "none", color: MUT, fontSize: 13, fontWeight: 600, padding: 8, cursor: "pointer", fontFamily: "inherit" }}>Später</button>
             </div>
           </div>

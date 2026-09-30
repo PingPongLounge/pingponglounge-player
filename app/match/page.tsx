@@ -235,7 +235,7 @@ export default function MatchPage() {
       {joinError && (
         <div role="alert" style={{
           position: "fixed", left: 16, right: 16, bottom: 88, zIndex: 120,
-          background: "#080B0D", border: "1px solid rgba(255,255,255,.20)",
+          background: "#231F20", border: "1px solid rgba(255,255,255,.20)",
           padding: "13px 16px", color: "#FFFFFF", fontFamily: INTER, fontSize: 14,
         }}>{joinError}</div>
       )}

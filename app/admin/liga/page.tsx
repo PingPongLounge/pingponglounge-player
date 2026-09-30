@@ -4,8 +4,8 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { STAFF_EMAILS } from "@/lib/staff"
 
-const BG="#0E0E10",C="#1A1A1E",B="#1A1A1E",M="rgba(255,255,255,0.66)",G="#39FF14",W="#FFFFFF"
-const GRAD="linear-gradient(135deg,#39FF14 0%,#0FC24E 50%,#12D45C 100%)"
+const BG="#231F20",C="#2C2728",B="#2C2728",M="rgba(255,255,255,0.66)",G="#67F9A8",W="#FFFFFF"
+const GRAD="linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)"
 const CITIES=["Oerlikon","Langstrasse","Glattbrugg","Basel","Luzern","St. Gallen","Bern","Zürich"]
 const LEVELS=[{v:"1-4",l:"Level 1–4 (Einstieg)"},{v:"5-7",l:"Level 5–7 (Pro)"}]
 
@@ -99,7 +99,7 @@ export default function AdminLigaPage(){
           </div>
           <input value={form.description} onChange={e=>setForm(f=>({...f,description:e.target.value}))} placeholder="Beschreibung (optional)" style={{width:"100%",background:BG,borderRadius:8,padding:"12px",fontSize:14,color:W,outline:"none",marginBottom:12,boxSizing:"border-box"}}/>
           {msg&&<p style={{fontSize:13,color:msg.startsWith("✓")?G:"#FF6666",marginBottom:8}}>{msg}</p>}
-          <button onClick={createSeason} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#0E0E10",borderRadius:8,padding:"14px",fontSize:13,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
+          <button onClick={createSeason} disabled={saving} style={{width:"100%",background:saving?B:"#fff",color:saving?M:"#231F20",borderRadius:8,padding:"14px",fontSize:13,fontWeight:700,cursor:saving?"not-allowed":"pointer",textTransform:"lowercase",letterSpacing:"0.02em"}}>
             {saving?"erstellen...":"saison erstellen"}
           </button>
         </div>
@@ -118,8 +118,8 @@ export default function AdminLigaPage(){
                 <span style={{fontSize:11.5,fontWeight:700,color:G,background:`${G}18`,borderRadius:999,padding:"2px 8px",textTransform:"uppercase"}}>{s.status as string}</span>
               </div>
               <div style={{display:"flex",gap:6,flexWrap:"wrap"}}>
-                <Link href="/liga" style={{fontSize:11.5,color:M,background:"#1A1A1E",borderRadius:6,padding:"6px 10px",textDecoration:"none",fontWeight:700}}>Liga öffnen</Link>
-                {s.status==="open"&&<button onClick={()=>generateMatches(s.id as string)} disabled={generating===s.id} style={{fontSize:11.5,color:"#0E0E10",background:G,borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>{generating===s.id?"...":"Matches generieren"}</button>}
+                <Link href="/liga" style={{fontSize:11.5,color:M,background:"#2C2728",borderRadius:6,padding:"6px 10px",textDecoration:"none",fontWeight:700}}>Liga öffnen</Link>
+                {s.status==="open"&&<button onClick={()=>generateMatches(s.id as string)} disabled={generating===s.id} style={{fontSize:11.5,color:"#231F20",background:G,borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>{generating===s.id?"...":"Matches generieren"}</button>}
                 {s.status==="open"&&<button onClick={()=>updateStatus(s.id as string,"running")} style={{fontSize:11.5,color:W,background:B,borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>→ Running</button>}
                 {s.status==="running"&&<button onClick={()=>updateStatus(s.id as string,"finished")} style={{fontSize:11.5,color:W,background:B,borderRadius:6,padding:"6px 10px",cursor:"pointer",fontWeight:700}}>→ Finished</button>}
               </div>
@@ -136,7 +136,7 @@ export default function AdminLigaPage(){
           (kein Level). Jeder bekommt sie nur einmal.
         </p>
         <button onClick={sendReminders} disabled={reminding}
-          style={{fontSize:12,color:"#0E0E10",background:G,borderRadius:8,padding:"9px 14px",cursor:reminding?"wait":"pointer",fontWeight:800,opacity:reminding?.6:1}}>
+          style={{fontSize:12,color:"#231F20",background:G,borderRadius:8,padding:"9px 14px",cursor:reminding?"wait":"pointer",fontWeight:800,opacity:reminding?.6:1}}>
           {reminding?"Wird gesendet…":"Erinnerungen jetzt senden"}
         </button>
         {reminderMsg&&<p style={{fontSize:12,color:M,marginTop:10}}>{reminderMsg}</p>}

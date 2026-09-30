@@ -11,8 +11,8 @@
    Ladezustand — und auf /entdecken steht es ueber dem ersten Bildschirm,
    wo nichts flackern darf.
 
-   ton="dunkel"  Logo auf schwarzem Grund (BG)      → Marken-Gruen  #39FF14
-   ton="hell"    Logo auf Off-White (/entdecken)    → Tief-Gruen    #0B7A33
+   ton="dunkel"  Logo auf schwarzem Grund (BG)      → Marken-Gruen  #67F9A8
+   ton="hell"    Logo auf Off-White (/entdecken)    → Tief-Gruen    #047758
    Das Marken-Gruen erreicht auf Off-White nur 1,26:1 und waere dort
    praktisch unsichtbar; deshalb die zweite Wertepaarung. Beide Verlaeufe
    liegen ueber 3:1 gegen ihren Grund (Norm fuer grafische Elemente). */
@@ -28,8 +28,8 @@ interface PlayerLogoProps {
 }
 
 /* Zweiter, hellerer Endpunkt des Verlaufs auf hellem Grund.
-   #149B47 gegen #F7F5EF = 3,3:1 — gerade sicher ueber der Norm. */
-const HELL_ENDE = "#149B47"
+   #05946E gegen #F7F5EF = 3,3:1 — gerade sicher ueber der Norm. */
+const HELL_ENDE = "#05946E"
 
 export default function PlayerLogo({
   size = "md",

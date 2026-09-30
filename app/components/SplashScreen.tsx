@@ -4,7 +4,7 @@ import { useEffect, useState } from "react"
 // Nur noch PPL-Pink — Gruen und Tuerkis sind aus der Player-App raus.
 // 06.09.2026: UV-Violett statt Neon-Pink — der Splash liegt ueber jeder
 // Seite, auch ueber der oeffentlichen Startseite.
-const GRAD = "linear-gradient(135deg,#39FF14,#12D45C)"
+const GRAD = "linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)"
 const gt: React.CSSProperties = {
   background: GRAD,
   WebkitBackgroundClip: "text",
@@ -80,8 +80,8 @@ export default function SplashScreen() {
         >
           <defs>
             <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#39FF14" />
-              <stop offset="100%" stopColor="#12D45C" />
+              <stop offset="0%" stopColor="#67F9A8" />
+              <stop offset="100%" stopColor="#20F8BE" />
             </linearGradient>
           </defs>
 

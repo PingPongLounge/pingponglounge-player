@@ -35,12 +35,12 @@ type Season = {
   assignments: Assignment[]
 }
 
-const BG = "#080808"
+const BG = "#1A1718"
 const CARD = "#121212"
 const LINE = "rgba(255,255,255,.10)"
 const W = "#F4F1EB"
 const MUT = "rgba(244,241,235,.62)"
-const V = "#39FF14"
+const V = "#67F9A8"
 
 function fmtDate(v: string | null) {
   if (!v) return ""
@@ -180,7 +180,7 @@ export default function SeasonPage() {
                 <div style={{ fontSize:11.5, fontWeight: 900, letterSpacing: ".13em", color: V }}>ALS NÄCHSTES</div>
                 <div style={{ marginTop: 6, display: "flex", justifyContent: "space-between", gap: 12, alignItems: "center" }}>
                   <div><div style={{ fontSize: 19, fontWeight: 900 }}>{next.opponent_name}</div><div style={{ color: MUT, fontSize: 12, marginTop: 3 }}>Runde {next.round}{next.deadline ? ` · bis ${fmtDate(next.deadline)}` : ""}</div></div>
-                  {next.can_confirm ? <button onClick={() => confirmResult(next)} disabled={busy === next.id} style={{ background: V, color: "#06220E", border: 0, borderRadius: 11, padding: "10px 12px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>{busy === next.id ? "…" : `BESTÄTIGEN ${next.score_line || ""}`}</button> : next.status === "p1_entered" ? <span style={{ color: MUT, fontSize:11.5, fontWeight: 800, textAlign: "right" }}>WARTET AUF<br/>GEGNER</span> : <button onClick={() => openResult(next)} style={{ background: V, color: "#06220E", border: 0, borderRadius: 11, padding: "10px 12px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>RESULTAT</button>}
+                  {next.can_confirm ? <button onClick={() => confirmResult(next)} disabled={busy === next.id} style={{ background: V, color: "#231F20", border: 0, borderRadius: 11, padding: "10px 12px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>{busy === next.id ? "…" : `BESTÄTIGEN ${next.score_line || ""}`}</button> : next.status === "p1_entered" ? <span style={{ color: MUT, fontSize:11.5, fontWeight: 800, textAlign: "right" }}>WARTET AUF<br/>GEGNER</span> : <button onClick={() => openResult(next)} style={{ background: V, color: "#231F20", border: 0, borderRadius: 11, padding: "10px 12px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>RESULTAT</button>}
                 </div>
               </div>}
 
@@ -202,7 +202,7 @@ export default function SeasonPage() {
                       <div style={{ fontWeight: 800, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{a.opponent_name}</div>
                       <div style={{ color: MUT, fontSize: 12, marginTop: 2 }}>{a.opponent_elo ? `ELO ${a.opponent_elo} · ` : ""}{a.deadline ? `bis ${fmtDate(a.deadline)}` : ""}{a.score_line ? ` · ${a.score_line}` : ""}</div>
                     </div>
-                    {finished ? <span style={{ color: "#7EE787", fontSize: 12, fontWeight: 900 }}>✓ DONE</span> : a.can_confirm ? <button onClick={() => confirmResult(a)} disabled={busy === a.id} style={{ background: V, color: "#06220E", border: 0, borderRadius: 11, padding: "10px 11px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>{busy === a.id ? "…" : "BESTÄTIGEN"}</button> : waiting ? <span style={{ color: MUT, fontSize:11.5, fontWeight: 800, textAlign: "right" }}>WARTET AUF<br/>BESTÄTIGUNG</span> : <button onClick={() => openResult(a)} style={{ background: V, color: "#06220E", border: 0, borderRadius: 11, padding: "10px 11px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>RESULTAT</button>}
+                    {finished ? <span style={{ color: "#7EE787", fontSize: 12, fontWeight: 900 }}>✓ DONE</span> : a.can_confirm ? <button onClick={() => confirmResult(a)} disabled={busy === a.id} style={{ background: V, color: "#231F20", border: 0, borderRadius: 11, padding: "10px 11px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>{busy === a.id ? "…" : "BESTÄTIGEN"}</button> : waiting ? <span style={{ color: MUT, fontSize:11.5, fontWeight: 800, textAlign: "right" }}>WARTET AUF<br/>BESTÄTIGUNG</span> : <button onClick={() => openResult(a)} style={{ background: V, color: "#231F20", border: 0, borderRadius: 11, padding: "10px 11px", fontSize:11.5, fontWeight: 900, cursor: "pointer" }}>RESULTAT</button>}
                   </div>
                 })}
               </div>)}
@@ -217,7 +217,7 @@ export default function SeasonPage() {
               <h3 style={{ margin: 0, fontSize: 23 }}>{s.name}</h3>
               <div style={{ color: MUT, fontSize: 13, marginTop: 4 }}>{s.city}{s.start_date ? ` · Start ${fmtDate(s.start_date)}` : ""}</div>
               <p style={{ color: MUT, fontSize: 13, lineHeight: 1.5, margin: "12px 0" }}>{s.description || "Bis zu 8 automatische Gegner in 4 Runden. Deine Resultate zählen zur globalen Rangliste."}</p>
-              <button onClick={() => membership(s.id, "join")} disabled={busy === s.id} style={{ width: "100%", background: V, color: "#06220E", border: 0, borderRadius: 13, padding: 14, fontSize: 13, fontWeight: 900, cursor: "pointer" }}>{busy === s.id ? "…" : "SEASON MITMACHEN"}</button>
+              <button onClick={() => membership(s.id, "join")} disabled={busy === s.id} style={{ width: "100%", background: V, color: "#231F20", border: 0, borderRadius: 13, padding: 14, fontSize: 13, fontWeight: 900, cursor: "pointer" }}>{busy === s.id ? "…" : "SEASON MITMACHEN"}</button>
             </div>)}
           </section>}
 
@@ -235,11 +235,11 @@ export default function SeasonPage() {
           <h3 style={{ margin: "6px 0 4px", fontSize: 25 }}>gegen {resultFor.opponent_name}</h3>
           <p style={{ color: MUT, fontSize: 13, margin: "0 0 18px" }}>Gewonnene Sätze eintragen. Der Gegner bestätigt danach.</p>
           <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 12, alignItems: "center" }}>
-            <div><label style={{ display: "block", color: MUT, fontSize:11.5, marginBottom: 5 }}>DU</label><input type="number" min={0} max={4} value={mySets} onChange={e => setMySets(Math.max(0, Math.min(4, Number(e.target.value))))} style={{ width: "100%", background: "#080808", color: W, border: `1px solid ${LINE}`, borderRadius: 12, padding: 14, fontSize: 24, fontWeight: 900, textAlign: "center" }} /></div>
+            <div><label style={{ display: "block", color: MUT, fontSize:11.5, marginBottom: 5 }}>DU</label><input type="number" min={0} max={4} value={mySets} onChange={e => setMySets(Math.max(0, Math.min(4, Number(e.target.value))))} style={{ width: "100%", background: "#1A1718", color: W, border: `1px solid ${LINE}`, borderRadius: 12, padding: 14, fontSize: 24, fontWeight: 900, textAlign: "center" }} /></div>
             <span style={{ color: MUT, fontWeight: 900, marginTop: 18 }}>:</span>
-            <div><label style={{ display: "block", color: MUT, fontSize:11.5, marginBottom: 5 }}>GEGNER</label><input type="number" min={0} max={4} value={oppSets} onChange={e => setOppSets(Math.max(0, Math.min(4, Number(e.target.value))))} style={{ width: "100%", background: "#080808", color: W, border: `1px solid ${LINE}`, borderRadius: 12, padding: 14, fontSize: 24, fontWeight: 900, textAlign: "center" }} /></div>
+            <div><label style={{ display: "block", color: MUT, fontSize:11.5, marginBottom: 5 }}>GEGNER</label><input type="number" min={0} max={4} value={oppSets} onChange={e => setOppSets(Math.max(0, Math.min(4, Number(e.target.value))))} style={{ width: "100%", background: "#1A1718", color: W, border: `1px solid ${LINE}`, borderRadius: 12, padding: 14, fontSize: 24, fontWeight: 900, textAlign: "center" }} /></div>
           </div>
-          <button onClick={submitResult} disabled={busy === resultFor.id || mySets === oppSets || (mySets === 0 && oppSets === 0)} style={{ width: "100%", marginTop: 16, background: V, color: "#06220E", border: 0, borderRadius: 13, padding: 15, fontWeight: 900, cursor: "pointer", opacity: mySets === oppSets ? .45 : 1 }}>{busy === resultFor.id ? "…" : "RESULTAT SENDEN"}</button>
+          <button onClick={submitResult} disabled={busy === resultFor.id || mySets === oppSets || (mySets === 0 && oppSets === 0)} style={{ width: "100%", marginTop: 16, background: V, color: "#231F20", border: 0, borderRadius: 13, padding: 15, fontWeight: 900, cursor: "pointer", opacity: mySets === oppSets ? .45 : 1 }}>{busy === resultFor.id ? "…" : "RESULTAT SENDEN"}</button>
         </div>
       </div>}
     </main>

@@ -26,9 +26,9 @@ export default function GutscheinFeld({
   const [fehler, setFehler] = useState("")
   const [stand, setStand] = useState<GutscheinStand | null>(null)
 
-  const text = hell ? "#0A0A0C" : CREME
+  const text = hell ? "#231F20" : CREME
   const leise = hell ? "rgba(10,10,12,.70)" : SUB
-  const akzent = hell ? "#0B7A33" : VIOLETT
+  const akzent = hell ? "#047758" : VIOLETT
   const linie = hell ? "rgba(10,10,12,.16)" : LINE
 
   async function pruefen() {
@@ -106,7 +106,7 @@ export default function GutscheinFeld({
           minHeight: 48, padding: "0 18px", borderRadius: 999, border: "none", cursor: "pointer",
           fontFamily: "inherit", fontSize: 13, fontWeight: 900, letterSpacing: ".07em",
           textTransform: "uppercase", whiteSpace: "nowrap",
-          background: hell ? "#0B7A33" : VIOLETT, color: hell ? "#FFFFFF" : "#06220E",
+          background: hell ? "#047758" : VIOLETT, color: hell ? "#FFFFFF" : "#231F20",
           opacity: laeuft || !code.trim() ? .5 : 1,
         }}>{laeuft ? "…" : "Anwenden"}</button>
       </div>

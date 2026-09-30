@@ -1,13 +1,13 @@
 "use client"
 import { useState } from "react"
 
-const BG = "#0E0E10"
-const C  = "#1A1A1E"
-const B  = "#1A1A1E"
+const BG = "#231F20"
+const C  = "#2C2728"
+const B  = "#2C2728"
 const M  = "rgba(255,255,255,0.66)"
-const G  = "#39FF14"
+const G  = "#67F9A8"
 const W  = "#FFFFFF"
-const GRAD = "linear-gradient(135deg,#39FF14 0%,#0FC24E 50%,#12D45C 100%)"
+const GRAD = "linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)"
 
 export default function StaffRedeemPage() {
   const [code, setCode]       = useState("")
@@ -74,7 +74,7 @@ export default function StaffRedeemPage() {
             style={{
               width: "100%",
               background: code.length === 6 ? "#fff" : B,
-              color: code.length === 6 ? "#0E0E10" : M,
+              color: code.length === 6 ? "#231F20" : M,
               borderRadius: 10,
               padding: "16px",
               fontSize: 14,
@@ -117,7 +117,7 @@ export default function StaffRedeemPage() {
             </p>
             <div style={{
               background: G,
-              color: "#0E0E10",
+              color: "#231F20",
               borderRadius: 8,
               padding: "12px",
               textAlign: "center",

@@ -18,10 +18,14 @@
    ===================================================================== */
 
 /* ---------- Farben ---------------------------------------------------- */
-/** Ausserhalb des Canvas — der Rahmen auf dem Desktop. */
-export const AUSSEN = "#080808"
-/** Dunkle Flaechen INNERHALB des Canvas: Hero, Plakat, Fuss, Knopf. */
-export const DUNKEL = "#080B0D"
+/** Ausserhalb des Canvas — der Rahmen auf dem Desktop. Dieselbe Farbachse
+    wie DUNKEL, eine Stufe tiefer. */
+export const AUSSEN = "#1A1718"
+/** Dunkle Flaechen INNERHALB des Canvas: Hero, Plakat, Fuss, Knopf.
+    30.09.2026: aus dem Masterlogo (Logo Player.eps) gemessen. Vorher
+    #080B0D — kuehl und blaustichig, neben dem Logo sofort als zweites
+    Schwarz erkennbar. Weiss darauf 16.3:1. */
+export const DUNKEL = "#231F20"
 /** Seitengrund, neutral (nicht creme). */
 export const BG = "#F5F5F2"
 /** Karten- und Listenflaeche. */
@@ -29,13 +33,32 @@ export const FLAECHE = "#FFFFFF"
 export const TEXT = "#111111"
 export const LEISE = "#686868"
 export const KANTE = "#DDDDDA"
-/** Marken-Neon. NUR auf dunklem Grund (14:1). Auf Hell 1,26:1 — unsichtbar. */
-export const NEON = "#39FF14"
-/** Gruen auf hellem Grund (4,1:1). Der einzige helle Gruenwert der App. */
-export const AKZENT = "#078A3B"
+/** Signalgruen. NUR auf dunklem Grund (12.2:1 auf DUNKEL). Auf Weiss 1.34:1
+    — dort niemals verwenden, dafuer ist AKZENT da.
+    30.09.2026: die Mitte des Logo-Verlaufs. Vorher #39FF14 — ein Gruen,
+    das im Logo nicht vorkommt und neben ihm schreit. */
+export const NEON = "#67F9A8"
+/** Gruen auf hellem Grund. Abgeleitet aus dem Logo-Tuerkis (H164, S94 %),
+    Helligkeit gesenkt bis der Kontrast traegt: 5.55:1 auf Weiss, 5.08:1 auf
+    BG. Vorher #078A3B — 4.46:1 auf Weiss und damit knapp UNTER der Norm. */
+export const AKZENT = "#047758"
+/** Dieselbe Achse, heller: fuer grosse grafische Flaechen ohne Schrift
+    (Fortschrittsbalken, Baender). 3.84:1 — die Norm fuer Grafik ist 3:1. */
+export const AKZENT_FLAECHE = "#05946E"
 /** Sekundaertext und Kante innerhalb dunkler Flaechen. */
-export const DUNKEL_LEISE = "rgba(255,255,255,.62)"
+export const DUNKEL_LEISE = "#AEB0B8"
 export const DUNKEL_KANTE = "rgba(255,255,255,.20)"
+
+/* ---------- Markenverlauf ---------------------------------------------
+   Die drei Stuetzstellen des Logo-Verlaufs, aus der EPS gemessen. Der
+   Verlauf ist ein MARKENELEMENT, kein Flaechenmittel: Logo, Rangzahl,
+   Stufenband, hoechstens ein Wort im Hero. Nie als Schriftfarbe auf
+   hellem Grund, nie zweimal auf demselben Bildschirm. */
+export const MINT = "#84FDA2"
+export const TUERKIS = "#20F8BE"
+export const VERLAUF = `linear-gradient(135deg, ${MINT} 0%, ${NEON} 50%, ${TUERKIS} 100%)`
+/** Derselbe Verlauf fuer helle Flaechen — nur fuer Flaechen, nie fuer Text. */
+export const VERLAUF_HELL = `linear-gradient(135deg, ${AKZENT_FLAECHE} 0%, ${AKZENT} 100%)`
 
 /* ---------- Schrift ---------------------------------------------------
    ANTON = Momente (Hero, Plakat, Abschnittstitel, Sportzahlen).

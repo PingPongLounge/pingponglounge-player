@@ -18,7 +18,7 @@ export default function LigaLayout({ children }: { children: React.ReactNode }) 
            Farbe eines Navigationsknopfs.
            24.09.2026: Die Position kommt aus .p-schweber, damit er auf dem
            Desktop am Canvas haengt und nicht am Fensterrand. */
-        background:"#080B0D",color:"#FFFFFF",
+        background:"#231F20",color:"#FFFFFF",
         border:"1px solid rgba(255,255,255,.18)",
         padding:"13px 18px",minHeight:46,display:"inline-flex",alignItems:"center",
         fontSize:11,fontWeight:600,letterSpacing:".12em",

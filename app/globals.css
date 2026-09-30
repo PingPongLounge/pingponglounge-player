@@ -6,11 +6,11 @@
    das explizite border:none entfernt wurde. */
 button, input, textarea, select { border: none; outline: none; }
 button { background: none; }
-:root { --green: #39FF14; --dark: #080808; --card: #121214; --border: #1A1A1E; --muted: #8A8D99; --text: #F4F1EB; }
-/* 24.09.2026 · Canvas-Entscheid: ausserhalb des Player-Canvas #080808,
+:root { --green: #67F9A8; --dark: #1A1718; --card: #231F20; --border: #2C2728; --muted: #8A8D99; --text: #F4F1EB; }
+/* 24.09.2026 · Canvas-Entscheid: ausserhalb des Player-Canvas #1A1718,
    innerhalb Off-White wie auf der Startseite. Auf dem Handy ist der Canvas
    100% breit — dort sieht man von dieser Farbe nur den Ueberroll-Rand. */
-body { font-family: var(--font-inter), system-ui, sans-serif; background: #080808; color: #FFF9F3; -webkit-font-smoothing: antialiased; }
+body { font-family: var(--font-inter), system-ui, sans-serif; background: #1A1718; color: #FFF9F3; -webkit-font-smoothing: antialiased; }
 
 /* ── PLAYER V2: Breiten (07.09.2026, Referenzbild) ───────────────────────
    Eine Regel fuer die ganze App, statt maxWidth:620 in jeder Datei.
@@ -94,9 +94,9 @@ body { font-family: var(--font-inter), system-ui, sans-serif; background: #08080
 /* ── DER PLAYER-CANVAS (Entscheid Oliver, 24.09.2026) ────────────────────
    Eine Regel fuer die ganze App:
 
-     ausserhalb   #080808          (body, siehe oben)
+     ausserhalb   #1A1718          (body, siehe oben)
      innerhalb    Off-White #F5F5F2 auf den Seiten im neuen Bausystem,
-                  #080808 auf den noch dunklen Seiten
+                  #1A1718 auf den noch dunklen Seiten
      Breite       max. 1240px, zentriert
      Handy        100% — kein kuenstlicher schwarzer Seitenrand
 
@@ -108,7 +108,7 @@ main {
   max-width: 1240px;
   margin: 0 auto;
   min-height: 100dvh;
-  background: #080808;
+  background: #1A1718;
 }
 main:has(.ppl-hero), main.p-seite { background: var(--p-bg); }
 
@@ -126,24 +126,28 @@ main { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
    Grundwelt: Schwarz, Weiss, neutrales Hellgrau. Gruen ist NUR Akzent —
    auf einem normalen Schirm bleiben 90-95% der Flaeche neutral.
 
-     --p-dark    #080B0D  dunkle Plakatflaechen, Hero, Footer
+     --p-dark    #231F20  dunkle Plakatflaechen, Hero, Footer (aus dem Logo)
      --p-bg      #F5F5F2  Seitengrund (neutral, NICHT creme)
      --p-flaeche #FFFFFF  Karten
      --p-text    #111111
      --p-leise   #686868
      --p-kante   #DDDDDA
-     --p-neon    #39FF14  nur auf dunkel, sehr sparsam
-     --p-akzent  #078A3B  nur auf hell, sehr sparsam
+     --p-neon    #67F9A8  Signal, nur auf dunkel, sehr sparsam
+     --p-akzent  #047758  nur auf hell, sehr sparsam
+     --p-akzent-flaeche #05946E  grosse Grafikflaechen auf hell, nie Schrift
+     --p-verlauf Markenverlauf aus dem Logo — Logo, Rangzahl, Stufenband
 
    Kein Schatten, kein Radius. Struktur entsteht aus Linien und Weissraum.
    Klassen mit Praefix .ent- gehoeren zu /entdecken; die .p-* Klassen sind
    das gemeinsame Geruest fuer die weiteren Phasen.
    ===================================================================== */
 :root{
-  --p-dark:#080B0D; --p-bg:#F5F5F2; --p-flaeche:#FFFFFF;
+  --p-dark:#231F20; --p-bg:#F5F5F2; --p-flaeche:#FFFFFF;
   --p-text:#111111; --p-leise:#686868; --p-kante:#DDDDDA;
-  --p-neon:#39FF14; --p-akzent:#078A3B;
-  --p-dark-leise:rgba(255,255,255,.62); --p-dark-kante:rgba(255,255,255,.20);
+  --p-neon:#67F9A8; --p-akzent:#047758;
+  --p-dark-leise:#AEB0B8; --p-dark-kante:rgba(255,255,255,.20);
+  --p-akzent-flaeche:#05946E;
+  --p-verlauf:linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%);
   --p-anton:var(--font-anton),Impact,sans-serif;
   --p-inter:var(--font-inter),system-ui,sans-serif;
 }
@@ -295,7 +299,7 @@ main { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
 body:has(main.p-seite){overflow-x:hidden}
 
 /* ---- /entdecken loest sich aus dem alten dunklen App-Rahmen ----
-   Weiter oben in dieser Datei steht ein `main { background:#080808;
+   Weiter oben in dieser Datei steht ein `main { background:#1A1718;
    max-width:1100px; box-shadow:... }` fuer die dunklen App-Seiten. Die
    oeffentliche Startseite ist hell und randlos — sie hebt das gezielt auf,
    statt die Regel fuer alle anderen Seiten anzufassen. */
@@ -345,7 +349,7 @@ main.p-seite{background:var(--p-bg);padding-bottom:0}
 }
 
 /* ---- Seiten im neuen Bausystem sind hell, bis zum Rand ------------------
-   Der Rest der App sitzt noch im alten dunklen Rahmen: body ist #0A0A0C,
+   Der Rest der App sitzt noch im alten dunklen Rahmen: body ist #1A1718,
    dahinter liegt ein abgedunkeltes Lounge-Foto, und main war ein schwarzer
    1100px-Streifen. Nachdem main fuer die neuen Seiten randlos geworden ist,
    schien dieses Schwarz ueberall dort durch, wo die Seite selbst nichts

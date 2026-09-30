@@ -143,7 +143,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
   const isP2=match.p2_id===userId
   const sw=match.sets?{p1:match.sets.filter(s=>s.p1>s.p2).length,p2:match.sets.filter(s=>s.p2>s.p1).length}:{p1:0,p2:0}
   const matchUrl=typeof window!=="undefined"?`${window.location.origin}/liga/match/${match.id}`:""
-  const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(matchUrl)}&color=39FF14&bgcolor=15161A&margin=8`
+  const qrUrl=`https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(matchUrl)}&color=67F9A8&bgcolor=231F20&margin=8`
 
   return(
     <main className="p-dunkel" style={{minHeight:"100vh",padding:"20px",display:"flex",alignItems:"center",justifyContent:"center"}}>
@@ -261,7 +261,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
             <div style={{display:"flex",flexWrap:"wrap",gap:7,marginBottom:14}}>
               {MATCH_SPRUECHE.map(s=>(
                 <button key={s} onClick={()=>postComment(s)} disabled={saving}
-                  style={{borderRadius:999,padding:"9px 13px",fontSize:12.5,fontWeight:700,color: "#0B0B0D",background:GRAD,cursor:saving?"wait":"pointer",fontFamily:"inherit"}}>
+                  style={{borderRadius:999,padding:"9px 13px",fontSize:12.5,fontWeight:700,color: "#231F20",background:GRAD,cursor:saving?"wait":"pointer",fontFamily:"inherit"}}>
                   {s}
                 </button>
               ))}
@@ -273,7 +273,7 @@ export default function MatchPage({params}:{params:Promise<{id:string}>}){
                 placeholder="Oder schreib selbst …"
                 style={{flex:1,minWidth:0,background:BG,borderRadius:999,padding:"11px 14px",color:W,fontSize:13,outline:"none",fontFamily:"inherit"}}/>
               <button onClick={()=>postComment(comment)} disabled={saving||!comment.trim()}
-                style={{width:44,flexShrink:0,borderRadius:999,background:GRAD,color: "#0B0B0D",fontSize:16,fontWeight:900,cursor:(saving||!comment.trim())?"not-allowed":"pointer",opacity:(saving||!comment.trim())?.4:1,fontFamily:"inherit"}}>→</button>
+                style={{width:44,flexShrink:0,borderRadius:999,background:GRAD,color: "#231F20",fontSize:16,fontWeight:900,cursor:(saving||!comment.trim())?"not-allowed":"pointer",opacity:(saving||!comment.trim())?.4:1,fontFamily:"inherit"}}>→</button>
             </div>
 
             <button onClick={()=>{window.location.href=`/liga`}}

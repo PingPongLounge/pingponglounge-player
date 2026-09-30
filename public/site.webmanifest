@@ -4,8 +4,8 @@
   "description": "Finde Matches, spiel Liga, entdecke Turniere und Events und verfolge dein Rating.",
   "start_url": "/entdecken",
   "display": "standalone",
-  "background_color": "#0A0A0C",
-  "theme_color": "#0A0A0C",
+  "background_color": "#231F20",
+  "theme_color": "#231F20",
   "icons": [
     {
       "src": "/icon-192.png",

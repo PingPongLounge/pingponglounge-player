@@ -111,12 +111,12 @@ export default function PasswortAendernSeite() {
   }
 
   const feld: React.CSSProperties = {
-    width: '100%', boxSizing: 'border-box', background: '#0E0E10',
+    width: '100%', boxSizing: 'border-box', background: '#231F20',
     border: '1px solid rgba(244,241,235,.18)', borderRadius: 12,
     padding: '15px 16px', color: CREME, fontFamily: INTER, fontSize: 16, outline: 'none',
   }
   const knopf: React.CSSProperties = {
-    width: '100%', textAlign: 'center', background: VIOLETT, color: '#0B0B0D', border: 'none',
+    width: '100%', textAlign: 'center', background: VIOLETT, color: '#231F20', border: 'none',
     borderRadius: 100, padding: '16px 24px', fontFamily: INTER, fontSize: 14, fontWeight: 900,
     letterSpacing: '.1em', textTransform: 'uppercase', cursor: 'pointer', textDecoration: 'none',
     display: 'inline-block',

@@ -15,8 +15,8 @@
      · fillRule "evenodd", damit Loecher (Kreise, Pokalschale) offen bleiben
 
    Farbregel (siehe app/globals.css):
-     auf hell   → #111111, sparsam #078A3B
-     auf dunkel → weiss, sparsam #39FF14
+     auf hell   → #111111, sparsam #047758
+     auf dunkel → weiss, sparsam #67F9A8
 
    Wird das Blatt neu gezeichnet, wird diese Datei neu erzeugt — nicht von
    Hand nachgebessert.

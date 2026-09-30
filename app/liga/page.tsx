@@ -1364,7 +1364,7 @@ export default function LigaPage(){
         <div onClick={()=>setChatOpen(false)} style={{position:"fixed",inset:0,background:"rgba(8,11,13,.55)",zIndex:130,display:"flex",justifyContent:"flex-end"}}>
           {/* Der Chat ist die EINZIGE helle Flaeche unter den Overlays — hier
               gelten die hellen Tokens: Weiss, Kante #DDDDDA, Text #111111,
-              Gruen #078A3B. Vorher stand hier Neon (#39FF14) auf Weiss. */}
+              Gruen #047758. Vorher stand hier Neon (#67F9A8) auf Weiss. */}
           <div onClick={e=>e.stopPropagation()} style={{background:P_BG,borderLeft:`1px solid ${P_KANTE}`,height:"100%",width:"83%",maxWidth:380,display:"flex",flexDirection:"column",fontFamily:INTER}}>
             <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 16px",borderBottom:`1px solid ${P_KANTE}`,background:"#FFFFFF"}}>
               <span style={{fontFamily:INTER,fontSize:11,fontWeight:600,letterSpacing:".12em",textTransform:"uppercase",color:P_TEXT}}>Liga-Chat</span>

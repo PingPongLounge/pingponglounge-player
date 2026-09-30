@@ -22,7 +22,7 @@ function formatDate(d: string) {
 }
 
 function QRCode({ code }: { code: string }) {
-  const url = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(code)}&color=39FF14&bgcolor=15161A&margin=8`
+  const url = `https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=${encodeURIComponent(code)}&color=67F9A8&bgcolor=231F20&margin=8`
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
       {/* eslint-disable-next-line @next/next/no-img-element */}

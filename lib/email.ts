@@ -8,7 +8,7 @@ const RESEND_URL = "https://api.resend.com/emails"
 const FROM = process.env.RESEND_FROM || "Player <points@playerapp.ch>"
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"
 
-const G = "#39FF14"
+const G = "#67F9A8"
 
 /** Mailversand protokollieren, ohne den Aufrufer scheitern zu lassen.
  *
@@ -53,7 +53,7 @@ export async function sendEmail(opts: { to: string; subject: string; html: strin
         to: opts.to,
         subject: opts.subject,
         // Dark-Mode-Hinweis + voll deckender Hintergrund, damit kein weisser Rand bleibt
-        html: `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><meta name="supported-color-schemes" content="dark light"></head><body style="margin:0;padding:0;background-color:#0E0E10;">${opts.html}</body></html>`,
+        html: `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="dark light"><meta name="supported-color-schemes" content="dark light"></head><body style="margin:0;padding:0;background-color:#231F20;">${opts.html}</body></html>`,
       }),
       signal: AbortSignal.timeout(10000),
     })
@@ -64,17 +64,17 @@ export async function sendEmail(opts: { to: string; subject: string; html: strin
   }
 }
 
-const GRAD = "linear-gradient(135deg,#39FF14,#12D45C)"
-const CARD = "#1A1A1E"
+const GRAD = "linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)"
+const CARD = "#2C2728"
 
 // Voll deckender dunkler Hintergrund über die ganze Breite — sonst bleibt auf dem
 // Smartphone ein weisser Rand um die Karte stehen (Mail-Clients haben weissen BG).
 // Tabellen statt divs, weil Outlook/Gmail damit zuverlässig umgehen.
 function shell(inner: string): string {
   return `
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background-color:#0E0E10;margin:0;padding:0">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background-color:#231F20;margin:0;padding:0">
     <tr>
-      <td align="center" style="background-color:#0E0E10;padding:30px 16px 34px">
+      <td align="center" style="background-color:#231F20;padding:30px 16px 34px">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:520px;margin:0 auto">
           <tr>
             <td style="font-family:system-ui,-apple-system,'Segoe UI',sans-serif;color:#ffffff">
@@ -515,8 +515,8 @@ export async function sendTournamentStaffNotice(opts: {
       <tr><td style="padding:14px 18px;font-family:system-ui,sans-serif">
         <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
           ${zeile("Name", `${opts.vorname} ${opts.nachname}`)}
-          ${zeile("E-Mail", `<a href="mailto:${opts.email}" style="color:#12D45C">${opts.email}</a>`)}
-          ${opts.telefon ? zeile("Telefon", `<a href="tel:${opts.telefon}" style="color:#12D45C">${opts.telefon}</a>`) : ""}
+          ${zeile("E-Mail", `<a href="mailto:${opts.email}" style="color:#20F8BE">${opts.email}</a>`)}
+          ${opts.telefon ? zeile("Telefon", `<a href="tel:${opts.telefon}" style="color:#20F8BE">${opts.telefon}</a>`) : ""}
           ${opts.spielstaerke ? zeile("Spielstärke", opts.spielstaerke) : ""}
           ${zeile("Zahlung", opts.zahlungsstatus)}
           ${zeile("Warteliste", opts.warteliste ? `ja${opts.wartelistenPos ? ` · Position ${opts.wartelistenPos}` : ""}` : "nein")}

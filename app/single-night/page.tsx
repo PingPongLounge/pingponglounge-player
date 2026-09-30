@@ -7,7 +7,7 @@ import { BG, CARD, CELL, W, SUB, MUT, LINE, GREEN, DANGER, btn } from "@/app/the
 import { SINGLE_NIGHT_TICKETS, SINGLE_NIGHT_ABLAUF, SINGLE_NIGHT_ROTATION, SINGLE_NIGHT_INFO } from "@/lib/opengames"
 import { IconChevron } from "@/app/components/Icons"
 
-const PINK = "#39FF14"
+const PINK = "#67F9A8"
 
 type SnEvent = { id: string; date: string; start_hour: number | null; location_name: string; plaetze: number; frei: number }
 

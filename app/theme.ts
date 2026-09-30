@@ -16,7 +16,7 @@
 // =====================================================================
 
 import type { CSSProperties } from 'react'
-import { AKZENT } from '@/app/design'
+import { AKZENT, AUSSEN, DUNKEL, NEON, TUERKIS, VERLAUF } from '@/app/design'
 
 /* ---------- Farben — PLAYER V2 (07.09.2026, verbindlich) --------------------
    Drei Farben, eine Logik. Sie gilt fuer Player UND pingponglounge.ch:
@@ -41,27 +41,27 @@ import { AKZENT } from '@/app/design'
    (#2BD4C4) — mit Namen wie GREEN, die schon lange nicht mehr stimmten. Die
    Namen bleiben, weil ueber 200 Stellen sie importieren; die WERTE sind neu.
    Wer neu schreibt, nimmt SCHWARZ / CREME / VIOLETT. */
-export const BG     = '#080808'                  // Screen-Hintergrund
-export const CARD   = '#121214'                  // Karten-Flaeche
-export const CELL   = '#1A1A1E'                  // Zellen / Chips innerhalb Karten
-export const INPUTBG= '#0E0E10'                  // Eingabefelder
+export const BG     = AUSSEN                     // Screen-Hintergrund (#1A1718)
+export const CARD   = DUNKEL                     // Karten-Flaeche (#231F20)
+export const CELL   = '#2C2728'                  // Zellen / Chips (dieselbe Achse, eine Stufe heller)
+export const INPUTBG= DUNKEL                     // Eingabefelder (#231F20)
 export const W      = '#F4F1EB'                  // Primaertext (Off-White, kein reines Weiss)
 export const SUB    = 'rgba(244,241,235,.90)'    // Sekundaertext
 export const MUT    = 'rgba(244,241,235,.72)'    // Labels / gedaempft (war .62 — zu blass)
 export const LINE   = 'rgba(244,241,235,.13)'    // dezente Trennlinie
 export const DANGER = '#E5484D'                  // Fehler / Loeschen
 
-export const GREEN  = '#39FF14'                  // Marken-Gruen, NUR auf dunklem Grund
-export const CYAN   = '#12D45C'                  // Smaragd, das zweite Ende des Verlaufs
+export const GREEN  = NEON                       // Signalgruen (#67F9A8), NUR auf dunklem Grund
+export const CYAN   = TUERKIS                    // Tuerkis (#20F8BE), das zweite Ende des Verlaufs
 export const INK    = '#080808'                  // Schrift auf gruener oder heller Flaeche
-export const GRAD   = 'linear-gradient(135deg,#39FF14,#12D45C)'   // Logo + Rang
+export const GRAD   = VERLAUF                    // Markenverlauf aus dem Logo
 export const SHADOW = '0 4px 14px rgba(0,0,0,.35)'
 
 /* Neue, ehrlich benannte Namen fuer alles, was ab jetzt geschrieben wird. */
-export const SCHWARZ = '#080808'
+export const SCHWARZ = AUSSEN
 export const CREME   = '#F4F1EB'
-export const VIOLETT = '#39FF14'
-export const VIOLETT_HELL = '#12D45C'
+export const VIOLETT = NEON
+export const VIOLETT_HELL = TUERKIS
 /* Akzent fuer HELLE Flaechen (Off-White, Weiss). Auf dunklem Grund nehmen
    wir VIOLETT (= #39FF14), auf hellem diesen hier.
    24.09.2026: Der Wert stand hier auf #0B7A33, auf der Startseite aber auf
@@ -70,7 +70,7 @@ export const VIOLETT_HELL = '#12D45C'
    geaendert. Die 200+ Importstellen von AKZENT_TIEF bleiben unberuehrt. */
 export const AKZENT_TIEF = AKZENT
 /* Schrift auf hellblauer Flaeche — nie Weiss. */
-export const AKZENT_INK  = '#06220E'
+export const AKZENT_INK  = DUNKEL
 
 /* Zeilenabstand fuer Anton. Anton bringt fast keine eigene Luft mit; unter
    1.05 beruehren sich mehrzeilige Titel und werden zu einem Klumpen.
