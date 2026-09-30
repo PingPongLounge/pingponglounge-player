@@ -4,8 +4,8 @@ import { createClient } from "@/lib/supabase/client"
 import Link from "next/link"
 import { STAFF_EMAILS } from "@/lib/staff"
 
-const BG="#231F20",C="#2C2728",B="#2C2728",M="rgba(255,255,255,0.66)",G="#67F9A8",W="#FFFFFF"
-const GRAD="linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)"
+const BG="#231F20",C="#2C2728",B="#2C2728",M="rgba(255,255,255,0.66)",G="#53FDB1",W="#FFFFFF"
+const GRAD="linear-gradient(90deg,#8BFEA1 0%,#1BFCC2 100%)"
 const CITIES=["Oerlikon","Langstrasse","Glattbrugg","Basel","Luzern","St. Gallen","Bern","Zürich"]
 const LEVELS=[{v:"1-4",l:"Level 1–4 (Einstieg)"},{v:"5-7",l:"Level 5–7 (Pro)"}]
 

@@ -9,7 +9,7 @@
 import { useRef, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 
-const NEON = "#67F9A8", SCHWARZ = "#1A1718"
+const NEON = "#53FDB1", SCHWARZ = "#1A1718"
 
 export function initialen(name?: string | null): string {
   if (!name) return "PP"

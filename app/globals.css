@@ -6,7 +6,7 @@
    das explizite border:none entfernt wurde. */
 button, input, textarea, select { border: none; outline: none; }
 button { background: none; }
-:root { --green: #67F9A8; --dark: #1A1718; --card: #231F20; --border: #2C2728; --muted: #8A8D99; --text: #F4F1EB; }
+:root { --green: #53FDB1; --dark: #1A1718; --card: #231F20; --border: #2C2728; --muted: #8A8D99; --text: #F4F1EB; }
 /* 24.09.2026 · Canvas-Entscheid: ausserhalb des Player-Canvas #1A1718,
    innerhalb Off-White wie auf der Startseite. Auf dem Handy ist der Canvas
    100% breit — dort sieht man von dieser Farbe nur den Ueberroll-Rand. */
@@ -132,7 +132,7 @@ main { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
      --p-text    #111111
      --p-leise   #686868
      --p-kante   #DDDDDA
-     --p-neon    #67F9A8  Signal, nur auf dunkel, sehr sparsam
+     --p-neon    #53FDB1  Signal, nur auf dunkel, sehr sparsam
      --p-akzent  #047758  nur auf hell, sehr sparsam
      --p-akzent-flaeche #05946E  grosse Grafikflaechen auf hell, nie Schrift
      --p-verlauf Markenverlauf aus dem Logo — Logo, Rangzahl, Stufenband
@@ -144,10 +144,10 @@ main { padding-bottom: calc(28px + env(safe-area-inset-bottom)); }
 :root{
   --p-dark:#231F20; --p-bg:#F5F5F2; --p-flaeche:#FFFFFF;
   --p-text:#111111; --p-leise:#686868; --p-kante:#DDDDDA;
-  --p-neon:#67F9A8; --p-akzent:#047758;
+  --p-neon:#53FDB1; --p-akzent:#047758;
   --p-dark-leise:#AEB0B8; --p-dark-kante:rgba(255,255,255,.20);
   --p-akzent-flaeche:#05946E;
-  --p-verlauf:linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%);
+  --p-verlauf:linear-gradient(90deg,#8BFEA1 0%,#1BFCC2 100%);
   --p-anton:var(--font-anton),Impact,sans-serif;
   --p-inter:var(--font-inter),system-ui,sans-serif;
 }

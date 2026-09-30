@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 
 const CARD = "#2C2728", CELL = "#2C2728", W = "#FFFFFF"
-const GRAD = "linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)"
+const GRAD = "linear-gradient(90deg,#8BFEA1 0%,#1BFCC2 100%)"
 const SUB = "rgba(255,255,255,.82)", MUT = "rgba(255,255,255,.82)"
 const LINE = "rgba(255,255,255,.07)"
 
@@ -40,7 +40,7 @@ export default function LigaChatHome({
   return (
     <div style={{ margin: "0 18px", borderRadius: 20, background: CARD, overflow: "hidden" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "14px 18px", borderBottom: `1px solid ${LINE}` }}>
-        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#67F9A8", boxShadow: "0 0 8px #67F9A8" }} />
+        <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#53FDB1", boxShadow: "0 0 8px #53FDB1" }} />
         <span style={{ fontSize: 13, fontWeight: 800, textTransform: "uppercase", letterSpacing: ".06em", color: W }}>{seasonLabel}</span>
         <span style={{ marginLeft: "auto", fontSize:11.5, color: MUT, fontWeight: 500 }}>{playerCount} Spieler</span>
       </div>

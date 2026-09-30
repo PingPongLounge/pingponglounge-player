@@ -3,7 +3,7 @@ import { useEffect, useState, use } from "react"
 import { createClient } from "@/lib/supabase/client"
 
 const BG = "#231F20", CARD = "#2C2728", W = "#fff", MUT = "rgba(255,255,255,.7)"
-const GRAD = "linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)"
+const GRAD = "linear-gradient(90deg,#8BFEA1 0%,#1BFCC2 100%)"
 
 export default function JoinLeaguePage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = use(params)
@@ -57,7 +57,7 @@ export default function JoinLeaguePage({ params }: { params: Promise<{ code: str
         {state === "joining" && <div style={{ color: MUT, fontSize: 14 }}>Tritt bei …</div>}
 
         {state === "done" && (
-          <div style={{ color: "#67F9A8", fontSize: 15, fontWeight: 800 }}>✓ Drin{org ? ` — ${org}` : ""}! Weiter zur Liga …</div>
+          <div style={{ color: "#53FDB1", fontSize: 15, fontWeight: 800 }}>✓ Drin{org ? ` — ${org}` : ""}! Weiter zur Liga …</div>
         )}
 
         {state === "error" && (

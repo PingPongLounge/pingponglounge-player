@@ -40,7 +40,7 @@ const CARD = "#121212"
 const LINE = "rgba(255,255,255,.10)"
 const W = "#F4F1EB"
 const MUT = "rgba(244,241,235,.62)"
-const V = "#67F9A8"
+const V = "#53FDB1"
 
 function fmtDate(v: string | null) {
   if (!v) return ""

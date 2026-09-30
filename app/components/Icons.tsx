@@ -16,7 +16,7 @@
 
    Farbregel (siehe app/globals.css):
      auf hell   → #111111, sparsam #047758
-     auf dunkel → weiss, sparsam #67F9A8
+     auf dunkel → weiss, sparsam #53FDB1
 
    Wird das Blatt neu gezeichnet, wird diese Datei neu erzeugt — nicht von
    Hand nachgebessert.

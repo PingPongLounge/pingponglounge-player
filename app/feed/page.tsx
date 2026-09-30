@@ -3,7 +3,7 @@ import {useEffect,useState,useCallback} from "react"
 import {createClient} from "@/lib/supabase/client"
 import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
-const V="#67F9A8",B="#1A1718",P="#F4F1EB",M="#8e8b87",L="#292929",CELL="#151515"
+const V="#53FDB1",B="#1A1718",P="#F4F1EB",M="#8e8b87",L="#292929",CELL="#151515"
 function timeAgo(d:string){const diff=Date.now()-new Date(d).getTime(),m=Math.floor(diff/60000);if(m<1)return"gerade eben";if(m<60)return`vor ${m} Min`;const h=Math.floor(m/60);return h<24?`vor ${h} Std`:`vor ${Math.floor(h/24)} Tagen`}
 function setsLabel(sets:Array<{p1:number;p2:number}>|null){return sets?.map(s=>`${s.p1}:${s.p2}`).join(" · ")||""}
 type Profile={id:string;name:string;elo:number};type Season={name:string;city:string;skill_class:string};type Reaction={type:string;user_id:string};type Match={id:string;sets:Array<{p1:number;p2:number}>|null;winner_id:string|null;confirmed_at:string;p1_id:string;p2_id:string;p1:Profile|null;p2:Profile|null;season:Season|null;match_reactions:Reaction[]}

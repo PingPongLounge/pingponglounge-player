@@ -36,7 +36,7 @@
    kleine Hervorhebung, Link und Pfeil.
 
    Ohne "use client" — laeuft in Server- wie Client-Seiten. */
-/* VIOLETT ist der Name des Marken-Neon (#67F9A8) in theme.ts, AKZENT_TIEF
+/* VIOLETT ist der Name des Marken-Neon (#53FDB1) in theme.ts, AKZENT_TIEF
    der des tiefen Gruen (#047758). Die Namen stammen aus der Violett-Zeit
    und stimmen laengst nicht mehr — sie zu aendern hiesse, ueber 200
    Importstellen anzufassen. Die WERTE sind aktuell. */

@@ -51,8 +51,8 @@ export const MUT    = 'rgba(244,241,235,.72)'    // Labels / gedaempft (war .62 
 export const LINE   = 'rgba(244,241,235,.13)'    // dezente Trennlinie
 export const DANGER = '#E5484D'                  // Fehler / Loeschen
 
-export const GREEN  = NEON                       // Signalgruen (#67F9A8), NUR auf dunklem Grund
-export const CYAN   = TUERKIS                    // Tuerkis (#20F8BE), das zweite Ende des Verlaufs
+export const GREEN  = NEON                       // Signalgruen (#53FDB1), NUR auf dunklem Grund
+export const CYAN   = TUERKIS                    // Tuerkis (#1BFCC2), das zweite Ende des Verlaufs
 export const INK    = '#080808'                  // Schrift auf gruener oder heller Flaeche
 export const GRAD   = VERLAUF                    // Markenverlauf aus dem Logo
 export const SHADOW = '0 4px 14px rgba(0,0,0,.35)'

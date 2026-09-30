@@ -17,8 +17,8 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { createClient } from "@/lib/supabase/client"
 import NotificationBell from "./NotificationBell"
-import { PlayerZeichen } from "./PlayerLogo"
-import { ANTON, TEXT } from "@/app/design"
+import { PlayerLockup } from "./PlayerLogo"
+import { TEXT } from "@/app/design"
 
 /* Ab 1100px steht die Navigation ausgeschrieben im Kopf — dieselben fuenf
    Ziele wie im Hamburger darunter. Klasse .ent-nav blendet sie unter
@@ -65,11 +65,10 @@ export default function PlayerKopf({
         display: "flex", alignItems: "center", gap: 10,
         textDecoration: "none", color: farbe,
       }}>
-        <PlayerZeichen aufHell={aufHell} />
-        <span style={{
-          fontFamily: ANTON, fontSize: 17, letterSpacing: ".05em",
-          textTransform: "uppercase", lineHeight: 1,
-        }}>Player</span>
+        {/* 30.09.2026: vorher ein nachgezeichnetes P plus die Wortmarke in
+            Anton. Jetzt das echte waagrechte Lockup aus public/logo/ —
+            eine Grafik statt zwei Teile, die auseinanderlaufen koennen. */}
+        <PlayerLockup hoehe={26} aufHell={aufHell} />
       </Link>
 
       <span style={{ display: "flex", alignItems: "center", gap: 18 }}>

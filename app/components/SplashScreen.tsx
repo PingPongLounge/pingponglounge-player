@@ -1,18 +1,11 @@
 "use client"
 import { useEffect, useState } from "react"
 
-// Nur noch PPL-Pink — Gruen und Tuerkis sind aus der Player-App raus.
-// 06.09.2026: UV-Violett statt Neon-Pink — der Splash liegt ueber jeder
-// Seite, auch ueber der oeffentlichen Startseite.
-const GRAD = "linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)"
-const gt: React.CSSProperties = {
-  background: GRAD,
-  WebkitBackgroundClip: "text",
-  backgroundClip: "text",
-  WebkitTextFillColor: "transparent",
-}
-
+// 30.09.2026: Splash zeigt jetzt das echte Logo aus public/logo/ statt
+// einer nachgezeichneten Fassung. Der Verlauf steckt in den Dateien.
 const PLAYER_LETTERS = ["P", "L", "A", "Y", "E", "R"]
+/** Breite der Wortmarke im Splash. */
+const WORT_BREIT = 260
 
 export default function SplashScreen() {
   // Startet ausgeschaltet: wer die App in dieser Sitzung schon geoeffnet hat,
@@ -75,84 +68,76 @@ export default function SplashScreen() {
         <svg
           width="200"
           height="200"
-          viewBox="0 0 80 80"
+          viewBox="0 0 2159 2356"
           fill="none"
         >
           <defs>
-            <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#67F9A8" />
-              <stop offset="100%" stopColor="#20F8BE" />
+            <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="#8BFEA1" />
+              <stop offset="100%" stopColor="#1BFCC2" />
             </linearGradient>
           </defs>
 
-          {/* Das P sitzt mittig (Ball hängt rechts raus) */}
-          <g transform="translate(-2,0)">
-            {/* P-Paddle: stroke draw-in — nie ausgefüllt */}
-            <path
-              d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z"
-              fill="none"
-              stroke="url(#sg)"
-              strokeWidth="3"
-              strokeLinejoin="round"
-              strokeDasharray="280"
-              strokeDashoffset="0"
-              style={{ animation: "drawPath 0.7s cubic-bezier(0.4,0,0.2,1) forwards" }}
-            />
+          {/* 30.09.2026: vorher ein nachgezeichneter P-Pfad mit stroke-draw-in.
+              Das war nicht das Logo, sondern eine Annaeherung daran. Jetzt das
+              Original aus public/logo/. Ein Bitmap laesst sich nicht "zeichnen",
+              deshalb blendet das P auf statt sich zu zeichnen — der Ball faellt
+              weiterhin. */}
+          <image
+            href="/logo/symbol-nur-p-verlauf.svg"
+            x="0" y="0" width="1971" height="2243"
+            style={{ animation: "logoErscheint 0.7s cubic-bezier(0.4,0,0.2,1) forwards" }}
+          />
 
-            {/* Ball: fällt von oben, bounced */}
-            {showBall && (
-              <circle
-                cx="63"
-                cy="58"
-                r="6"
-                fill="url(#sg)"
-                style={{ animation: "ballBounce 0.55s cubic-bezier(0.22,0.61,0.36,1) forwards" }}
-              />
-            )}
-          </g>
+          {/* Ball: fällt von oben, bounced */}
+          {showBall && (
+            <circle
+              cx="1895.5"
+              cy="2092.5"
+              r="263.5"
+              fill="url(#sg)"
+              style={{ animation: "ballBounce 0.55s cubic-bezier(0.22,0.61,0.36,1) forwards" }}
+            />
+          )}
         </svg>
 
         {/* Der pulsierende Glow-Ring um das Logo ist raus — er zeichnete einen
             Kreis, der im Logo nichts zu suchen hat. */}
       </div>
 
-      {/* PLAYER Buchstaben */}
-      <div style={{
-        display: "flex",
-        gap: 5,
-        height: 44,
-        alignItems: "center",
-      }}>
-        {PLAYER_LETTERS.map((l, i) => (
-          <span
-            key={l}
-            style={{
-              fontSize: 34,
-              fontWeight: 900,
-              letterSpacing: ".18em",
-              fontFamily: "var(--font-inter), system-ui, sans-serif",
-              ...gt,
-              opacity: i < letterIndex ? 1 : 0,
-              transform: i < letterIndex ? "translateY(0)" : "translateY(10px)",
-              transition: "opacity 0.2s ease, transform 0.25s ease",
-              display: "inline-block",
-            }}
-          >
-            {l}
-          </span>
-        ))}
+      {/* PLAYER Wortmarke — 30.09.2026: vorher die sechs Buchstaben einzeln
+          in Inter 900 mit Verlaufsfuellung. Das ist nicht die Wortmarke:
+          die steht in League Spartan ExtraBold mit 0.114 em Laufweite und
+          traegt den Verlauf pro Buchstabe. Jetzt das Original aus
+          public/logo/, das sich von links nach rechts aufbaut — derselbe
+          Rhythmus, dieselbe Zustandslogik (letterIndex), richtige Form. */}
+      <div style={{ height: 44, width: WORT_BREIT, display: "flex", alignItems: "center" }}>
+        <div style={{
+          width: Math.round((letterIndex / PLAYER_LETTERS.length) * WORT_BREIT),
+          overflow: "hidden",
+          transition: "width 0.22s ease",
+        }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo/wortmarke-verlauf.svg"
+            alt="PLAYER"
+            width={WORT_BREIT}
+            height={Math.round(WORT_BREIT * 474 / 2833)}
+            style={{ display: "block", width: WORT_BREIT, maxWidth: "none", height: "auto" }}
+          />
+        </div>
       </div>
 
       <style>{`
-        @keyframes drawPath {
-          from { stroke-dashoffset: 280; opacity: 0.3; }
-          to   { stroke-dashoffset: 0;   opacity: 1; }
+        @keyframes logoErscheint {
+          from { opacity: 0; transform: scale(0.94); }
+          to   { opacity: 1; transform: scale(1); }
         }
         @keyframes ballBounce {
-          0%   { transform: translateY(-44px); opacity: 0; }
-          55%  { transform: translateY(5px);  opacity: 1; }
-          75%  { transform: translateY(-10px); }
-          90%  { transform: translateY(3px); }
+          0%   { transform: translateY(-1190px); opacity: 0; }
+          55%  { transform: translateY(135px);  opacity: 1; }
+          75%  { transform: translateY(-270px); }
+          90%  { transform: translateY(81px); }
           100% { transform: translateY(0); }
         }
         @keyframes logoBreathe {

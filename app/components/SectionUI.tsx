@@ -5,7 +5,7 @@ import NotificationBell from "./NotificationBell"
 
 const CARD = "#2C2728", W = "#FFFFFF"
 const SUB = "rgba(255,255,255,.88)", MUT = "rgba(255,255,255,.82)"
-const GRAD = "linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)"
+const GRAD = "linear-gradient(90deg,#8BFEA1 0%,#1BFCC2 100%)"
 const SHADOW = "0 1px 4px rgba(0,0,0,.14)"
 const gt: React.CSSProperties = { background: GRAD, WebkitBackgroundClip: "text", backgroundClip: "text", WebkitTextFillColor: "transparent" }
 
@@ -21,7 +21,7 @@ export function SectionTopBar({ section: _section }: { section: string }) {
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "12px clamp(16px,4vw,32px)", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <Link href="/entdecken" aria-label="Zur Startseite" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
           <svg width="21" height="21" viewBox="0 0 80 80" fill="none" aria-hidden>
-            <defs><linearGradient id="stbg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="#67F9A8" /><stop offset="1" stopColor="#20F8BE" /></linearGradient></defs>
+            <defs><linearGradient id="stbg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stopColor="#8BFEA1" /><stop offset="1" stopColor="#1BFCC2" /></linearGradient></defs>
             <path d="M 20 60 L 20 10 L 44 10 C 56 10 64 18 64 30 C 64 42 56 50 44 50 L 36 50 L 36 60 Z" fill="none" stroke="url(#stbg)" strokeWidth="3.6" strokeLinejoin="round" />
             <circle cx="63" cy="58" r="6.5" fill="url(#stbg)" />
           </svg>
@@ -35,7 +35,7 @@ export function SectionTopBar({ section: _section }: { section: string }) {
   )
 }
 
-const HERO = "#231F20", LINE = "rgba(255,255,255,.07)", GREEN = "#67F9A8"
+const HERO = "#231F20", LINE = "rgba(255,255,255,.07)", GREEN = "#53FDB1"
 
 /**
  * DAS MUSTER — ein Block für jede Sektion, wie in der Liga:
@@ -124,7 +124,7 @@ export function SectionIntro({ storageKey, title, steps, cta }: { storageKey: st
        die Kante, nicht der Schatten. */
     <div style={{ position: "relative", marginTop: 16, padding: 22, background: CARD, border: "1px solid rgba(255,255,255,.12)" }}>
       <button onClick={dismiss} aria-label="Ausblenden" style={{ position: "absolute", top: 14, right: 14, background: "none", color: MUT, fontSize: 16, cursor: "pointer", lineHeight: 1 }}>✕</button>
-      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".13em", textTransform: "uppercase", color: "#67F9A8" }}>Neu hier?</div>
+      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: ".13em", textTransform: "uppercase", color: "#53FDB1" }}>Neu hier?</div>
       {/* Anton statt Inter 900 — dieselbe Abschnitts-Ebene wie ueberall. */}
       <div style={{ fontFamily: "var(--font-anton), Impact, sans-serif", fontWeight: 400, fontSize: 21, letterSpacing: ".012em", textTransform: "uppercase", color: W, margin: "8px 0 16px", paddingRight: 24 }}>{title}</div>
       {steps.map(([n, t, d]) => (
@@ -132,13 +132,13 @@ export function SectionIntro({ storageKey, title, steps, cta }: { storageKey: st
           {/* Die Ziffer war ein gefuellter Neonkreis — drei davon
               untereinander waren drei gruene Flecken. Jetzt Anton in
               Neon auf dem dunklen Grund, ohne Flaeche. */}
-          <span style={{ width: 24, flexShrink: 0, fontFamily: "var(--font-anton), Impact, sans-serif", fontWeight: 400, fontSize: 21, lineHeight: 1.15, color: "#67F9A8" }}>{n}</span>
+          <span style={{ width: 24, flexShrink: 0, fontFamily: "var(--font-anton), Impact, sans-serif", fontWeight: 400, fontSize: 21, lineHeight: 1.15, color: "#53FDB1" }}>{n}</span>
           <div><div style={{ fontSize: 15, fontWeight: 600, color: W }}>{t}</div><div style={{ fontSize: 13, fontWeight: 400, color: MUT, marginTop: 3, lineHeight: 1.45 }}>{d}</div></div>
         </div>
       ))}
       {/* Der eine kraeftige Aufruf auf dunklem Grund darf Neon bleiben —
           aber flaechig, ohne Verlauf und ohne Radius. */}
-      {cta && <Link href={cta.href} style={{ display: "block", textAlign: "center", marginTop: 8, background: "#67F9A8", color: "#231F20", padding: "15px", fontSize: 12.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".12em", textDecoration: "none" }}>{cta.label}</Link>}
+      {cta && <Link href={cta.href} style={{ display: "block", textAlign: "center", marginTop: 8, background: "#53FDB1", color: "#231F20", padding: "15px", fontSize: 12.5, fontWeight: 600, textTransform: "uppercase", letterSpacing: ".12em", textDecoration: "none" }}>{cta.label}</Link>}
     </div>
   )
 }

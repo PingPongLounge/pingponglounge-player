@@ -33,11 +33,12 @@ export const FLAECHE = "#FFFFFF"
 export const TEXT = "#111111"
 export const LEISE = "#686868"
 export const KANTE = "#DDDDDA"
-/** Signalgruen. NUR auf dunklem Grund (12.2:1 auf DUNKEL). Auf Weiss 1.34:1
+/** Signalgruen. NUR auf dunklem Grund (12.46:1 auf DUNKEL). Auf Weiss 1.31:1
     — dort niemals verwenden, dafuer ist AKZENT da.
-    30.09.2026: die Mitte des Logo-Verlaufs. Vorher #39FF14 — ein Gruen,
-    das im Logo nicht vorkommt und neben ihm schreit. */
-export const NEON = "#67F9A8"
+    30.09.2026, zweiter Durchgang: die exakte Mitte des gemessenen
+    Logo-Verlaufs. Die Zwischenwerte davor (#39FF14, dann #67F9A8) waren
+    geschaetzt; dieser ist der Mittelwert aus #8BFEA1 und #1BFCC2. */
+export const NEON = "#53FDB1"
 /** Gruen auf hellem Grund. Abgeleitet aus dem Logo-Tuerkis (H164, S94 %),
     Helligkeit gesenkt bis der Kontrast traegt: 5.55:1 auf Weiss, 5.08:1 auf
     BG. Vorher #078A3B — 4.46:1 auf Weiss und damit knapp UNTER der Norm. */
@@ -50,15 +51,24 @@ export const DUNKEL_LEISE = "#AEB0B8"
 export const DUNKEL_KANTE = "rgba(255,255,255,.20)"
 
 /* ---------- Markenverlauf ---------------------------------------------
-   Die drei Stuetzstellen des Logo-Verlaufs, aus der EPS gemessen. Der
-   Verlauf ist ein MARKENELEMENT, kein Flaechenmittel: Logo, Rangzahl,
+   30.09.2026: aus den Original-Logodaten gemessen, nicht mehr geschaetzt.
+   An P, Ball und allen sechs Buchstaben einzeln nachgerechnet — der
+   Verlauf ist WAAGRECHT, hat GENAU ZWEI Stuetzstellen und liegt ueber der
+   Bounding-Box jedes einzelnen Elements (R² >= 0.9996). Vorher stand hier
+   135deg mit drei Stuetzstellen; beides kam im Logo nie vor.
+
+   Jeder Buchstabe traegt seinen EIGENEN vollen Verlauf — nicht ein
+   Verlauf ueber das ganze Wort. Wer den Verlauf auf mehrere Elemente
+   legt, legt ihn auf jedes einzeln.
+
+   Der Verlauf ist ein MARKENELEMENT, kein Flaechenmittel: Logo, Rangzahl,
    Stufenband, hoechstens ein Wort im Hero. Nie als Schriftfarbe auf
    hellem Grund, nie zweimal auf demselben Bildschirm. */
-export const MINT = "#84FDA2"
-export const TUERKIS = "#20F8BE"
-export const VERLAUF = `linear-gradient(135deg, ${MINT} 0%, ${NEON} 50%, ${TUERKIS} 100%)`
+export const MINT = "#8BFEA1"
+export const TUERKIS = "#1BFCC2"
+export const VERLAUF = `linear-gradient(90deg, ${MINT} 0%, ${TUERKIS} 100%)`
 /** Derselbe Verlauf fuer helle Flaechen — nur fuer Flaechen, nie fuer Text. */
-export const VERLAUF_HELL = `linear-gradient(135deg, ${AKZENT_FLAECHE} 0%, ${AKZENT} 100%)`
+export const VERLAUF_HELL = `linear-gradient(90deg, ${AKZENT_FLAECHE} 0%, ${AKZENT} 100%)`
 
 /* ---------- Schrift ---------------------------------------------------
    ANTON = Momente (Hero, Plakat, Abschnittstitel, Sportzahlen).

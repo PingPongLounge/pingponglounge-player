@@ -7,8 +7,8 @@ import { ratingLabel } from "@/app/theme"
 import { OG_TRAINING_PREIS_CHF } from "@/lib/opengames"
 
 const BG = "#231F20", CARD = "#2C2728", CELL = "#2C2728", W = "#FFFFFF"
-const MUT = "rgba(255,255,255,.82)", GREEN = "#67F9A8"
-const GRAD = "linear-gradient(135deg,#84FDA2 0%,#67F9A8 50%,#20F8BE 100%)"
+const MUT = "rgba(255,255,255,.82)", GREEN = "#53FDB1"
+const GRAD = "linear-gradient(90deg,#8BFEA1 0%,#1BFCC2 100%)"
 
 type Player = { user_id: string; name: string; elo: number; level: string }
 type Training = {

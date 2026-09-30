@@ -10,9 +10,9 @@ import { IconOpenGames, IconTurniere, IconTraining, IconCommunity, IconChevron }
    (#3B6FE0) — das war die einzige Stelle im Frontend, an der noch ein
    blauer PLAYER-Akzent uebrig war (23.09.2026). Jetzt Gruen, wie ueberall.
    Es sind Icon-Striche auf Schwarz, alle vier ueber 7:1. */
-const GRUEN_TURNIER  = "#20F8BE"
-const GRUEN_SINGLE   = "#67F9A8"
-const GRUEN_TRAINING = "#20F8BE"
+const GRUEN_TURNIER  = "#1BFCC2"
+const GRUEN_SINGLE   = "#53FDB1"
+const GRUEN_TRAINING = "#1BFCC2"
 
 type IkName = "opengames" | "turniere" | "training" | "community"
 type Opt = { href: string; title: string; sub: string; color: string; icon: IkName }

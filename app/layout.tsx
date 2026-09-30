@@ -17,7 +17,7 @@ const anton = Anton({ subsets: ["latin"], weight: "400", variable: "--font-anton
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" })
 
 /* Hochzaehlen, wenn sich das Icon aendert. Siehe Kommentar bei icons. */
-const ICON_V = "3"
+const ICON_V = "4"
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE),
