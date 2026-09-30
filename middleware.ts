@@ -204,8 +204,11 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
+  // robots.txt lief in dieselbe Login-Umleitung (30.09.2026). Der
+  // WhatsApp/Facebook-Crawler holt sie vor jeder Link-Vorschau; eine
+  // robots.txt, die 307 auf /login antwortet, kostet die Vorschau.
   // site.webmanifest, apple-touch-icon & Co. werden vom Browser OHNE Cookies
   // geholt — sie liefen in die Login-Umleitung und kamen als HTML zurück.
   // Deshalb hier ausgenommen.
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|favicon.svg|site.webmanifest|apple-touch-icon.png|logo-player.svg|auth|join|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|webmanifest)$).*)'],
+  matcher: ['/((?!_next/static|_next/image|favicon.ico|favicon.svg|site.webmanifest|apple-touch-icon.png|logo-player.svg|robots.txt|sitemap.xml|auth|join|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|webmanifest)$).*)'],
 }
