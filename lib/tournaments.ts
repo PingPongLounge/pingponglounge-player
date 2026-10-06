@@ -13,6 +13,49 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 // nichts falsch war. 30 Minuten sind der kleinste Wert, den Stripe erlaubt.
 export const RESERVE_MINUTES = 30   // so lange ist ein Platz bei Online-Zahlung reserviert
 
+// ─── ZWEI WEGE ZUM STARTGELD ─────────────────────────────────────────────────
+// 06.10.2026 (Oliver): Wer online bezahlt, zahlt 5.- weniger als wer vor Ort
+// bezahlt. Bisher kannte ein Turnier nur EINEN Weg (payment_mode), jetzt wählt
+// die anmeldende Person. Freigeschaltet wird die Wahl pro Turnier über
+// onsite_fee_chf — ohne diesen Wert bleibt alles wie vorher.
+//
+// Eine vor Ort zu zahlende Anmeldung bekommt einen eigenen Zahlstatus statt
+// "free": Sie belegt sofort einen Platz (darum zählt belegung() sie mit), aber
+// es steht noch Geld aus — "free" würde das verschlucken und "none" meint
+// bereits etwas anderes (abgebrochener Online-Checkout, hält keinen Platz).
+export const VOR_ORT_OFFEN = "onsite_due"
+
+export type Zahlweg = {
+  /** Darf bei diesem Turnier überhaupt vor Ort bezahlt werden? */
+  vorOrtMoeglich: boolean
+  /** Diese Anmeldung zahlt vor Ort. */
+  vorOrt: boolean
+  /** Es muss jetzt online bezahlt werden (Checkout folgt). */
+  bezahltNoetig: boolean
+  /** Betrag dieser Anmeldung — online günstiger, vor Ort teurer. */
+  betrag: number
+  /** Zahlstatus für den Datensatz (Warteliste separat behandeln). */
+  status: "none" | "free" | typeof VOR_ORT_OFFEN
+}
+
+export function zahlweg(
+  t: { payment_mode: string | null; entry_fee_chf: number | string | null; onsite_fee_chf?: number | string | null },
+  wunsch?: string | null,
+): Zahlweg {
+  const onlinePreis = Number(t.entry_fee_chf) || 0
+  const vorOrtPreis = Number(t.onsite_fee_chf) || 0
+  const onlineMoeglich = t.payment_mode === "online" && onlinePreis > 0
+  const vorOrtMoeglich = onlineMoeglich && vorOrtPreis > 0
+  const vorOrt = vorOrtMoeglich && wunsch === "onsite"
+  return {
+    vorOrtMoeglich,
+    vorOrt,
+    bezahltNoetig: onlineMoeglich && !vorOrt,
+    betrag: vorOrt ? vorOrtPreis : onlineMoeglich ? onlinePreis : 0,
+    status: vorOrt ? VOR_ORT_OFFEN : onlineMoeglich ? "none" : "free",
+  }
+}
+
 // ─── SELBSTEINSCHÄTZUNG DER GÄSTE ────────────────────────────────────────────
 // Gäste (ohne Player-Konto) wählen eine verständliche Kategorie. Das ist KEIN
 // echtes Elo. Der interne Näherungswert (seedElo) dient nur der Setzliste und
@@ -71,7 +114,9 @@ export async function belegung(admin: SupabaseClient, tournamentId: string, maxP
   const rows = data || []
   const belegt = rows.filter(r => {
     // bezahlt/gratis zählt immer; reserviert nur solange die Frist läuft
-    if (["paid", "free"].includes(r.payment_status)) return true
+    // Vor Ort zu zahlen heisst: der Platz ist verbindlich vergeben, das Geld
+    // kommt an der Kasse — zählt also wie bezahlt gegen die Kapazität.
+    if (["paid", "free", VOR_ORT_OFFEN].includes(r.payment_status)) return true
     if (["reserved", "pending"].includes(r.payment_status) && r.reserved_until && r.reserved_until > jetzt) return true
     return false
   })

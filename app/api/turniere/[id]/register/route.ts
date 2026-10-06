@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { belegung, naechsteWartelistenPos, seedWert } from "@/lib/tournaments"
+import { belegung, naechsteWartelistenPos, seedWert, zahlweg } from "@/lib/tournaments"
 import { NextRequest, NextResponse } from "next/server"
 
 // ANMELDUNG ÜBER PLAYER
@@ -11,15 +11,18 @@ import { NextRequest, NextResponse } from "next/server"
 // Bei kostenlosen / Vor-Ort-Turnieren ist die Anmeldung sofort gültig. Bei
 // Online-Zahlung entsteht hier nur ein reservierter Platz; bezahlt wird über
 // die Checkout-Route, und erst der Webhook setzt payment_status='paid'.
-export async function POST(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
+  // payment_choice: "online" (Standard) oder "onsite" — vor Ort zahlen kostet
+  // 5.- mehr und ist nur möglich, wenn das Turnier es zulässt.
+  const body = await req.json().catch(() => ({}))
   const sb = await createClient()
   const { data: { user } } = await sb.auth.getUser()
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
 
   const admin = createAdminClient()
   const { data: t } = await admin.from("player_tournaments")
-    .select("id,status,max_players,payment_mode,entry_fee_chf,registration_deadline")
+    .select("id,status,max_players,payment_mode,entry_fee_chf,onsite_fee_chf,registration_deadline")
     .eq("id", id).single()
   if (!t) return NextResponse.json({ error: "Turnier nicht gefunden" }, { status: 404 })
   if (!["open", "published", "registration_open"].includes(t.status))
@@ -41,7 +44,8 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     .not("elo", "is", null).gt("elo", prof.elo ?? 1000)
   const rank = (besser ?? 0) + 1
 
-  const bezahltNoetig = t.payment_mode === "online" && Number(t.entry_fee_chf) > 0
+  const weg = zahlweg(t, typeof body.payment_choice === "string" ? body.payment_choice : null)
+  const bezahltNoetig = weg.bezahltNoetig
   const b = await belegung(admin, id, t.max_players)
   const aufWarteliste = b.voll
   const wlPos = aufWarteliste ? await naechsteWartelistenPos(admin, id) : null
@@ -54,8 +58,8 @@ export async function POST(_req: NextRequest, { params }: { params: Promise<{ id
     elo_at_signup: prof.elo, level_at_signup: prof.level, rank_at_signup: rank,
     seeding_value: seed,
     // Gratis/Vor-Ort → sofort gültig; Online → erst nach Zahlung (Checkout-Route)
-    payment_status: aufWarteliste ? "none" : (bezahltNoetig ? "none" : "free"),
-    amount_chf: bezahltNoetig ? t.entry_fee_chf : 0,
+    payment_status: aufWarteliste ? "none" : weg.status,
+    amount_chf: weg.betrag,
     waitlist: aufWarteliste, waitlist_pos: wlPos,
   }).select("id").single()
 

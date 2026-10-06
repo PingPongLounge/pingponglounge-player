@@ -1,5 +1,5 @@
 import { createAdminClient } from "@/lib/supabase/admin"
-import { belegung, naechsteWartelistenPos, seedWert, selfRatingElo, SELF_RATINGS } from "@/lib/tournaments"
+import { belegung, naechsteWartelistenPos, seedWert, selfRatingElo, SELF_RATINGS, zahlweg, VOR_ORT_OFFEN } from "@/lib/tournaments"
 import { NextRequest, NextResponse } from "next/server"
 import { melde, sendTournamentConfirm, sendTournamentStaffNotice } from "@/lib/email"
 
@@ -42,7 +42,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const admin = createAdminClient()
   const { data: t } = await admin.from("player_tournaments")
-    .select("id,name,date,start_time,end_time,city,status,max_players,payment_mode,entry_fee_chf,registration_deadline,published_web,format")
+    .select("id,name,date,start_time,end_time,city,status,max_players,payment_mode,entry_fee_chf,onsite_fee_chf,registration_deadline,published_web,format")
     .eq("id", id).single()
   if (!t) return NextResponse.json({ error: "Turnier nicht gefunden" }, { status: 404 })
 
@@ -76,15 +76,20 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const { data: schon } = await admin.from("tournament_registrations")
     .select("id,waitlist,payment_status").eq("tournament_id", id).is("player_id", null).ilike("email", email).maybeSingle()
   if (schon) {
+    // Wer vor Ort zahlt, soll nicht nachträglich an die Kasse geschickt werden.
     const offen = t.payment_mode === "online" && Number(t.entry_fee_chf) > 0
-      && !schon.waitlist && schon.payment_status !== "paid"
+      && !schon.waitlist
+      && schon.payment_status !== "paid" && schon.payment_status !== VOR_ORT_OFFEN
     return NextResponse.json({
       ok: true, already: true, waitlist: schon.waitlist,
       registration_id: schon.id, needsPayment: offen,
     })
   }
 
-  const bezahltNoetig = t.payment_mode === "online" && Number(t.entry_fee_chf) > 0
+  // Online im Voraus oder vor Ort — die Wahl kommt aus dem Formular und gilt
+  // nur, wenn das Turnier sie zulaesst (onsite_fee_chf gesetzt).
+  const weg = zahlweg(t, typeof body.payment_choice === "string" ? body.payment_choice : null)
+  const bezahltNoetig = weg.bezahltNoetig
   const b = await belegung(admin, id, t.max_players)
   const aufWarteliste = b.voll
   const wlPos = aufWarteliste ? await naechsteWartelistenPos(admin, id) : null
@@ -97,8 +102,8 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     geschlecht: geschlecht || null,
     begleitung: gBegleitung,
     seeding_value: seedWert({ reg_type: "guest", self_rating: self }) ?? selfRatingElo(self),
-    payment_status: aufWarteliste ? "none" : (bezahltNoetig ? "none" : "free"),
-    amount_chf: bezahltNoetig ? t.entry_fee_chf : 0,
+    payment_status: aufWarteliste ? "none" : weg.status,
+    amount_chf: weg.betrag,
     waitlist: aufWarteliste, waitlist_pos: wlPos,
   }).select("id").single()
 
@@ -120,7 +125,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       datumLabel,
       zeitLabel: t.start_time ? `${String(t.start_time).slice(0, 5)}${t.end_time ? `–${String(t.end_time).slice(0, 5)}` : ""} Uhr` : undefined,
       ort: t.city || undefined,
-      startgeldChf: Number(t.entry_fee_chf) || 0,
+      startgeldChf: weg.betrag,
       bezahlt: false,
       warteliste: aufWarteliste,
       turnierUrl: `https://pingponglounge.ch/turniere/${id}`,
@@ -148,7 +153,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         spielstaerke: SELF_RATINGS.find(r => r.key === self)?.label ?? self,
         zahlungsstatus: aufWarteliste ? "Warteliste, keine Zahlung"
           : bezahltNoetig ? "offen (online)"
-          : Number(t.entry_fee_chf) > 0 ? `CHF ${t.entry_fee_chf} vor Ort` : "gratis",
+          : weg.betrag > 0 ? `CHF ${weg.betrag} vor Ort` : "gratis",
         warteliste: aufWarteliste,
         wartelistenPos: wlPos,
         belegt: b.belegt, max: t.max_players,

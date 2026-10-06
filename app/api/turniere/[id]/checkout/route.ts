@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import Stripe from "stripe"
 import { createAdminClient } from "@/lib/supabase/admin"
-import { belegung, RESERVE_MINUTES } from "@/lib/tournaments"
+import { belegung, RESERVE_MINUTES, VOR_ORT_OFFEN } from "@/lib/tournaments"
 import { erlaubteBasis, erlaubterPfad } from "@/lib/return-base"
 import { gibGutscheinFrei, normCode, reserviereGutschein } from "@/lib/gutschein"
 import { schliesseAbTurnier } from "@/lib/abschluss"
@@ -44,6 +44,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (!reg) return NextResponse.json({ error: "Anmeldung nicht gefunden" }, { status: 404 })
   if (reg.waitlist) return NextResponse.json({ error: "Du stehst auf der Warteliste — noch keine Zahlung nötig." }, { status: 400 })
   if (["paid", "free"].includes(reg.payment_status)) return NextResponse.json({ ok: true, alreadyPaid: true })
+  // Wer sich fuer "vor Ort zahlen" entschieden hat, wird hier nicht mehr an die
+  // Kasse geschickt — sonst wuerde er den hoeheren Betrag online bezahlen.
+  if (reg.payment_status === VOR_ORT_OFFEN)
+    return NextResponse.json({ error: "Diese Anmeldung wird vor Ort bezahlt" }, { status: 400 })
 
   const { data: t } = await admin.from("player_tournaments")
     .select("id,name,entry_fee_chf,payment_mode,max_players,status,date,start_time,city").eq("id", id).single()
