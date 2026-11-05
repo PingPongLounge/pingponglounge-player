@@ -1,4 +1,4 @@
-import { STAFF_EMAILS } from "@/lib/staff"
+import { STAFF_EMAILS, MAIL_EMPFAENGER_INTERN } from "@/lib/staff"
 import { ratingLabel } from "@/lib/rewards"
 // Transaktionale E-Mails via Resend (REST, ohne SDK). Ohne RESEND_API_KEY
 // passiert nichts — die App läuft normal weiter, es wird nur nicht gemailt.
@@ -479,7 +479,7 @@ export async function sendTournamentConfirm(opts: {
  *  Damit kann sie nicht doppelt kommen: die beiden Wege schliessen einander
  *  aus, genau wie bei der Bestaetigungsmail an den Gast.
  *
- *  Geht an alle STAFF_EMAILS. Blockiert nie — der Aufrufer verpackt sie in
+ *  Geht an MAIL_EMPFAENGER_INTERN (seit 05.11.2026 nur info@). Blockiert nie — der Aufrufer verpackt sie in
  *  melde(), Fehler landen im Serverlog.
  */
 export async function sendTournamentStaffNotice(opts: {
@@ -526,9 +526,9 @@ export async function sendTournamentStaffNotice(opts: {
     </table>
     ${opts.turnierId ? outlineButton(`https://pingponglounge.ch/turniere/${opts.turnierId}`, "Turnier ansehen") : ""}`
 
-  // An alle Staff-Adressen. Ein Versand je Adresse, damit eine ungueltige
-  // Adresse die anderen nicht mitreisst.
-  const ergebnisse = await Promise.all(STAFF_EMAILS.map(adresse => sendEmail({
+  // Ein Versand je Adresse, damit eine ungueltige Adresse die anderen nicht
+  // mitreisst. Empfaenger seit 05.11.2026 nur noch info@ (siehe lib/staff.ts).
+  const ergebnisse = await Promise.all(MAIL_EMPFAENGER_INTERN.map(adresse => sendEmail({
     to: adresse,
     subject: `${opts.warteliste ? "Warteliste" : "Anmeldung"}: ${opts.vorname} ${opts.nachname} — ${opts.turnier}`,
     html: shell(inner),
