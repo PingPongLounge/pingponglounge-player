@@ -86,6 +86,47 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     })
   }
 
+  // ─── KONTO-ABGLEICH ────────────────────────────────────────────────────────
+  // Die Anmeldung laeuft ueber pingponglounge.ch, ohne Login. Wer dort bucht,
+  // landete bisher IMMER als Gast — auch wenn zur selben E-Mail laengst ein
+  // PLAYER-Konto mit Level und Elo existiert. In der Teilnehmerliste stand
+  // dann "Gast" statt "Level 3 · 1066", und jemand musste es von Hand
+  // nachtragen. Deshalb: E-Mail gegen die Profile pruefen und direkt verbinden.
+  //
+  // Bewusst eq statt ilike: ein Unterstrich in einer Adresse waere bei ilike
+  // ein Platzhalter und koennte ein FREMDES Konto treffen. Profil-E-Mails
+  // werden kleingeschrieben gespeichert, die Eingabe oben ebenso.
+  const { data: konto } = await admin.from("profiles")
+    .select("id,elo,level").eq("email", email).maybeSingle()
+
+  // Hat sich dieses Konto schon selbst angemeldet? Dann nicht ein zweites Mal
+  // eintragen — sonst belegt dieselbe Person zwei der max_players Plaetze und
+  // steht zweimal in der Auslosung.
+  if (konto) {
+    const { data: schonMitKonto } = await admin.from("tournament_registrations")
+      .select("id,waitlist,payment_status")
+      .eq("tournament_id", id).eq("player_id", konto.id).maybeSingle()
+    if (schonMitKonto) {
+      const offen = t.payment_mode === "online" && Number(t.entry_fee_chf) > 0
+        && !schonMitKonto.waitlist
+        && schonMitKonto.payment_status !== "paid" && schonMitKonto.payment_status !== VOR_ORT_OFFEN
+      return NextResponse.json({
+        ok: true, already: true, waitlist: schonMitKonto.waitlist,
+        registration_id: schonMitKonto.id, needsPayment: offen,
+      })
+    }
+  }
+
+  // Rang in der globalen Rangliste nach Elo — gleiche Rechnung wie bei der
+  // Anmeldung im Player selbst.
+  let kontoRang: number | null = null
+  if (konto) {
+    const { count: besser } = await admin.from("profiles")
+      .select("id", { count: "exact", head: true })
+      .not("elo", "is", null).gt("elo", konto.elo ?? 1000)
+    kontoRang = (besser ?? 0) + 1
+  }
+
   // Online im Voraus oder vor Ort — die Wahl kommt aus dem Formular und gilt
   // nur, wenn das Turnier sie zulaesst (onsite_fee_chf gesetzt).
   const weg = zahlweg(t, typeof body.payment_choice === "string" ? body.payment_choice : null)
@@ -95,13 +136,21 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   const wlPos = aufWarteliste ? await naechsteWartelistenPos(admin, id) : null
 
   const { data: reg, error } = await admin.from("tournament_registrations").insert({
-    tournament_id: id, player_id: null,
-    reg_type: "guest", source: "ppl_web",
+    tournament_id: id, player_id: konto?.id ?? null,
+    reg_type: konto ? "player" : "guest", source: "ppl_web",
     first_name: first, last_name: last, email, phone,
     self_rating: self, consent: true,
     geschlecht: geschlecht || null,
     begleitung: gBegleitung,
-    seeding_value: seedWert({ reg_type: "guest", self_rating: self }) ?? selfRatingElo(self),
+    elo_at_signup: konto?.elo ?? null,
+    level_at_signup: konto?.level ?? null,
+    rank_at_signup: kontoRang,
+    // Setzwert: echtes Elo schlaegt Level schlaegt Selbsteinschaetzung. Ein
+    // Konto ohne Elo faellt bewusst auf die Selbsteinschaetzung zurueck,
+    // statt als "nicht eingestuft" in die Auslosung zu gehen.
+    seeding_value: (konto
+      ? seedWert({ reg_type: "player", elo_at_signup: konto.elo, level_at_signup: konto.level })
+      : null) ?? seedWert({ reg_type: "guest", self_rating: self }) ?? selfRatingElo(self),
     payment_status: aufWarteliste ? "none" : weg.status,
     amount_chf: weg.betrag,
     waitlist: aufWarteliste, waitlist_pos: wlPos,
