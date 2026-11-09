@@ -247,7 +247,10 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
 
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
-    payment_method_types: ["card"],
+    // 09.11.2026: keine feste Liste mehr. Stripe bietet an, was im Dashboard
+    // aktiviert ist — damit erscheinen TWINT, Apple Pay und Google Pay, ohne
+    // dass der Code angefasst werden muss. Vorher stand hier ["card"], was das
+    // Dashboard uebersteuerte und alles ausser Karte ausschloss.
     line_items: [{
       quantity: 1,
       price_data: {
