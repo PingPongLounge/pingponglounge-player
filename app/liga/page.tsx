@@ -960,7 +960,7 @@ export default function LigaPage(){
                   Fordere Spieler rund um deinen Rang heraus. Jedes bestätigte Spiel verschiebt dein Rating — ein Sieg gegen jemand Stärkeren bringt am meisten, gegen jemand Schwächeren am wenigsten.
                 </p>
                 <p style={{fontSize:14,lineHeight:1.55,color:P_LEISE,margin:0,maxWidth:"52ch"}}>
-                  Gegen denselben Gegner zählen höchstens {MAX_RANKED_PER_OPPONENT} Spiele pro Jahr für die Wertung. {AKTIVITAETSPFLICHT_AKTIV?`Und wer weniger als ${MIN_MATCHES_PER_MONTH} gewertete Spiele im Monat hat, verliert ${MONTHLY_PENALTY_ELO} Punkte.`:"In der Rangliste stehst du ab 5 gewerteten Spielen. Wer 2 Monate nicht spielt, fällt raus, behält aber seine Punkte und ist mit dem nächsten Spiel wieder drin. Wer ein Turnier gewinnt, bekommt zusätzlich 30 Punkte."} Die Stufe ist kein eigener Aufstieg, sondern ein Etikett für deinen Rating-Bereich.
+                  Gegen denselben Gegner zählen höchstens {MAX_RANKED_PER_OPPONENT} Spiele pro Jahr für die Wertung. {AKTIVITAETSPFLICHT_AKTIV?`Und wer weniger als ${MIN_MATCHES_PER_MONTH} gewertete Spiele im Monat hat, verliert ${MONTHLY_PENALTY_ELO} Punkte.`:"Rang ab 5 Spielen · 2 Monate Pause = raus, Punkte bleiben · Turniersieg +30"} Die Stufe ist kein eigener Aufstieg, sondern ein Etikett für deinen Rating-Bereich.
                 </p>
               </div>
             </div>

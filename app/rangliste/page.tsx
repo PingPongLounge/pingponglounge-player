@@ -109,12 +109,12 @@ export default function RanglistePage() {
               </div>
               {me.inaktiv && (
                 <p data-qa="rang-inaktiv" style={{ padding: "0 18px 16px", fontSize: 13, lineHeight: 1.5, color: LEISE, margin: 0 }}>
-                  Inaktiv: Du hast seit 2 Monaten nicht gespielt. Deine Punkte bleiben, mit dem nächsten Spiel bist du wieder in der Rangliste.
+                  Inaktiv · ein Spiel und du bist wieder drin
                 </p>
               )}
               {me.provisorisch && (
                 <p data-qa="rang-provisorisch" style={{ padding: "0 18px 16px", fontSize: 13, lineHeight: 1.5, color: LEISE, margin: 0 }}>
-                  Provisorisch: Du erscheinst in der Rangliste, sobald du 5 Spiele gemacht hast. Noch {me.fehlend} {me.fehlend === 1 ? "Spiel" : "Spiele"}.
+                  Provisorisch · noch {me.fehlend} {me.fehlend === 1 ? "Spiel" : "Spiele"} bis zum Rang
                 </p>
               )}
             </section>
@@ -183,7 +183,7 @@ export default function RanglistePage() {
           </section>
 
           <p data-qa="rang-regeln" className="p-hinweis" style={{ fontSize: 13, lineHeight: 1.5, margin: "12px 2px 0" }}>
-            In der Rangliste stehst du ab 5 gewerteten Spielen. Wer 2 Monate nicht spielt, fällt raus und ist mit dem nächsten Spiel wieder drin. Die Punkte bleiben.
+            Rang ab 5 Spielen · 2 Monate Pause = raus, Punkte bleiben
           </p>
 
           {!loading && !error && !canton && prov.length > 0 && (
