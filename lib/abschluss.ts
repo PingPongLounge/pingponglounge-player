@@ -5,6 +5,7 @@ import { melde, sendBookingConfirm, sendEmail, sendTournamentConfirm, sendTourna
 import { entryQrFor, weekdayOf, SINGLE_NIGHT_PLAETZE } from "@/lib/opengames"
 import { belegung, SELF_RATINGS } from "@/lib/tournaments"
 import { bestaetigeGutschein } from "@/lib/gutschein"
+import { abmeldeLink } from "@/lib/turnier-abmelden"
 
 /* ── DER ABSCHLUSS EINER ANMELDUNG ───────────────────────────────────────────
    Bis hierher gab es zwei Wege zum bestätigten Platz: den Stripe-Webhook und —
@@ -207,6 +208,7 @@ export async function schliesseAbTurnier(
       startgeldChf: betrag,
       bezahlt: true,
       turnierUrl: `https://pingponglounge.ch/turniere/${reg.tournament_id}`,
+      abmeldeUrl: abmeldeLink(regId, reg.tournament_id),
     }),
   ) // wirft nie — Zahlung darf nie am Mailversand scheitern
 

@@ -2,6 +2,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { belegung, naechsteWartelistenPos, seedWert, selfRatingElo, SELF_RATINGS, zahlweg, VOR_ORT_OFFEN } from "@/lib/tournaments"
 import { NextRequest, NextResponse } from "next/server"
 import { melde, sendTournamentConfirm, sendTournamentStaffNotice } from "@/lib/email"
+import { abmeldeLink } from "@/lib/turnier-abmelden"
 
 // ANMELDUNG ÜBER PING PONG LOUNGE (Gast, ohne Player-Konto)
 // KEIN Login nötig. Gast gibt Name, E-Mail und eine verständliche
@@ -178,6 +179,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       bezahlt: false,
       warteliste: aufWarteliste,
       turnierUrl: `https://pingponglounge.ch/turniere/${id}`,
+      abmeldeUrl: reg?.id ? abmeldeLink(reg.id, id) : undefined,
       }),
     ) // wirft nie — Anmeldung darf nie am Mailversand scheitern
   }

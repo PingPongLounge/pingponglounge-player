@@ -81,6 +81,9 @@ const PUBLIC_API = [
   // pruefen den Token selbst und lassen ohne ihn niemanden durch.
   '/api/single-night/cancel',
   '/api/trainingscamp/cancel',
+  // 17.11.2026: Turnier-Abmeldung per Link aus der Bestaetigungsmail. Prueft
+  // die HMAC-Signatur selbst (lib/turnier-abmelden.ts).
+  '/api/turniere/abmelden',
 ]
 
 // Routen mit dynamischem Segment, die ebenfalls ohne Login erreichbar sein

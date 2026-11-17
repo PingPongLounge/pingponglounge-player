@@ -429,6 +429,8 @@ export async function sendTournamentConfirm(opts: {
   warteliste?: boolean
   turnierUrl?: string
   stornoText?: string
+  /** Signierter Abmeldelink (lib/turnier-abmelden.ts). */
+  abmeldeUrl?: string
 }) {
   const titel = opts.warteliste ? "Auf der Warteliste" : "Anmeldung bestätigt"
   const status = opts.warteliste
@@ -459,8 +461,11 @@ export async function sendTournamentConfirm(opts: {
     <p style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:18px;line-height:1.5;font-family:system-ui,sans-serif">${
       opts.stornoText ||
       // 16.11.2026 (Oliver): Abmelderegel 24 Stunden, gleicher Wortlaut wie auf der Webseite.
-      "Kannst du doch nicht? Kein Problem – melde dich bis 24 Stunden vor dem Turnier ab, dann ist es kostenlos. Danach müssen wir den Platz leider verrechnen, weil er für andere blockiert war. Zum Abmelden einfach auf diese Mail antworten."
-    }</p>
+      // 17.11.2026: Abmelden per Link statt per Antwortmail.
+      "Kannst du doch nicht? Kein Problem – melde dich bis 24 Stunden vor dem Turnier ab, dann ist es kostenlos. Danach müssen wir den Platz leider verrechnen, weil er für andere blockiert war."
+    }${opts.abmeldeUrl
+      ? ` <a href="${opts.abmeldeUrl}" style="color:#ffffff;text-decoration:underline">Hier abmelden</a>`
+      : " Zum Abmelden einfach auf diese Mail antworten."}</p>
     <p style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:8px;line-height:1.5;font-family:system-ui,sans-serif">Bring Hallenschuhe mit. Schläger und Bälle sind vor Ort.</p>`
   return sendEmail({
     to: opts.to,
