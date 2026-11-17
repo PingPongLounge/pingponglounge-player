@@ -180,8 +180,8 @@ export default function RanglistePage() {
           {!loading && !error && !canton && prov.length > 0 && (
             <section className="p-karte p-abschnitt" data-qa="rangliste-provisorisch">
               <div className="p-kopf">
-                <h2>Provisorisch</h2>
-                <span className="p-mehr">Rang ab 5 Spielen</span>
+                <h2><IconRangliste size={22}/>Provisorisch</h2>
+                <span className="p-mehr">ab 5 Spielen</span>
               </div>
               {prov.map(p => (
                 <Link key={p.user_id} href={`/spieler/${p.user_id}`} className="p-zeile">
