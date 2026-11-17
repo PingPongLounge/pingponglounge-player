@@ -97,5 +97,8 @@ export async function GET(req: NextRequest) {
     players: gefiltert,
     me: me ?? (meProv ? { ...meProv, provisorisch: true, fehlend: MIN_SPIELE_RANG - meProv.spiele } : null),
     total: alle.length,
+    // Noch ohne Rang: wer schon gespielt hat, aber weniger als MIN_SPIELE_RANG Spiele.
+    provisorisch: provisorisch.filter(r => r.spiele > 0)
+      .map(r => ({ user_id: r.user_id, name: r.name, elo: r.elo, level: r.level, avatar: r.avatar, spiele: r.spiele })),
   })
 }

@@ -26,6 +26,7 @@ export default function RanglistePage() {
   const [canton, setCanton] = useState("")
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
+  const [prov, setProv] = useState<{ user_id: string; name: string; elo: number; spiele: number }[]>([])
 
   const load = useCallback(async (ct: string) => {
     setLoading(true); setError("")
@@ -34,7 +35,7 @@ export default function RanglistePage() {
       const res = await fetch(`/api/rangliste${qs}`)
       if (!res.ok) throw new Error()
       const json = await res.json()
-      setPlayers(json.players || []); setMe(json.me || null)
+      setPlayers(json.players || []); setMe(json.me || null); setProv(json.provisorisch || [])
     } catch { setError("Rangliste konnte nicht geladen werden.") }
     finally { setLoading(false) }
   }, [])
@@ -175,6 +176,26 @@ export default function RanglistePage() {
               )
             })}
           </section>
+
+          {!loading && !error && !canton && prov.length > 0 && (
+            <section className="p-karte p-abschnitt" data-qa="rangliste-provisorisch">
+              <div className="p-kopf">
+                <h2>Provisorisch</h2>
+                <span className="p-mehr">Rang ab 5 Spielen</span>
+              </div>
+              {prov.map(p => (
+                <Link key={p.user_id} href={`/spieler/${p.user_id}`} className="p-zeile">
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <b style={{ display: "block", fontSize: 15.5, fontWeight: 600, lineHeight: 1.3 }}>{p.name}</b>
+                    <span style={{ display: "block", marginTop: 3, fontSize: 13, fontWeight: 400, color: LEISE }}>
+                      {me?.user_id === p.user_id ? "Du · " : ""}{p.spiele} von 5 Spielen
+                    </span>
+                  </span>
+                  <span style={{ flexShrink: 0, minWidth: 52, textAlign: "right", fontFamily: ANTON, fontWeight: 400, fontSize: 21, lineHeight: 1, color: LEISE, fontVariantNumeric: "tabular-nums" }}>{p.elo}</span>
+                </Link>
+              ))}
+            </section>
+          )}
         </div>
       </main>
       <BottomNav />
