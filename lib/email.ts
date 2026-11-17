@@ -457,7 +457,9 @@ export async function sendTournamentConfirm(opts: {
     </table>
     ${opts.turnierUrl ? outlineButton(opts.turnierUrl, "Turnier ansehen") : ""}
     <p style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:18px;line-height:1.5;font-family:system-ui,sans-serif">${
-      opts.stornoText || "Abmelden bis zum Anmeldeschluss — schreib uns dazu einfach auf diese Mail."
+      opts.stornoText ||
+      // 16.11.2026 (Oliver): Abmelderegel 24 Stunden, gleicher Wortlaut wie auf der Webseite.
+      "Kannst du doch nicht? Kein Problem – melde dich bis 24 Stunden vor dem Turnier ab, dann ist es kostenlos. Danach müssen wir den Platz leider verrechnen, weil er für andere blockiert war. Zum Abmelden einfach auf diese Mail antworten."
     }</p>
     <p style="font-size:12.5px;color:rgba(255,255,255,.6);margin-top:8px;line-height:1.5;font-family:system-ui,sans-serif">Bring Hallenschuhe mit. Schläger und Bälle sind vor Ort.</p>`
   return sendEmail({
