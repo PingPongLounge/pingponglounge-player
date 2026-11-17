@@ -2,7 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { NextRequest, NextResponse } from "next/server"
 import { PP_CONFIG } from "@/lib/rewards"
-import { berechneElo } from "@/lib/elo"
+import { berechneElo, TURNIER_BONUS_SIEG } from "@/lib/elo"
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -68,11 +68,13 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
       .eq("round", m.round + 1)
       .eq("match_number", nextMatchNum)
       .maybeSingle()
+    let istFinale = false
     if (nextMatch) {
       if (isFirstSlot) await admin.from("tournament_matches").update({ p1_id: m.winner_id }).eq("id", nextMatch.id)
       else await admin.from("tournament_matches").update({ p2_id: m.winner_id }).eq("id", nextMatch.id)
     } else {
       // Kein nächstes Match -> das war das Finale: Champion + Turnier beendet
+      istFinale = true
       await admin.from("player_tournaments").update({ status: "finished", champion_id: m.winner_id, updated_at: new Date().toISOString() }).eq("id", m.tournament_id)
 
       // PingPoints fürs Podest — NUR bei Turnieren, die für den Rang zählen.
@@ -126,10 +128,29 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
           await admin.from("profiles").update({ elo: newW, matches_played: (w.matches_played ?? 0) + 1, matches_won: (w.matches_won ?? 0) + 1 }).eq("id", m.winner_id)
           await admin.from("profiles").update({ elo: newL, matches_played: (l.matches_played ?? 0) + 1 }).eq("id", loserId)
           await admin.from("elo_history").insert([
-            { player_id: m.winner_id, elo: newW, delta: newW - wElo, match_id, note: "turnier" },
-            { player_id: loserId, elo: newL, delta: newL - lElo, match_id, note: "turnier" },
+            // match_id zeigt auf league_matches (Fremdschluessel) — ein Turnierspiel
+            // dort einzutragen scheiterte still, der Verlauf blieb leer. Die
+            // Turnierspiel-Id steht deshalb im Vermerk.
+            { player_id: m.winner_id, elo: newW, delta: newW - wElo, match_id: null, note: `turnier:${m.tournament_id}:${match_id}` },
+            { player_id: loserId, elo: newL, delta: newL - lElo, match_id: null, note: `turnier:${m.tournament_id}:${match_id}` },
           ])
         }
+      }
+    }
+
+    // Turnierbonus fuer den Sieger — erst nach den Punkten des Finales,
+    // als eigener Eintrag. Gleiche Bedingung wie das Podest (gewertet, ab 4).
+    if (istFinale && m.winner_id) {
+      const { data: tB } = await admin.from("player_tournaments").select("counts_for_rank").eq("id", m.tournament_id).single()
+      const { count: anzahl } = await admin.from("tournament_registrations")
+        .select("id", { count: "exact", head: true }).eq("tournament_id", m.tournament_id)
+      const schluessel = `turnierbonus:${m.tournament_id}`
+      const { data: schon } = await admin.from("elo_history").select("id").eq("player_id", m.winner_id).eq("note", schluessel).maybeSingle()
+      if (tB?.counts_for_rank && (anzahl ?? 0) >= 4 && !schon) {
+        const { data: s } = await admin.from("profiles").select("elo").eq("id", m.winner_id).single()
+        const neu = (s?.elo ?? 1000) + TURNIER_BONUS_SIEG
+        await admin.from("profiles").update({ elo: neu }).eq("id", m.winner_id)
+        await admin.from("elo_history").insert({ player_id: m.winner_id, elo: neu, delta: TURNIER_BONUS_SIEG, match_id: null, note: schluessel })
       }
     }
   }

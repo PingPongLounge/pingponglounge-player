@@ -6,6 +6,12 @@ import type { SupabaseClient } from "@supabase/supabase-js"
 export const K = 32
 export const ELO_FLOOR = 100
 
+// Turnierbonus (Oliver, 17.11.2026): Der Turniersieger bekommt zusaetzlich
+// zu den Spielpunkten +30 — nur der oberste Sieger, nur bei gewerteten Turnieren.
+// Grund: Wer als Favorit alles gewinnt, holte sonst kaum Punkte (Grand Smash:
+// Sieger +31, Finalist +117). Eigener Eintrag in elo_history (note turnierbonus:<id>).
+export const TURNIER_BONUS_SIEG = 30
+
 /**
  * Die reine Rechnung — ohne Datenbank, deshalb testbar.
  * Vorher steckte sie mitten in applyElo() und liess sich nur mit einer echten
