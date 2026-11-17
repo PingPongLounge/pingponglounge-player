@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { belegung, naechsteWartelistenPos, seedWert, zahlweg } from "@/lib/tournaments"
 import { NextRequest, NextResponse } from "next/server"
+import { MIN_SPIELE_RANG } from "@/lib/rang"
 
 // ANMELDUNG ÜBER PLAYER
 // Der eingeloggte Nutzer wird mit seinen Profildaten angemeldet — er muss seine
@@ -41,7 +42,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   // Relevanter Rang = Position in der globalen Rangliste nach Elo.
   const { count: besser } = await admin.from("profiles")
     .select("id", { count: "exact", head: true })
-    .not("elo", "is", null).gt("elo", prof.elo ?? 1000)
+    .not("elo", "is", null).gt("elo", prof.elo ?? 1000).gte("matches_played", MIN_SPIELE_RANG)
   const rank = (besser ?? 0) + 1
 
   const weg = zahlweg(t, typeof body.payment_choice === "string" ? body.payment_choice : null)

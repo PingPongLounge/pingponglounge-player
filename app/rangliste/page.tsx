@@ -16,7 +16,7 @@ import { ANTON, INTER, TEXT, LEISE, AKZENT, BG } from "@/app/design"
 import { IconRangliste } from "@/app/components/Icons"
 
 const CANTONS = ["AG","AI","AR","BE","BL","BS","FR","GE","GL","GR","JU","LU","NE","NW","OW","SG","SH","SO","SZ","TG","TI","UR","VD","VS","ZG","ZH"]
-type Player = { user_id: string; name: string; elo: number; level: string; city?: string | null; canton?: string | null; rank_global: number; rank_filtered: number; avatar?: string | null }
+type Player = { user_id: string; name: string; elo: number; level: string; city?: string | null; canton?: string | null; rank_global: number; rank_filtered: number; avatar?: string | null; provisorisch?: boolean; fehlend?: number }
 
 function ini(n: string) { return n.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase() }
 
@@ -40,7 +40,7 @@ export default function RanglistePage() {
   }, [])
   useEffect(() => { load(canton) }, [canton, load])
 
-  const meinPlatz = me ? (canton ? me.rank_filtered : me.rank_global) : null
+  const meinPlatz = me && !me.provisorisch ? (canton ? me.rank_filtered : me.rank_global) : null
 
   return (
     <>
@@ -70,7 +70,7 @@ export default function RanglistePage() {
               {me ? (
                 <>
                   <div>
-                    <span className="zahl">#{meinPlatz}</span>
+                    <span className="zahl">{meinPlatz ? `#${meinPlatz}` : "–"}</span>
                     <span className="was">Dein Rang</span>
                   </div>
                   <div>
@@ -99,13 +99,18 @@ export default function RanglistePage() {
               </div>
               <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 16, padding: "16px 18px" }}>
                 <span style={{ fontFamily: ANTON, fontWeight: 400, fontSize: 56, lineHeight: .9, letterSpacing: "-.01em" }}>
-                  #{meinPlatz}
+                  {meinPlatz ? `#${meinPlatz}` : "–"}
                 </span>
                 <span style={{ textAlign: "right", fontSize: 13, lineHeight: 1.5, color: LEISE }}>
                   <b style={{ display: "block", fontSize: 15, fontWeight: 600, color: TEXT }}>Level {me.level}</b>
                   Rating {me.elo}
                 </span>
               </div>
+              {me.provisorisch && (
+                <p data-qa="rang-provisorisch" style={{ padding: "0 18px 16px", fontSize: 13, lineHeight: 1.5, color: LEISE, margin: 0 }}>
+                  Provisorisch: Du erscheinst in der Rangliste, sobald du 5 Spiele gemacht hast. Noch {me.fehlend} {me.fehlend === 1 ? "Spiel" : "Spiele"}.
+                </p>
+              )}
             </section>
           )}
 

@@ -9,6 +9,7 @@ import {
   IconOpenGames, IconLiga, IconRangliste, IconTurniere, IconSpieler,
   IconMatches, IconPfeil, IconChevron,
 } from '@/app/components/Icons'
+import { MIN_SPIELE_RANG } from "@/lib/rang"
 import {
   DUNKEL, BG, TEXT, LEISE, KANTE, NEON, AKZENT, DUNKEL_KANTE, ANTON, INTER,
 } from '@/app/design'
@@ -133,7 +134,7 @@ export default async function EntdeckenPage() {
         // Vier holen, drei zeigen: faellt einer ohne Namen raus, steht die
         // Rangliste trotzdem auf drei Zeilen.
         admin.from('public_profiles').select('id,name,elo,level,matches_played')
-          .gt('matches_played', 0).order('elo', { ascending: false }).limit(4),
+          .gte('matches_played', MIN_SPIELE_RANG).order('elo', { ascending: false }).limit(4),
         admin.from('open_games').select('id,location_name,date,start_hour,max_players,current_players,level')
           .not('kind', 'in', '(training,single_night)').in('status', ['open', 'full', 'p1_entered'])
           .not('date', 'is', null).gte('date', heute)
@@ -572,7 +573,7 @@ export default async function EntdeckenPage() {
 
   // Alle unabhängigen Abfragen parallel
   const [higherRes, ppRes, gamesRes, tourRes, membershipRes] = await Promise.all([
-    sb.from('public_profiles').select('*', { count: 'exact', head: true }).gt('elo', elo).gt('matches_played', 0),
+    sb.from('public_profiles').select('*', { count: 'exact', head: true }).gt('elo', elo).gte('matches_played', MIN_SPIELE_RANG),
     sb.from('ping_points_transactions').select('amount').eq('player_id', user.id),
     // Nur bevorstehende Spiele — vorher standen Spiele von letzter Woche ganz
     // oben in der Liste, weil das Datum nicht gefiltert wurde.
@@ -643,7 +644,7 @@ export default async function EntdeckenPage() {
     }
   })
 
-  const rank = (higherRes.count ?? 0) + 1
+  const rank = played >= MIN_SPIELE_RANG ? (higherRes.count ?? 0) + 1 : null
   const ppBalance = (ppRes.data || []).reduce((s, t) => s + Number(t.amount || 0), 0)
 
   // Dein nächstes Spiel: die früheste bevorstehende Buchung des Users (nur wenn vorhanden).

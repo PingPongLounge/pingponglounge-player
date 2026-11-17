@@ -28,7 +28,7 @@ export type Aktivitaet = { art: "forderung" | "neu"; id: string; spielerId: stri
 export type LetztesMatch = { id: string; gegnerId: string; gegner: string; avatar: string | null; satz: string; sieg: boolean }
 export type StartData = {
   firstName: string; initials: string; avatarUrl?: string | null; canton?: string | null
-  lvl: string; rank: number; elo: number; pct: number; nextLabel: string
+  lvl: string; rank: number | null; elo: number; pct: number; nextLabel: string
   ppBalance: number; wins: number; played: number; games: Game[]
   season: { has: boolean; label: string; city: string; leagueRank: number }
   tour: { name: string; dateLabel: string; formatLabel: string } | null
@@ -68,7 +68,7 @@ export default function StartHomeV2(d: StartData) {
                 <span className="was">Rating</span>
               </div>
               <div>
-                <span className="zahl">#{ligaRang}</span>
+                <span className="zahl">{ligaRang ? `#${ligaRang}` : "–"}</span>
                 <span className="was">{ligaLabel}</span>
               </div>
               <div>
@@ -120,7 +120,7 @@ export default function StartHomeV2(d: StartData) {
                 <span className="zahl">{d.elo}</span><span className="was">Rating</span>
               </Link>
               <Link href="/liga" className="p-kachel">
-                <span className="zahl">#{ligaRang}</span><span className="was">{ligaLabel}</span>
+                <span className="zahl">{ligaRang ? `#${ligaRang}` : "–"}</span><span className="was">{ligaLabel}</span>
               </Link>
               <Link href="/matchhistorie" className="p-kachel">
                 <span className="zahl">{d.played}</span><span className="was">Matches</span>

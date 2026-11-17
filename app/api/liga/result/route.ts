@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { sendResultConfirmRequest } from "@/lib/email"
 import { signAction } from "@/lib/token"
 import { notify } from "@/lib/notify"
+import { MIN_SPIELE_RANG } from "@/lib/rang"
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://playerliga.ch"
 
@@ -138,6 +139,7 @@ export async function POST(req: NextRequest) {
         .from("profiles")
         .select("id", { count: "exact", head: true })
         .gt("elo", oppElo)
+        .gte("matches_played", MIN_SPIELE_RANG)
       const rankNow = typeof count === "number" ? count + 1 : null
 
       const t = signAction("confirm", match_id, opponentId)

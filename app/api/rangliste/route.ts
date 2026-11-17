@@ -3,6 +3,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 import { globalLeagueId } from "@/lib/liga"
 import { tierForElo } from "@/lib/rewards"
 import { NextRequest, NextResponse } from "next/server"
+import { MIN_SPIELE_RANG } from "@/lib/rang"
 
 // ─── ZENTRALE RANGLISTE MIT FILTERN ──────────────────────────────────────────
 // Eine Liga, eine Elo, eine Platzierung. Die Filter berechnen nur die
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
   if (ids.length === 0) return NextResponse.json({ players: [], me: null })
 
   const { data: profs } = await admin.from("profiles")
-    .select("id,name,elo,level,avatar_url,home_location,handedness,pips,anti,player_category,visible_in_ranking")
+    .select("id,name,elo,level,avatar_url,home_location,handedness,pips,anti,player_category,visible_in_ranking,matches_played")
     .in("id", ids)
     // Wer sich aus der oeffentlichen Rangliste nimmt, erscheint hier nicht mehr.
     // Die eigenen Spiele und das eigene Rating bleiben davon unberuehrt.
@@ -60,10 +61,14 @@ export async function GET(req: NextRequest) {
         city: loc?.city || null, canton: loc?.canton || null, country: loc?.country || null,
         handedness: pf.handedness || null, pips: pf.pips || null, anti: pf.anti || false,
         category: pf.player_category || null,
+        spiele: pf.matches_played ?? 0,
         rank_global: 0, rank_filtered: 0,
       }
     })
     .sort((a, b) => b.elo - a.elo)
+  // Erst ab MIN_SPIELE_RANG Spielen in der Rangliste (lib/rang.ts).
+  const provisorisch = alle.filter(r => r.spiele < MIN_SPIELE_RANG)
+  alle.splice(0, alle.length, ...alle.filter(r => r.spiele >= MIN_SPIELE_RANG))
   alle.forEach((r, i) => (r.rank_global = i + 1))
 
   const scope = p.get("scope") || "world"
@@ -86,6 +91,11 @@ export async function GET(req: NextRequest) {
 
   const me = user ? (gefiltert.find(r => r.user_id === user.id)
                   || alle.find(r => r.user_id === user.id) || null) : null
+  const meProv = user && !me ? provisorisch.find(r => r.user_id === user.id) : null
 
-  return NextResponse.json({ players: gefiltert, me, total: alle.length })
+  return NextResponse.json({
+    players: gefiltert,
+    me: me ?? (meProv ? { ...meProv, provisorisch: true, fehlend: MIN_SPIELE_RANG - meProv.spiele } : null),
+    total: alle.length,
+  })
 }
