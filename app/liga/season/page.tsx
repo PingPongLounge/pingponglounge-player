@@ -149,7 +149,7 @@ export default function SeasonPage() {
           <h1 style={{ margin: "8px 0 10px", fontSize: 42, lineHeight: .92, textTransform: "uppercase" }}>Saison</h1>
           <p style={{ margin: 0, color: MUT, lineHeight: 1.5, fontSize: 15 }}>Automatische Gegner. Gleiche globale Wertung.</p>
           <div style={{ marginTop: 18, paddingTop: 16, borderTop: `1px solid ${LINE}`, fontSize: 13, lineHeight: 1.5, color: MUT }}>
-            Du musst bei keiner Season mitmachen. Deine globale Rangliste bleibt trotzdem aktiv. Für den Rating-Erhalt zählen weiterhin deine gewerteten Pflichtspiele pro Monat.
+            Du musst bei keiner Season mitmachen. Deine globale Rangliste bleibt trotzdem aktiv.
           </div>
         </div>
 

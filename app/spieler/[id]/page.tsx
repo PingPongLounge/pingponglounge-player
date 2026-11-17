@@ -15,7 +15,7 @@ import ProfilAktionen from "@/app/components/ProfilAktionen"
 import PlayerKopf from "@/app/components/PlayerKopf"
 import { ANTON, INTER, TEXT, LEISE, BG, knopf, knopfUmriss } from "@/app/design"
 import { IconMatches } from "@/app/components/Icons"
-import { MIN_SPIELE_RANG } from "@/lib/rang"
+import { MIN_SPIELE_RANG, aktivAb, rangberechtigt, hatRang } from "@/lib/rang"
 
 type Satz = { p1: number; p2: number }
 type Spiel = { id: string; p1_id: string; p2_id: string; winner_id: string | null; sets: Satz[] | null; played_at: string | null }
@@ -37,7 +37,7 @@ export default async function SpielerSeite({ params }: { params: Promise<{ id: s
 
   const { data: p } = await admin
     .from("public_profiles")
-    .select("id,name,level,elo,matches_played,matches_won,canton,avatar_url")
+    .select("id,name,level,elo,matches_played,matches_won,canton,avatar_url,zuletzt_gewertet")
     .eq("id", id)
     .maybeSingle()
   if (!p) notFound()
@@ -53,7 +53,7 @@ export default async function SpielerSeite({ params }: { params: Promise<{ id: s
       .limit(8),
     admin.from("public_profiles")
       .select("id", { count: "exact", head: true })
-      .gt("elo", p.elo ?? 1000).gte("matches_played", MIN_SPIELE_RANG),
+      .gt("elo", p.elo ?? 1000).gte("matches_played", MIN_SPIELE_RANG).gte("zuletzt_gewertet", aktivAb()),
   ])
 
   // Das eigene Profil zeigt den Bild-Knopf und keine Aktionen gegen sich selbst.
@@ -91,8 +91,8 @@ export default async function SpielerSeite({ params }: { params: Promise<{ id: s
               <span className="was">Rating</span>
             </div>
             <div>
-              <span className="zahl">{(p.matches_played ?? 0) >= MIN_SPIELE_RANG ? `#${(hoeher ?? 0) + 1}` : "–"}</span>
-              <span className="was">{(p.matches_played ?? 0) >= MIN_SPIELE_RANG ? "Rang" : "Rang ab 5 Spielen"}</span>
+              <span className="zahl">{rangberechtigt(p.matches_played, p.zuletzt_gewertet) ? `#${(hoeher ?? 0) + 1}` : "–"}</span>
+              <span className="was">{rangberechtigt(p.matches_played, p.zuletzt_gewertet) ? "Rang" : hatRang(p.matches_played) ? "Inaktiv" : "Rang ab 5 Spielen"}</span>
             </div>
             <div>
               <span className="zahl">{quote !== null ? `${quote}%` : "—"}</span>

@@ -5,7 +5,7 @@ import Link from "next/link"
 import BottomNav from "@/app/components/BottomNav"
 import PendingConfirmBanner from "@/app/components/PendingConfirmBanner"
 import NotificationBell from "@/app/components/NotificationBell"
-import { MAX_RANKED_PER_OPPONENT, RANKED_WINDOW_MONTHS, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO, TIERS, tierForElo, tierRangeLabel, type TierKey } from "@/lib/rewards"
+import { MAX_RANKED_PER_OPPONENT, RANKED_WINDOW_MONTHS, MIN_MATCHES_PER_MONTH, MONTHLY_PENALTY_ELO, AKTIVITAETSPFLICHT_AKTIV, TIERS, tierForElo, tierRangeLabel, type TierKey } from "@/lib/rewards"
 import {
   ratingLabel, ANTON, INTER,
 } from "@/app/theme"
@@ -762,7 +762,7 @@ export default function LigaPage(){
                     in einer Nebenzeile. Der Fortschritt und die Bestaetigung
                     "Soll erfuellt" waren im Redesign verloren gegangen —
                     genau die zwei Dinge, die man auf einen Blick sucht. */}
-                <div style={{padding:"0 18px 16px"}}>
+                {AKTIVITAETSPFLICHT_AKTIV&&<div style={{padding:"0 18px 16px"}}>
                   <div style={{display:"flex",alignItems:"baseline",justifyContent:"space-between",gap:12,fontSize:13}}>
                     <span style={{color:P_LEISE}}>Monatssoll · {monatCount}/{MIN_MATCHES_PER_MONTH} gewertete Spiele</span>
                     <span style={{fontWeight:600,whiteSpace:"nowrap",color:monatOk?P_AKZENT:P_TEXT}}>
@@ -772,10 +772,10 @@ export default function LigaPage(){
                   <div className="p-fortschritt" role="progressbar" aria-valuemin={0} aria-valuemax={MIN_MATCHES_PER_MONTH} aria-valuenow={Math.min(monatCount,MIN_MATCHES_PER_MONTH)} aria-label="Monatssoll">
                     <span style={{width:`${Math.min(100,Math.round(monatCount/MIN_MATCHES_PER_MONTH*100))}%`}}/>
                   </div>
-                </div>
+                </div>}
               </section>
 
-              {!monatOk&&(
+              {AKTIVITAETSPFLICHT_AKTIV&&!monatOk&&(
                 <p className="p-hinweis" style={{fontSize:13,margin:"10px 2px 0",lineHeight:1.5}}>
                   Noch {MIN_MATCHES_PER_MONTH-monatCount} gewertete Spiele bis Monatsende, sonst −{MONTHLY_PENALTY_ELO} Punkte.
                 </p>
@@ -960,7 +960,7 @@ export default function LigaPage(){
                   Fordere Spieler rund um deinen Rang heraus. Jedes bestätigte Spiel verschiebt dein Rating — ein Sieg gegen jemand Stärkeren bringt am meisten, gegen jemand Schwächeren am wenigsten.
                 </p>
                 <p style={{fontSize:14,lineHeight:1.55,color:P_LEISE,margin:0,maxWidth:"52ch"}}>
-                  Gegen denselben Gegner zählen höchstens {MAX_RANKED_PER_OPPONENT} Spiele pro Jahr für die Wertung. Und wer weniger als {MIN_MATCHES_PER_MONTH} gewertete Spiele im Monat hat, verliert {MONTHLY_PENALTY_ELO} Punkte. Die Stufe ist kein eigener Aufstieg, sondern ein Etikett für deinen Rating-Bereich.
+                  Gegen denselben Gegner zählen höchstens {MAX_RANKED_PER_OPPONENT} Spiele pro Jahr für die Wertung. {AKTIVITAETSPFLICHT_AKTIV?`Und wer weniger als ${MIN_MATCHES_PER_MONTH} gewertete Spiele im Monat hat, verliert ${MONTHLY_PENALTY_ELO} Punkte.`:"In der Rangliste stehst du ab 5 gewerteten Spielen. Wer 2 Monate nicht spielt, fällt raus, behält aber seine Punkte und ist mit dem nächsten Spiel wieder drin. Wer ein Turnier gewinnt, bekommt zusätzlich 30 Punkte."} Die Stufe ist kein eigener Aufstieg, sondern ein Etikett für deinen Rating-Bereich.
                 </p>
               </div>
             </div>

@@ -9,7 +9,7 @@ import {
   IconOpenGames, IconLiga, IconRangliste, IconTurniere, IconSpieler,
   IconMatches, IconPfeil, IconChevron,
 } from '@/app/components/Icons'
-import { MIN_SPIELE_RANG } from "@/lib/rang"
+import { MIN_SPIELE_RANG, aktivAb, rangberechtigt } from "@/lib/rang"
 import {
   DUNKEL, BG, TEXT, LEISE, KANTE, NEON, AKZENT, DUNKEL_KANTE, ANTON, INTER,
 } from '@/app/design'
@@ -134,7 +134,7 @@ export default async function EntdeckenPage() {
         // Vier holen, drei zeigen: faellt einer ohne Namen raus, steht die
         // Rangliste trotzdem auf drei Zeilen.
         admin.from('public_profiles').select('id,name,elo,level,matches_played')
-          .gte('matches_played', MIN_SPIELE_RANG).order('elo', { ascending: false }).limit(4),
+          .gte('matches_played', MIN_SPIELE_RANG).gte('zuletzt_gewertet', aktivAb()).order('elo', { ascending: false }).limit(4),
         admin.from('open_games').select('id,location_name,date,start_hour,max_players,current_players,level')
           .not('kind', 'in', '(training,single_night)').in('status', ['open', 'full', 'p1_entered'])
           .not('date', 'is', null).gte('date', heute)
@@ -561,7 +561,7 @@ export default async function EntdeckenPage() {
     )
   }
 
-  const { data: profile } = await sb.from('profiles').select('id,name,level,elo,matches_played,matches_won,avatar_url,canton').eq('id', user.id).maybeSingle()
+  const { data: profile } = await sb.from('profiles').select('id,name,level,elo,matches_played,matches_won,avatar_url,canton,zuletzt_gewertet').eq('id', user.id).maybeSingle()
   // Level-Gate: Wer noch keine Einstufung hat, wird zuerst zum Onboarding (Level-Abfrage) geschickt.
   if (!profile || !profile.level) redirect('/onboarding')
   const elo = profile?.elo ?? 1000
@@ -573,7 +573,7 @@ export default async function EntdeckenPage() {
 
   // Alle unabhängigen Abfragen parallel
   const [higherRes, ppRes, gamesRes, tourRes, membershipRes] = await Promise.all([
-    sb.from('public_profiles').select('*', { count: 'exact', head: true }).gt('elo', elo).gte('matches_played', MIN_SPIELE_RANG),
+    sb.from('public_profiles').select('*', { count: 'exact', head: true }).gt('elo', elo).gte('matches_played', MIN_SPIELE_RANG).gte('zuletzt_gewertet', aktivAb()),
     sb.from('ping_points_transactions').select('amount').eq('player_id', user.id),
     // Nur bevorstehende Spiele — vorher standen Spiele von letzter Woche ganz
     // oben in der Liste, weil das Datum nicht gefiltert wurde.
@@ -644,7 +644,7 @@ export default async function EntdeckenPage() {
     }
   })
 
-  const rank = played >= MIN_SPIELE_RANG ? (higherRes.count ?? 0) + 1 : null
+  const rank = rangberechtigt(played, profile?.zuletzt_gewertet) ? (higherRes.count ?? 0) + 1 : null
   const ppBalance = (ppRes.data || []).reduce((s, t) => s + Number(t.amount || 0), 0)
 
   // Dein nächstes Spiel: die früheste bevorstehende Buchung des Users (nur wenn vorhanden).

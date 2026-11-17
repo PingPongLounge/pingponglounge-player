@@ -67,14 +67,14 @@ export async function applyMonthlyPenalties(admin: SupabaseClient): Promise<numb
   const { bis: vormonatEnde, von: vormonatStart } = monthRange(vormonat)
   const { data: regs } = await admin
     .from("league_registrations")
-    .select("player_id,created_at")
+    .select("player_id,registered_at")
     .eq("season_id", global.id)
 
   for (const r of regs || []) {
     const pid = r.player_id as string
 
     // Erster angebrochener Monat ist frei.
-    const beitritt = r.created_at ? new Date(r.created_at as string) : null
+    const beitritt = r.registered_at ? new Date(r.registered_at as string) : null
     if (beitritt && beitritt >= new Date(vormonatStart)) continue
     if (beitritt && beitritt >= new Date(vormonatEnde)) continue
 

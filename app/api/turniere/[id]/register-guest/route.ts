@@ -3,7 +3,7 @@ import { belegung, naechsteWartelistenPos, seedWert, selfRatingElo, SELF_RATINGS
 import { NextRequest, NextResponse } from "next/server"
 import { melde, sendTournamentConfirm, sendTournamentStaffNotice } from "@/lib/email"
 import { abmeldeLink } from "@/lib/turnier-abmelden"
-import { MIN_SPIELE_RANG } from "@/lib/rang"
+import { MIN_SPIELE_RANG, aktivAb } from "@/lib/rang"
 
 // ANMELDUNG ÜBER PING PONG LOUNGE (Gast, ohne Player-Konto)
 // KEIN Login nötig. Gast gibt Name, E-Mail und eine verständliche
@@ -125,7 +125,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
   if (konto) {
     const { count: besser } = await admin.from("profiles")
       .select("id", { count: "exact", head: true })
-      .not("elo", "is", null).gt("elo", konto.elo ?? 1000).gte("matches_played", MIN_SPIELE_RANG)
+      .not("elo", "is", null).gt("elo", konto.elo ?? 1000).gte("matches_played", MIN_SPIELE_RANG).gte("zuletzt_gewertet", aktivAb())
     kontoRang = (besser ?? 0) + 1
   }
 

@@ -61,6 +61,10 @@ export const RANKED_WINDOW_MONTHS = 12
 // Zeitraum (verständlich und passend zu monatlichen Standortturnieren).
 export const MIN_MATCHES_PER_MONTH = 3   // gewertete Spiele pro Kalendermonat (gilt für ALLE, auch Elite)
 export const MONTHLY_PENALTY_ELO = 12    // Abzug, wenn nicht erreicht
+// 17.11.2026 (Oliver): Monatspflicht abgeschaltet — noch keine Werbung gemacht,
+// sie haette fast alle getroffen. Kein Abzug, keine Warnmails, keine Anzeige.
+// Wieder einschalten = true setzen.
+export const AKTIVITAETSPFLICHT_AKTIV = false
 // Erster Monat, der bewertet wird — davor wird NICHT rückwirkend bestraft.
 export const ACTIVITY_RULE_START = "2026-08"   // Format YYYY-MM
 

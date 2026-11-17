@@ -16,7 +16,7 @@ import { ANTON, INTER, TEXT, LEISE, AKZENT, BG } from "@/app/design"
 import { IconRangliste } from "@/app/components/Icons"
 
 const CANTONS = ["AG","AI","AR","BE","BL","BS","FR","GE","GL","GR","JU","LU","NE","NW","OW","SG","SH","SO","SZ","TG","TI","UR","VD","VS","ZG","ZH"]
-type Player = { user_id: string; name: string; elo: number; level: string; city?: string | null; canton?: string | null; rank_global: number; rank_filtered: number; avatar?: string | null; provisorisch?: boolean; fehlend?: number }
+type Player = { user_id: string; name: string; elo: number; level: string; city?: string | null; canton?: string | null; rank_global: number; rank_filtered: number; avatar?: string | null; provisorisch?: boolean; fehlend?: number; inaktiv?: boolean }
 
 function ini(n: string) { return n.split(/\s+/).map(w => w[0]).join("").slice(0, 2).toUpperCase() }
 
@@ -41,7 +41,7 @@ export default function RanglistePage() {
   }, [])
   useEffect(() => { load(canton) }, [canton, load])
 
-  const meinPlatz = me && !me.provisorisch ? (canton ? me.rank_filtered : me.rank_global) : null
+  const meinPlatz = me && !me.provisorisch && !me.inaktiv ? (canton ? me.rank_filtered : me.rank_global) : null
 
   return (
     <>
@@ -107,6 +107,11 @@ export default function RanglistePage() {
                   Rating {me.elo}
                 </span>
               </div>
+              {me.inaktiv && (
+                <p data-qa="rang-inaktiv" style={{ padding: "0 18px 16px", fontSize: 13, lineHeight: 1.5, color: LEISE, margin: 0 }}>
+                  Inaktiv: Du hast seit 2 Monaten nicht gespielt. Deine Punkte bleiben, mit dem nächsten Spiel bist du wieder in der Rangliste.
+                </p>
+              )}
               {me.provisorisch && (
                 <p data-qa="rang-provisorisch" style={{ padding: "0 18px 16px", fontSize: 13, lineHeight: 1.5, color: LEISE, margin: 0 }}>
                   Provisorisch: Du erscheinst in der Rangliste, sobald du 5 Spiele gemacht hast. Noch {me.fehlend} {me.fehlend === 1 ? "Spiel" : "Spiele"}.
@@ -176,6 +181,10 @@ export default function RanglistePage() {
               )
             })}
           </section>
+
+          <p data-qa="rang-regeln" className="p-hinweis" style={{ fontSize: 13, lineHeight: 1.5, margin: "12px 2px 0" }}>
+            In der Rangliste stehst du ab 5 gewerteten Spielen. Wer 2 Monate nicht spielt, fällt raus und ist mit dem nächsten Spiel wieder drin. Die Punkte bleiben.
+          </p>
 
           {!loading && !error && !canton && prov.length > 0 && (
             <section className="p-karte p-abschnitt" data-qa="rangliste-provisorisch">

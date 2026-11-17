@@ -5,7 +5,7 @@ import { sendResultConfirmRequest } from "@/lib/email"
 import { signAction } from "@/lib/token"
 import { MAX_RANKED_PER_OPPONENT } from "@/lib/rewards"
 import { NextRequest, NextResponse } from "next/server"
-import { MIN_SPIELE_RANG } from "@/lib/rang"
+import { MIN_SPIELE_RANG, aktivAb } from "@/lib/rang"
 
 // Ergebnis eines Open Games eintragen und bestätigen.
 // Bisher fehlte das komplett — die App versprach "Resultat erfassen, dein Rang
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
         const oppWon = winner_id === opponentId
         const oppElo = opp2.elo ?? 1000
         const after = eloPreview(oppElo, me?.elo ?? 1000, oppWon)
-        const { count } = await admin.from("profiles").select("id", { count: "exact", head: true }).gt("elo", oppElo).gte("matches_played", MIN_SPIELE_RANG)
+        const { count } = await admin.from("profiles").select("id", { count: "exact", head: true }).gt("elo", oppElo).gte("matches_played", MIN_SPIELE_RANG).gte("zuletzt_gewertet", aktivAb())
 
         const t = signAction("confirm-game", id, opponentId)
         await sendResultConfirmRequest({

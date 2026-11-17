@@ -3,6 +3,7 @@ import { autoConfirmOverdue, remindStuckOnboarding, expireOldChallenges, expireS
 import { ensureOpenGames } from "@/lib/opengames"
 import { releaseStaleReservations } from "@/lib/tournaments"
 import { applyMonthlyPenalties, warnMonthlyOpen } from "@/lib/monthly"
+import { AKTIVITAETSPFLICHT_AKTIV } from "@/lib/rewards"
 import { NextRequest, NextResponse } from "next/server"
 
 // EIN täglicher Cron für alles — der Vercel-Hobby-Plan erlaubt nur tägliche Crons
@@ -42,11 +43,11 @@ async function run(req: NextRequest) {
   catch (e) { console.error("Open Games anlegen fehlgeschlagen:", e) }
 
   let penalties = 0
-  try { penalties = await applyMonthlyPenalties(admin) }
+  try { if (AKTIVITAETSPFLICHT_AKTIV) penalties = await applyMonthlyPenalties(admin) }
   catch (e) { console.error("Monatsabrechnung fehlgeschlagen:", e) }
 
   let warned = 0
-  try { warned = await warnMonthlyOpen(admin) }
+  try { if (AKTIVITAETSPFLICHT_AKTIV) warned = await warnMonthlyOpen(admin) }
   catch (e) { console.error("Monats-Warnungen fehlgeschlagen:", e) }
 
   let freigegeben = 0
